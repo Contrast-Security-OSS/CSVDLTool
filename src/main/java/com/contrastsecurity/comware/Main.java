@@ -85,7 +85,6 @@ public class Main implements PropertyChangeListener {
 
     public static final String ROOT_DIR = "sample";
     public static final String WINDOW_TITLE = "Comware";
-    public static final String ORG_ID = "442311fd-c9d6-44a9-a00b-2b03db2d816c";
 
     private ComwareShell shell;
 
@@ -212,13 +211,19 @@ public class Main implements PropertyChangeListener {
             @Override
             public void widgetSelected(SelectionEvent event) {
                 try (CloseableHttpClient httpClient = HttpClients.createDefault();) {
+                    String contrastUrl = preferenceStore.getString(PreferenceConstants.CONTRAST_URL);
+                    String apiKey = preferenceStore.getString(PreferenceConstants.API_KEY);
+                    String serviceKey = preferenceStore.getString(PreferenceConstants.SERVICE_KEY);
+                    String userName = preferenceStore.getString(PreferenceConstants.USERNAME);
+                    String orgId = preferenceStore.getString(PreferenceConstants.ORG_ID);
+
                     RequestConfig config = RequestConfig.custom().setSocketTimeout(3000).setConnectTimeout(3000).build();
-                    HttpGet httpGet = new HttpGet("https://eval.contrastsecurity.com/Contrast/api/ng/442311fd-c9d6-44a9-a00b-2b03db2d816c/applications?expand=modules,skip_links");
-                    String auth = "turbou@i.softbank.jp" + ":" + "12MJTI6EN244ZY9C";
+                    HttpGet httpGet = new HttpGet(String.format("%s/api/ng/%s/applications?expand=modules,skip_links", contrastUrl, orgId));
+                    String auth = userName + ":" + serviceKey;
                     byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(StandardCharsets.ISO_8859_1));
                     String authHeader = new String(encodedAuth);
                     httpGet.addHeader(HttpHeaders.ACCEPT, "application/json");
-                    httpGet.addHeader("API-Key", "EFhK6pIuD6mh5RX6YQ2iMOOavh9Mc52u");
+                    httpGet.addHeader("API-Key", apiKey);
                     httpGet.addHeader(HttpHeaders.AUTHORIZATION, authHeader);
                     httpGet.setConfig(config);
                     try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet);) {
@@ -234,10 +239,10 @@ public class Main implements PropertyChangeListener {
                                 if (!app.getApp_id().equals("dcaeafe3-cee2-421d-a6de-8215abf7672d")) {
                                     continue;
                                 }
-                                String url = String.format("https://eval.contrastsecurity.com/Contrast/api/ng/%s/traces/%s/ids", ORG_ID, app.getApp_id());
+                                String url = String.format("%s/api/ng/%s/traces/%s/ids", contrastUrl, orgId, app.getApp_id());
                                 httpGet = new HttpGet(url);
                                 httpGet.addHeader(HttpHeaders.ACCEPT, "application/json");
-                                httpGet.addHeader("API-Key", "EFhK6pIuD6mh5RX6YQ2iMOOavh9Mc52u");
+                                httpGet.addHeader("API-Key", apiKey);
                                 httpGet.addHeader(HttpHeaders.AUTHORIZATION, authHeader);
                                 httpGet.setConfig(config);
                                 try (CloseableHttpResponse httpResponse2 = httpClient.execute(httpGet);) {
@@ -248,11 +253,10 @@ public class Main implements PropertyChangeListener {
                                         TracesJson tracesJson = gson.fromJson(jsonString2, tracesType);
                                         // System.out.println(tracesJson);
                                         for (String trace_id : tracesJson.getTraces()) {
-                                            url = String.format("https://eval.contrastsecurity.com/Contrast/api/ng/%s/traces/%s/trace/%s?expand=skip_links", ORG_ID,
-                                                    app.getApp_id(), trace_id);
+                                            url = String.format("%s/api/ng/%s/traces/%s/trace/%s?expand=skip_links", contrastUrl, orgId, app.getApp_id(), trace_id);
                                             httpGet = new HttpGet(url);
                                             httpGet.addHeader(HttpHeaders.ACCEPT, "application/json");
-                                            httpGet.addHeader("API-Key", "EFhK6pIuD6mh5RX6YQ2iMOOavh9Mc52u");
+                                            httpGet.addHeader("API-Key", apiKey);
                                             httpGet.addHeader(HttpHeaders.AUTHORIZATION, authHeader);
                                             httpGet.setConfig(config);
                                             try (CloseableHttpResponse httpResponse3 = httpClient.execute(httpGet);) {
@@ -264,10 +268,10 @@ public class Main implements PropertyChangeListener {
                                                     TraceJson traceJson = gson.fromJson(jsonString3, traceType);
                                                     System.out.println(traceJson.getTrace());
                                                     // Story
-                                                    url = String.format("https://eval.contrastsecurity.com/Contrast/api/ng/%s/traces/%s/story", ORG_ID, trace_id);
+                                                    url = String.format("%s/api/ng/%s/traces/%s/story", contrastUrl, orgId, trace_id);
                                                     httpGet = new HttpGet(url);
                                                     httpGet.addHeader(HttpHeaders.ACCEPT, "application/json");
-                                                    httpGet.addHeader("API-Key", "EFhK6pIuD6mh5RX6YQ2iMOOavh9Mc52u");
+                                                    httpGet.addHeader("API-Key", apiKey);
                                                     httpGet.addHeader(HttpHeaders.AUTHORIZATION, authHeader);
                                                     httpGet.setConfig(config);
                                                     try (CloseableHttpResponse httpResponse4 = httpClient.execute(httpGet);) {
@@ -285,10 +289,10 @@ public class Main implements PropertyChangeListener {
                                                         throw e;
                                                     }
                                                     // How to Fix
-                                                    url = String.format("https://eval.contrastsecurity.com/Contrast/api/ng/%s/traces/%s/recommendation", ORG_ID, trace_id);
+                                                    url = String.format("%s/api/ng/%s/traces/%s/recommendation", contrastUrl, orgId, trace_id);
                                                     httpGet = new HttpGet(url);
                                                     httpGet.addHeader(HttpHeaders.ACCEPT, "application/json");
-                                                    httpGet.addHeader("API-Key", "EFhK6pIuD6mh5RX6YQ2iMOOavh9Mc52u");
+                                                    httpGet.addHeader("API-Key", apiKey);
                                                     httpGet.addHeader(HttpHeaders.AUTHORIZATION, authHeader);
                                                     httpGet.setConfig(config);
                                                     try (CloseableHttpResponse httpResponse5 = httpClient.execute(httpGet);) {
@@ -306,11 +310,10 @@ public class Main implements PropertyChangeListener {
                                                         throw e;
                                                     }
                                                     // Comment
-                                                    url = String.format("https://eval.contrastsecurity.com/Contrast/api/ng/%s/applications/%s/traces/%s/notes", ORG_ID,
-                                                            app.getApp_id(), trace_id);
+                                                    url = String.format("%s/api/ng/%s/applications/%s/traces/%s/notes", contrastUrl, orgId, app.getApp_id(), trace_id);
                                                     httpGet = new HttpGet(url);
                                                     httpGet.addHeader(HttpHeaders.ACCEPT, "application/json");
-                                                    httpGet.addHeader("API-Key", "EFhK6pIuD6mh5RX6YQ2iMOOavh9Mc52u");
+                                                    httpGet.addHeader("API-Key", apiKey);
                                                     httpGet.addHeader(HttpHeaders.AUTHORIZATION, authHeader);
                                                     httpGet.setConfig(config);
                                                     try (CloseableHttpResponse httpResponse6 = httpClient.execute(httpGet);) {

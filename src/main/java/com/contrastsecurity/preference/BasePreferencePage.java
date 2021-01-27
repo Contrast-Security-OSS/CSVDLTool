@@ -23,6 +23,18 @@
 
 package com.contrastsecurity.preference;
 
+import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
+
+import org.apache.commons.codec.binary.Base64;
+import org.apache.http.HttpHeaders;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
@@ -36,12 +48,17 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
+import com.contrastsecurity.model.OrganizationJson;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 public class BasePreferencePage extends PreferencePage {
 
     private Text contrastUrlTxt;
     private Text apiKeyTxt;
     private Text serviceKeyTxt;
     private Text userNameTxt;
+    private Text orgNameTxt;
     private Text orgIdTxt;
 
     public BasePreferencePage() {
@@ -81,19 +98,52 @@ public class BasePreferencePage extends PreferencePage {
         mkDirBtn.setLayoutData(mkDirBtnGrDt);
         mkDirBtn.setText("組織IDを取得");
         mkDirBtn.addSelectionListener(new SelectionListener() {
-            public void widgetDefaultSelected(SelectionEvent e) {
+            public void widgetDefaultSelected(SelectionEvent event) {
             }
 
-            public void widgetSelected(SelectionEvent e) {
-                // if (mkNum > 0) {
-                // MessageDialog.openInformation(composite.getShell(),
-                // "ディレクトリ作成", "ディレクトリを作成しました。");
-                // } else {
-                // MessageDialog.openWarning(composite.getShell(), "ディレクトリ作成",
-                // "ディレクトリ作成対象が設定されていません。");
-                // }
+            public void widgetSelected(SelectionEvent event) {
+                try (CloseableHttpClient httpClient = HttpClients.createDefault();) {
+                    Gson gson = new Gson();
+                    RequestConfig config = RequestConfig.custom().setSocketTimeout(3000).setConnectTimeout(3000).build();
+                    HttpGet httpGet = new HttpGet(String.format("%s/api/ng/profile/organizations/default", contrastUrlTxt.getText()));
+                    String auth = userNameTxt.getText() + ":" + serviceKeyTxt.getText();
+                    byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(StandardCharsets.ISO_8859_1));
+                    String authHeader = new String(encodedAuth);
+                    httpGet.addHeader(HttpHeaders.ACCEPT, "application/json");
+                    httpGet.addHeader("API-Key", apiKeyTxt.getText());
+                    httpGet.addHeader(HttpHeaders.AUTHORIZATION, authHeader);
+                    httpGet.setConfig(config);
+                    try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet);) {
+                        System.out.println(httpResponse.getStatusLine().getStatusCode());
+                        if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                            String jsonString = EntityUtils.toString(httpResponse.getEntity());
+                            System.out.println(jsonString);
+                            Type organizationType = new TypeToken<OrganizationJson>() {
+                            }.getType();
+                            OrganizationJson organizationJson = gson.fromJson(jsonString, organizationType);
+                            System.out.println(organizationJson);
+                            orgNameTxt.setText(organizationJson.getOrganization().getName());
+                            orgIdTxt.setText(organizationJson.getOrganization().getOrganization_uuid());
+                        } else if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
+                            String jsonString = EntityUtils.toString(httpResponse.getEntity());
+                            System.out.println(jsonString);
+                        } else {
+                            System.out.println("200, 401以外のステータスコードが返却されました。");
+                        }
+                    } catch (Exception e) {
+                        throw e;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         });
+
+        new Label(composite, SWT.LEFT).setText("組織名：");
+        orgNameTxt = new Text(composite, SWT.BORDER);
+        orgNameTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        orgNameTxt.setText(preferenceStore.getString(PreferenceConstants.ORG_NAME));
+        orgNameTxt.setEditable(false);
 
         new Label(composite, SWT.LEFT).setText("組織ID：");
         orgIdTxt = new Text(composite, SWT.BORDER);
@@ -122,6 +172,12 @@ public class BasePreferencePage extends PreferencePage {
         }
         if (this.userNameTxt != null) {
             ps.setValue(PreferenceConstants.USERNAME, this.userNameTxt.getText());
+        }
+        if (this.orgNameTxt != null) {
+            ps.setValue(PreferenceConstants.ORG_NAME, this.orgNameTxt.getText());
+        }
+        if (this.orgIdTxt != null) {
+            ps.setValue(PreferenceConstants.ORG_ID, this.orgIdTxt.getText());
         }
         return true;
     }

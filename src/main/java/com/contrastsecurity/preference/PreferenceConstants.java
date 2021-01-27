@@ -28,6 +28,7 @@ public class PreferenceConstants {
     public static final String API_KEY = new String("com.contrastsecurity.api_key");
     public static final String SERVICE_KEY = new String("com.contrastsecurity.service_key");
     public static final String USERNAME = new String("com.contrastsecurity.username");
+    public static final String ORG_NAME = new String("com.contrastsecurity.org_name");
     public static final String ORG_ID = new String("com.contrastsecurity.org_id");
 
     public static final String PROXY_HOST = new String("com.contrastsecurity.proxy_host");

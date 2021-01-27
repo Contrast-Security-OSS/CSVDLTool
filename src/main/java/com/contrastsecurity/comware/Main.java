@@ -73,7 +73,7 @@ import com.contrastsecurity.model.TraceJson;
 import com.contrastsecurity.model.TracesJson;
 import com.contrastsecurity.preference.AboutPage;
 import com.contrastsecurity.preference.BasePreferencePage;
-import com.contrastsecurity.preference.PathPreferencePage;
+import com.contrastsecurity.preference.ProxyPreferencePage;
 import com.contrastsecurity.preference.PreferenceConstants;
 import com.contrastsecurity.preference.TtlPreferencePage;
 import com.google.gson.Gson;
@@ -360,7 +360,7 @@ public class Main implements PropertyChangeListener {
             public void widgetSelected(SelectionEvent event) {
                 PreferenceManager mgr = new PreferenceManager();
                 PreferenceNode baseNode = new PreferenceNode("base", new BasePreferencePage());
-                PreferenceNode pathNode = new PreferenceNode("path", new PathPreferencePage());
+                PreferenceNode pathNode = new PreferenceNode("path", new ProxyPreferencePage());
                 PreferenceNode ttlNode = new PreferenceNode("ttl", new TtlPreferencePage());
                 mgr.addToRoot(baseNode);
                 mgr.addTo(baseNode.getId(), pathNode);
@@ -385,7 +385,7 @@ public class Main implements PropertyChangeListener {
         Logger logger = Logger.getLogger("comware");
 
         uiUpdate();
-        shell.setSize(300, 200);
+        shell.setSize(450, 300);
         shell.open();
         try {
             while (!shell.isDisposed()) {

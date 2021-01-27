@@ -41,9 +41,8 @@ public class ProxyPreferencePage extends PreferencePage {
 
     private Text hostTxt;
     private Text portTxt;
-    private Text workDirTxt;
-    private Text logDirTxt;
-    private Text iniFileDirTxt;
+    private Text userTxt;
+    private Text passTxt;
     private List<Text> textList;
 
     public ProxyPreferencePage() {
@@ -64,13 +63,13 @@ public class ProxyPreferencePage extends PreferencePage {
         new Label(composite, SWT.LEFT).setText("ホスト：");
         hostTxt = new Text(composite, SWT.BORDER);
         hostTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        hostTxt.setText(preferenceStore.getString(PreferenceConstants.TTPMACRO_EXE));
+        hostTxt.setText(preferenceStore.getString(PreferenceConstants.PROXY_HOST));
 
         // ========== ポート ========== //
         new Label(composite, SWT.LEFT).setText("ポート：");
         portTxt = new Text(composite, SWT.BORDER);
         portTxt.setLayoutData(new GridData());
-        portTxt.setText(preferenceStore.getString(PreferenceConstants.TTPMACRO_EXE));
+        portTxt.setText(preferenceStore.getString(PreferenceConstants.PROXY_HOST));
 
         Group dirGrp = new Group(composite, SWT.NONE);
         GridLayout dirGrpLt = new GridLayout(2, false);
@@ -86,17 +85,17 @@ public class ProxyPreferencePage extends PreferencePage {
 
         // ========== ユーザー ========== //
         new Label(dirGrp, SWT.LEFT).setText("ユーザー：");
-        workDirTxt = new Text(dirGrp, SWT.BORDER);
-        workDirTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        workDirTxt.setText(preferenceStore.getString(PreferenceConstants.WORK_DIR));
-        this.textList.add(workDirTxt);
+        userTxt = new Text(dirGrp, SWT.BORDER);
+        userTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        userTxt.setText(preferenceStore.getString(PreferenceConstants.PROXY_USER));
+        this.textList.add(userTxt);
 
         // ========== パスワード ========== //
         new Label(dirGrp, SWT.LEFT).setText("パスワード：");
-        logDirTxt = new Text(dirGrp, SWT.BORDER);
-        logDirTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        logDirTxt.setText(preferenceStore.getString(PreferenceConstants.LOG_DIR));
-        this.textList.add(logDirTxt);
+        passTxt = new Text(dirGrp, SWT.BORDER);
+        passTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        passTxt.setText(preferenceStore.getString(PreferenceConstants.PROXY_PASS));
+        this.textList.add(passTxt);
 
         noDefaultAndApplyButton();
         return composite;
@@ -109,16 +108,16 @@ public class ProxyPreferencePage extends PreferencePage {
             return true;
         }
         if (this.hostTxt != null) {
-            ps.setValue(PreferenceConstants.TTPMACRO_EXE, this.hostTxt.getText());
+            ps.setValue(PreferenceConstants.PROXY_HOST, this.hostTxt.getText());
         }
-        if (this.workDirTxt != null) {
-            ps.setValue(PreferenceConstants.WORK_DIR, this.workDirTxt.getText());
+        if (this.portTxt != null) {
+            ps.setValue(PreferenceConstants.PROXY_HOST, this.portTxt.getText());
         }
-        if (this.logDirTxt != null) {
-            ps.setValue(PreferenceConstants.LOG_DIR, this.logDirTxt.getText());
+        if (this.userTxt != null) {
+            ps.setValue(PreferenceConstants.PROXY_USER, this.userTxt.getText());
         }
-        if (this.iniFileDirTxt != null) {
-            ps.setValue(PreferenceConstants.INIFILE_DIR, this.iniFileDirTxt.getText());
+        if (this.passTxt != null) {
+            ps.setValue(PreferenceConstants.PROXY_PASS, this.passTxt.getText());
         }
         return true;
     }

@@ -64,7 +64,7 @@ public class AboutPage extends PreferencePage {
         GridData copyrightLblGrDt = new GridData();
         copyrightLblGrDt.horizontalSpan = 2;
         copyrightLbl.setLayoutData(copyrightLblGrDt);
-        copyrightLbl.setText("Copyright (C) 2015-2019 Tabocom All Rights Reserved.");
+        copyrightLbl.setText("Copyright (C) 2021 XXXXX All Rights Reserved.");
 
         Composite licenseGrp = new Composite(parent, SWT.NONE);
         GridLayout licenseGrpGrLt = new GridLayout(1, false);

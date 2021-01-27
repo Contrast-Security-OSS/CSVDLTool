@@ -26,9 +26,10 @@ package com.contrastsecurity.comware;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Type;
@@ -63,9 +64,11 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.yaml.snakeyaml.Yaml;
 
 import com.contrastsecurity.model.Application;
 import com.contrastsecurity.model.ApplicationJson;
+import com.contrastsecurity.model.ContrastSecurityYaml;
 import com.contrastsecurity.model.HowToFixJson;
 import com.contrastsecurity.model.NotesJson;
 import com.contrastsecurity.model.StoryJson;
@@ -73,9 +76,8 @@ import com.contrastsecurity.model.TraceJson;
 import com.contrastsecurity.model.TracesJson;
 import com.contrastsecurity.preference.AboutPage;
 import com.contrastsecurity.preference.BasePreferencePage;
-import com.contrastsecurity.preference.ProxyPreferencePage;
 import com.contrastsecurity.preference.PreferenceConstants;
-import com.contrastsecurity.preference.TtlPreferencePage;
+import com.contrastsecurity.preference.ProxyPreferencePage;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -119,20 +121,26 @@ public class Main implements PropertyChangeListener {
             this.preferenceStore = new PreferenceStore(homeDir + "\\comware.properties");
             try {
                 this.preferenceStore.load();
-                this.preferenceStore.setValue(PreferenceConstants.CURRENT_PROP_PATH, homeDir + "\\comware.properties");
             } catch (FileNotFoundException fnfe) {
                 this.preferenceStore = new PreferenceStore("comware.properties");
                 this.preferenceStore.load();
-                File propFile = new File("comware.properties");
-                this.preferenceStore.setValue(PreferenceConstants.CURRENT_PROP_PATH, propFile.getCanonicalPath());
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        this.preferenceStore.setDefault(PreferenceConstants.WORK_DIR, "work");
-        this.preferenceStore.setDefault(PreferenceConstants.LOG_DIR, "log");
-        this.preferenceStore.setDefault(PreferenceConstants.INIFILE_DIR, "ini");
-
+        try {
+            Yaml yaml = new Yaml();
+            InputStream is = new FileInputStream("contrast_security.yaml");
+            ContrastSecurityYaml contrastSecurityYaml = yaml.loadAs(is, ContrastSecurityYaml.class);
+            is.close();
+            System.out.println(contrastSecurityYaml);
+            this.preferenceStore.setDefault(PreferenceConstants.CONTRAST_URL, contrastSecurityYaml.getUrl());
+            this.preferenceStore.setDefault(PreferenceConstants.API_KEY, contrastSecurityYaml.getApiKey());
+            this.preferenceStore.setDefault(PreferenceConstants.SERVICE_KEY, contrastSecurityYaml.getServiceKey());
+            this.preferenceStore.setDefault(PreferenceConstants.USERNAME, contrastSecurityYaml.getUserName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         this.optionInputsCache = new HashMap<String, Map<String, String>>();
     }
 
@@ -361,10 +369,8 @@ public class Main implements PropertyChangeListener {
                 PreferenceManager mgr = new PreferenceManager();
                 PreferenceNode baseNode = new PreferenceNode("base", new BasePreferencePage());
                 PreferenceNode pathNode = new PreferenceNode("path", new ProxyPreferencePage());
-                PreferenceNode ttlNode = new PreferenceNode("ttl", new TtlPreferencePage());
                 mgr.addToRoot(baseNode);
                 mgr.addTo(baseNode.getId(), pathNode);
-                mgr.addTo(baseNode.getId(), ttlNode);
                 PreferenceNode aboutNode = new PreferenceNode("about", new AboutPage());
                 mgr.addToRoot(aboutNode);
                 PreferenceDialog dialog = new PreferenceDialog(shell, mgr);

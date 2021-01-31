@@ -31,6 +31,7 @@ import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
@@ -39,6 +40,7 @@ import org.eclipse.swt.widgets.Text;
 
 public class ProxyPreferencePage extends PreferencePage {
 
+    private Button validFlg;
     private Text hostTxt;
     private Text portTxt;
     private Text userTxt;
@@ -52,24 +54,42 @@ public class ProxyPreferencePage extends PreferencePage {
     @Override
     protected Control createContents(Composite parent) {
         final Composite composite = new Composite(parent, SWT.NONE);
-        GridLayout compositeLt = new GridLayout(4, false);
+        GridLayout compositeLt = new GridLayout(1, false);
         compositeLt.marginHeight = 15;
-        compositeLt.marginWidth = 15;
+        compositeLt.marginWidth = 5;
         compositeLt.horizontalSpacing = 10;
         composite.setLayout(compositeLt);
         IPreferenceStore preferenceStore = getPreferenceStore();
 
+        validFlg = new Button(composite, SWT.CHECK);
+        // GridData validFlgGrDt = new GridData();
+        // validFlgGrDt.horizontalSpan = 4;
+        // validFlg.setLayoutData(validFlgGrDt);
+        validFlg.setText("プロキシ経由");
+        if (preferenceStore.getBoolean(PreferenceConstants.PROXY_YUKO)) {
+            validFlg.setSelection(true);
+        }
+
+        Group proxyGrp = new Group(composite, SWT.NONE);
+        GridLayout proxyGrpLt = new GridLayout(4, false);
+        proxyGrpLt.marginWidth = 15;
+        proxyGrpLt.horizontalSpacing = 10;
+        proxyGrp.setLayout(proxyGrpLt);
+        GridData proxyGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        // proxyGrpGrDt.horizontalSpan = 4;
+        proxyGrp.setLayoutData(proxyGrpGrDt);
+
         // ========== ホスト ========== //
-        new Label(composite, SWT.LEFT).setText("ホスト：");
-        hostTxt = new Text(composite, SWT.BORDER);
+        new Label(proxyGrp, SWT.LEFT).setText("ホスト：");
+        hostTxt = new Text(proxyGrp, SWT.BORDER);
         hostTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         hostTxt.setText(preferenceStore.getString(PreferenceConstants.PROXY_HOST));
 
         // ========== ポート ========== //
-        new Label(composite, SWT.LEFT).setText("ポート：");
-        portTxt = new Text(composite, SWT.BORDER);
+        new Label(proxyGrp, SWT.LEFT).setText("ポート：");
+        portTxt = new Text(proxyGrp, SWT.BORDER);
         portTxt.setLayoutData(new GridData());
-        portTxt.setText(preferenceStore.getString(PreferenceConstants.PROXY_HOST));
+        portTxt.setText(preferenceStore.getString(PreferenceConstants.PROXY_PORT));
 
         Group dirGrp = new Group(composite, SWT.NONE);
         GridLayout dirGrpLt = new GridLayout(2, false);
@@ -77,7 +97,7 @@ public class ProxyPreferencePage extends PreferencePage {
         dirGrpLt.horizontalSpacing = 10;
         dirGrp.setLayout(dirGrpLt);
         GridData dirGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
-        dirGrpGrDt.horizontalSpan = 4;
+        // dirGrpGrDt.horizontalSpan = 4;
         dirGrp.setLayoutData(dirGrpGrDt);
         dirGrp.setText("認証");
 
@@ -107,11 +127,12 @@ public class ProxyPreferencePage extends PreferencePage {
         if (ps == null) {
             return true;
         }
+        ps.setValue(PreferenceConstants.PROXY_YUKO, this.validFlg.getSelection());
         if (this.hostTxt != null) {
             ps.setValue(PreferenceConstants.PROXY_HOST, this.hostTxt.getText());
         }
         if (this.portTxt != null) {
-            ps.setValue(PreferenceConstants.PROXY_HOST, this.portTxt.getText());
+            ps.setValue(PreferenceConstants.PROXY_PORT, this.portTxt.getText());
         }
         if (this.userTxt != null) {
             ps.setValue(PreferenceConstants.PROXY_USER, this.userTxt.getText());

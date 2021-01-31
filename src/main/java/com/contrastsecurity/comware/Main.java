@@ -57,6 +57,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.events.ShellListener;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -206,6 +207,7 @@ public class Main implements PropertyChangeListener {
         bulkExecuteBtn = new Button(bulkGrp, SWT.PUSH);
         bulkExecuteBtn.setLayoutData(new GridData(GridData.FILL_BOTH));
         bulkExecuteBtn.setText("取得");
+        bulkExecuteBtn.setFont(new Font(display, "ＭＳ ゴシック", 20, SWT.NORMAL));
         bulkExecuteBtn.setToolTipText("対象サーバすべてに一括接続をします。");
         bulkExecuteBtn.addSelectionListener(new SelectionListener() {
             @Override

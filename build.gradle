@@ -3,7 +3,7 @@ apply plugin: 'eclipse'
 
 sourceCompatibility = 1.8
 
-version = '2.3.0'
+version = '0.0.1'
 
 def defaultEncoding = 'UTF-8'
     tasks.withType(AbstractCompile) each { it.options.encoding = defaultEncoding }
@@ -48,12 +48,12 @@ task copyToLib(type: Copy) {
 }
 
 jar {
-    baseName = 'TeratermStation'
+    baseName = 'Comware'
     exclude 'META-INF/*.RSA', 'META-INF/*.SF','META-INF/*.DSA' 
     manifest {
         attributes 'Implementation-Title': 'Gradle Quickstart',
                    'Implementation-Version': version
-        attributes 'Main-Class': 'jp.co.tabocom.teratermstation.Main'
+        attributes 'Main-Class': 'com.contrastsecurity.comware.Main'
     }
     from configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
 }

@@ -25,16 +25,26 @@ package com.contrastsecurity.preference;
 
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.http.Header;
 import org.apache.http.HttpHeaders;
+import org.apache.http.HttpHost;
 import org.apache.http.HttpStatus;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
@@ -96,22 +106,41 @@ public class BasePreferencePage extends PreferencePage {
         mkDirBtnGrDt.horizontalSpan = 2;
         mkDirBtnGrDt.horizontalAlignment = SWT.RIGHT;
         mkDirBtn.setLayoutData(mkDirBtnGrDt);
-        mkDirBtn.setText("組織IDを取得");
+        mkDirBtn.setText("組織情報を取得");
         mkDirBtn.addSelectionListener(new SelectionListener() {
             public void widgetDefaultSelected(SelectionEvent event) {
             }
 
             public void widgetSelected(SelectionEvent event) {
-                try (CloseableHttpClient httpClient = HttpClients.createDefault();) {
+                try {
                     Gson gson = new Gson();
-                    RequestConfig config = RequestConfig.custom().setSocketTimeout(3000).setConnectTimeout(3000).build();
                     HttpGet httpGet = new HttpGet(String.format("%s/api/ng/profile/organizations/default", contrastUrlTxt.getText()));
                     String auth = userNameTxt.getText() + ":" + serviceKeyTxt.getText();
                     byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(StandardCharsets.ISO_8859_1));
                     String authHeader = new String(encodedAuth);
-                    httpGet.addHeader(HttpHeaders.ACCEPT, "application/json");
-                    httpGet.addHeader("API-Key", apiKeyTxt.getText());
-                    httpGet.addHeader(HttpHeaders.AUTHORIZATION, authHeader);
+                    List<Header> headers = new ArrayList<Header>();
+                    headers.add(new BasicHeader(HttpHeaders.ACCEPT, "application/json"));
+                    headers.add(new BasicHeader("API-Key", apiKeyTxt.getText()));
+                    headers.add(new BasicHeader(HttpHeaders.AUTHORIZATION, authHeader));
+                    RequestConfig config = null;
+                    CloseableHttpClient httpClient = null;
+                    if (preferenceStore.getBoolean(PreferenceConstants.PROXY_YUKO)) {
+                        HttpHost proxy = new HttpHost(preferenceStore.getString(PreferenceConstants.PROXY_HOST),
+                                new Integer(preferenceStore.getString(PreferenceConstants.PROXY_PORT)));
+                        config = RequestConfig.custom().setSocketTimeout(3000).setConnectTimeout(3000).setProxy(proxy).build();
+                        String proxy_user = preferenceStore.getString(PreferenceConstants.PROXY_USER);
+                        String proxy_pass = preferenceStore.getString(PreferenceConstants.PROXY_PASS);
+                        if (proxy_user.isEmpty() || proxy_pass.isEmpty()) {
+                            httpClient = HttpClients.custom().setDefaultHeaders(headers).build();
+                        } else {
+                            CredentialsProvider credsProvider = new BasicCredentialsProvider();
+                            credsProvider.setCredentials(new AuthScope(proxy), new UsernamePasswordCredentials("oyoyo", "buhihi"));
+                            httpClient = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).setDefaultHeaders(headers).build();
+                        }
+                    } else {
+                        config = RequestConfig.custom().setSocketTimeout(3000).setConnectTimeout(3000).build();
+                        httpClient = HttpClients.custom().setDefaultHeaders(headers).build();
+                    }
                     httpGet.setConfig(config);
                     try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet);) {
                         System.out.println(httpResponse.getStatusLine().getStatusCode());
@@ -127,6 +156,7 @@ public class BasePreferencePage extends PreferencePage {
                         } else if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
                             String jsonString = EntityUtils.toString(httpResponse.getEntity());
                             System.out.println(jsonString);
+                            MessageDialog.openError(composite.getShell(), "組織情報の取得", "401: 認証エラーです。");
                         } else {
                             System.out.println("200, 401以外のステータスコードが返却されました。");
                         }

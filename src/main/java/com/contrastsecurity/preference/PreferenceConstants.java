@@ -31,6 +31,7 @@ public class PreferenceConstants {
     public static final String ORG_NAME = new String("com.contrastsecurity.org_name");
     public static final String ORG_ID = new String("com.contrastsecurity.org_id");
 
+    public static final String PROXY_YUKO = new String("com.contrastsecurity.proxy_yuko");
     public static final String PROXY_HOST = new String("com.contrastsecurity.proxy_host");
     public static final String PROXY_PORT = new String("com.contrastsecurity.proxy_port");
     public static final String PROXY_USER = new String("com.contrastsecurity.proxy_user");

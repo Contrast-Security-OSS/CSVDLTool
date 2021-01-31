@@ -29,6 +29,8 @@ import java.util.List;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -59,6 +61,7 @@ public class ProxyPreferencePage extends PreferencePage {
         compositeLt.marginWidth = 5;
         compositeLt.horizontalSpacing = 10;
         composite.setLayout(compositeLt);
+
         IPreferenceStore preferenceStore = getPreferenceStore();
 
         validFlg = new Button(composite, SWT.CHECK);
@@ -116,6 +119,20 @@ public class ProxyPreferencePage extends PreferencePage {
         passTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         passTxt.setText(preferenceStore.getString(PreferenceConstants.PROXY_PASS));
         this.textList.add(passTxt);
+
+        Button mkDirBtn = new Button(composite, SWT.NULL);
+        GridData mkDirBtnGrDt = new GridData(SWT.RIGHT, SWT.BOTTOM, true, true, 1, 1);
+        mkDirBtnGrDt.widthHint = 90;
+        mkDirBtn.setLayoutData(mkDirBtnGrDt);
+        mkDirBtn.setText("適用");
+        mkDirBtn.addSelectionListener(new SelectionListener() {
+            public void widgetDefaultSelected(SelectionEvent e) {
+            }
+
+            public void widgetSelected(SelectionEvent e) {
+                performOk();
+            }
+        });
 
         noDefaultAndApplyButton();
         return composite;

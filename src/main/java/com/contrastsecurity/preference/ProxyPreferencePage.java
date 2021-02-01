@@ -120,12 +120,12 @@ public class ProxyPreferencePage extends PreferencePage {
         passTxt.setText(preferenceStore.getString(PreferenceConstants.PROXY_PASS));
         this.textList.add(passTxt);
 
-        Button mkDirBtn = new Button(composite, SWT.NULL);
-        GridData mkDirBtnGrDt = new GridData(SWT.RIGHT, SWT.BOTTOM, true, true, 1, 1);
-        mkDirBtnGrDt.widthHint = 90;
-        mkDirBtn.setLayoutData(mkDirBtnGrDt);
-        mkDirBtn.setText("適用");
-        mkDirBtn.addSelectionListener(new SelectionListener() {
+        Button applyBtn = new Button(composite, SWT.NULL);
+        GridData applyBtnGrDt = new GridData(SWT.RIGHT, SWT.BOTTOM, true, true, 1, 1);
+        applyBtnGrDt.widthHint = 90;
+        applyBtn.setLayoutData(applyBtnGrDt);
+        applyBtn.setText("適用");
+        applyBtn.addSelectionListener(new SelectionListener() {
             public void widgetDefaultSelected(SelectionEvent e) {
             }
 

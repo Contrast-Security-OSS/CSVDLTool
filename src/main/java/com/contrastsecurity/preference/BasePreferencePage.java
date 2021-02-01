@@ -101,13 +101,13 @@ public class BasePreferencePage extends PreferencePage {
         userNameTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         userNameTxt.setText(preferenceStore.getString(PreferenceConstants.USERNAME));
 
-        Button mkDirBtn = new Button(composite, SWT.NULL);
-        GridData mkDirBtnGrDt = new GridData();
-        mkDirBtnGrDt.horizontalSpan = 2;
-        mkDirBtnGrDt.horizontalAlignment = SWT.RIGHT;
-        mkDirBtn.setLayoutData(mkDirBtnGrDt);
-        mkDirBtn.setText("組織情報を取得");
-        mkDirBtn.addSelectionListener(new SelectionListener() {
+        Button getOrgBtn = new Button(composite, SWT.NULL);
+        GridData getOrgBtnGrDt = new GridData();
+        getOrgBtnGrDt.horizontalSpan = 2;
+        getOrgBtnGrDt.horizontalAlignment = SWT.RIGHT;
+        getOrgBtn.setLayoutData(getOrgBtnGrDt);
+        getOrgBtn.setText("組織情報を取得");
+        getOrgBtn.addSelectionListener(new SelectionListener() {
             public void widgetDefaultSelected(SelectionEvent event) {
             }
 
@@ -181,6 +181,20 @@ public class BasePreferencePage extends PreferencePage {
         orgIdTxt.setText(preferenceStore.getString(PreferenceConstants.ORG_ID));
         orgIdTxt.setEditable(false);
 
+        Button applyBtn = new Button(composite, SWT.NULL);
+        GridData applyBtnGrDt = new GridData(SWT.RIGHT, SWT.BOTTOM, true, true, 1, 1);
+        applyBtnGrDt.widthHint = 90;
+        applyBtnGrDt.horizontalSpan = 2;
+        applyBtn.setLayoutData(applyBtnGrDt);
+        applyBtn.setText("適用");
+        applyBtn.addSelectionListener(new SelectionListener() {
+            public void widgetDefaultSelected(SelectionEvent e) {
+            }
+
+            public void widgetSelected(SelectionEvent e) {
+                performOk();
+            }
+        });
         noDefaultAndApplyButton();
         return composite;
     }

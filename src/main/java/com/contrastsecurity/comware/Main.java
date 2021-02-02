@@ -34,6 +34,14 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpHeaders;
@@ -61,6 +69,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Listener;
 import org.yaml.snakeyaml.Yaml;
 
@@ -70,6 +79,7 @@ import com.contrastsecurity.model.ContrastSecurityYaml;
 import com.contrastsecurity.model.HowToFixJson;
 import com.contrastsecurity.model.NotesJson;
 import com.contrastsecurity.model.StoryJson;
+import com.contrastsecurity.model.Trace;
 import com.contrastsecurity.model.TraceJson;
 import com.contrastsecurity.model.TracesJson;
 import com.contrastsecurity.preference.AboutPage;
@@ -85,9 +95,15 @@ public class Main implements PropertyChangeListener {
 
     private ComwareShell shell;
 
-    // 一括起動ボタン
+    private Button appLoadBtn;
+    private org.eclipse.swt.widgets.List srcList;
+    private org.eclipse.swt.widgets.List dstList;
     private Button executeBtn;
     private Button settingBtn;
+
+    private Map<String, String> fullAppMap = new TreeMap<String, String>();
+    private List<String> srcApps = new ArrayList<String>();
+    private List<String> dstApps = new ArrayList<String>();
 
     private PreferenceStore preferenceStore;
 
@@ -173,18 +189,163 @@ public class Main implements PropertyChangeListener {
         baseLayout.marginWidth = 10;
         shell.setLayout(baseLayout);
 
+        Group appListGrp = new Group(shell, SWT.NONE);
+        appListGrp.setLayout(new GridLayout(3, false));
+        appListGrp.setLayoutData(new GridData(GridData.FILL_BOTH));
+        // appListGrp.setBackground(display.getSystemColor(SWT.COLOR_RED));
+
+        appLoadBtn = new Button(appListGrp, SWT.PUSH);
+        GridData appLoadBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        appLoadBtnGrDt.horizontalSpan = 3;
+        appLoadBtn.setLayoutData(appLoadBtnGrDt);
+        appLoadBtn.setText("アプリ読み込み");
+        appLoadBtn.addSelectionListener(new SelectionListener() {
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                try (CloseableHttpClient httpClient = HttpClients.createDefault();) {
+                    String contrastUrl = preferenceStore.getString(PreferenceConstants.CONTRAST_URL);
+                    String apiKey = preferenceStore.getString(PreferenceConstants.API_KEY);
+                    String serviceKey = preferenceStore.getString(PreferenceConstants.SERVICE_KEY);
+                    String userName = preferenceStore.getString(PreferenceConstants.USERNAME);
+                    String orgId = preferenceStore.getString(PreferenceConstants.ORG_ID);
+
+                    RequestConfig config = RequestConfig.custom().setSocketTimeout(3000).setConnectTimeout(3000).build();
+                    HttpGet httpGet = new HttpGet(String.format("%s/api/ng/%s/applications?expand=modules,skip_links", contrastUrl, orgId));
+                    String auth = userName + ":" + serviceKey;
+                    byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(StandardCharsets.ISO_8859_1));
+                    String authHeader = new String(encodedAuth);
+                    httpGet.addHeader(HttpHeaders.ACCEPT, "application/json");
+                    httpGet.addHeader("API-Key", apiKey);
+                    httpGet.addHeader(HttpHeaders.AUTHORIZATION, authHeader);
+                    httpGet.setConfig(config);
+                    try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet);) {
+                        if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                            String jsonString = EntityUtils.toString(httpResponse.getEntity());
+                            // System.out.println(jsonString);
+                            Gson gson = new Gson();
+                            Type contType = new TypeToken<ApplicationJson>() {
+                            }.getType();
+                            ApplicationJson applicationJson = gson.fromJson(jsonString, contType);
+                            // System.out.println(applicationJson);
+                            srcList.removeAll();
+                            fullAppMap.clear();
+                            for (Application app : applicationJson.getApplications()) {
+                                srcList.add(app.getName());
+                                srcApps.add(app.getName());
+                                fullAppMap.put(app.getName(), app.getApp_id());
+                            }
+                        }
+                    } catch (Exception e) {
+                        throw e;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void widgetDefaultSelected(SelectionEvent event) {
+            }
+        });
+
+        this.srcList = new org.eclipse.swt.widgets.List(appListGrp, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
+        srcList.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+        Composite btnGrp = new Composite(appListGrp, SWT.NONE);
+        btnGrp.setLayout(new GridLayout(1, false));
+        GridData btnGrpGrDt = new GridData(GridData.FILL_VERTICAL);
+        btnGrpGrDt.verticalAlignment = SWT.CENTER;
+        btnGrp.setLayoutData(btnGrpGrDt);
+
+        Button allRightBtn = new Button(btnGrp, SWT.PUSH);
+        allRightBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        allRightBtn.setText(">>");
+        allRightBtn.addSelectionListener(new SelectionListener() {
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                for (String appName : srcApps) {
+                    dstList.add(appName);
+                    dstApps.add(appName);
+                }
+                srcList.removeAll();
+                srcApps.clear();
+            }
+
+            @Override
+            public void widgetDefaultSelected(SelectionEvent event) {
+            }
+        });
+
+        Button rightBtn = new Button(btnGrp, SWT.PUSH);
+        rightBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        rightBtn.setText(">");
+        rightBtn.addSelectionListener(new SelectionListener() {
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                for (int idx : srcList.getSelectionIndices()) {
+                    dstList.add(srcApps.get(idx));
+                    dstApps.add(srcApps.get(idx));
+                    srcList.remove(idx);
+                    srcApps.remove(idx);
+                }
+            }
+
+            @Override
+            public void widgetDefaultSelected(SelectionEvent event) {
+            }
+        });
+
+        Button leftBtn = new Button(btnGrp, SWT.PUSH);
+        leftBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        leftBtn.setText("<");
+        leftBtn.addSelectionListener(new SelectionListener() {
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                for (int idx : dstList.getSelectionIndices()) {
+                    srcList.add(dstApps.get(idx));
+                    srcApps.add(dstApps.get(idx));
+                    dstList.remove(idx);
+                    dstApps.remove(idx);
+                }
+            }
+
+            @Override
+            public void widgetDefaultSelected(SelectionEvent event) {
+            }
+        });
+
+        Button allLeftBtn = new Button(btnGrp, SWT.PUSH);
+        allLeftBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        allLeftBtn.setText("<<");
+        allLeftBtn.addSelectionListener(new SelectionListener() {
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                for (String appName : dstApps) {
+                    srcList.add(appName);
+                    srcApps.add(appName);
+                }
+                dstList.removeAll();
+                dstApps.clear();
+            }
+
+            @Override
+            public void widgetDefaultSelected(SelectionEvent event) {
+            }
+        });
+        dstList = new org.eclipse.swt.widgets.List(appListGrp, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
+        dstList.setLayoutData(new GridData(GridData.FILL_BOTH));
+
         // ========== 一括グループ ==========
         Composite bulkGrp = new Composite(shell, SWT.NULL);
         bulkGrp.setLayout(new GridLayout(1, false));
-        GridData bulkGrpGrDt = new GridData(GridData.FILL_BOTH);
-        bulkGrpGrDt.horizontalSpan = 3;
+        GridData bulkGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        // bulkGrpGrDt.horizontalSpan = 3;
         // bulkGrpGrDt.widthHint = 100;
         bulkGrp.setLayoutData(bulkGrpGrDt);
-        // bulkGrp.setBackground(display.getSystemColor(SWT.COLOR_RED));
 
         // ========== 一括起動ボタン ==========
         executeBtn = new Button(bulkGrp, SWT.PUSH);
-        executeBtn.setLayoutData(new GridData(GridData.FILL_BOTH));
+        executeBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         executeBtn.setText("取得");
         executeBtn.setFont(new Font(display, "ＭＳ ゴシック", 20, SWT.NORMAL));
         executeBtn.addSelectionListener(new SelectionListener() {
@@ -192,6 +353,7 @@ public class Main implements PropertyChangeListener {
             public void widgetSelected(SelectionEvent event) {
                 executeBtn.setEnabled(false);
                 settingBtn.setEnabled(false);
+                List<String[]> csvList = new ArrayList<String[]>();
                 try (CloseableHttpClient httpClient = HttpClients.createDefault();) {
                     String contrastUrl = preferenceStore.getString(PreferenceConstants.CONTRAST_URL);
                     String apiKey = preferenceStore.getString(PreferenceConstants.API_KEY);
@@ -221,6 +383,7 @@ public class Main implements PropertyChangeListener {
                                 if (!app.getApp_id().equals("dcaeafe3-cee2-421d-a6de-8215abf7672d")) {
                                     continue;
                                 }
+
                                 String url = String.format("%s/api/ng/%s/traces/%s/ids", contrastUrl, orgId, app.getApp_id());
                                 httpGet = new HttpGet(url);
                                 httpGet.addHeader(HttpHeaders.ACCEPT, "application/json");
@@ -235,6 +398,7 @@ public class Main implements PropertyChangeListener {
                                         TracesJson tracesJson = gson.fromJson(jsonString2, tracesType);
                                         // System.out.println(tracesJson);
                                         for (String trace_id : tracesJson.getTraces()) {
+                                            List<String> csvLineList = new ArrayList<String>();
                                             url = String.format("%s/api/ng/%s/traces/%s/trace/%s?expand=skip_links", contrastUrl, orgId, app.getApp_id(), trace_id);
                                             httpGet = new HttpGet(url);
                                             httpGet.addHeader(HttpHeaders.ACCEPT, "application/json");
@@ -248,7 +412,32 @@ public class Main implements PropertyChangeListener {
                                                     Type traceType = new TypeToken<TraceJson>() {
                                                     }.getType();
                                                     TraceJson traceJson = gson.fromJson(jsonString3, traceType);
-                                                    System.out.println(traceJson.getTrace());
+                                                    // System.out.println(traceJson.getTrace());
+                                                    Trace trace = traceJson.getTrace();
+                                                    // ==================== 01. アプリケーション名 ====================
+                                                    csvLineList.add(app.getName());
+                                                    // ==================== 03. （脆弱性の）カテゴリ ====================
+                                                    csvLineList.add(trace.getCategory_label());
+                                                    // ==================== 04. （脆弱性の）ルール ====================
+                                                    csvLineList.add(trace.getRule_title());
+                                                    // ==================== 05. 深刻度 ====================
+                                                    csvLineList.add(trace.getSeverity_label());
+                                                    // ==================== 06. ステータス ====================
+                                                    csvLineList.add(trace.getStatus());
+                                                    // ==================== 07. 言語（Javaなど） ====================
+                                                    csvLineList.add(trace.getLanguage());
+                                                    // ==================== 08. グループ（アプリケーションのグループ） ====================
+                                                    csvLineList.add("");
+                                                    // ==================== 09. 脆弱性のタイトル（例：SQLインジェクション：「/api/v1/approvers/」ページのリクエストボディ ） ====================
+                                                    csvLineList.add("");
+                                                    // ==================== 10. 最初の検出 ====================
+                                                    // ==================== 11. 最後の検出 ====================
+                                                    // ==================== 12. ビルド番号 ====================
+                                                    // ==================== 13. 次のサーバにより報告 ====================
+                                                    // ==================== 14. ルート ====================
+                                                    // ==================== 15. モジュール ====================
+                                                    // ==================== 16. HTTP情報 ====================
+                                                    // ==================== 17. コメント ====================
                                                     // Story
                                                     url = String.format("%s/api/ng/%s/traces/%s/story", contrastUrl, orgId, trace_id);
                                                     httpGet = new HttpGet(url);
@@ -318,7 +507,8 @@ public class Main implements PropertyChangeListener {
                                             } catch (Exception e) {
                                                 throw e;
                                             }
-
+                                            String[] strArray = new String[csvLineList.size()];
+                                            csvList.add(csvLineList.toArray(strArray));
                                         }
                                     } else {
                                         System.out.println("200以外のステータスコードが返却されました。");
@@ -334,6 +524,12 @@ public class Main implements PropertyChangeListener {
                         throw e;
                     }
                 } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                List<String> list = csvList.stream().map(line -> String.join(",", line)).collect(Collectors.toList());
+                try {
+                    Files.write(Paths.get("", "out.csv"), list, StandardOpenOption.CREATE);
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
                 executeBtn.setEnabled(true);
@@ -378,7 +574,7 @@ public class Main implements PropertyChangeListener {
         Logger logger = Logger.getLogger("comware");
 
         uiUpdate();
-        shell.setSize(450, 300);
+        shell.setSize(480, 360);
         shell.open();
         try {
             while (!shell.isDisposed()) {

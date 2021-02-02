@@ -360,168 +360,146 @@ public class Main implements PropertyChangeListener {
                     String serviceKey = preferenceStore.getString(PreferenceConstants.SERVICE_KEY);
                     String userName = preferenceStore.getString(PreferenceConstants.USERNAME);
                     String orgId = preferenceStore.getString(PreferenceConstants.ORG_ID);
-
                     RequestConfig config = RequestConfig.custom().setSocketTimeout(3000).setConnectTimeout(3000).build();
-                    HttpGet httpGet = new HttpGet(String.format("%s/api/ng/%s/applications?expand=modules,skip_links", contrastUrl, orgId));
                     String auth = userName + ":" + serviceKey;
                     byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(StandardCharsets.ISO_8859_1));
                     String authHeader = new String(encodedAuth);
-                    httpGet.addHeader(HttpHeaders.ACCEPT, "application/json");
-                    httpGet.addHeader("API-Key", apiKey);
-                    httpGet.addHeader(HttpHeaders.AUTHORIZATION, authHeader);
-                    httpGet.setConfig(config);
-                    try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet);) {
-                        if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                            String jsonString = EntityUtils.toString(httpResponse.getEntity());
-                            // System.out.println(jsonString);
-                            Gson gson = new Gson();
-                            Type contType = new TypeToken<ApplicationJson>() {
-                            }.getType();
-                            ApplicationJson applicationJson = gson.fromJson(jsonString, contType);
-                            // System.out.println(applicationJson);
-                            for (Application app : applicationJson.getApplications()) {
-                                if (!app.getApp_id().equals("dcaeafe3-cee2-421d-a6de-8215abf7672d")) {
-                                    continue;
-                                }
+                    Gson gson = new Gson();
+                    for (String appName : dstApps) {
+                        String appId = fullAppMap.get(appName);
 
-                                String url = String.format("%s/api/ng/%s/traces/%s/ids", contrastUrl, orgId, app.getApp_id());
-                                httpGet = new HttpGet(url);
-                                httpGet.addHeader(HttpHeaders.ACCEPT, "application/json");
-                                httpGet.addHeader("API-Key", apiKey);
-                                httpGet.addHeader(HttpHeaders.AUTHORIZATION, authHeader);
-                                httpGet.setConfig(config);
-                                try (CloseableHttpResponse httpResponse2 = httpClient.execute(httpGet);) {
-                                    if (httpResponse2.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                                        String jsonString2 = EntityUtils.toString(httpResponse2.getEntity());
-                                        Type tracesType = new TypeToken<TracesJson>() {
-                                        }.getType();
-                                        TracesJson tracesJson = gson.fromJson(jsonString2, tracesType);
-                                        // System.out.println(tracesJson);
-                                        for (String trace_id : tracesJson.getTraces()) {
-                                            List<String> csvLineList = new ArrayList<String>();
-                                            url = String.format("%s/api/ng/%s/traces/%s/trace/%s?expand=skip_links", contrastUrl, orgId, app.getApp_id(), trace_id);
+                        String url = String.format("%s/api/ng/%s/traces/%s/ids", contrastUrl, orgId, appId);
+                        HttpGet httpGet = new HttpGet(url);
+                        httpGet.addHeader(HttpHeaders.ACCEPT, "application/json");
+                        httpGet.addHeader("API-Key", apiKey);
+                        httpGet.addHeader(HttpHeaders.AUTHORIZATION, authHeader);
+                        httpGet.setConfig(config);
+                        try (CloseableHttpResponse httpResponse2 = httpClient.execute(httpGet);) {
+                            if (httpResponse2.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                                String jsonString2 = EntityUtils.toString(httpResponse2.getEntity());
+                                Type tracesType = new TypeToken<TracesJson>() {
+                                }.getType();
+                                TracesJson tracesJson = gson.fromJson(jsonString2, tracesType);
+                                // System.out.println(tracesJson);
+                                for (String trace_id : tracesJson.getTraces()) {
+                                    List<String> csvLineList = new ArrayList<String>();
+                                    url = String.format("%s/api/ng/%s/traces/%s/trace/%s?expand=skip_links", contrastUrl, orgId, appId, trace_id);
+                                    httpGet = new HttpGet(url);
+                                    httpGet.addHeader(HttpHeaders.ACCEPT, "application/json");
+                                    httpGet.addHeader("API-Key", apiKey);
+                                    httpGet.addHeader(HttpHeaders.AUTHORIZATION, authHeader);
+                                    httpGet.setConfig(config);
+                                    try (CloseableHttpResponse httpResponse3 = httpClient.execute(httpGet);) {
+                                        if (httpResponse3.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                                            String jsonString3 = EntityUtils.toString(httpResponse3.getEntity());
+                                            // System.out.println(jsonString3);
+                                            Type traceType = new TypeToken<TraceJson>() {
+                                            }.getType();
+                                            TraceJson traceJson = gson.fromJson(jsonString3, traceType);
+                                            // System.out.println(traceJson.getTrace());
+                                            Trace trace = traceJson.getTrace();
+                                            // ==================== 01. アプリケーション名 ====================
+                                            csvLineList.add(appName);
+                                            // ==================== 03. （脆弱性の）カテゴリ ====================
+                                            csvLineList.add(trace.getCategory_label());
+                                            // ==================== 04. （脆弱性の）ルール ====================
+                                            csvLineList.add(trace.getRule_title());
+                                            // ==================== 05. 深刻度 ====================
+                                            csvLineList.add(trace.getSeverity_label());
+                                            // ==================== 06. ステータス ====================
+                                            csvLineList.add(trace.getStatus());
+                                            // ==================== 07. 言語（Javaなど） ====================
+                                            csvLineList.add(trace.getLanguage());
+                                            // ==================== 08. グループ（アプリケーションのグループ） ====================
+                                            csvLineList.add("");
+                                            // ==================== 09. 脆弱性のタイトル（例：SQLインジェクション：「/api/v1/approvers/」ページのリクエストボディ ） ====================
+                                            csvLineList.add("");
+                                            // ==================== 10. 最初の検出 ====================
+                                            // ==================== 11. 最後の検出 ====================
+                                            // ==================== 12. ビルド番号 ====================
+                                            // ==================== 13. 次のサーバにより報告 ====================
+                                            // ==================== 14. ルート ====================
+                                            // ==================== 15. モジュール ====================
+                                            // ==================== 16. HTTP情報 ====================
+                                            // ==================== 17. コメント ====================
+                                            // Story
+                                            url = String.format("%s/api/ng/%s/traces/%s/story", contrastUrl, orgId, trace_id);
                                             httpGet = new HttpGet(url);
                                             httpGet.addHeader(HttpHeaders.ACCEPT, "application/json");
                                             httpGet.addHeader("API-Key", apiKey);
                                             httpGet.addHeader(HttpHeaders.AUTHORIZATION, authHeader);
                                             httpGet.setConfig(config);
-                                            try (CloseableHttpResponse httpResponse3 = httpClient.execute(httpGet);) {
-                                                if (httpResponse3.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                                                    String jsonString3 = EntityUtils.toString(httpResponse3.getEntity());
-                                                    // System.out.println(jsonString3);
-                                                    Type traceType = new TypeToken<TraceJson>() {
+                                            try (CloseableHttpResponse httpResponse4 = httpClient.execute(httpGet);) {
+                                                if (httpResponse4.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                                                    String jsonString4 = EntityUtils.toString(httpResponse4.getEntity());
+                                                    System.out.println(jsonString4);
+                                                    Type storyType = new TypeToken<StoryJson>() {
                                                     }.getType();
-                                                    TraceJson traceJson = gson.fromJson(jsonString3, traceType);
-                                                    // System.out.println(traceJson.getTrace());
-                                                    Trace trace = traceJson.getTrace();
-                                                    // ==================== 01. アプリケーション名 ====================
-                                                    csvLineList.add(app.getName());
-                                                    // ==================== 03. （脆弱性の）カテゴリ ====================
-                                                    csvLineList.add(trace.getCategory_label());
-                                                    // ==================== 04. （脆弱性の）ルール ====================
-                                                    csvLineList.add(trace.getRule_title());
-                                                    // ==================== 05. 深刻度 ====================
-                                                    csvLineList.add(trace.getSeverity_label());
-                                                    // ==================== 06. ステータス ====================
-                                                    csvLineList.add(trace.getStatus());
-                                                    // ==================== 07. 言語（Javaなど） ====================
-                                                    csvLineList.add(trace.getLanguage());
-                                                    // ==================== 08. グループ（アプリケーションのグループ） ====================
-                                                    csvLineList.add("");
-                                                    // ==================== 09. 脆弱性のタイトル（例：SQLインジェクション：「/api/v1/approvers/」ページのリクエストボディ ） ====================
-                                                    csvLineList.add("");
-                                                    // ==================== 10. 最初の検出 ====================
-                                                    // ==================== 11. 最後の検出 ====================
-                                                    // ==================== 12. ビルド番号 ====================
-                                                    // ==================== 13. 次のサーバにより報告 ====================
-                                                    // ==================== 14. ルート ====================
-                                                    // ==================== 15. モジュール ====================
-                                                    // ==================== 16. HTTP情報 ====================
-                                                    // ==================== 17. コメント ====================
-                                                    // Story
-                                                    url = String.format("%s/api/ng/%s/traces/%s/story", contrastUrl, orgId, trace_id);
-                                                    httpGet = new HttpGet(url);
-                                                    httpGet.addHeader(HttpHeaders.ACCEPT, "application/json");
-                                                    httpGet.addHeader("API-Key", apiKey);
-                                                    httpGet.addHeader(HttpHeaders.AUTHORIZATION, authHeader);
-                                                    httpGet.setConfig(config);
-                                                    try (CloseableHttpResponse httpResponse4 = httpClient.execute(httpGet);) {
-                                                        if (httpResponse4.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                                                            String jsonString4 = EntityUtils.toString(httpResponse4.getEntity());
-                                                            System.out.println(jsonString4);
-                                                            Type storyType = new TypeToken<StoryJson>() {
-                                                            }.getType();
-                                                            StoryJson storyJson = gson.fromJson(jsonString4, storyType);
-                                                            System.out.println(storyJson);
-                                                        } else {
-                                                            System.out.println("200以外のステータスコードが返却されました。");
-                                                        }
-                                                    } catch (Exception e) {
-                                                        throw e;
-                                                    }
-                                                    // How to Fix
-                                                    url = String.format("%s/api/ng/%s/traces/%s/recommendation", contrastUrl, orgId, trace_id);
-                                                    httpGet = new HttpGet(url);
-                                                    httpGet.addHeader(HttpHeaders.ACCEPT, "application/json");
-                                                    httpGet.addHeader("API-Key", apiKey);
-                                                    httpGet.addHeader(HttpHeaders.AUTHORIZATION, authHeader);
-                                                    httpGet.setConfig(config);
-                                                    try (CloseableHttpResponse httpResponse5 = httpClient.execute(httpGet);) {
-                                                        if (httpResponse5.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                                                            String jsonString5 = EntityUtils.toString(httpResponse5.getEntity());
-                                                            // System.out.println(jsonString5);
-                                                            Type howToFixType = new TypeToken<HowToFixJson>() {
-                                                            }.getType();
-                                                            HowToFixJson howToFixJson = gson.fromJson(jsonString5, howToFixType);
-                                                            // System.out.println(howToFixJson);
-                                                        } else {
-                                                            System.out.println("200以外のステータスコードが返却されました。");
-                                                        }
-                                                    } catch (Exception e) {
-                                                        throw e;
-                                                    }
-                                                    // Comment
-                                                    url = String.format("%s/api/ng/%s/applications/%s/traces/%s/notes", contrastUrl, orgId, app.getApp_id(), trace_id);
-                                                    httpGet = new HttpGet(url);
-                                                    httpGet.addHeader(HttpHeaders.ACCEPT, "application/json");
-                                                    httpGet.addHeader("API-Key", apiKey);
-                                                    httpGet.addHeader(HttpHeaders.AUTHORIZATION, authHeader);
-                                                    httpGet.setConfig(config);
-                                                    try (CloseableHttpResponse httpResponse6 = httpClient.execute(httpGet);) {
-                                                        if (httpResponse6.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                                                            String jsonString6 = EntityUtils.toString(httpResponse6.getEntity());
-                                                            // System.out.println(jsonString6);
-                                                            Type notesType = new TypeToken<NotesJson>() {
-                                                            }.getType();
-                                                            NotesJson notesJson = gson.fromJson(jsonString6, notesType);
-                                                            System.out.println(notesJson);
-                                                        } else {
-                                                            System.out.println("200以外のステータスコードが返却されました。");
-                                                        }
-                                                    } catch (Exception e) {
-                                                        throw e;
-                                                    }
+                                                    StoryJson storyJson = gson.fromJson(jsonString4, storyType);
+                                                    System.out.println(storyJson);
                                                 } else {
                                                     System.out.println("200以外のステータスコードが返却されました。");
                                                 }
                                             } catch (Exception e) {
                                                 throw e;
                                             }
-                                            String[] strArray = new String[csvLineList.size()];
-                                            csvList.add(csvLineList.toArray(strArray));
+                                            // How to Fix
+                                            url = String.format("%s/api/ng/%s/traces/%s/recommendation", contrastUrl, orgId, trace_id);
+                                            httpGet = new HttpGet(url);
+                                            httpGet.addHeader(HttpHeaders.ACCEPT, "application/json");
+                                            httpGet.addHeader("API-Key", apiKey);
+                                            httpGet.addHeader(HttpHeaders.AUTHORIZATION, authHeader);
+                                            httpGet.setConfig(config);
+                                            try (CloseableHttpResponse httpResponse5 = httpClient.execute(httpGet);) {
+                                                if (httpResponse5.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                                                    String jsonString5 = EntityUtils.toString(httpResponse5.getEntity());
+                                                    // System.out.println(jsonString5);
+                                                    Type howToFixType = new TypeToken<HowToFixJson>() {
+                                                    }.getType();
+                                                    HowToFixJson howToFixJson = gson.fromJson(jsonString5, howToFixType);
+                                                    // System.out.println(howToFixJson);
+                                                } else {
+                                                    System.out.println("200以外のステータスコードが返却されました。");
+                                                }
+                                            } catch (Exception e) {
+                                                throw e;
+                                            }
+                                            // Comment
+                                            url = String.format("%s/api/ng/%s/applications/%s/traces/%s/notes", contrastUrl, orgId, appId, trace_id);
+                                            httpGet = new HttpGet(url);
+                                            httpGet.addHeader(HttpHeaders.ACCEPT, "application/json");
+                                            httpGet.addHeader("API-Key", apiKey);
+                                            httpGet.addHeader(HttpHeaders.AUTHORIZATION, authHeader);
+                                            httpGet.setConfig(config);
+                                            try (CloseableHttpResponse httpResponse6 = httpClient.execute(httpGet);) {
+                                                if (httpResponse6.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                                                    String jsonString6 = EntityUtils.toString(httpResponse6.getEntity());
+                                                    // System.out.println(jsonString6);
+                                                    Type notesType = new TypeToken<NotesJson>() {
+                                                    }.getType();
+                                                    NotesJson notesJson = gson.fromJson(jsonString6, notesType);
+                                                    System.out.println(notesJson);
+                                                } else {
+                                                    System.out.println("200以外のステータスコードが返却されました。");
+                                                }
+                                            } catch (Exception e) {
+                                                throw e;
+                                            }
+                                        } else {
+                                            System.out.println("200以外のステータスコードが返却されました。");
                                         }
-                                    } else {
-                                        System.out.println("200以外のステータスコードが返却されました。");
+                                    } catch (Exception e) {
+                                        throw e;
                                     }
-                                } catch (Exception e) {
-                                    throw e;
+                                    String[] strArray = new String[csvLineList.size()];
+                                    csvList.add(csvLineList.toArray(strArray));
                                 }
+                            } else {
+                                System.out.println("200以外のステータスコードが返却されました。");
                             }
-                        } else {
-                            System.out.println("200以外のステータスコードが返却されました。");
+                        } catch (Exception e) {
+                            throw e;
                         }
-                    } catch (Exception e) {
-                        throw e;
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

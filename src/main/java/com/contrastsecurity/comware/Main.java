@@ -34,8 +34,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpHeaders;
@@ -47,7 +45,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.jface.preference.PreferenceManager;
 import org.eclipse.jface.preference.PreferenceNode;
@@ -84,25 +81,15 @@ import com.google.gson.reflect.TypeToken;
 
 public class Main implements PropertyChangeListener {
 
-    public static final String ROOT_DIR = "sample";
     public static final String WINDOW_TITLE = "Comware";
 
     private ComwareShell shell;
 
-    // TTL生成のみチェックボックス
-    private Button onlyTtlGenChkBox;
     // 一括起動ボタン
-    private Button bulkExecuteBtn;
+    private Button executeBtn;
+    private Button settingBtn;
 
     private PreferenceStore preferenceStore;
-
-    // Diff取得識別子に指定できる文字定義
-    public static String ACCEPTABLE_CHAR = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
-
-    private Map<String, Map<String, String>> optionInputsCache;
-
-    private String loadDirErrorMsg;
-    private String openingMsg;
 
     private PropertyChangeSupport support = new PropertyChangeSupport(this);
 
@@ -141,7 +128,6 @@ public class Main implements PropertyChangeListener {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        this.optionInputsCache = new HashMap<String, Map<String, String>>();
     }
 
     private void createPart() {
@@ -187,13 +173,6 @@ public class Main implements PropertyChangeListener {
         baseLayout.marginWidth = 10;
         shell.setLayout(baseLayout);
 
-        if (loadDirErrorMsg != null && !loadDirErrorMsg.isEmpty()) {
-            MessageDialog.openError(shell, "サーバ定義ロード", loadDirErrorMsg);
-        }
-        if (openingMsg != null && !openingMsg.isEmpty()) {
-            MessageDialog.openInformation(shell, "ご利用ありがとうございます。", openingMsg);
-        }
-
         // ========== 一括グループ ==========
         Composite bulkGrp = new Composite(shell, SWT.NULL);
         bulkGrp.setLayout(new GridLayout(1, false));
@@ -204,14 +183,16 @@ public class Main implements PropertyChangeListener {
         // bulkGrp.setBackground(display.getSystemColor(SWT.COLOR_RED));
 
         // ========== 一括起動ボタン ==========
-        bulkExecuteBtn = new Button(bulkGrp, SWT.PUSH);
-        bulkExecuteBtn.setLayoutData(new GridData(GridData.FILL_BOTH));
-        bulkExecuteBtn.setText("取得");
-        bulkExecuteBtn.setFont(new Font(display, "ＭＳ ゴシック", 20, SWT.NORMAL));
-        bulkExecuteBtn.setToolTipText("対象サーバすべてに一括接続をします。");
-        bulkExecuteBtn.addSelectionListener(new SelectionListener() {
+        executeBtn = new Button(bulkGrp, SWT.PUSH);
+        executeBtn.setLayoutData(new GridData(GridData.FILL_BOTH));
+        executeBtn.setText("取得");
+        executeBtn.setFont(new Font(display, "ＭＳ ゴシック", 20, SWT.NORMAL));
+        executeBtn.setToolTipText("対象サーバすべてに一括接続をします。");
+        executeBtn.addSelectionListener(new SelectionListener() {
             @Override
             public void widgetSelected(SelectionEvent event) {
+                executeBtn.setEnabled(false);
+                settingBtn.setEnabled(false);
                 try (CloseableHttpClient httpClient = HttpClients.createDefault();) {
                     String contrastUrl = preferenceStore.getString(PreferenceConstants.CONTRAST_URL);
                     String apiKey = preferenceStore.getString(PreferenceConstants.API_KEY);
@@ -356,6 +337,8 @@ public class Main implements PropertyChangeListener {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+                executeBtn.setEnabled(true);
+                settingBtn.setEnabled(true);
             }
 
             @Override
@@ -364,11 +347,11 @@ public class Main implements PropertyChangeListener {
         });
 
         // ========== 設定ボタン ==========
-        Button settingsBtn = new Button(bulkGrp, SWT.PUSH);
-        settingsBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        settingsBtn.setText("設定");
-        settingsBtn.setToolTipText("動作に必要な設定を行います。");
-        settingsBtn.addSelectionListener(new SelectionListener() {
+        settingBtn = new Button(bulkGrp, SWT.PUSH);
+        settingBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        settingBtn.setText("設定");
+        settingBtn.setToolTipText("動作に必要な設定を行います。");
+        settingBtn.addSelectionListener(new SelectionListener() {
             @Override
             public void widgetSelected(SelectionEvent event) {
                 PreferenceManager mgr = new PreferenceManager();
@@ -421,28 +404,13 @@ public class Main implements PropertyChangeListener {
         return preferenceStore;
     }
 
-    public boolean isTtlOnly() {
-        return this.onlyTtlGenChkBox.getSelection();
-    }
-
     @Override
     public void propertyChange(PropertyChangeEvent event) {
         if ("authInput".equals(event.getPropertyName())) {
             Boolean enableFlg = (Boolean) event.getNewValue();
-            this.bulkExecuteBtn.setEnabled(enableFlg.booleanValue());
+            this.executeBtn.setEnabled(enableFlg.booleanValue());
         } else if ("optionInputs".equals(event.getPropertyName())) {
             String oldValue = (String) event.getOldValue();
-            String value = (String) event.getNewValue();
-            String group = oldValue.split("/")[0];
-            String name = oldValue.split("/")[1];
-            if (this.optionInputsCache.containsKey(group)) {
-                Map<String, String> inputs = this.optionInputsCache.get(group);
-                inputs.put(name, value);
-            } else {
-                Map<String, String> inputs = new HashMap<String, String>();
-                inputs.put(name, value);
-                this.optionInputsCache.put(group, inputs);
-            }
         }
     }
 

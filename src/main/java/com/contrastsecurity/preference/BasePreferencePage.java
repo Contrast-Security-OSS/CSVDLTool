@@ -55,7 +55,9 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 
 import com.contrastsecurity.model.OrganizationJson;
@@ -85,21 +87,40 @@ public class BasePreferencePage extends PreferencePage {
         contrastUrlTxt = new Text(composite, SWT.BORDER);
         contrastUrlTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         contrastUrlTxt.setText(preferenceStore.getString(PreferenceConstants.CONTRAST_URL));
+        contrastUrlTxt.addListener(SWT.FocusIn, new Listener() {
+            public void handleEvent(Event e) {
+                contrastUrlTxt.selectAll();
+            }
+        });
 
         new Label(composite, SWT.LEFT).setText("API Key：");
         apiKeyTxt = new Text(composite, SWT.BORDER);
         apiKeyTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         apiKeyTxt.setText(preferenceStore.getString(PreferenceConstants.API_KEY));
-
+        apiKeyTxt.addListener(SWT.FocusIn, new Listener() {
+            public void handleEvent(Event e) {
+                apiKeyTxt.selectAll();
+            }
+        });
         new Label(composite, SWT.LEFT).setText("Service Key：");
         serviceKeyTxt = new Text(composite, SWT.BORDER);
         serviceKeyTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         serviceKeyTxt.setText(preferenceStore.getString(PreferenceConstants.SERVICE_KEY));
+        serviceKeyTxt.addListener(SWT.FocusIn, new Listener() {
+            public void handleEvent(Event e) {
+                serviceKeyTxt.selectAll();
+            }
+        });
 
         new Label(composite, SWT.LEFT).setText("Username：");
         userNameTxt = new Text(composite, SWT.BORDER);
         userNameTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         userNameTxt.setText(preferenceStore.getString(PreferenceConstants.USERNAME));
+        userNameTxt.addListener(SWT.FocusIn, new Listener() {
+            public void handleEvent(Event e) {
+                userNameTxt.selectAll();
+            }
+        });
 
         Button getOrgBtn = new Button(composite, SWT.NULL);
         GridData getOrgBtnGrDt = new GridData();

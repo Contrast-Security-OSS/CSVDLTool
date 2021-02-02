@@ -91,7 +91,7 @@ import com.google.gson.reflect.TypeToken;
 
 public class Main implements PropertyChangeListener {
 
-    public static final String WINDOW_TITLE = "Comware";
+    public static final String WINDOW_TITLE = "ComwareTool";
 
     private ComwareShell shell;
 
@@ -99,6 +99,7 @@ public class Main implements PropertyChangeListener {
     private org.eclipse.swt.widgets.List srcList;
     private org.eclipse.swt.widgets.List dstList;
     private Button executeBtn;
+    private Button includeDescChk;
     private Button settingBtn;
 
     private Map<String, String> fullAppMap = new TreeMap<String, String>();
@@ -136,7 +137,7 @@ public class Main implements PropertyChangeListener {
             InputStream is = new FileInputStream("contrast_security.yaml");
             ContrastSecurityYaml contrastSecurityYaml = yaml.loadAs(is, ContrastSecurityYaml.class);
             is.close();
-            System.out.println(contrastSecurityYaml);
+            // System.out.println(contrastSecurityYaml);
             this.preferenceStore.setDefault(PreferenceConstants.CONTRAST_URL, contrastSecurityYaml.getUrl());
             this.preferenceStore.setDefault(PreferenceConstants.API_KEY, contrastSecurityYaml.getApiKey());
             this.preferenceStore.setDefault(PreferenceConstants.SERVICE_KEY, contrastSecurityYaml.getServiceKey());
@@ -165,6 +166,12 @@ public class Main implements PropertyChangeListener {
 
             @Override
             public void shellClosed(ShellEvent event) {
+                preferenceStore.setValue(PreferenceConstants.INCLUDE_DESCRIPTION, includeDescChk.getSelection());
+                try {
+                    preferenceStore.save();
+                } catch (IOException ioe) {
+                    ioe.printStackTrace();
+                }
             }
 
             @Override
@@ -336,7 +343,7 @@ public class Main implements PropertyChangeListener {
         dstList.setLayoutData(new GridData(GridData.FILL_BOTH));
 
         // ========== 一括グループ ==========
-        Composite bulkGrp = new Composite(shell, SWT.NULL);
+        Group bulkGrp = new Group(shell, SWT.NULL);
         bulkGrp.setLayout(new GridLayout(1, false));
         GridData bulkGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
         // bulkGrpGrDt.horizontalSpan = 3;
@@ -345,7 +352,9 @@ public class Main implements PropertyChangeListener {
 
         // ========== 一括起動ボタン ==========
         executeBtn = new Button(bulkGrp, SWT.PUSH);
-        executeBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        GridData executeBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        executeBtnGrDt.heightHint = 50;
+        executeBtn.setLayoutData(executeBtnGrDt);
         executeBtn.setText("取得");
         executeBtn.setFont(new Font(display, "ＭＳ ゴシック", 20, SWT.NORMAL));
         executeBtn.addSelectionListener(new SelectionListener() {
@@ -519,8 +528,14 @@ public class Main implements PropertyChangeListener {
             }
         });
 
+        includeDescChk = new Button(bulkGrp, SWT.CHECK);
+        includeDescChk.setText("何が起こったか？どんなリスクであるか？修正方法を含める");
+        if (preferenceStore.getBoolean(PreferenceConstants.INCLUDE_DESCRIPTION)) {
+            includeDescChk.setSelection(true);
+        }
+
         // ========== 設定ボタン ==========
-        settingBtn = new Button(bulkGrp, SWT.PUSH);
+        settingBtn = new Button(shell, SWT.PUSH);
         settingBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         settingBtn.setText("設定");
         settingBtn.setToolTipText("動作に必要な設定を行います。");

@@ -36,4 +36,6 @@ public class PreferenceConstants {
     public static final String PROXY_PORT = new String("com.contrastsecurity.proxy_port");
     public static final String PROXY_USER = new String("com.contrastsecurity.proxy_user");
     public static final String PROXY_PASS = new String("com.contrastsecurity.proxy_pass");
+
+    public static final String INCLUDE_DESCRIPTION = new String("com.contrastsecurity.include_description");
 }

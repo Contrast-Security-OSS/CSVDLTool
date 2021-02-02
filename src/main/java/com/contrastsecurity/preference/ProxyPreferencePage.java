@@ -26,6 +26,8 @@ package com.contrastsecurity.preference;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
@@ -117,6 +119,7 @@ public class ProxyPreferencePage extends PreferencePage {
         new Label(dirGrp, SWT.LEFT).setText("パスワード：");
         passTxt = new Text(dirGrp, SWT.BORDER);
         passTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        passTxt.setEchoChar('*');
         passTxt.setText(preferenceStore.getString(PreferenceConstants.PROXY_PASS));
         this.textList.add(passTxt);
 
@@ -149,6 +152,11 @@ public class ProxyPreferencePage extends PreferencePage {
             ps.setValue(PreferenceConstants.PROXY_HOST, this.hostTxt.getText());
         }
         if (this.portTxt != null) {
+            String port = this.portTxt.getText();
+            if (!StringUtils.isNumeric(port)) {
+                MessageDialog.openError(getShell(), "ポート", "ポート番号は数値を指定してください。");
+                return false;
+            }
             ps.setValue(PreferenceConstants.PROXY_PORT, this.portTxt.getText());
         }
         if (this.userTxt != null) {

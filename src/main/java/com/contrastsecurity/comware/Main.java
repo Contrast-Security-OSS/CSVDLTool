@@ -187,7 +187,6 @@ public class Main implements PropertyChangeListener {
         executeBtn.setLayoutData(new GridData(GridData.FILL_BOTH));
         executeBtn.setText("取得");
         executeBtn.setFont(new Font(display, "ＭＳ ゴシック", 20, SWT.NORMAL));
-        executeBtn.setToolTipText("対象サーバすべてに一括接続をします。");
         executeBtn.addSelectionListener(new SelectionListener() {
             @Override
             public void widgetSelected(SelectionEvent event) {

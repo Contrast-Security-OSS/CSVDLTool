@@ -33,11 +33,14 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Type;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -53,11 +56,14 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.jface.preference.PreferenceManager;
 import org.eclipse.jface.preference.PreferenceNode;
 import org.eclipse.jface.preference.PreferenceStore;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.ShellEvent;
@@ -70,13 +76,16 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Text;
 import org.yaml.snakeyaml.Yaml;
 
 import com.contrastsecurity.model.Application;
 import com.contrastsecurity.model.ApplicationJson;
 import com.contrastsecurity.model.ContrastSecurityYaml;
 import com.contrastsecurity.model.HowToFixJson;
+import com.contrastsecurity.model.Note;
 import com.contrastsecurity.model.NotesJson;
 import com.contrastsecurity.model.StoryJson;
 import com.contrastsecurity.model.Trace;
@@ -98,6 +107,8 @@ public class Main implements PropertyChangeListener {
     private Button appLoadBtn;
     private org.eclipse.swt.widgets.List srcList;
     private org.eclipse.swt.widgets.List dstList;
+    private Label srcCount;
+    private Label dstCount;
     private Button executeBtn;
     private Button includeDescChk;
     private Button settingBtn;
@@ -193,7 +204,7 @@ public class Main implements PropertyChangeListener {
         display.addFilter(SWT.KeyUp, listener);
 
         GridLayout baseLayout = new GridLayout(1, false);
-        baseLayout.marginWidth = 10;
+        baseLayout.marginWidth = 5;
         shell.setLayout(baseLayout);
 
         Group appListGrp = new Group(shell, SWT.NONE);
@@ -235,12 +246,16 @@ public class Main implements PropertyChangeListener {
                             ApplicationJson applicationJson = gson.fromJson(jsonString, contType);
                             // System.out.println(applicationJson);
                             srcList.removeAll();
+                            srcApps.clear();
+                            dstList.removeAll();
+                            dstApps.clear();
                             fullAppMap.clear();
                             for (Application app : applicationJson.getApplications()) {
                                 srcList.add(app.getName());
                                 srcApps.add(app.getName());
                                 fullAppMap.put(app.getName(), app.getApp_id());
                             }
+                            srcCount.setText(String.valueOf(srcList.getItemCount()));
                         }
                     } catch (Exception e) {
                         throw e;
@@ -255,8 +270,65 @@ public class Main implements PropertyChangeListener {
             }
         });
 
-        this.srcList = new org.eclipse.swt.widgets.List(appListGrp, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
-        srcList.setLayoutData(new GridData(GridData.FILL_BOTH));
+        Composite srcGrp = new Composite(appListGrp, SWT.NONE);
+        srcGrp.setLayout(new GridLayout(1, false));
+        GridData srcGrpGrDt = new GridData(GridData.FILL_BOTH);
+        srcGrp.setLayoutData(srcGrpGrDt);
+
+        Text srcListFilter = new Text(srcGrp, SWT.BORDER);
+        srcListFilter.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        srcListFilter.setMessage("Filter");
+        srcListFilter.addModifyListener(new ModifyListener() {
+            @Override
+            public void modifyText(ModifyEvent event) {
+                String keyword = srcListFilter.getText();
+                if (keyword.isEmpty()) {
+                    srcList.removeAll();
+                    srcApps.clear();
+                    for (String appName : fullAppMap.keySet()) {
+                        if (dstApps.contains(appName)) {
+                            continue;
+                        }
+                        srcList.add(appName);
+                        srcApps.add(appName);
+                    }
+                } else {
+                    srcList.removeAll();
+                    srcApps.clear();
+                    for (String appName : fullAppMap.keySet()) {
+                        if (appName.toLowerCase().contains(keyword.toLowerCase())) {
+                            if (dstApps.contains(appName)) {
+                                continue;
+                            }
+                            srcList.add(appName);
+                            srcApps.add(appName);
+                        }
+                    }
+                }
+                srcCount.setText(String.valueOf(srcList.getItemCount()));
+            }
+        });
+        this.srcList = new org.eclipse.swt.widgets.List(srcGrp, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
+        this.srcList.setLayoutData(new GridData(GridData.FILL_BOTH));
+        this.srcList.addListener(SWT.MouseDoubleClick, new Listener() {
+            @Override
+            public void handleEvent(Event event) {
+                int idx = srcList.getSelectionIndex();
+                dstList.add(srcApps.get(idx));
+                dstApps.add(srcApps.get(idx));
+                srcList.remove(idx);
+                srcApps.remove(idx);
+                srcCount.setText(String.valueOf(srcList.getItemCount()));
+                dstCount.setText(String.valueOf(dstList.getItemCount()));
+            }
+        });
+
+        this.srcCount = new Label(srcGrp, SWT.RIGHT);
+        GridData srcCountGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        srcCountGrDt.heightHint = 8;
+        this.srcCount.setLayoutData(srcCountGrDt);
+        this.srcCount.setFont(new Font(display, "ＭＳ ゴシック", 8, SWT.NORMAL));
+        this.srcCount.setText("0");
 
         Composite btnGrp = new Composite(appListGrp, SWT.NONE);
         btnGrp.setLayout(new GridLayout(1, false));
@@ -276,6 +348,8 @@ public class Main implements PropertyChangeListener {
                 }
                 srcList.removeAll();
                 srcApps.clear();
+                srcCount.setText(String.valueOf(srcList.getItemCount()));
+                dstCount.setText(String.valueOf(dstList.getItemCount()));
             }
 
             @Override
@@ -292,9 +366,15 @@ public class Main implements PropertyChangeListener {
                 for (int idx : srcList.getSelectionIndices()) {
                     dstList.add(srcApps.get(idx));
                     dstApps.add(srcApps.get(idx));
-                    srcList.remove(idx);
-                    srcApps.remove(idx);
                 }
+                List<Integer> sortedList = Arrays.stream(srcList.getSelectionIndices()).boxed().collect(Collectors.toList());
+                Collections.reverse(sortedList);
+                for (Integer idx : sortedList) {
+                    srcList.remove(idx.intValue());
+                    srcApps.remove(idx.intValue());
+                }
+                srcCount.setText(String.valueOf(srcList.getItemCount()));
+                dstCount.setText(String.valueOf(dstList.getItemCount()));
             }
 
             @Override
@@ -311,9 +391,15 @@ public class Main implements PropertyChangeListener {
                 for (int idx : dstList.getSelectionIndices()) {
                     srcList.add(dstApps.get(idx));
                     srcApps.add(dstApps.get(idx));
-                    dstList.remove(idx);
-                    dstApps.remove(idx);
                 }
+                List<Integer> sortedList = Arrays.stream(dstList.getSelectionIndices()).boxed().collect(Collectors.toList());
+                Collections.reverse(sortedList);
+                for (Integer idx : sortedList) {
+                    dstList.remove(idx.intValue());
+                    dstApps.remove(idx.intValue());
+                }
+                srcCount.setText(String.valueOf(srcList.getItemCount()));
+                dstCount.setText(String.valueOf(dstList.getItemCount()));
             }
 
             @Override
@@ -333,14 +419,75 @@ public class Main implements PropertyChangeListener {
                 }
                 dstList.removeAll();
                 dstApps.clear();
+                srcCount.setText(String.valueOf(srcList.getItemCount()));
+                dstCount.setText(String.valueOf(dstList.getItemCount()));
             }
 
             @Override
             public void widgetDefaultSelected(SelectionEvent event) {
             }
         });
-        dstList = new org.eclipse.swt.widgets.List(appListGrp, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
-        dstList.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+        Composite dstGrp = new Composite(appListGrp, SWT.NONE);
+        dstGrp.setLayout(new GridLayout(1, false));
+        GridData dstGrpGrDt = new GridData(GridData.FILL_BOTH);
+        dstGrp.setLayoutData(dstGrpGrDt);
+
+        Text dstListFilter = new Text(dstGrp, SWT.BORDER);
+        dstListFilter.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        dstListFilter.setMessage("Filter");
+        dstListFilter.addModifyListener(new ModifyListener() {
+            @Override
+            public void modifyText(ModifyEvent event) {
+                String keyword = dstListFilter.getText();
+                if (keyword.isEmpty()) {
+                    dstList.removeAll();
+                    dstApps.clear();
+                    for (String appName : fullAppMap.keySet()) {
+                        if (srcApps.contains(appName)) {
+                            continue;
+                        }
+                        dstList.add(appName);
+                        dstApps.add(appName);
+                    }
+                } else {
+                    dstList.removeAll();
+                    dstApps.clear();
+                    for (String appName : fullAppMap.keySet()) {
+                        if (appName.toLowerCase().contains(keyword.toLowerCase())) {
+                            if (srcApps.contains(appName)) {
+                                continue;
+                            }
+                            dstList.add(appName);
+                            dstApps.add(appName);
+                        }
+                    }
+                }
+                dstCount.setText(String.valueOf(dstList.getItemCount()));
+            }
+        });
+
+        this.dstList = new org.eclipse.swt.widgets.List(dstGrp, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
+        this.dstList.setLayoutData(new GridData(GridData.FILL_BOTH));
+        this.dstList.addListener(SWT.MouseDoubleClick, new Listener() {
+            @Override
+            public void handleEvent(Event event) {
+                int idx = dstList.getSelectionIndex();
+                srcList.add(dstApps.get(idx));
+                srcApps.add(dstApps.get(idx));
+                dstList.remove(idx);
+                dstApps.remove(idx);
+                srcCount.setText(String.valueOf(srcList.getItemCount()));
+                dstCount.setText(String.valueOf(dstList.getItemCount()));
+            }
+        });
+
+        this.dstCount = new Label(dstGrp, SWT.RIGHT);
+        this.dstCount.setFont(new Font(display, "ＭＳ ゴシック", 8, SWT.NORMAL));
+        GridData dstCountGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        dstCountGrDt.heightHint = 8;
+        this.dstCount.setLayoutData(dstCountGrDt);
+        this.dstCount.setText("0");
 
         // ========== 一括グループ ==========
         Group bulkGrp = new Group(shell, SWT.NULL);
@@ -360,6 +507,10 @@ public class Main implements PropertyChangeListener {
         executeBtn.addSelectionListener(new SelectionListener() {
             @Override
             public void widgetSelected(SelectionEvent event) {
+                if (dstApps.isEmpty()) {
+                    MessageDialog.openInformation(shell, "取得", "取得対象のアプリケーションを選択してください。");
+                    return;
+                }
                 executeBtn.setEnabled(false);
                 settingBtn.setEnabled(false);
                 List<String[]> csvList = new ArrayList<String[]>();
@@ -401,7 +552,7 @@ public class Main implements PropertyChangeListener {
                                     try (CloseableHttpResponse httpResponse3 = httpClient.execute(httpGet);) {
                                         if (httpResponse3.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                                             String jsonString3 = EntityUtils.toString(httpResponse3.getEntity());
-                                            // System.out.println(jsonString3);
+                                            System.out.println(jsonString3);
                                             Type traceType = new TypeToken<TraceJson>() {
                                             }.getType();
                                             TraceJson traceJson = gson.fromJson(jsonString3, traceType);
@@ -428,54 +579,57 @@ public class Main implements PropertyChangeListener {
                                             // ==================== 11. 最後の検出 ====================
                                             csvLineList.add(trace.getLast_time_seen());
                                             // ==================== 12. ビルド番号 ====================
+                                            csvLineList.add(trace.getApp_version_tags());
                                             // ==================== 13. 次のサーバにより報告 ====================
                                             // ==================== 14. ルート ====================
                                             // ==================== 15. モジュール ====================
                                             // ==================== 16. HTTP情報 ====================
-                                            // ==================== 17. コメント ====================
-                                            // Story
-                                            url = String.format("%s/api/ng/%s/traces/%s/story", contrastUrl, orgId, trace_id);
-                                            httpGet = new HttpGet(url);
-                                            httpGet.addHeader(HttpHeaders.ACCEPT, "application/json");
-                                            httpGet.addHeader("API-Key", apiKey);
-                                            httpGet.addHeader(HttpHeaders.AUTHORIZATION, authHeader);
-                                            httpGet.setConfig(config);
-                                            try (CloseableHttpResponse httpResponse4 = httpClient.execute(httpGet);) {
-                                                if (httpResponse4.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                                                    String jsonString4 = EntityUtils.toString(httpResponse4.getEntity());
-                                                    System.out.println(jsonString4);
-                                                    Type storyType = new TypeToken<StoryJson>() {
-                                                    }.getType();
-                                                    StoryJson storyJson = gson.fromJson(jsonString4, storyType);
-                                                    System.out.println(storyJson);
-                                                } else {
-                                                    System.out.println("200以外のステータスコードが返却されました。");
+                                            if (includeDescChk.getSelection()) {
+                                                // ==================== 17. 何が起こったか？ ====================
+                                                // ==================== 18. どんなリスクであるか？ ====================
+                                                url = String.format("%s/api/ng/%s/traces/%s/story", contrastUrl, orgId, trace_id);
+                                                httpGet = new HttpGet(url);
+                                                httpGet.addHeader(HttpHeaders.ACCEPT, "application/json");
+                                                httpGet.addHeader("API-Key", apiKey);
+                                                httpGet.addHeader(HttpHeaders.AUTHORIZATION, authHeader);
+                                                httpGet.setConfig(config);
+                                                try (CloseableHttpResponse httpResponse4 = httpClient.execute(httpGet);) {
+                                                    if (httpResponse4.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                                                        String jsonString4 = EntityUtils.toString(httpResponse4.getEntity());
+                                                        // System.out.println(jsonString4);
+                                                        Type storyType = new TypeToken<StoryJson>() {
+                                                        }.getType();
+                                                        StoryJson storyJson = gson.fromJson(jsonString4, storyType);
+                                                        // System.out.println(storyJson);
+                                                    } else {
+                                                        System.out.println("200以外のステータスコードが返却されました。");
+                                                    }
+                                                } catch (Exception e) {
+                                                    throw e;
                                                 }
-                                            } catch (Exception e) {
-                                                throw e;
-                                            }
-                                            // How to Fix
-                                            url = String.format("%s/api/ng/%s/traces/%s/recommendation", contrastUrl, orgId, trace_id);
-                                            httpGet = new HttpGet(url);
-                                            httpGet.addHeader(HttpHeaders.ACCEPT, "application/json");
-                                            httpGet.addHeader("API-Key", apiKey);
-                                            httpGet.addHeader(HttpHeaders.AUTHORIZATION, authHeader);
-                                            httpGet.setConfig(config);
-                                            try (CloseableHttpResponse httpResponse5 = httpClient.execute(httpGet);) {
-                                                if (httpResponse5.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                                                    String jsonString5 = EntityUtils.toString(httpResponse5.getEntity());
-                                                    // System.out.println(jsonString5);
-                                                    Type howToFixType = new TypeToken<HowToFixJson>() {
-                                                    }.getType();
-                                                    HowToFixJson howToFixJson = gson.fromJson(jsonString5, howToFixType);
-                                                    // System.out.println(howToFixJson);
-                                                } else {
-                                                    System.out.println("200以外のステータスコードが返却されました。");
+                                                // ==================== 19. 修正方法 ====================
+                                                url = String.format("%s/api/ng/%s/traces/%s/recommendation", contrastUrl, orgId, trace_id);
+                                                httpGet = new HttpGet(url);
+                                                httpGet.addHeader(HttpHeaders.ACCEPT, "application/json");
+                                                httpGet.addHeader("API-Key", apiKey);
+                                                httpGet.addHeader(HttpHeaders.AUTHORIZATION, authHeader);
+                                                httpGet.setConfig(config);
+                                                try (CloseableHttpResponse httpResponse5 = httpClient.execute(httpGet);) {
+                                                    if (httpResponse5.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                                                        String jsonString5 = EntityUtils.toString(httpResponse5.getEntity());
+                                                        // System.out.println(jsonString5);
+                                                        Type howToFixType = new TypeToken<HowToFixJson>() {
+                                                        }.getType();
+                                                        HowToFixJson howToFixJson = gson.fromJson(jsonString5, howToFixType);
+                                                        // System.out.println(howToFixJson);
+                                                    } else {
+                                                        System.out.println("200以外のステータスコードが返却されました。");
+                                                    }
+                                                } catch (Exception e) {
+                                                    throw e;
                                                 }
-                                            } catch (Exception e) {
-                                                throw e;
                                             }
-                                            // Comment
+                                            // ==================== 20(17). コメント(最後尾) ====================
                                             url = String.format("%s/api/ng/%s/applications/%s/traces/%s/notes", contrastUrl, orgId, appId, trace_id);
                                             httpGet = new HttpGet(url);
                                             httpGet.addHeader(HttpHeaders.ACCEPT, "application/json");
@@ -489,7 +643,10 @@ public class Main implements PropertyChangeListener {
                                                     Type notesType = new TypeToken<NotesJson>() {
                                                     }.getType();
                                                     NotesJson notesJson = gson.fromJson(jsonString6, notesType);
-                                                    System.out.println(notesJson);
+                                                    // System.out.println(notesJson);
+                                                    for (Note note : notesJson.getNotes()) {
+                                                        csvLineList.add(note.getNote());
+                                                    }
                                                 } else {
                                                     System.out.println("200以外のステータスコードが返却されました。");
                                                 }
@@ -517,7 +674,7 @@ public class Main implements PropertyChangeListener {
                 }
                 List<String> list = csvList.stream().map(line -> String.join(",", line)).collect(Collectors.toList());
                 try {
-                    Files.write(Paths.get("", "out.csv"), list, StandardOpenOption.CREATE);
+                    Files.write(Paths.get("", "out.csv"), list, Charset.forName("Shift_JIS"), StandardOpenOption.TRUNCATE_EXISTING);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

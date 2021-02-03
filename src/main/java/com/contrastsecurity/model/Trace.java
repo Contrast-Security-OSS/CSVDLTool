@@ -14,6 +14,7 @@ public class Trace {
     private String severity_label;
     private String status;
     private String language;
+    private List<String> app_version_tags;
     private String first_time_seen;
     private String last_time_seen;
 
@@ -71,6 +72,14 @@ public class Trace {
 
     public void setLanguage(String language) {
         this.language = language;
+    }
+
+    public String getApp_version_tags() {
+        return String.join("|", this.app_version_tags);
+    }
+
+    public void setApp_version_tags(List<String> app_version_tags) {
+        this.app_version_tags = app_version_tags;
     }
 
     public String getFirst_time_seen() {

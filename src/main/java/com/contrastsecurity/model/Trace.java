@@ -1,5 +1,8 @@
 package com.contrastsecurity.model;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,6 +14,8 @@ public class Trace {
     private String severity_label;
     private String status;
     private String language;
+    private String first_time_seen;
+    private String last_time_seen;
 
     public String getCategory_label() {
         return category_label;
@@ -66,6 +71,24 @@ public class Trace {
 
     public void setLanguage(String language) {
         this.language = language;
+    }
+
+    public String getFirst_time_seen() {
+        LocalDateTime ldt = LocalDateTime.ofInstant(Instant.ofEpochMilli(Long.parseLong(this.first_time_seen)), ZoneId.systemDefault());
+        return ldt.toString();
+    }
+
+    public void setFirst_time_seen(String first_time_seen) {
+        this.first_time_seen = first_time_seen;
+    }
+
+    public String getLast_time_seen() {
+        LocalDateTime ldt = LocalDateTime.ofInstant(Instant.ofEpochMilli(Long.parseLong(this.last_time_seen)), ZoneId.systemDefault());
+        return ldt.toString();
+    }
+
+    public void setLast_time_seen(String last_time_seen) {
+        this.last_time_seen = last_time_seen;
     }
 
     @Override

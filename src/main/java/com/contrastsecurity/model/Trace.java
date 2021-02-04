@@ -17,6 +17,9 @@ public class Trace {
     private List<String> app_version_tags;
     private String first_time_seen;
     private String last_time_seen;
+    private Application application;
+    private Request request;
+    private List<Note> notes;
 
     public String getCategory_label() {
         return category_label;
@@ -98,6 +101,33 @@ public class Trace {
 
     public void setLast_time_seen(String last_time_seen) {
         this.last_time_seen = last_time_seen;
+    }
+
+    public Application getApplication() {
+        return application;
+    }
+
+    public void setApplication(Application application) {
+        this.application = application;
+    }
+
+    public Request getRequest() {
+        return request;
+    }
+
+    public void setRequest(Request request) {
+        this.request = request;
+    }
+
+    public List<Note> getNotes() {
+        if (this.notes == null) {
+            return new ArrayList<Note>();
+        }
+        return notes;
+    }
+
+    public void setNotes(List<Note> notes) {
+        this.notes = notes;
     }
 
     @Override

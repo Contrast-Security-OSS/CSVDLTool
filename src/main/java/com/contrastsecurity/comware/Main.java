@@ -26,18 +26,18 @@ package com.contrastsecurity.comware;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Type;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -47,6 +47,8 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.config.RequestConfig;
@@ -86,7 +88,8 @@ import com.contrastsecurity.model.ApplicationJson;
 import com.contrastsecurity.model.ContrastSecurityYaml;
 import com.contrastsecurity.model.HowToFixJson;
 import com.contrastsecurity.model.Note;
-import com.contrastsecurity.model.NotesJson;
+import com.contrastsecurity.model.Route;
+import com.contrastsecurity.model.RouteJson;
 import com.contrastsecurity.model.StoryJson;
 import com.contrastsecurity.model.Trace;
 import com.contrastsecurity.model.TraceJson;
@@ -513,7 +516,7 @@ public class Main implements PropertyChangeListener {
                 }
                 executeBtn.setEnabled(false);
                 settingBtn.setEnabled(false);
-                List<String[]> csvList = new ArrayList<String[]>();
+                List<List<String>> csvList = new ArrayList<List<String>>();
                 try (CloseableHttpClient httpClient = HttpClients.createDefault();) {
                     String contrastUrl = preferenceStore.getString(PreferenceConstants.CONTRAST_URL);
                     String apiKey = preferenceStore.getString(PreferenceConstants.API_KEY);
@@ -543,7 +546,8 @@ public class Main implements PropertyChangeListener {
                                 // System.out.println(tracesJson);
                                 for (String trace_id : tracesJson.getTraces()) {
                                     List<String> csvLineList = new ArrayList<String>();
-                                    url = String.format("%s/api/ng/%s/traces/%s/trace/%s?expand=skip_links", contrastUrl, orgId, appId, trace_id);
+                                    url = String.format("%s/api/ng/%s/traces/%s/trace/%s?expand=events,notes,request,application,servers,server_environments,skip_links",
+                                            contrastUrl, orgId, appId, trace_id);
                                     httpGet = new HttpGet(url);
                                     httpGet.addHeader(HttpHeaders.ACCEPT, "application/json");
                                     httpGet.addHeader("API-Key", apiKey);
@@ -552,7 +556,9 @@ public class Main implements PropertyChangeListener {
                                     try (CloseableHttpResponse httpResponse3 = httpClient.execute(httpGet);) {
                                         if (httpResponse3.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                                             String jsonString3 = EntityUtils.toString(httpResponse3.getEntity());
-                                            System.out.println(jsonString3);
+//                                            System.out.println("------------------------------------------------------");
+//                                            System.out.println(jsonString3);
+//                                            System.out.println("------------------------------------------------------");
                                             Type traceType = new TypeToken<TraceJson>() {
                                             }.getType();
                                             TraceJson traceJson = gson.fromJson(jsonString3, traceType);
@@ -581,11 +587,38 @@ public class Main implements PropertyChangeListener {
                                             // ==================== 12. ビルド番号 ====================
                                             csvLineList.add(trace.getApp_version_tags());
                                             // ==================== 13. 次のサーバにより報告 ====================
+                                            csvLineList.add("");
                                             // ==================== 14. ルート ====================
+                                            url = String.format("%s/api/ng/%s/traces/%s/trace/%s/routes?expand=skip_links", contrastUrl, orgId, appId, trace_id);
+                                            httpGet = new HttpGet(url);
+                                            httpGet.addHeader(HttpHeaders.ACCEPT, "application/json");
+                                            httpGet.addHeader("API-Key", apiKey);
+                                            httpGet.addHeader(HttpHeaders.AUTHORIZATION, authHeader);
+                                            httpGet.setConfig(config);
+                                            try (CloseableHttpResponse httpResponse4 = httpClient.execute(httpGet);) {
+                                                if (httpResponse4.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                                                    String jsonString4 = EntityUtils.toString(httpResponse4.getEntity());
+                                                    System.out.println(jsonString4);
+                                                    Type routeType = new TypeToken<RouteJson>() {
+                                                    }.getType();
+                                                    RouteJson routeJson = gson.fromJson(jsonString4, routeType);
+                                                    // System.out.println(storyJson);
+                                                    List<String> signatureList = routeJson.getRoutes().stream().map(Route::getSignature).collect(Collectors.toList());
+                                                    csvLineList.add(String.join(",", signatureList));
+                                                } else {
+                                                    System.out.println("200以外のステータスコードが返却されました。");
+                                                }
+                                            } catch (Exception e) {
+                                                throw e;
+                                            }
                                             // ==================== 15. モジュール ====================
+                                            Application app = trace.getApplication();
+                                            String module = String.format("%s (%s) - %s", app.getName(), app.getContext_path(), app.getLanguage());
+                                            csvLineList.add(module);
                                             // ==================== 16. HTTP情報 ====================
                                             if (includeDescChk.getSelection()) {
                                                 // ==================== 17. 何が起こったか？ ====================
+                                                csvLineList.add("");
                                                 // ==================== 18. どんなリスクであるか？ ====================
                                                 url = String.format("%s/api/ng/%s/traces/%s/story", contrastUrl, orgId, trace_id);
                                                 httpGet = new HttpGet(url);
@@ -593,14 +626,15 @@ public class Main implements PropertyChangeListener {
                                                 httpGet.addHeader("API-Key", apiKey);
                                                 httpGet.addHeader(HttpHeaders.AUTHORIZATION, authHeader);
                                                 httpGet.setConfig(config);
-                                                try (CloseableHttpResponse httpResponse4 = httpClient.execute(httpGet);) {
-                                                    if (httpResponse4.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                                                        String jsonString4 = EntityUtils.toString(httpResponse4.getEntity());
+                                                try (CloseableHttpResponse httpResponse5 = httpClient.execute(httpGet);) {
+                                                    if (httpResponse5.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                                                        String jsonString5 = EntityUtils.toString(httpResponse5.getEntity());
                                                         // System.out.println(jsonString4);
                                                         Type storyType = new TypeToken<StoryJson>() {
                                                         }.getType();
-                                                        StoryJson storyJson = gson.fromJson(jsonString4, storyType);
+                                                        StoryJson storyJson = gson.fromJson(jsonString5, storyType);
                                                         // System.out.println(storyJson);
+                                                        csvLineList.add(storyJson.getStory().getRisk().getText());
                                                     } else {
                                                         System.out.println("200以外のステータスコードが返却されました。");
                                                     }
@@ -614,14 +648,16 @@ public class Main implements PropertyChangeListener {
                                                 httpGet.addHeader("API-Key", apiKey);
                                                 httpGet.addHeader(HttpHeaders.AUTHORIZATION, authHeader);
                                                 httpGet.setConfig(config);
-                                                try (CloseableHttpResponse httpResponse5 = httpClient.execute(httpGet);) {
-                                                    if (httpResponse5.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                                                        String jsonString5 = EntityUtils.toString(httpResponse5.getEntity());
+                                                try (CloseableHttpResponse httpResponse6 = httpClient.execute(httpGet);) {
+                                                    if (httpResponse6.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                                                        String jsonString6 = EntityUtils.toString(httpResponse6.getEntity());
                                                         // System.out.println(jsonString5);
                                                         Type howToFixType = new TypeToken<HowToFixJson>() {
                                                         }.getType();
-                                                        HowToFixJson howToFixJson = gson.fromJson(jsonString5, howToFixType);
+                                                        HowToFixJson howToFixJson = gson.fromJson(jsonString6, howToFixType);
                                                         // System.out.println(howToFixJson);
+                                                        csvLineList.add(howToFixJson.getRecommendation().getText());
+
                                                     } else {
                                                         System.out.println("200以外のステータスコードが返却されました。");
                                                     }
@@ -630,28 +666,8 @@ public class Main implements PropertyChangeListener {
                                                 }
                                             }
                                             // ==================== 20(17). コメント(最後尾) ====================
-                                            url = String.format("%s/api/ng/%s/applications/%s/traces/%s/notes", contrastUrl, orgId, appId, trace_id);
-                                            httpGet = new HttpGet(url);
-                                            httpGet.addHeader(HttpHeaders.ACCEPT, "application/json");
-                                            httpGet.addHeader("API-Key", apiKey);
-                                            httpGet.addHeader(HttpHeaders.AUTHORIZATION, authHeader);
-                                            httpGet.setConfig(config);
-                                            try (CloseableHttpResponse httpResponse6 = httpClient.execute(httpGet);) {
-                                                if (httpResponse6.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                                                    String jsonString6 = EntityUtils.toString(httpResponse6.getEntity());
-                                                    // System.out.println(jsonString6);
-                                                    Type notesType = new TypeToken<NotesJson>() {
-                                                    }.getType();
-                                                    NotesJson notesJson = gson.fromJson(jsonString6, notesType);
-                                                    // System.out.println(notesJson);
-                                                    for (Note note : notesJson.getNotes()) {
-                                                        csvLineList.add(note.getNote());
-                                                    }
-                                                } else {
-                                                    System.out.println("200以外のステータスコードが返却されました。");
-                                                }
-                                            } catch (Exception e) {
-                                                throw e;
+                                            for (Note note : trace.getNotes()) {
+                                                csvLineList.add(note.getNote());
                                             }
                                         } else {
                                             System.out.println("200以外のステータスコードが返却されました。");
@@ -659,8 +675,7 @@ public class Main implements PropertyChangeListener {
                                     } catch (Exception e) {
                                         throw e;
                                     }
-                                    String[] strArray = new String[csvLineList.size()];
-                                    csvList.add(csvLineList.toArray(strArray));
+                                    csvList.add(csvLineList);
                                 }
                             } else {
                                 System.out.println("200以外のステータスコードが返却されました。");
@@ -672,10 +687,11 @@ public class Main implements PropertyChangeListener {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                List<String> list = csvList.stream().map(line -> String.join(",", line)).collect(Collectors.toList());
-                try {
-                    Files.delete(Paths.get("", "out.csv"));
-                    Files.write(Paths.get("", "out.csv"), list, Charset.forName("Shift_JIS"), StandardOpenOption.CREATE);
+                try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File("out.csv")), "shift-jis"))) {
+                    CSVPrinter printer = CSVFormat.EXCEL.print(bw);
+                    for (List<String> csvLine : csvList) {
+                        printer.printRecord(csvLine);
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

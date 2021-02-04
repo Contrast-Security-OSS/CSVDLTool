@@ -35,7 +35,7 @@ import org.eclipse.swt.widgets.Label;
 public class AboutPage extends PreferencePage {
 
     public AboutPage() {
-        super("Comwareについて");
+        super("ComwareToolについて");
     }
 
     @Override

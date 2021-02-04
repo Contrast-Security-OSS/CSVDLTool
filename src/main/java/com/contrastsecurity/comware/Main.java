@@ -674,7 +674,8 @@ public class Main implements PropertyChangeListener {
                 }
                 List<String> list = csvList.stream().map(line -> String.join(",", line)).collect(Collectors.toList());
                 try {
-                    Files.write(Paths.get("", "out.csv"), list, Charset.forName("Shift_JIS"), StandardOpenOption.TRUNCATE_EXISTING);
+                    Files.delete(Paths.get("", "out.csv"));
+                    Files.write(Paths.get("", "out.csv"), list, Charset.forName("Shift_JIS"), StandardOpenOption.CREATE);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

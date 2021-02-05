@@ -23,27 +23,7 @@
 
 package com.contrastsecurity.preference;
 
-import java.lang.reflect.Type;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.codec.binary.Base64;
-import org.apache.http.Header;
-import org.apache.http.HttpHeaders;
-import org.apache.http.HttpHost;
-import org.apache.http.HttpStatus;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicHeader;
-import org.apache.http.util.EntityUtils;
+import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
@@ -60,9 +40,10 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 
-import com.contrastsecurity.model.OrganizationJson;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import com.contrastsecurity.comware.api.Api;
+import com.contrastsecurity.comware.api.OrganizationAPI;
+import com.contrastsecurity.comware.exception.ResponseException;
+import com.contrastsecurity.model.Organization;
 
 public class BasePreferencePage extends PreferencePage {
 
@@ -72,6 +53,8 @@ public class BasePreferencePage extends PreferencePage {
     private Text userNameTxt;
     private Text orgNameTxt;
     private Text orgIdTxt;
+
+    Logger logger = Logger.getLogger("comwaretool");
 
     public BasePreferencePage() {
         super("基本設定");
@@ -133,59 +116,16 @@ public class BasePreferencePage extends PreferencePage {
             }
 
             public void widgetSelected(SelectionEvent event) {
+                Api api = new OrganizationAPI(preferenceStore, contrastUrlTxt.getText(), userNameTxt.getText(), serviceKeyTxt.getText(), apiKeyTxt.getText());
                 try {
-                    Gson gson = new Gson();
-                    HttpGet httpGet = new HttpGet(String.format("%s/api/ng/profile/organizations/default", contrastUrlTxt.getText()));
-                    String auth = userNameTxt.getText() + ":" + serviceKeyTxt.getText();
-                    byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(StandardCharsets.ISO_8859_1));
-                    String authHeader = new String(encodedAuth);
-                    List<Header> headers = new ArrayList<Header>();
-                    headers.add(new BasicHeader(HttpHeaders.ACCEPT, "application/json"));
-                    headers.add(new BasicHeader("API-Key", apiKeyTxt.getText()));
-                    headers.add(new BasicHeader(HttpHeaders.AUTHORIZATION, authHeader));
-                    RequestConfig config = null;
-                    CloseableHttpClient httpClient = null;
-                    if (preferenceStore.getBoolean(PreferenceConstants.PROXY_YUKO)) {
-                        HttpHost proxy = new HttpHost(preferenceStore.getString(PreferenceConstants.PROXY_HOST),
-                                Integer.parseInt(preferenceStore.getString(PreferenceConstants.PROXY_PORT)));
-                        config = RequestConfig.custom().setSocketTimeout(3000).setConnectTimeout(3000).setProxy(proxy).build();
-                        String proxy_user = preferenceStore.getString(PreferenceConstants.PROXY_USER);
-                        String proxy_pass = preferenceStore.getString(PreferenceConstants.PROXY_PASS);
-                        if (proxy_user.isEmpty() || proxy_pass.isEmpty()) {
-                            httpClient = HttpClients.custom().setDefaultHeaders(headers).build();
-                        } else {
-                            CredentialsProvider credsProvider = new BasicCredentialsProvider();
-                            credsProvider.setCredentials(new AuthScope(proxy), new UsernamePasswordCredentials(proxy_user, proxy_pass));
-                            httpClient = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).setDefaultHeaders(headers).build();
-                        }
-                    } else {
-                        config = RequestConfig.custom().setSocketTimeout(3000).setConnectTimeout(3000).build();
-                        httpClient = HttpClients.custom().setDefaultHeaders(headers).build();
-                    }
-                    httpGet.setConfig(config);
-                    try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet);) {
-                        System.out.println(httpResponse.getStatusLine().getStatusCode());
-                        if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                            String jsonString = EntityUtils.toString(httpResponse.getEntity());
-                            System.out.println(jsonString);
-                            Type organizationType = new TypeToken<OrganizationJson>() {
-                            }.getType();
-                            OrganizationJson organizationJson = gson.fromJson(jsonString, organizationType);
-                            System.out.println(organizationJson);
-                            orgNameTxt.setText(organizationJson.getOrganization().getName());
-                            orgIdTxt.setText(organizationJson.getOrganization().getOrganization_uuid());
-                        } else if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
-                            String jsonString = EntityUtils.toString(httpResponse.getEntity());
-                            System.out.println(jsonString);
-                            MessageDialog.openError(composite.getShell(), "組織情報の取得", "401: 認証エラーです。");
-                        } else {
-                            System.out.println("200, 401以外のステータスコードが返却されました。");
-                        }
-                    } catch (Exception e) {
-                        throw e;
-                    }
+                    Organization organization = (Organization) api.get();
+                    orgNameTxt.setText(organization.getName());
+                    orgIdTxt.setText(organization.getOrganization_uuid());
+                } catch (ResponseException re) {
+                    MessageDialog.openError(composite.getShell(), "組織情報の取得", re.getMessage());
                 } catch (Exception e) {
                     e.printStackTrace();
+                    MessageDialog.openError(composite.getShell(), "組織情報の取得", e.getMessage());
                 }
             }
         });

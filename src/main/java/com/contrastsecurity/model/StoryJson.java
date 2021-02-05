@@ -3,7 +3,7 @@ package com.contrastsecurity.model;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StoryJson extends Contrast {
+public class StoryJson extends ContrastJson {
 
     private Story story;
 

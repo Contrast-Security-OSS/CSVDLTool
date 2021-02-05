@@ -3,7 +3,7 @@ package com.contrastsecurity.model;
 import java.util.List;
 import java.util.StringJoiner;
 
-public class NotesJson extends Contrast {
+public class NotesJson extends ContrastJson {
     private List<Note> notes;
 
     public List<Note> getNotes() {

@@ -3,7 +3,7 @@ package com.contrastsecurity.model;
 import java.util.List;
 import java.util.StringJoiner;
 
-public class TracesJson extends Contrast {
+public class TracesJson extends ContrastJson {
     private List<String> traces;
 
     public List<String> getTraces() {

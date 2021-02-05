@@ -124,6 +124,8 @@ public class Main implements PropertyChangeListener {
 
     private PropertyChangeSupport support = new PropertyChangeSupport(this);
 
+    Logger logger = Logger.getLogger("comwaretool");
+
     /**
      * @param args
      */

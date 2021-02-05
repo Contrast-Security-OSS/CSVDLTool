@@ -2,7 +2,7 @@ package com.contrastsecurity.model;
 
 import java.util.List;
 
-public class RouteJson extends Contrast {
+public class RouteJson extends ContrastJson {
     private List<Route> routes;
 
     public List<Route> getRoutes() {

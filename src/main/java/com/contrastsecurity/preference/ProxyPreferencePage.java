@@ -144,18 +144,28 @@ public class ProxyPreferencePage extends PreferencePage {
     @Override
     public boolean performOk() {
         IPreferenceStore ps = getPreferenceStore();
+        List<String> errors = new ArrayList<String>();
         if (ps == null) {
             return true;
         }
         ps.setValue(PreferenceConstants.PROXY_YUKO, this.validFlg.getSelection());
         if (this.hostTxt != null) {
+            if (this.validFlg.getSelection()) {
+                if (this.hostTxt.getText().isEmpty()) {
+                    errors.add("・ホストを指定してください。");
+                }
+            }
             ps.setValue(PreferenceConstants.PROXY_HOST, this.hostTxt.getText());
         }
         if (this.portTxt != null) {
-            String port = this.portTxt.getText();
-            if (!StringUtils.isNumeric(port)) {
-                MessageDialog.openError(getShell(), "ポート", "ポート番号は数値を指定してください。");
-                return false;
+            if (this.validFlg.getSelection()) {
+                if (this.portTxt.getText().isEmpty()) {
+                    errors.add("・ポート番号を指定してください。");
+                } else {
+                    if (!StringUtils.isNumeric(this.portTxt.getText())) {
+                        errors.add("・ポート番号は数値を指定してください。");
+                    }
+                }
             }
             ps.setValue(PreferenceConstants.PROXY_PORT, this.portTxt.getText());
         }
@@ -164,6 +174,10 @@ public class ProxyPreferencePage extends PreferencePage {
         }
         if (this.passTxt != null) {
             ps.setValue(PreferenceConstants.PROXY_PASS, this.passTxt.getText());
+        }
+        if (!errors.isEmpty()) {
+            MessageDialog.openError(getShell(), "プロキシ設定", String.join("\r\n", errors));
+            return false;
         }
         return true;
     }

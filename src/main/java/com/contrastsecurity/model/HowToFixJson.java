@@ -3,7 +3,7 @@ package com.contrastsecurity.model;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HowToFixJson extends Contrast {
+public class HowToFixJson extends ContrastJson {
     private String owasp;
     private String cwe;
     private Recommendation recommendation;

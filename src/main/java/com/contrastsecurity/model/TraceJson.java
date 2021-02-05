@@ -1,6 +1,6 @@
 package com.contrastsecurity.model;
 
-public class TraceJson extends Contrast {
+public class TraceJson extends ContrastJson {
     private Trace trace;
 
     public Trace getTrace() {

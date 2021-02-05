@@ -1,6 +1,6 @@
 package com.contrastsecurity.model;
 
-public class OrganizationJson extends Contrast {
+public class OrganizationJson extends ContrastJson {
     private Organization organization;
 
     public Organization getOrganization() {

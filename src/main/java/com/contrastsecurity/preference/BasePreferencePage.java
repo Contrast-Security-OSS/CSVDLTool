@@ -147,7 +147,7 @@ public class BasePreferencePage extends PreferencePage {
                     CloseableHttpClient httpClient = null;
                     if (preferenceStore.getBoolean(PreferenceConstants.PROXY_YUKO)) {
                         HttpHost proxy = new HttpHost(preferenceStore.getString(PreferenceConstants.PROXY_HOST),
-                                new Integer(preferenceStore.getString(PreferenceConstants.PROXY_PORT)));
+                                Integer.parseInt(preferenceStore.getString(PreferenceConstants.PROXY_PORT)));
                         config = RequestConfig.custom().setSocketTimeout(3000).setConnectTimeout(3000).setProxy(proxy).build();
                         String proxy_user = preferenceStore.getString(PreferenceConstants.PROXY_USER);
                         String proxy_pass = preferenceStore.getString(PreferenceConstants.PROXY_PASS);
@@ -155,7 +155,7 @@ public class BasePreferencePage extends PreferencePage {
                             httpClient = HttpClients.custom().setDefaultHeaders(headers).build();
                         } else {
                             CredentialsProvider credsProvider = new BasicCredentialsProvider();
-                            credsProvider.setCredentials(new AuthScope(proxy), new UsernamePasswordCredentials("oyoyo", "buhihi"));
+                            credsProvider.setCredentials(new AuthScope(proxy), new UsernamePasswordCredentials(proxy_user, proxy_pass));
                             httpClient = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).setDefaultHeaders(headers).build();
                         }
                     } else {

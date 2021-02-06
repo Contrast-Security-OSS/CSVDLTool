@@ -24,18 +24,18 @@
 package com.contrastsecurity.preference;
 
 public class PreferenceConstants {
-    public static final String CONTRAST_URL = new String("com.contrastsecurity.contrast_url");
-    public static final String API_KEY = new String("com.contrastsecurity.api_key");
-    public static final String SERVICE_KEY = new String("com.contrastsecurity.service_key");
-    public static final String USERNAME = new String("com.contrastsecurity.username");
-    public static final String ORG_NAME = new String("com.contrastsecurity.org_name");
-    public static final String ORG_ID = new String("com.contrastsecurity.org_id");
+    public static final String CONTRAST_URL = new String("com.contrastsecurity.csvdltool.contrast_url");
+    public static final String API_KEY = new String("com.contrastsecurity.csvdltool.api_key");
+    public static final String SERVICE_KEY = new String("com.contrastsecurity.csvdltool.service_key");
+    public static final String USERNAME = new String("com.contrastsecurity.csvdltool.username");
+    public static final String ORG_NAME = new String("com.contrastsecurity.csvdltool.org_name");
+    public static final String ORG_ID = new String("com.contrastsecurity.csvdltool.org_id");
 
-    public static final String PROXY_YUKO = new String("com.contrastsecurity.proxy_yuko");
-    public static final String PROXY_HOST = new String("com.contrastsecurity.proxy_host");
-    public static final String PROXY_PORT = new String("com.contrastsecurity.proxy_port");
-    public static final String PROXY_USER = new String("com.contrastsecurity.proxy_user");
-    public static final String PROXY_PASS = new String("com.contrastsecurity.proxy_pass");
+    public static final String PROXY_YUKO = new String("com.contrastsecurity.csvdltool.proxy_yuko");
+    public static final String PROXY_HOST = new String("com.contrastsecurity.csvdltool.proxy_host");
+    public static final String PROXY_PORT = new String("com.contrastsecurity.csvdltool.proxy_port");
+    public static final String PROXY_USER = new String("com.contrastsecurity.csvdltool.proxy_user");
+    public static final String PROXY_PASS = new String("com.contrastsecurity.csvdltool.proxy_pass");
 
-    public static final String INCLUDE_DESCRIPTION = new String("com.contrastsecurity.include_description");
+    public static final String INCLUDE_DESCRIPTION = new String("com.contrastsecurity.csvdltool.include_description");
 }

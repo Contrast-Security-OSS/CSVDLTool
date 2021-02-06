@@ -40,10 +40,10 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 
-import com.contrastsecurity.comware.api.Api;
-import com.contrastsecurity.comware.api.OrganizationApi;
-import com.contrastsecurity.comware.exception.ApiException;
-import com.contrastsecurity.comware.model.Organization;
+import com.contrastsecurity.csvdltool.api.Api;
+import com.contrastsecurity.csvdltool.api.OrganizationApi;
+import com.contrastsecurity.csvdltool.exception.ApiException;
+import com.contrastsecurity.csvdltool.model.Organization;
 
 public class BasePreferencePage extends PreferencePage {
 
@@ -54,7 +54,7 @@ public class BasePreferencePage extends PreferencePage {
     private Text orgNameTxt;
     private Text orgIdTxt;
 
-    Logger logger = Logger.getLogger("comwaretool");
+    Logger logger = Logger.getLogger("csvdltool");
 
     public BasePreferencePage() {
         super("基本設定");

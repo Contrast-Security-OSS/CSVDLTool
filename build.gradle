@@ -3,7 +3,7 @@ apply plugin: 'eclipse'
 
 sourceCompatibility = 1.8
 
-version = '0.0.1'
+version = '0.0.3'
 
 def defaultEncoding = 'UTF-8'
     tasks.withType(AbstractCompile) each { it.options.encoding = defaultEncoding }
@@ -47,12 +47,12 @@ task copyToLib(type: Copy) {
 }
 
 jar {
-    baseName = 'Comware'
+    baseName = 'CSVDLTool'
     exclude 'META-INF/*.RSA', 'META-INF/*.SF','META-INF/*.DSA' 
     manifest {
         attributes 'Implementation-Title': 'Gradle Quickstart',
                    'Implementation-Version': version
-        attributes 'Main-Class': 'com.contrastsecurity.comware.Main'
+        attributes 'Main-Class': 'com.contrastsecurity.csvdltool.Main'
     }
     from configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
 }

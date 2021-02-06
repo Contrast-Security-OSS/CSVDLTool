@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package com.contrastsecurity.preference;
+package com.contrastsecurity.csvdltool.preference;
 
 import java.util.ArrayList;
 import java.util.List;

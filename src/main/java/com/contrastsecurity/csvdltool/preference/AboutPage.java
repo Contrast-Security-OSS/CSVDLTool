@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package com.contrastsecurity.preference;
+package com.contrastsecurity.csvdltool.preference;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;

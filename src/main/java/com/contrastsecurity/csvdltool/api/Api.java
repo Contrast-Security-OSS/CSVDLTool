@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 import com.contrastsecurity.csvdltool.exception.ApiException;
-import com.contrastsecurity.preference.PreferenceConstants;
+import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
 
 public abstract class Api {
 

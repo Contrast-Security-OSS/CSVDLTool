@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package com.contrastsecurity.preference;
+package com.contrastsecurity.csvdltool.preference;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.MessageDialog;

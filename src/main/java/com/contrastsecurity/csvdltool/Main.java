@@ -90,10 +90,10 @@ import com.contrastsecurity.csvdltool.model.Note;
 import com.contrastsecurity.csvdltool.model.Route;
 import com.contrastsecurity.csvdltool.model.Story;
 import com.contrastsecurity.csvdltool.model.Trace;
-import com.contrastsecurity.preference.AboutPage;
-import com.contrastsecurity.preference.BasePreferencePage;
-import com.contrastsecurity.preference.PreferenceConstants;
-import com.contrastsecurity.preference.ProxyPreferencePage;
+import com.contrastsecurity.csvdltool.preference.AboutPage;
+import com.contrastsecurity.csvdltool.preference.BasePreferencePage;
+import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
+import com.contrastsecurity.csvdltool.preference.ProxyPreferencePage;
 
 public class Main implements PropertyChangeListener {
 

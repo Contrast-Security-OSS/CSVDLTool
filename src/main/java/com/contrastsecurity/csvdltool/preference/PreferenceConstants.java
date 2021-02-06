@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package com.contrastsecurity.preference;
+package com.contrastsecurity.csvdltool.preference;
 
 public class PreferenceConstants {
     public static final String CONTRAST_URL = new String("com.contrastsecurity.csvdltool.contrast_url");

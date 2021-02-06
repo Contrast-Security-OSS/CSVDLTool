@@ -1,4 +1,4 @@
-package com.contrastsecurity.model;
+package com.contrastsecurity.comware.model;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

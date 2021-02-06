@@ -11,8 +11,8 @@ import org.apache.http.HttpHeaders;
 import org.apache.http.message.BasicHeader;
 import org.eclipse.jface.preference.IPreferenceStore;
 
-import com.contrastsecurity.model.Contrast;
-import com.contrastsecurity.model.OrganizationJson;
+import com.contrastsecurity.comware.json.OrganizationJson;
+import com.contrastsecurity.comware.model.Contrast;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 

@@ -1,4 +1,6 @@
-package com.contrastsecurity.model;
+package com.contrastsecurity.comware.json;
+
+import com.contrastsecurity.comware.model.Organization;
 
 public class OrganizationJson extends ContrastJson {
     private Organization organization;

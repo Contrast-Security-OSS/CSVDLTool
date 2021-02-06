@@ -1,7 +1,9 @@
-package com.contrastsecurity.model;
+package com.contrastsecurity.comware.json;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.contrastsecurity.comware.model.Recommendation;
 
 public class HowToFixJson extends ContrastJson {
     private String owasp;

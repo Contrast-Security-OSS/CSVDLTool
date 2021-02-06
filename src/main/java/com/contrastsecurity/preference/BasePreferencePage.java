@@ -43,7 +43,7 @@ import org.eclipse.swt.widgets.Text;
 import com.contrastsecurity.comware.api.Api;
 import com.contrastsecurity.comware.api.OrganizationAPI;
 import com.contrastsecurity.comware.exception.ResponseException;
-import com.contrastsecurity.model.Organization;
+import com.contrastsecurity.comware.model.Organization;
 
 public class BasePreferencePage extends PreferencePage {
 

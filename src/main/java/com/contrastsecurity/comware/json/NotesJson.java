@@ -1,7 +1,9 @@
-package com.contrastsecurity.model;
+package com.contrastsecurity.comware.json;
 
 import java.util.List;
 import java.util.StringJoiner;
+
+import com.contrastsecurity.comware.model.Note;
 
 public class NotesJson extends ContrastJson {
     private List<Note> notes;

@@ -1,4 +1,4 @@
-package com.contrastsecurity.model;
+package com.contrastsecurity.comware.model;
 
 import java.util.List;
 import java.util.Map;

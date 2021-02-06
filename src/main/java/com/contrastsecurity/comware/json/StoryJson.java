@@ -1,7 +1,9 @@
-package com.contrastsecurity.model;
+package com.contrastsecurity.comware.json;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.contrastsecurity.comware.model.Story;
 
 public class StoryJson extends ContrastJson {
 

@@ -1,4 +1,4 @@
-package com.contrastsecurity.model;
+package com.contrastsecurity.comware.model;
 
 import java.time.Instant;
 import java.time.LocalDateTime;

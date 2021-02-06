@@ -1,4 +1,6 @@
-package com.contrastsecurity.model;
+package com.contrastsecurity.comware.json;
+
+import com.contrastsecurity.comware.model.Trace;
 
 public class TraceJson extends ContrastJson {
     private Trace trace;

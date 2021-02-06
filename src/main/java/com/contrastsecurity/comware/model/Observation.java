@@ -1,4 +1,4 @@
-package com.contrastsecurity.model;
+package com.contrastsecurity.comware.model;
 
 public class Observation {
     private String url;

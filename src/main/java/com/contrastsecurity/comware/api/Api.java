@@ -19,7 +19,7 @@ import org.apache.http.util.EntityUtils;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 import com.contrastsecurity.comware.exception.ResponseException;
-import com.contrastsecurity.model.Contrast;
+import com.contrastsecurity.comware.model.Contrast;
 import com.contrastsecurity.preference.PreferenceConstants;
 
 public abstract class Api {

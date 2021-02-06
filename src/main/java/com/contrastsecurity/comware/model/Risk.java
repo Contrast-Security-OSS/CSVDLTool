@@ -1,6 +1,6 @@
-package com.contrastsecurity.model;
+package com.contrastsecurity.comware.model;
 
-public class Recommendation {
+public class Risk {
     private String text;
 
     public String getText() {

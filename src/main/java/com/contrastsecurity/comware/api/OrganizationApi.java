@@ -12,17 +12,16 @@ import org.apache.http.message.BasicHeader;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 import com.contrastsecurity.comware.json.OrganizationJson;
-import com.contrastsecurity.comware.model.Contrast;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-public class OrganizationAPI extends Api {
+public class OrganizationApi extends Api {
     private String url;
     private String username;
     private String sevice_key;
     private String api_key;
 
-    public OrganizationAPI(IPreferenceStore preferenceStore, String url, String username, String sevice_key, String api_key) {
+    public OrganizationApi(IPreferenceStore preferenceStore, String url, String username, String sevice_key, String api_key) {
         super(preferenceStore);
         this.url = url;
         this.username = username;
@@ -48,7 +47,7 @@ public class OrganizationAPI extends Api {
     }
 
     @Override
-    protected Contrast convert(String response) {
+    protected Object convert(String response) {
         Gson gson = new Gson();
         Type organizationType = new TypeToken<OrganizationJson>() {
         }.getType();

@@ -83,7 +83,9 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.yaml.snakeyaml.Yaml;
 
-import com.contrastsecurity.comware.json.ApplicationJson;
+import com.contrastsecurity.comware.api.Api;
+import com.contrastsecurity.comware.api.ApplicationsApi;
+import com.contrastsecurity.comware.exception.ResponseException;
 import com.contrastsecurity.comware.json.HowToFixJson;
 import com.contrastsecurity.comware.json.RouteJson;
 import com.contrastsecurity.comware.json.StoryJson;
@@ -225,48 +227,26 @@ public class Main implements PropertyChangeListener {
         appLoadBtn.addSelectionListener(new SelectionListener() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                try (CloseableHttpClient httpClient = HttpClients.createDefault();) {
-                    String contrastUrl = preferenceStore.getString(PreferenceConstants.CONTRAST_URL);
-                    String apiKey = preferenceStore.getString(PreferenceConstants.API_KEY);
-                    String serviceKey = preferenceStore.getString(PreferenceConstants.SERVICE_KEY);
-                    String userName = preferenceStore.getString(PreferenceConstants.USERNAME);
-                    String orgId = preferenceStore.getString(PreferenceConstants.ORG_ID);
-
-                    RequestConfig config = RequestConfig.custom().setSocketTimeout(3000).setConnectTimeout(3000).build();
-                    HttpGet httpGet = new HttpGet(String.format("%s/api/ng/%s/applications?expand=modules,skip_links", contrastUrl, orgId));
-                    String auth = userName + ":" + serviceKey;
-                    byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(StandardCharsets.ISO_8859_1));
-                    String authHeader = new String(encodedAuth);
-                    httpGet.addHeader(HttpHeaders.ACCEPT, "application/json");
-                    httpGet.addHeader("API-Key", apiKey);
-                    httpGet.addHeader(HttpHeaders.AUTHORIZATION, authHeader);
-                    httpGet.setConfig(config);
-                    try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet);) {
-                        if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                            String jsonString = EntityUtils.toString(httpResponse.getEntity());
-                            // System.out.println(jsonString);
-                            Gson gson = new Gson();
-                            Type contType = new TypeToken<ApplicationJson>() {
-                            }.getType();
-                            ApplicationJson applicationJson = gson.fromJson(jsonString, contType);
-                            // System.out.println(applicationJson);
-                            srcList.removeAll();
-                            srcApps.clear();
-                            dstList.removeAll();
-                            dstApps.clear();
-                            fullAppMap.clear();
-                            for (Application app : applicationJson.getApplications()) {
-                                srcList.add(app.getName());
-                                srcApps.add(app.getName());
-                                fullAppMap.put(app.getName(), app.getApp_id());
-                            }
-                            srcCount.setText(String.valueOf(srcList.getItemCount()));
-                        }
-                    } catch (Exception e) {
-                        throw e;
+                Api api = new ApplicationsApi(preferenceStore);
+                try {
+                    @SuppressWarnings("unchecked")
+                    List<Application> applications = (List<Application>) api.get();
+                    srcList.removeAll();
+                    srcApps.clear();
+                    dstList.removeAll();
+                    dstApps.clear();
+                    fullAppMap.clear();
+                    for (Application app : applications) {
+                        srcList.add(app.getName());
+                        srcApps.add(app.getName());
+                        fullAppMap.put(app.getName(), app.getApp_id());
                     }
+                    srcCount.setText(String.valueOf(srcList.getItemCount()));
+                } catch (ResponseException re) {
+                    MessageDialog.openError(shell, "組織情報の取得", re.getMessage());
                 } catch (Exception e) {
                     e.printStackTrace();
+                    MessageDialog.openError(shell, "組織情報の取得", e.getMessage());
                 }
             }
 

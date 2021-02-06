@@ -1,9 +1,13 @@
 package com.contrastsecurity.comware.api;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.http.Header;
+import org.apache.http.HttpHeaders;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpStatus;
 import org.apache.http.auth.AuthScope;
@@ -15,31 +19,43 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 import com.contrastsecurity.comware.exception.ResponseException;
-import com.contrastsecurity.comware.model.Contrast;
 import com.contrastsecurity.preference.PreferenceConstants;
 
 public abstract class Api {
 
-    private IPreferenceStore preferenceStore;
+    protected IPreferenceStore preferenceStore;
 
     public Api(IPreferenceStore preferenceStore) {
         this.preferenceStore = preferenceStore;
     }
 
-    public Contrast get() throws Exception {
+    public Object get() throws Exception {
         String response = this.getResponse();
         return this.convert(response);
     }
 
     protected abstract String getUrl();
 
-    protected abstract List<Header> getHeaders();
+    protected List<Header> getHeaders() {
+        String apiKey = preferenceStore.getString(PreferenceConstants.API_KEY);
+        String serviceKey = preferenceStore.getString(PreferenceConstants.SERVICE_KEY);
+        String userName = preferenceStore.getString(PreferenceConstants.USERNAME);
+        String auth = String.format("%s:%s", userName, serviceKey);
+        byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(StandardCharsets.ISO_8859_1));
+        String authHeader = new String(encodedAuth);
+        List<Header> headers = new ArrayList<Header>();
+        headers.add(new BasicHeader(HttpHeaders.ACCEPT, "application/json"));
+        headers.add(new BasicHeader("API-Key", apiKey));
+        headers.add(new BasicHeader(HttpHeaders.AUTHORIZATION, authHeader));
+        return headers;
+    }
 
-    protected abstract Contrast convert(String response);
+    protected abstract Object convert(String response);
 
     private String getResponse() throws Exception {
         HttpGet httpGet = new HttpGet(this.getUrl());

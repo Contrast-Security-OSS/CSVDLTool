@@ -41,7 +41,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 
 import com.contrastsecurity.comware.api.Api;
-import com.contrastsecurity.comware.api.OrganizationAPI;
+import com.contrastsecurity.comware.api.OrganizationApi;
 import com.contrastsecurity.comware.exception.ResponseException;
 import com.contrastsecurity.comware.model.Organization;
 
@@ -116,7 +116,7 @@ public class BasePreferencePage extends PreferencePage {
             }
 
             public void widgetSelected(SelectionEvent event) {
-                Api api = new OrganizationAPI(preferenceStore, contrastUrlTxt.getText(), userNameTxt.getText(), serviceKeyTxt.getText(), apiKeyTxt.getText());
+                Api api = new OrganizationApi(preferenceStore, contrastUrlTxt.getText(), userNameTxt.getText(), serviceKeyTxt.getText(), apiKeyTxt.getText());
                 try {
                     Organization organization = (Organization) api.get();
                     orgNameTxt.setText(organization.getName());

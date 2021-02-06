@@ -3,7 +3,7 @@ package com.contrastsecurity.comware.model;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Organization extends Contrast {
+public class Organization {
     private String name;
     private String organization_uuid;
 

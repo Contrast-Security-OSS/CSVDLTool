@@ -5,7 +5,7 @@ import java.util.StringJoiner;
 
 import com.contrastsecurity.csvdltool.model.Application;
 
-public class ApplicationJson extends ContrastJson {
+public class ApplicationsJson extends ContrastJson {
     private List<Application> applications;
 
     public List<Application> getApplications() {

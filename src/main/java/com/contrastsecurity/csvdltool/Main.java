@@ -76,6 +76,7 @@ import org.yaml.snakeyaml.Yaml;
 import com.contrastsecurity.csvdltool.api.Api;
 import com.contrastsecurity.csvdltool.api.ApplicationsApi;
 import com.contrastsecurity.csvdltool.api.HowToFixApi;
+import com.contrastsecurity.csvdltool.api.HttpRequestApi;
 import com.contrastsecurity.csvdltool.api.RoutesApi;
 import com.contrastsecurity.csvdltool.api.StoryApi;
 import com.contrastsecurity.csvdltool.api.TraceApi;
@@ -84,6 +85,7 @@ import com.contrastsecurity.csvdltool.exception.ApiException;
 import com.contrastsecurity.csvdltool.json.HowToFixJson;
 import com.contrastsecurity.csvdltool.model.Application;
 import com.contrastsecurity.csvdltool.model.ContrastSecurityYaml;
+import com.contrastsecurity.csvdltool.model.HttpRequest;
 import com.contrastsecurity.csvdltool.model.Note;
 import com.contrastsecurity.csvdltool.model.Route;
 import com.contrastsecurity.csvdltool.model.Story;
@@ -508,6 +510,8 @@ public class Main implements PropertyChangeListener {
                             Trace trace = (Trace) traceApi.get();
                             // ==================== 01. アプリケーション名 ====================
                             csvLineList.add(appName);
+                            // ==================== 02. マージしたときの、各アプリ名称（可能であれば） ====================
+                            csvLineList.add("");
                             // ==================== 03. （脆弱性の）カテゴリ ====================
                             csvLineList.add(trace.getCategory_label());
                             // ==================== 04. （脆弱性の）ルール ====================
@@ -540,7 +544,13 @@ public class Main implements PropertyChangeListener {
                             String module = String.format("%s (%s) - %s", app.getName(), app.getContext_path(), app.getLanguage());
                             csvLineList.add(module);
                             // ==================== 16. HTTP情報 ====================
-                            csvLineList.add("");
+                            Api httpRequestApi = new HttpRequestApi(preferenceStore, trace_id);
+                            HttpRequest httpRequest = (HttpRequest) httpRequestApi.get();
+                            if (httpRequest != null) {
+                                csvLineList.add(httpRequest.getText());
+                            } else {
+                                csvLineList.add("");
+                            }
                             if (includeDescChk.getSelection()) {
                                 // ==================== 17. 何が起こったか？ ====================
                                 csvLineList.add("");

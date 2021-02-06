@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry kind="output" path="bin/default"/>
 	<classpathentry output="bin/main" kind="src" path="src/main/java">
 		<attributes>
 			<attribute name="gradle_scope" value="main"/>
@@ -12,7 +13,6 @@
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="output" path="bin/default"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8/"/>
 	<classpathentry sourcepath="C:/Users/turbou/.gradle/caches/modules-2/files-2.1/org.apache.httpcomponents/httpclient/4.5.13/9654e91a61d7662c36be6710ef8e720c0e3f9807/httpclient-4.5.13-sources.jar" kind="lib" path="C:/Users/turbou/.gradle/caches/modules-2/files-2.1/org.apache.httpcomponents/httpclient/4.5.13/e5f6cae5ca7ecaac1ec2827a9e2d65ae2869cada/httpclient-4.5.13.jar">
 		<attributes>
@@ -45,16 +45,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry sourcepath="C:/Users/turbou/.gradle/caches/modules-2/files-2.1/log4j/log4j/1.2.17/677abe279b68c5e7490d6d50c6951376238d7d3e/log4j-1.2.17-sources.jar" kind="lib" path="C:/Users/turbou/.gradle/caches/modules-2/files-2.1/log4j/log4j/1.2.17/5af35056b4d257e4b64b9e8069c0746e8b08629f/log4j-1.2.17.jar">
-		<attributes>
-			<attribute name="gradle_used_by_scope" value="main,test"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry sourcepath="C:/Users/turbou/.gradle/caches/modules-2/files-2.1/net.java.dev.jna/jna-platform/4.2.0/cbc1a168ef3ec39e92b91763188f7447c753d5be/jna-platform-4.2.0-sources.jar" kind="lib" path="C:/Users/turbou/.gradle/caches/modules-2/files-2.1/net.java.dev.jna/jna-platform/4.2.0/4a04d34615d534f273f7b8bd30d75304efe4ab04/jna-platform-4.2.0.jar">
-		<attributes>
-			<attribute name="gradle_used_by_scope" value="main,test"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry sourcepath="C:/Users/turbou/.gradle/caches/modules-2/files-2.1/net.java.dev.jna/jna/4.2.0/6f6b127a5018e889a46067216a53485abb1b1f78/jna-4.2.0-sources.jar" kind="lib" path="C:/Users/turbou/.gradle/caches/modules-2/files-2.1/net.java.dev.jna/jna/4.2.0/812b976ed15bb1b0b3fc059fae927b0f76b39585/jna-4.2.0.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>

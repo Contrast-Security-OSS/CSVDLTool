@@ -79,7 +79,7 @@ import com.contrastsecurity.comware.api.RoutesApi;
 import com.contrastsecurity.comware.api.StoryApi;
 import com.contrastsecurity.comware.api.TraceApi;
 import com.contrastsecurity.comware.api.TracesApi;
-import com.contrastsecurity.comware.exception.ResponseException;
+import com.contrastsecurity.comware.exception.ApiException;
 import com.contrastsecurity.comware.json.HowToFixJson;
 import com.contrastsecurity.comware.model.Application;
 import com.contrastsecurity.comware.model.ContrastSecurityYaml;
@@ -231,7 +231,7 @@ public class Main implements PropertyChangeListener {
                         fullAppMap.put(app.getName(), app.getApp_id());
                     }
                     srcCount.setText(String.valueOf(srcList.getItemCount()));
-                } catch (ResponseException re) {
+                } catch (ApiException re) {
                     MessageDialog.openError(shell, "組織情報の取得", re.getMessage());
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -552,7 +552,7 @@ public class Main implements PropertyChangeListener {
 
                             csvList.add(csvLineList);
                         }
-                    } catch (ResponseException re) {
+                    } catch (ApiException re) {
                         MessageDialog.openError(shell, "組織情報の取得", re.getMessage());
                     } catch (Exception e) {
                         e.printStackTrace();

@@ -1,6 +1,8 @@
 package com.contrastsecurity.comware.api;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,12 +23,15 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
+import org.apache.log4j.Logger;
 import org.eclipse.jface.preference.IPreferenceStore;
 
-import com.contrastsecurity.comware.exception.ResponseException;
+import com.contrastsecurity.comware.exception.ApiException;
 import com.contrastsecurity.preference.PreferenceConstants;
 
 public abstract class Api {
+
+    Logger logger = Logger.getLogger("comwaretool");
 
     protected IPreferenceStore preferenceStore;
 
@@ -40,6 +45,8 @@ public abstract class Api {
     }
 
     protected abstract String getUrl();
+
+    protected abstract Object convert(String response);
 
     protected List<Header> getHeaders() {
         String apiKey = preferenceStore.getString(PreferenceConstants.API_KEY);
@@ -55,10 +62,10 @@ public abstract class Api {
         return headers;
     }
 
-    protected abstract Object convert(String response);
-
     private String getResponse() throws Exception {
-        HttpGet httpGet = new HttpGet(this.getUrl());
+        String url = this.getUrl();
+        logger.info(url);
+        HttpGet httpGet = new HttpGet(url);
         List<Header> headers = this.getHeaders();
         CloseableHttpClient httpClient = null;
         try {
@@ -80,27 +87,35 @@ public abstract class Api {
                 httpClient = HttpClients.custom().setDefaultHeaders(headers).build();
             }
             try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet);) {
-                System.out.println(httpResponse.getStatusLine().getStatusCode());
                 if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                     return EntityUtils.toString(httpResponse.getEntity());
                 } else if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
-                    throw new ResponseException(EntityUtils.toString(httpResponse.getEntity()));
+                    throw new ApiException(EntityUtils.toString(httpResponse.getEntity()));
                 } else {
-                    throw new ResponseException("200, 401以外のステータスコードが返却されました。");
+                    throw new ApiException("200, 401以外のステータスコードが返却されました。");
                 }
             } catch (Exception e) {
                 throw e;
             }
         } catch (Exception e) {
+            StringWriter stringWriter = new StringWriter();
+            PrintWriter printWriter = new PrintWriter(stringWriter);
+            e.printStackTrace(printWriter);
+            String trace = stringWriter.toString();
+            logger.error(trace);
             throw e;
         } finally {
             try {
                 if (httpClient != null) {
                     httpClient.close();
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
-                return null;
+            } catch (IOException ioe) {
+                StringWriter stringWriter = new StringWriter();
+                PrintWriter printWriter = new PrintWriter(stringWriter);
+                ioe.printStackTrace(printWriter);
+                String trace = stringWriter.toString();
+                logger.error(trace);
+                throw ioe;
             }
         }
     }

@@ -225,7 +225,7 @@ public class Main implements PropertyChangeListener {
         GridData appLoadBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
         appLoadBtnGrDt.horizontalSpan = 3;
         appLoadBtn.setLayoutData(appLoadBtnGrDt);
-        appLoadBtn.setText("アプリ読み込み");
+        appLoadBtn.setText("アプリ一覧の読み込み");
         appLoadBtn.addSelectionListener(new SelectionListener() {
             @SuppressWarnings("unchecked")
             @Override
@@ -247,10 +247,10 @@ public class Main implements PropertyChangeListener {
                     }
                     srcCount.setText(String.valueOf(srcList.getItemCount()));
                 } catch (ApiException re) {
-                    MessageDialog.openError(shell, "組織情報の取得", re.getMessage());
+                    MessageDialog.openError(shell, "アプリ一覧の読み込み", re.getMessage());
                 } catch (Exception e) {
                     e.printStackTrace();
-                    MessageDialog.openError(shell, "組織情報の取得", e.getMessage());
+                    MessageDialog.openError(shell, "アプリ一覧の読み込み", e.getMessage());
                 }
             }
 
@@ -353,8 +353,12 @@ public class Main implements PropertyChangeListener {
             @Override
             public void widgetSelected(SelectionEvent event) {
                 for (int idx : srcList.getSelectionIndices()) {
-                    dstList.add(srcApps.get(idx));
-                    dstApps.add(srcApps.get(idx));
+                    String appName = srcApps.get(idx);
+                    String keyword = dstListFilter.getText();
+                    if (appName.toLowerCase().contains(keyword.toLowerCase())) {
+                        dstList.add(appName);
+                        dstApps.add(appName);
+                    }
                 }
                 List<Integer> sortedList = Arrays.stream(srcList.getSelectionIndices()).boxed().collect(Collectors.toList());
                 Collections.reverse(sortedList);
@@ -378,8 +382,12 @@ public class Main implements PropertyChangeListener {
             @Override
             public void widgetSelected(SelectionEvent event) {
                 for (int idx : dstList.getSelectionIndices()) {
-                    srcList.add(dstApps.get(idx));
-                    srcApps.add(dstApps.get(idx));
+                    String appName = dstApps.get(idx);
+                    String keyword = srcListFilter.getText();
+                    if (appName.toLowerCase().contains(keyword.toLowerCase())) {
+                        srcList.add(appName);
+                        srcApps.add(appName);
+                    }
                 }
                 List<Integer> sortedList = Arrays.stream(dstList.getSelectionIndices()).boxed().collect(Collectors.toList());
                 Collections.reverse(sortedList);

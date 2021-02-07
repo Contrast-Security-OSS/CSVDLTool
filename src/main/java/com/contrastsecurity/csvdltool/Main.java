@@ -488,16 +488,16 @@ public class Main implements PropertyChangeListener {
         this.dstCount.setLayoutData(dstCountGrDt);
         this.dstCount.setText("0");
 
-        // ========== 一括グループ ==========
-        Group bulkGrp = new Group(shell, SWT.NULL);
-        bulkGrp.setLayout(new GridLayout(1, false));
-        GridData bulkGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
-        // bulkGrpGrDt.horizontalSpan = 3;
-        // bulkGrpGrDt.widthHint = 100;
-        bulkGrp.setLayoutData(bulkGrpGrDt);
+        // ========== グループ ==========
+        Group buttonGrp = new Group(shell, SWT.NULL);
+        buttonGrp.setLayout(new GridLayout(1, false));
+        GridData buttonGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        // buttonGrpGrDt.horizontalSpan = 3;
+        // buttonGrpGrDt.widthHint = 100;
+        buttonGrp.setLayoutData(buttonGrpGrDt);
 
-        // ========== 一括起動ボタン ==========
-        executeBtn = new Button(bulkGrp, SWT.PUSH);
+        // ========== 取得ボタン ==========
+        executeBtn = new Button(buttonGrp, SWT.PUSH);
         GridData executeBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
         executeBtnGrDt.heightHint = 50;
         executeBtn.setLayoutData(executeBtnGrDt);
@@ -541,7 +541,7 @@ public class Main implements PropertyChangeListener {
                             // ==================== 08. グループ（アプリケーションのグループ） ====================
                             csvLineList.add("");
                             // ==================== 09. 脆弱性のタイトル（例：SQLインジェクション：「/api/v1/approvers/」ページのリクエストボディ ） ====================
-                            csvLineList.add("");
+                            csvLineList.add(trace.getTitle());
                             // ==================== 10. 最初の検出 ====================
                             csvLineList.add(trace.getFirst_time_seen());
                             // ==================== 11. 最後の検出 ====================
@@ -615,7 +615,7 @@ public class Main implements PropertyChangeListener {
             }
         });
 
-        includeDescChk = new Button(bulkGrp, SWT.CHECK);
+        includeDescChk = new Button(buttonGrp, SWT.CHECK);
         includeDescChk.setText("何が起こったか？どんなリスクであるか？修正方法を含める");
         if (preferenceStore.getBoolean(PreferenceConstants.INCLUDE_DESCRIPTION)) {
             includeDescChk.setSelection(true);

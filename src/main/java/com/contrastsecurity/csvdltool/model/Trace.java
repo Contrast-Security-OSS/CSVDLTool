@@ -8,6 +8,7 @@ import java.util.List;
 
 public class Trace {
     private String category_label;
+    private String title;
     private String rule_title;
     private String uuid;
     private String impact_label;
@@ -27,6 +28,14 @@ public class Trace {
 
     public void setCategory_label(String category_label) {
         this.category_label = category_label;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getRule_title() {

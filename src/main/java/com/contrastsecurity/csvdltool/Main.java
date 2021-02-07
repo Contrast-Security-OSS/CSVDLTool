@@ -523,10 +523,11 @@ public class Main implements PropertyChangeListener {
                             List<String> csvLineList = new ArrayList<String>();
                             Api traceApi = new TraceApi(preferenceStore, appId, trace_id);
                             Trace trace = (Trace) traceApi.get();
+                            Application realApp = trace.getApplication();
                             // ==================== 01. アプリケーション名 ====================
                             csvLineList.add(appName);
                             // ==================== 02. マージしたときの、各アプリ名称（可能であれば） ====================
-                            csvLineList.add("");
+                            csvLineList.add(realApp.getName());
                             // ==================== 03. （脆弱性の）カテゴリ ====================
                             csvLineList.add(trace.getCategory_label());
                             // ==================== 04. （脆弱性の）ルール ====================

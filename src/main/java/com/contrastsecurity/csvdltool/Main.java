@@ -84,6 +84,7 @@ import com.contrastsecurity.csvdltool.api.TracesApi;
 import com.contrastsecurity.csvdltool.exception.ApiException;
 import com.contrastsecurity.csvdltool.json.HowToFixJson;
 import com.contrastsecurity.csvdltool.model.Application;
+import com.contrastsecurity.csvdltool.model.Chapter;
 import com.contrastsecurity.csvdltool.model.ContrastSecurityYaml;
 import com.contrastsecurity.csvdltool.model.HttpRequest;
 import com.contrastsecurity.csvdltool.model.Note;
@@ -552,11 +553,16 @@ public class Main implements PropertyChangeListener {
                                 csvLineList.add("");
                             }
                             if (includeDescChk.getSelection()) {
-                                // ==================== 17. 何が起こったか？ ====================
-                                csvLineList.add("");
-                                // ==================== 18. どんなリスクであるか？ ====================
                                 Api storyApi = new StoryApi(preferenceStore, trace_id);
                                 Story story = (Story) storyApi.get();
+                                // ==================== 17. 何が起こったか？ ====================
+                                List<String> chapterLines = new ArrayList<String>();
+                                for (Chapter chapter : story.getChapters()) {
+                                    chapterLines.add(chapter.getIntroText());
+                                    chapterLines.add(chapter.getBody());
+                                }
+                                csvLineList.add(String.join("\r\n", chapterLines));
+                                // ==================== 18. どんなリスクであるか？ ====================
                                 csvLineList.add(story.getRisk().getText());
                                 // ==================== 19. 修正方法 ====================
                                 Api howToFixApi = new HowToFixApi(preferenceStore, trace_id);

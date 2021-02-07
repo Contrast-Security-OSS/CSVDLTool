@@ -232,18 +232,22 @@ public class Main implements PropertyChangeListener {
             public void widgetSelected(SelectionEvent event) {
                 Api applicationsApi = new ApplicationsApi(preferenceStore);
                 try {
-                    List<Application> applications = (List<Application>) applicationsApi.get();
+                    // src
                     srcListFilter.setText("");
-                    dstListFilter.setText("");
                     srcList.removeAll();
                     srcApps.clear();
+                    // dst
+                    dstListFilter.setText("");
                     dstList.removeAll();
                     dstApps.clear();
+                    // full
                     fullAppMap.clear();
+
+                    List<Application> applications = (List<Application>) applicationsApi.get();
                     for (Application app : applications) {
-                        srcList.add(app.getName());
-                        srcApps.add(app.getName());
-                        fullAppMap.put(app.getName(), app.getApp_id());
+                        srcList.add(app.getName()); // memory src
+                        srcApps.add(app.getName()); // UI list
+                        fullAppMap.put(app.getName(), app.getApp_id()); // memory full
                     }
                     srcCount.setText(String.valueOf(srcList.getItemCount()));
                 } catch (ApiException re) {
@@ -266,28 +270,26 @@ public class Main implements PropertyChangeListener {
 
         srcListFilter = new Text(srcGrp, SWT.BORDER);
         srcListFilter.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        srcListFilter.setMessage("Filter");
+        srcListFilter.setMessage("Filter...");
         srcListFilter.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent event) {
+                srcList.removeAll(); // memory src
+                srcApps.clear(); // UI List src
                 String keyword = srcListFilter.getText();
                 if (keyword.isEmpty()) {
-                    srcList.removeAll();
-                    srcApps.clear();
                     for (String appName : fullAppMap.keySet()) {
                         if (dstApps.contains(appName)) {
-                            continue;
+                            continue; // 既に選択済みのアプリはスキップ
                         }
-                        srcList.add(appName);
-                        srcApps.add(appName);
+                        srcList.add(appName); // memory src
+                        srcApps.add(appName); // UI List src
                     }
                 } else {
-                    srcList.removeAll();
-                    srcApps.clear();
                     for (String appName : fullAppMap.keySet()) {
                         if (appName.toLowerCase().contains(keyword.toLowerCase())) {
                             if (dstApps.contains(appName)) {
-                                continue;
+                                continue; // 既に選択済みのアプリはスキップ
                             }
                             srcList.add(appName);
                             srcApps.add(appName);
@@ -432,31 +434,29 @@ public class Main implements PropertyChangeListener {
 
         dstListFilter = new Text(dstGrp, SWT.BORDER);
         dstListFilter.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        dstListFilter.setMessage("Filter");
+        dstListFilter.setMessage("Filter...");
         dstListFilter.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent event) {
+                dstList.removeAll(); // memory dst
+                dstApps.clear(); // UI List dst
                 String keyword = dstListFilter.getText();
                 if (keyword.isEmpty()) {
-                    dstList.removeAll();
-                    dstApps.clear();
                     for (String appName : fullAppMap.keySet()) {
                         if (srcApps.contains(appName)) {
-                            continue;
+                            continue; // 選択可能にあるアプリはスキップ
                         }
-                        dstList.add(appName);
-                        dstApps.add(appName);
+                        dstList.add(appName); // memory dst
+                        dstApps.add(appName); // UI List dst
                     }
                 } else {
-                    dstList.removeAll();
-                    dstApps.clear();
                     for (String appName : fullAppMap.keySet()) {
                         if (appName.toLowerCase().contains(keyword.toLowerCase())) {
                             if (srcApps.contains(appName)) {
-                                continue;
+                                continue; // 選択可能にあるアプリはスキップ
                             }
-                            dstList.add(appName);
-                            dstApps.add(appName);
+                            dstList.add(appName); // memory dst
+                            dstApps.add(appName); // UI List dst
                         }
                     }
                 }

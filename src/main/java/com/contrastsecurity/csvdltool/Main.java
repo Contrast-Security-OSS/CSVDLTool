@@ -103,6 +103,8 @@ public class Main implements PropertyChangeListener {
     private CSVDLToolShell shell;
 
     private Button appLoadBtn;
+    private Text srcListFilter;
+    private Text dstListFilter;
     private org.eclipse.swt.widgets.List srcList;
     private org.eclipse.swt.widgets.List dstList;
     private Label srcCount;
@@ -231,6 +233,8 @@ public class Main implements PropertyChangeListener {
                 Api applicationsApi = new ApplicationsApi(preferenceStore);
                 try {
                     List<Application> applications = (List<Application>) applicationsApi.get();
+                    srcListFilter.setText("");
+                    dstListFilter.setText("");
                     srcList.removeAll();
                     srcApps.clear();
                     dstList.removeAll();
@@ -260,7 +264,7 @@ public class Main implements PropertyChangeListener {
         GridData srcGrpGrDt = new GridData(GridData.FILL_BOTH);
         srcGrp.setLayoutData(srcGrpGrDt);
 
-        Text srcListFilter = new Text(srcGrp, SWT.BORDER);
+        srcListFilter = new Text(srcGrp, SWT.BORDER);
         srcListFilter.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         srcListFilter.setMessage("Filter");
         srcListFilter.addModifyListener(new ModifyListener() {
@@ -418,7 +422,7 @@ public class Main implements PropertyChangeListener {
         GridData dstGrpGrDt = new GridData(GridData.FILL_BOTH);
         dstGrp.setLayoutData(dstGrpGrDt);
 
-        Text dstListFilter = new Text(dstGrp, SWT.BORDER);
+        dstListFilter = new Text(dstGrp, SWT.BORDER);
         dstListFilter.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         dstListFilter.setMessage("Filter");
         dstListFilter.addModifyListener(new ModifyListener() {
@@ -539,7 +543,7 @@ public class Main implements PropertyChangeListener {
                             Api routesApi = new RoutesApi(preferenceStore, appId, trace_id);
                             List<Route> routes = (List<Route>) routesApi.get();
                             List<String> signatureList = routes.stream().map(Route::getSignature).collect(Collectors.toList());
-                            csvLineList.add(String.join(",", signatureList));
+                            csvLineList.add(String.join("\r\n", signatureList));
                             // ==================== 15. モジュール ====================
                             Application app = trace.getApplication();
                             String module = String.format("%s (%s) - %s", app.getName(), app.getContext_path(), app.getLanguage());
@@ -550,7 +554,7 @@ public class Main implements PropertyChangeListener {
                             if (httpRequest != null) {
                                 csvLineList.add(httpRequest.getText());
                             } else {
-                                csvLineList.add("");
+                                csvLineList.add(""); // HTTP情報がない場合もあります。
                             }
                             if (includeDescChk.getSelection()) {
                                 Api storyApi = new StoryApi(preferenceStore, trace_id);

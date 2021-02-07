@@ -92,6 +92,8 @@ public abstract class Api {
                 } else if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
                     throw new ApiException(EntityUtils.toString(httpResponse.getEntity()));
                 } else {
+                    logger.warn(httpResponse.getStatusLine().getStatusCode());
+                    logger.warn(EntityUtils.toString(httpResponse.getEntity()));
                     throw new ApiException("200, 401以外のステータスコードが返却されました。");
                 }
             } catch (Exception e) {

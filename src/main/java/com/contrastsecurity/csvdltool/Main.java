@@ -157,20 +157,20 @@ public class Main implements PropertyChangeListener {
             e.printStackTrace();
         }
         try {
-            Yaml yaml = new Yaml();
-            InputStream is = new FileInputStream("contrast_security.yaml");
-            ContrastSecurityYaml contrastSecurityYaml = yaml.loadAs(is, ContrastSecurityYaml.class);
-            is.close();
-            // System.out.println(contrastSecurityYaml);
-            this.preferenceStore.setDefault(PreferenceConstants.CONTRAST_URL, contrastSecurityYaml.getUrl());
-            this.preferenceStore.setDefault(PreferenceConstants.API_KEY, contrastSecurityYaml.getApiKey());
-            this.preferenceStore.setDefault(PreferenceConstants.SERVICE_KEY, contrastSecurityYaml.getServiceKey());
-            this.preferenceStore.setDefault(PreferenceConstants.USERNAME, contrastSecurityYaml.getUserName());
             this.preferenceStore.setDefault(PreferenceConstants.SLEEP_TRACE, 300);
             this.preferenceStore.setDefault(PreferenceConstants.CSV_OUT_HEADER, true);
             this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_BUILDNO, ",");
             this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_SERVER, ",");
             this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_ROUTE, "\\r\\n");
+
+            Yaml yaml = new Yaml();
+            InputStream is = new FileInputStream("contrast_security.yaml");
+            ContrastSecurityYaml contrastSecurityYaml = yaml.loadAs(is, ContrastSecurityYaml.class);
+            is.close();
+            this.preferenceStore.setDefault(PreferenceConstants.CONTRAST_URL, contrastSecurityYaml.getUrl());
+            this.preferenceStore.setDefault(PreferenceConstants.API_KEY, contrastSecurityYaml.getApiKey());
+            this.preferenceStore.setDefault(PreferenceConstants.SERVICE_KEY, contrastSecurityYaml.getServiceKey());
+            this.preferenceStore.setDefault(PreferenceConstants.USERNAME, contrastSecurityYaml.getUserName());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -202,7 +202,6 @@ public class Main implements PropertyChangeListener {
 
             @Override
             public void shellClosed(ShellEvent event) {
-                preferenceStore.setValue(PreferenceConstants.INCLUDE_DESCRIPTION, includeDescChk.getSelection());
                 try {
                     preferenceStore.save();
                 } catch (IOException ioe) {

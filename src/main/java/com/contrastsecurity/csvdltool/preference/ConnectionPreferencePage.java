@@ -49,11 +49,10 @@ public class ConnectionPreferencePage extends PreferencePage {
     private Text portTxt;
     private Text userTxt;
     private Text passTxt;
-    private List<Text> textList;
     private Button ignoreSSLCertCheckFlg;
 
     public ConnectionPreferencePage() {
-        super("接続l設定");
+        super("接続設定");
     }
 
     @Override
@@ -117,14 +116,11 @@ public class ConnectionPreferencePage extends PreferencePage {
         dirGrp.setLayoutData(dirGrpGrDt);
         dirGrp.setText("認証");
 
-        this.textList = new ArrayList<Text>();
-
         // ========== ユーザー ========== //
         new Label(dirGrp, SWT.LEFT).setText("ユーザー：");
         userTxt = new Text(dirGrp, SWT.BORDER);
         userTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         userTxt.setText(preferenceStore.getString(PreferenceConstants.PROXY_USER));
-        this.textList.add(userTxt);
 
         // ========== パスワード ========== //
         new Label(dirGrp, SWT.LEFT).setText("パスワード：");
@@ -132,7 +128,6 @@ public class ConnectionPreferencePage extends PreferencePage {
         passTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         passTxt.setEchoChar('*');
         passTxt.setText(preferenceStore.getString(PreferenceConstants.PROXY_PASS));
-        this.textList.add(passTxt);
 
         Group sslCertGrp = new Group(composite, SWT.NONE);
         GridLayout sslCertGrpLt = new GridLayout(1, false);

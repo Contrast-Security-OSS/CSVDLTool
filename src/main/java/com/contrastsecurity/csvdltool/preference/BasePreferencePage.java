@@ -69,6 +69,7 @@ public class BasePreferencePage extends PreferencePage {
         compositeLt.marginHeight = 15;
         compositeLt.marginWidth = 5;
         compositeLt.horizontalSpacing = 10;
+        compositeLt.verticalSpacing = 20;
         composite.setLayout(compositeLt);
 
         Composite baseGrp = new Composite(composite, SWT.NONE);

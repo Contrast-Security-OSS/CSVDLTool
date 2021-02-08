@@ -44,12 +44,11 @@ import org.eclipse.swt.widgets.Text;
 
 public class OtherPreferencePage extends PreferencePage {
 
-    private Button validFlg;
-    private Text hostTxt;
+    private Button outCsvHeaderFlg;
+    private Text traceSleepTxt;
     private Text portTxt;
     private Text userTxt;
     private Text passTxt;
-    private List<Text> textList;
 
     public OtherPreferencePage() {
         super("その他設定");
@@ -57,71 +56,47 @@ public class OtherPreferencePage extends PreferencePage {
 
     @Override
     protected Control createContents(Composite parent) {
+        IPreferenceStore preferenceStore = getPreferenceStore();
+
         final Composite composite = new Composite(parent, SWT.NONE);
         GridLayout compositeLt = new GridLayout(1, false);
         compositeLt.marginHeight = 15;
         compositeLt.marginWidth = 5;
         compositeLt.horizontalSpacing = 10;
+        compositeLt.verticalSpacing = 20;
         composite.setLayout(compositeLt);
 
-        IPreferenceStore preferenceStore = getPreferenceStore();
-
-        validFlg = new Button(composite, SWT.CHECK);
-        // GridData validFlgGrDt = new GridData();
-        // validFlgGrDt.horizontalSpan = 4;
-        // validFlg.setLayoutData(validFlgGrDt);
-        validFlg.setText("プロキシ経由");
-        if (preferenceStore.getBoolean(PreferenceConstants.PROXY_YUKO)) {
-            validFlg.setSelection(true);
-        }
-
-        Group proxyGrp = new Group(composite, SWT.NONE);
-        GridLayout proxyGrpLt = new GridLayout(4, false);
-        proxyGrpLt.marginWidth = 15;
-        proxyGrpLt.horizontalSpacing = 10;
-        proxyGrp.setLayout(proxyGrpLt);
-        GridData proxyGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
-        // proxyGrpGrDt.horizontalSpan = 4;
-        proxyGrp.setLayoutData(proxyGrpGrDt);
-
-        // ========== ホスト ========== //
-        new Label(proxyGrp, SWT.LEFT).setText("ホスト：");
-        hostTxt = new Text(proxyGrp, SWT.BORDER);
-        hostTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        hostTxt.setText(preferenceStore.getString(PreferenceConstants.PROXY_HOST));
-
-        // ========== ポート ========== //
-        new Label(proxyGrp, SWT.LEFT).setText("ポート：");
-        portTxt = new Text(proxyGrp, SWT.BORDER);
-        portTxt.setLayoutData(new GridData());
-        portTxt.setText(preferenceStore.getString(PreferenceConstants.PROXY_PORT));
-
-        Group dirGrp = new Group(composite, SWT.NONE);
+        Group csvGrp = new Group(composite, SWT.NONE);
         GridLayout dirGrpLt = new GridLayout(2, false);
         dirGrpLt.marginWidth = 15;
         dirGrpLt.horizontalSpacing = 10;
-        dirGrp.setLayout(dirGrpLt);
+        csvGrp.setLayout(dirGrpLt);
         GridData dirGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
         // dirGrpGrDt.horizontalSpan = 4;
-        dirGrp.setLayoutData(dirGrpGrDt);
-        dirGrp.setText("認証");
+        csvGrp.setLayoutData(dirGrpGrDt);
+        csvGrp.setText("CSV");
 
-        this.textList = new ArrayList<Text>();
+        outCsvHeaderFlg = new Button(csvGrp, SWT.CHECK);
+        outCsvHeaderFlg.setText("カラムヘッダを出力");
+        if (preferenceStore.getBoolean(PreferenceConstants.CSV_OUT_HEADER)) {
+            outCsvHeaderFlg.setSelection(true);
+        }
 
-        // ========== ユーザー ========== //
-        new Label(dirGrp, SWT.LEFT).setText("ユーザー：");
-        userTxt = new Text(dirGrp, SWT.BORDER);
-        userTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        userTxt.setText(preferenceStore.getString(PreferenceConstants.PROXY_USER));
-        this.textList.add(userTxt);
+        Group ctrlGrp = new Group(composite, SWT.NONE);
+        GridLayout proxyGrpLt = new GridLayout(4, false);
+        proxyGrpLt.marginWidth = 15;
+        proxyGrpLt.horizontalSpacing = 10;
+        ctrlGrp.setLayout(proxyGrpLt);
+        GridData proxyGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        // proxyGrpGrDt.horizontalSpan = 4;
+        ctrlGrp.setLayoutData(proxyGrpGrDt);
+        ctrlGrp.setText("制御");
 
-        // ========== パスワード ========== //
-        new Label(dirGrp, SWT.LEFT).setText("パスワード：");
-        passTxt = new Text(dirGrp, SWT.BORDER);
-        passTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        passTxt.setEchoChar('*');
-        passTxt.setText(preferenceStore.getString(PreferenceConstants.PROXY_PASS));
-        this.textList.add(passTxt);
+        // ========== 脆弱性取得ごとスリープ ========== //
+        new Label(ctrlGrp, SWT.LEFT).setText("脆弱性取得間隔スリープ（ミリ秒）：");
+        traceSleepTxt = new Text(ctrlGrp, SWT.BORDER);
+        traceSleepTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        traceSleepTxt.setText(preferenceStore.getString(PreferenceConstants.SLEEP_TRACE));
 
         Button applyBtn = new Button(composite, SWT.NULL);
         GridData applyBtnGrDt = new GridData(SWT.RIGHT, SWT.BOTTOM, true, true, 1, 1);
@@ -148,17 +123,17 @@ public class OtherPreferencePage extends PreferencePage {
         if (ps == null) {
             return true;
         }
-        ps.setValue(PreferenceConstants.PROXY_YUKO, this.validFlg.getSelection());
-        if (this.hostTxt != null) {
-            if (this.validFlg.getSelection()) {
-                if (this.hostTxt.getText().isEmpty()) {
+        ps.setValue(PreferenceConstants.PROXY_YUKO, this.outCsvHeaderFlg.getSelection());
+        if (this.traceSleepTxt != null) {
+            if (this.outCsvHeaderFlg.getSelection()) {
+                if (this.traceSleepTxt.getText().isEmpty()) {
                     errors.add("・ホストを指定してください。");
                 }
             }
-            ps.setValue(PreferenceConstants.PROXY_HOST, this.hostTxt.getText());
+            ps.setValue(PreferenceConstants.PROXY_HOST, this.traceSleepTxt.getText());
         }
         if (this.portTxt != null) {
-            if (this.validFlg.getSelection()) {
+            if (this.outCsvHeaderFlg.getSelection()) {
                 if (this.portTxt.getText().isEmpty()) {
                     errors.add("・ポート番号を指定してください。");
                 } else {

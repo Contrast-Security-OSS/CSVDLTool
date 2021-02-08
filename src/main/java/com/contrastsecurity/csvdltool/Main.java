@@ -98,6 +98,7 @@ import com.contrastsecurity.csvdltool.model.Trace;
 import com.contrastsecurity.csvdltool.preference.AboutPage;
 import com.contrastsecurity.csvdltool.preference.BasePreferencePage;
 import com.contrastsecurity.csvdltool.preference.ConnectionPreferencePage;
+import com.contrastsecurity.csvdltool.preference.OtherPreferencePage;
 import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
 
 public class Main implements PropertyChangeListener {
@@ -122,6 +123,11 @@ public class Main implements PropertyChangeListener {
     private List<String> dstApps = new ArrayList<String>();
 
     private PreferenceStore preferenceStore;
+
+    private static final List<String> CSV_HEADER = new ArrayList<String>(Arrays.asList("アプリケーション名", "マージしたときの各アプリ名称", "カテゴリ", "ルール", "深刻度", "ステータス", "言語", "アプリケーションのグループ",
+            "脆弱性のタイトル", "最初の検出", "最後の検出", "ビルド番号", "次のサーバにより報告", "ルート", "モジュール", "HTTP情報", "コメント"));
+    private static final List<String> CSV_HEADER_FULL = new ArrayList<String>(Arrays.asList("アプリケーション名", "マージしたときの各アプリ名称", "カテゴリ", "ルール", "深刻度", "ステータス", "言語", "アプリケーションのグループ",
+            "脆弱性のタイトル", "最初の検出", "最後の検出", "ビルド番号", "次のサーバにより報告", "ルート", "モジュール", "HTTP情報", "何が起こったか？", "どんなリスクであるか？", "修正方法", "コメント"));
 
     private PropertyChangeSupport support = new PropertyChangeSupport(this);
 
@@ -159,6 +165,8 @@ public class Main implements PropertyChangeListener {
             this.preferenceStore.setDefault(PreferenceConstants.API_KEY, contrastSecurityYaml.getApiKey());
             this.preferenceStore.setDefault(PreferenceConstants.SERVICE_KEY, contrastSecurityYaml.getServiceKey());
             this.preferenceStore.setDefault(PreferenceConstants.USERNAME, contrastSecurityYaml.getUserName());
+            this.preferenceStore.setDefault(PreferenceConstants.SLEEP_TRACE, 300);
+            this.preferenceStore.setDefault(PreferenceConstants.CSV_OUT_HEADER, true);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -515,6 +523,7 @@ public class Main implements PropertyChangeListener {
                     MessageDialog.openInformation(shell, "取得", "取得対象のアプリケーションを選択してください。");
                     return;
                 }
+                int sleepTrace = preferenceStore.getInt(PreferenceConstants.SLEEP_TRACE);
                 executeBtn.setEnabled(false);
                 settingBtn.setEnabled(false);
                 Map<String, String> appGroupMap = new HashMap<String, String>();
@@ -531,6 +540,7 @@ public class Main implements PropertyChangeListener {
                             }
                         }
                     }
+                    Thread.sleep(1000);
                     // 選択済みアプリの脆弱性情報を取得
                     for (String appName : dstApps) {
                         String appId = fullAppMap.get(appName);
@@ -612,6 +622,7 @@ public class Main implements PropertyChangeListener {
                             }
 
                             csvList.add(csvLineList);
+                            Thread.sleep(sleepTrace);
                         }
                     }
                 } catch (ApiException re) {
@@ -624,8 +635,17 @@ public class Main implements PropertyChangeListener {
                     logger.error(trace);
                     MessageDialog.openError(shell, "脆弱性情報の取得", e.getMessage());
                 }
+
+                // ========== CSV出力 ==========
                 try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File("out.csv")), "shift-jis"))) {
                     CSVPrinter printer = CSVFormat.EXCEL.print(bw);
+                    if (preferenceStore.getBoolean(PreferenceConstants.CSV_OUT_HEADER)) {
+                        if (includeDescChk.getSelection()) {
+                            printer.printRecord(CSV_HEADER_FULL);
+                        } else {
+                            printer.printRecord(CSV_HEADER);
+                        }
+                    }
                     for (List<String> csvLine : csvList) {
                         printer.printRecord(csvLine);
                     }
@@ -658,10 +678,10 @@ public class Main implements PropertyChangeListener {
                 PreferenceManager mgr = new PreferenceManager();
                 PreferenceNode baseNode = new PreferenceNode("base", new BasePreferencePage());
                 PreferenceNode connectionNode = new PreferenceNode("connection", new ConnectionPreferencePage());
-//                PreferenceNode otherNode = new PreferenceNode("other", new OtherPreferencePage());
+                PreferenceNode otherNode = new PreferenceNode("other", new OtherPreferencePage());
                 mgr.addToRoot(baseNode);
                 mgr.addTo(baseNode.getId(), connectionNode);
-//                mgr.addTo(baseNode.getId(), otherNode);
+                mgr.addTo(baseNode.getId(), otherNode);
                 PreferenceNode aboutNode = new PreferenceNode("about", new AboutPage());
                 mgr.addToRoot(aboutNode);
                 PreferenceDialog dialog = new PreferenceDialog(shell, mgr);

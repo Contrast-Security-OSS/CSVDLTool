@@ -39,6 +39,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -75,6 +76,7 @@ import org.yaml.snakeyaml.Yaml;
 
 import com.contrastsecurity.csvdltool.api.Api;
 import com.contrastsecurity.csvdltool.api.ApplicationsApi;
+import com.contrastsecurity.csvdltool.api.GroupsApi;
 import com.contrastsecurity.csvdltool.api.HowToFixApi;
 import com.contrastsecurity.csvdltool.api.HttpRequestApi;
 import com.contrastsecurity.csvdltool.api.RoutesApi;
@@ -86,6 +88,7 @@ import com.contrastsecurity.csvdltool.json.HowToFixJson;
 import com.contrastsecurity.csvdltool.model.Application;
 import com.contrastsecurity.csvdltool.model.Chapter;
 import com.contrastsecurity.csvdltool.model.ContrastSecurityYaml;
+import com.contrastsecurity.csvdltool.model.CustomGroup;
 import com.contrastsecurity.csvdltool.model.HttpRequest;
 import com.contrastsecurity.csvdltool.model.Note;
 import com.contrastsecurity.csvdltool.model.Route;
@@ -514,11 +517,24 @@ public class Main implements PropertyChangeListener {
                 }
                 executeBtn.setEnabled(false);
                 settingBtn.setEnabled(false);
+                Map<String, String> appGroupMap = new HashMap<String, String>();
                 List<List<String>> csvList = new ArrayList<List<String>>();
-                for (String appName : dstApps) {
-                    String appId = fullAppMap.get(appName);
-                    Api tracesApi = new TracesApi(preferenceStore, appId);
-                    try {
+                try {
+                    // アプリケーショングループの情報を取得
+                    Api groupsApi = new GroupsApi(preferenceStore);
+                    List<CustomGroup> customGroups = (List<CustomGroup>) groupsApi.get();
+                    for (CustomGroup customGroup : customGroups) {
+                        List<Application> apps = customGroup.getApplications();
+                        if (apps != null) {
+                            for (Application app : apps) {
+                                appGroupMap.put(app.getName(), customGroup.getName());
+                            }
+                        }
+                    }
+                    // 選択済みアプリの脆弱性情報を取得
+                    for (String appName : dstApps) {
+                        String appId = fullAppMap.get(appName);
+                        Api tracesApi = new TracesApi(preferenceStore, appId);
                         List<String> traces = (List<String>) tracesApi.get();
                         for (String trace_id : traces) {
                             List<String> csvLineList = new ArrayList<String>();
@@ -540,7 +556,11 @@ public class Main implements PropertyChangeListener {
                             // ==================== 07. 言語（Javaなど） ====================
                             csvLineList.add(trace.getLanguage());
                             // ==================== 08. グループ（アプリケーションのグループ） ====================
-                            csvLineList.add("");
+                            if (appGroupMap.containsKey(appName)) {
+                                csvLineList.add(appGroupMap.get(appName));
+                            } else {
+                                csvLineList.add("");
+                            }
                             // ==================== 09. 脆弱性のタイトル（例：SQLインジェクション：「/api/v1/approvers/」ページのリクエストボディ ） ====================
                             csvLineList.add(trace.getTitle());
                             // ==================== 10. 最初の検出 ====================
@@ -593,12 +613,16 @@ public class Main implements PropertyChangeListener {
 
                             csvList.add(csvLineList);
                         }
-                    } catch (ApiException re) {
-                        MessageDialog.openError(shell, "組織情報の取得", re.getMessage());
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        MessageDialog.openError(shell, "組織情報の取得", e.getMessage());
                     }
+                } catch (ApiException re) {
+                    MessageDialog.openError(shell, "脆弱性情報の取得", re.getMessage());
+                } catch (Exception e) {
+                    StringWriter stringWriter = new StringWriter();
+                    PrintWriter printWriter = new PrintWriter(stringWriter);
+                    e.printStackTrace(printWriter);
+                    String trace = stringWriter.toString();
+                    logger.error(trace);
+                    MessageDialog.openError(shell, "脆弱性情報の取得", e.getMessage());
                 }
                 try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File("out.csv")), "shift-jis"))) {
                     CSVPrinter printer = CSVFormat.EXCEL.print(bw);

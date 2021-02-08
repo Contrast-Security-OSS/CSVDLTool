@@ -1,10 +1,13 @@
 package com.contrastsecurity.csvdltool.api;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 
 import com.contrastsecurity.csvdltool.json.GroupsJson;
+import com.contrastsecurity.csvdltool.model.CustomGroup;
+import com.contrastsecurity.csvdltool.model.CustomGroups;
 import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -28,7 +31,12 @@ public class GroupsApi extends Api {
         Type contType = new TypeToken<GroupsJson>() {
         }.getType();
         GroupsJson groupsJson = gson.fromJson(response, contType);
-        return groupsJson.getCustom_groups().getGroups();
+        CustomGroups customGroups = groupsJson.getCustom_groups();
+        if (customGroups != null) {
+            return customGroups.getGroups();
+        } else {
+            return new ArrayList<CustomGroup>();
+        }
     }
 
 }

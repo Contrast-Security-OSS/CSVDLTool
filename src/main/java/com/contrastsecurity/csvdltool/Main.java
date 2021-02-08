@@ -93,8 +93,8 @@ import com.contrastsecurity.csvdltool.model.Story;
 import com.contrastsecurity.csvdltool.model.Trace;
 import com.contrastsecurity.csvdltool.preference.AboutPage;
 import com.contrastsecurity.csvdltool.preference.BasePreferencePage;
+import com.contrastsecurity.csvdltool.preference.ConnectionPreferencePage;
 import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
-import com.contrastsecurity.csvdltool.preference.ProxyPreferencePage;
 
 public class Main implements PropertyChangeListener {
 
@@ -631,9 +631,11 @@ public class Main implements PropertyChangeListener {
             public void widgetSelected(SelectionEvent event) {
                 PreferenceManager mgr = new PreferenceManager();
                 PreferenceNode baseNode = new PreferenceNode("base", new BasePreferencePage());
-                PreferenceNode pathNode = new PreferenceNode("path", new ProxyPreferencePage());
+                PreferenceNode connectionNode = new PreferenceNode("connection", new ConnectionPreferencePage());
+//                PreferenceNode otherNode = new PreferenceNode("other", new OtherPreferencePage());
                 mgr.addToRoot(baseNode);
-                mgr.addTo(baseNode.getId(), pathNode);
+                mgr.addTo(baseNode.getId(), connectionNode);
+//                mgr.addTo(baseNode.getId(), otherNode);
                 PreferenceNode aboutNode = new PreferenceNode("about", new AboutPage());
                 mgr.addToRoot(aboutNode);
                 PreferenceDialog dialog = new PreferenceDialog(shell, mgr);

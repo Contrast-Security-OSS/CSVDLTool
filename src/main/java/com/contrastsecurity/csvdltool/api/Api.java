@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,10 +20,13 @@ import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHeader;
+import org.apache.http.ssl.SSLContextBuilder;
+import org.apache.http.ssl.TrustStrategy;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -76,15 +81,42 @@ public abstract class Api {
                 String proxy_user = this.preferenceStore.getString(PreferenceConstants.PROXY_USER);
                 String proxy_pass = this.preferenceStore.getString(PreferenceConstants.PROXY_PASS);
                 if (proxy_user.isEmpty() || proxy_pass.isEmpty()) {
-                    httpClient = HttpClients.custom().setDefaultHeaders(headers).build();
+                    if (preferenceStore.getBoolean(PreferenceConstants.IGNORE_SSLCERT_CHECK)) {
+                        httpClient = HttpClients.custom().setDefaultHeaders(headers).setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
+                                .setSSLContext(new SSLContextBuilder().loadTrustMaterial(null, new TrustStrategy() {
+                                    public boolean isTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
+                                        return true;
+                                    }
+                                }).build()).build();
+                    } else {
+                        httpClient = HttpClients.custom().setDefaultHeaders(headers).build();
+                    }
                 } else {
                     CredentialsProvider credsProvider = new BasicCredentialsProvider();
                     credsProvider.setCredentials(new AuthScope(proxy), new UsernamePasswordCredentials(proxy_user, proxy_pass));
-                    httpClient = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).setDefaultHeaders(headers).build();
+                    if (preferenceStore.getBoolean(PreferenceConstants.IGNORE_SSLCERT_CHECK)) {
+                        httpClient = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).setDefaultHeaders(headers)
+                                .setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE).setSSLContext(new SSLContextBuilder().loadTrustMaterial(null, new TrustStrategy() {
+                                    public boolean isTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
+                                        return true;
+                                    }
+                                }).build()).build();
+                    } else {
+                        httpClient = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).setDefaultHeaders(headers)
+                                .setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE).setSSLContext(new SSLContextBuilder().loadTrustMaterial(null, new TrustStrategy() {
+                                    public boolean isTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
+                                        return true;
+                                    }
+                                }).build()).build();
+                    }
                 }
             } else {
                 httpGet.setConfig(RequestConfig.custom().setSocketTimeout(3000).setConnectTimeout(3000).build());
-                httpClient = HttpClients.custom().setDefaultHeaders(headers).build();
+                if (preferenceStore.getBoolean(PreferenceConstants.IGNORE_SSLCERT_CHECK)) {
+                    httpClient = HttpClients.custom().setDefaultHeaders(headers).build();
+                } else {
+                    httpClient = HttpClients.custom().setDefaultHeaders(headers).build();
+                }
             }
             try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet);) {
                 if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {

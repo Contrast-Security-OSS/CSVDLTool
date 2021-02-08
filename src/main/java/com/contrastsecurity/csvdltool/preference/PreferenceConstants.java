@@ -36,6 +36,7 @@ public class PreferenceConstants {
     public static final String PROXY_PORT = new String("com.contrastsecurity.csvdltool.proxy_port");
     public static final String PROXY_USER = new String("com.contrastsecurity.csvdltool.proxy_user");
     public static final String PROXY_PASS = new String("com.contrastsecurity.csvdltool.proxy_pass");
+    public static final String IGNORE_SSLCERT_CHECK = new String("com.contrastsecurity.csvdltool.ignore_sslcert_check");
 
     public static final String INCLUDE_DESCRIPTION = new String("com.contrastsecurity.csvdltool.include_description");
 }

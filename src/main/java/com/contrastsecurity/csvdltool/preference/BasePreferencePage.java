@@ -62,12 +62,25 @@ public class BasePreferencePage extends PreferencePage {
 
     @Override
     protected Control createContents(Composite parent) {
-        final Composite composite = new Composite(parent, SWT.NONE);
-        composite.setLayout(new GridLayout(2, false));
         IPreferenceStore preferenceStore = getPreferenceStore();
 
-        new Label(composite, SWT.LEFT).setText("Contrast URL：");
-        contrastUrlTxt = new Text(composite, SWT.BORDER);
+        final Composite composite = new Composite(parent, SWT.NONE);
+        GridLayout compositeLt = new GridLayout(1, false);
+        compositeLt.marginHeight = 15;
+        compositeLt.marginWidth = 5;
+        compositeLt.horizontalSpacing = 10;
+        composite.setLayout(compositeLt);
+
+        Composite baseGrp = new Composite(composite, SWT.NONE);
+        GridLayout baseGrpLt = new GridLayout(2, false);
+        baseGrpLt.marginWidth = 15;
+        baseGrpLt.horizontalSpacing = 10;
+        baseGrp.setLayout(baseGrpLt);
+        GridData baseGrpLtGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        baseGrp.setLayoutData(baseGrpLtGrDt);
+
+        new Label(baseGrp, SWT.LEFT).setText("Contrast URL：");
+        contrastUrlTxt = new Text(baseGrp, SWT.BORDER);
         contrastUrlTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         contrastUrlTxt.setText(preferenceStore.getString(PreferenceConstants.CONTRAST_URL));
         contrastUrlTxt.addListener(SWT.FocusIn, new Listener() {
@@ -76,8 +89,8 @@ public class BasePreferencePage extends PreferencePage {
             }
         });
 
-        new Label(composite, SWT.LEFT).setText("API Key：");
-        apiKeyTxt = new Text(composite, SWT.BORDER);
+        new Label(baseGrp, SWT.LEFT).setText("API Key：");
+        apiKeyTxt = new Text(baseGrp, SWT.BORDER);
         apiKeyTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         apiKeyTxt.setText(preferenceStore.getString(PreferenceConstants.API_KEY));
         apiKeyTxt.addListener(SWT.FocusIn, new Listener() {
@@ -85,8 +98,8 @@ public class BasePreferencePage extends PreferencePage {
                 apiKeyTxt.selectAll();
             }
         });
-        new Label(composite, SWT.LEFT).setText("Service Key：");
-        serviceKeyTxt = new Text(composite, SWT.BORDER);
+        new Label(baseGrp, SWT.LEFT).setText("Service Key：");
+        serviceKeyTxt = new Text(baseGrp, SWT.BORDER);
         serviceKeyTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         serviceKeyTxt.setText(preferenceStore.getString(PreferenceConstants.SERVICE_KEY));
         serviceKeyTxt.addListener(SWT.FocusIn, new Listener() {
@@ -95,8 +108,8 @@ public class BasePreferencePage extends PreferencePage {
             }
         });
 
-        new Label(composite, SWT.LEFT).setText("Username：");
-        userNameTxt = new Text(composite, SWT.BORDER);
+        new Label(baseGrp, SWT.LEFT).setText("Username：");
+        userNameTxt = new Text(baseGrp, SWT.BORDER);
         userNameTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         userNameTxt.setText(preferenceStore.getString(PreferenceConstants.USERNAME));
         userNameTxt.addListener(SWT.FocusIn, new Listener() {
@@ -105,7 +118,7 @@ public class BasePreferencePage extends PreferencePage {
             }
         });
 
-        Button getOrgBtn = new Button(composite, SWT.NULL);
+        Button getOrgBtn = new Button(baseGrp, SWT.NULL);
         GridData getOrgBtnGrDt = new GridData();
         getOrgBtnGrDt.horizontalSpan = 2;
         getOrgBtnGrDt.horizontalAlignment = SWT.RIGHT;
@@ -129,14 +142,22 @@ public class BasePreferencePage extends PreferencePage {
             }
         });
 
-        new Label(composite, SWT.LEFT).setText("組織名：");
-        orgNameTxt = new Text(composite, SWT.BORDER);
+        Composite orgGrp = new Composite(composite, SWT.NONE);
+        GridLayout orgGrpLt = new GridLayout(2, false);
+        orgGrpLt.marginWidth = 15;
+        orgGrpLt.horizontalSpacing = 10;
+        orgGrp.setLayout(orgGrpLt);
+        GridData orgGrpLtGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        orgGrp.setLayoutData(orgGrpLtGrDt);
+
+        new Label(orgGrp, SWT.LEFT).setText("組織名：");
+        orgNameTxt = new Text(orgGrp, SWT.BORDER);
         orgNameTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         orgNameTxt.setText(preferenceStore.getString(PreferenceConstants.ORG_NAME));
         orgNameTxt.setEditable(false);
 
-        new Label(composite, SWT.LEFT).setText("組織ID：");
-        orgIdTxt = new Text(composite, SWT.BORDER);
+        new Label(orgGrp, SWT.LEFT).setText("組織ID：");
+        orgIdTxt = new Text(orgGrp, SWT.BORDER);
         orgIdTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         orgIdTxt.setText(preferenceStore.getString(PreferenceConstants.ORG_ID));
         orgIdTxt.setEditable(false);

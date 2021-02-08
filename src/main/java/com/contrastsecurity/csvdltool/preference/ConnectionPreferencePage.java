@@ -42,7 +42,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-public class ProxyPreferencePage extends PreferencePage {
+public class ConnectionPreferencePage extends PreferencePage {
 
     private Button validFlg;
     private Text hostTxt;
@@ -50,23 +50,34 @@ public class ProxyPreferencePage extends PreferencePage {
     private Text userTxt;
     private Text passTxt;
     private List<Text> textList;
+    private Button ignoreSSLCertCheckFlg;
 
-    public ProxyPreferencePage() {
-        super("プロキシ設定");
+    public ConnectionPreferencePage() {
+        super("接続l設定");
     }
 
     @Override
     protected Control createContents(Composite parent) {
+        IPreferenceStore preferenceStore = getPreferenceStore();
+
         final Composite composite = new Composite(parent, SWT.NONE);
         GridLayout compositeLt = new GridLayout(1, false);
         compositeLt.marginHeight = 15;
         compositeLt.marginWidth = 5;
         compositeLt.horizontalSpacing = 10;
+        compositeLt.verticalSpacing = 20;
         composite.setLayout(compositeLt);
 
-        IPreferenceStore preferenceStore = getPreferenceStore();
+        Group proxyGrp = new Group(composite, SWT.NONE);
+        GridLayout proxyGrpLt = new GridLayout(1, false);
+        proxyGrpLt.marginWidth = 15;
+        proxyGrpLt.horizontalSpacing = 10;
+        proxyGrp.setLayout(proxyGrpLt);
+        GridData proxyGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        proxyGrp.setLayoutData(proxyGrpGrDt);
+        proxyGrp.setText("プロキシ設定");
 
-        validFlg = new Button(composite, SWT.CHECK);
+        validFlg = new Button(proxyGrp, SWT.CHECK);
         // GridData validFlgGrDt = new GridData();
         // validFlgGrDt.horizontalSpan = 4;
         // validFlg.setLayoutData(validFlgGrDt);
@@ -75,28 +86,28 @@ public class ProxyPreferencePage extends PreferencePage {
             validFlg.setSelection(true);
         }
 
-        Group proxyGrp = new Group(composite, SWT.NONE);
-        GridLayout proxyGrpLt = new GridLayout(4, false);
-        proxyGrpLt.marginWidth = 15;
-        proxyGrpLt.horizontalSpacing = 10;
-        proxyGrp.setLayout(proxyGrpLt);
-        GridData proxyGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        Group proxyHostGrp = new Group(proxyGrp, SWT.NONE);
+        GridLayout proxyHostGrppLt = new GridLayout(4, false);
+        proxyHostGrppLt.marginWidth = 15;
+        proxyHostGrppLt.horizontalSpacing = 10;
+        proxyHostGrp.setLayout(proxyHostGrppLt);
+        GridData proxyHostGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
         // proxyGrpGrDt.horizontalSpan = 4;
-        proxyGrp.setLayoutData(proxyGrpGrDt);
+        proxyHostGrp.setLayoutData(proxyHostGrpGrDt);
 
         // ========== ホスト ========== //
-        new Label(proxyGrp, SWT.LEFT).setText("ホスト：");
-        hostTxt = new Text(proxyGrp, SWT.BORDER);
+        new Label(proxyHostGrp, SWT.LEFT).setText("ホスト：");
+        hostTxt = new Text(proxyHostGrp, SWT.BORDER);
         hostTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         hostTxt.setText(preferenceStore.getString(PreferenceConstants.PROXY_HOST));
 
         // ========== ポート ========== //
-        new Label(proxyGrp, SWT.LEFT).setText("ポート：");
-        portTxt = new Text(proxyGrp, SWT.BORDER);
+        new Label(proxyHostGrp, SWT.LEFT).setText("ポート：");
+        portTxt = new Text(proxyHostGrp, SWT.BORDER);
         portTxt.setLayoutData(new GridData());
         portTxt.setText(preferenceStore.getString(PreferenceConstants.PROXY_PORT));
 
-        Group dirGrp = new Group(composite, SWT.NONE);
+        Group dirGrp = new Group(proxyGrp, SWT.NONE);
         GridLayout dirGrpLt = new GridLayout(2, false);
         dirGrpLt.marginWidth = 15;
         dirGrpLt.horizontalSpacing = 10;
@@ -122,6 +133,25 @@ public class ProxyPreferencePage extends PreferencePage {
         passTxt.setEchoChar('*');
         passTxt.setText(preferenceStore.getString(PreferenceConstants.PROXY_PASS));
         this.textList.add(passTxt);
+
+        Group sslCertGrp = new Group(composite, SWT.NONE);
+        GridLayout sslCertGrpLt = new GridLayout(1, false);
+        sslCertGrpLt.marginWidth = 15;
+        sslCertGrpLt.horizontalSpacing = 10;
+        sslCertGrp.setLayout(sslCertGrpLt);
+        GridData sslCertGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        sslCertGrp.setLayoutData(sslCertGrpGrDt);
+        sslCertGrp.setText("SSL証明書検証");
+
+        // ========== 証明書検証回避 ========== //
+        ignoreSSLCertCheckFlg = new Button(sslCertGrp, SWT.CHECK);
+        // GridData ignoreSSLCertCheckFlgGrDt = new GridData();
+        // ignoreSSLCertCheckFlgGrDt.horizontalSpan = 4;
+        // ignoreSSLCertCheckFlg.setLayoutData(ignoreSSLCertCheckFlgGrDt);
+        ignoreSSLCertCheckFlg.setText("検証を無効にする");
+        if (preferenceStore.getBoolean(PreferenceConstants.IGNORE_SSLCERT_CHECK)) {
+            ignoreSSLCertCheckFlg.setSelection(true);
+        }
 
         Button applyBtn = new Button(composite, SWT.NULL);
         GridData applyBtnGrDt = new GridData(SWT.RIGHT, SWT.BOTTOM, true, true, 1, 1);
@@ -175,8 +205,9 @@ public class ProxyPreferencePage extends PreferencePage {
         if (this.passTxt != null) {
             ps.setValue(PreferenceConstants.PROXY_PASS, this.passTxt.getText());
         }
+        ps.setValue(PreferenceConstants.IGNORE_SSLCERT_CHECK, this.ignoreSSLCertCheckFlg.getSelection());
         if (!errors.isEmpty()) {
-            MessageDialog.openError(getShell(), "プロキシ設定", String.join("\r\n", errors));
+            MessageDialog.openError(getShell(), "接続設定", String.join("\r\n", errors));
             return false;
         }
         return true;

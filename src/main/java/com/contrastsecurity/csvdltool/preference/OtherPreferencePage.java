@@ -46,9 +46,6 @@ public class OtherPreferencePage extends PreferencePage {
 
     private Button outCsvHeaderFlg;
     private Text traceSleepTxt;
-    private Text portTxt;
-    private Text userTxt;
-    private Text passTxt;
 
     public OtherPreferencePage() {
         super("その他設定");
@@ -123,32 +120,16 @@ public class OtherPreferencePage extends PreferencePage {
         if (ps == null) {
             return true;
         }
-        ps.setValue(PreferenceConstants.PROXY_YUKO, this.outCsvHeaderFlg.getSelection());
+        ps.setValue(PreferenceConstants.CSV_OUT_HEADER, this.outCsvHeaderFlg.getSelection());
         if (this.traceSleepTxt != null) {
-            if (this.outCsvHeaderFlg.getSelection()) {
-                if (this.traceSleepTxt.getText().isEmpty()) {
-                    errors.add("・ホストを指定してください。");
+            if (this.traceSleepTxt.getText().isEmpty()) {
+                errors.add("・脆弱性取得間隔スリープを指定してください。");
+            } else {
+                if (!StringUtils.isNumeric(this.traceSleepTxt.getText())) {
+                    errors.add("・脆弱性取得間隔スリープは数値を指定してください。");
                 }
             }
-            ps.setValue(PreferenceConstants.PROXY_HOST, this.traceSleepTxt.getText());
-        }
-        if (this.portTxt != null) {
-            if (this.outCsvHeaderFlg.getSelection()) {
-                if (this.portTxt.getText().isEmpty()) {
-                    errors.add("・ポート番号を指定してください。");
-                } else {
-                    if (!StringUtils.isNumeric(this.portTxt.getText())) {
-                        errors.add("・ポート番号は数値を指定してください。");
-                    }
-                }
-            }
-            ps.setValue(PreferenceConstants.PROXY_PORT, this.portTxt.getText());
-        }
-        if (this.userTxt != null) {
-            ps.setValue(PreferenceConstants.PROXY_USER, this.userTxt.getText());
-        }
-        if (this.passTxt != null) {
-            ps.setValue(PreferenceConstants.PROXY_PASS, this.passTxt.getText());
+            ps.setValue(PreferenceConstants.SLEEP_TRACE, this.traceSleepTxt.getText());
         }
         if (!errors.isEmpty()) {
             MessageDialog.openError(getShell(), "プロキシ設定", String.join("\r\n", errors));

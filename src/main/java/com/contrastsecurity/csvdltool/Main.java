@@ -168,6 +168,9 @@ public class Main implements PropertyChangeListener {
             this.preferenceStore.setDefault(PreferenceConstants.USERNAME, contrastSecurityYaml.getUserName());
             this.preferenceStore.setDefault(PreferenceConstants.SLEEP_TRACE, 300);
             this.preferenceStore.setDefault(PreferenceConstants.CSV_OUT_HEADER, true);
+            this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_BUILDNO, ",");
+            this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_SERVER, ",");
+            this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_ROUTE, "\\r\\n");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -525,6 +528,9 @@ public class Main implements PropertyChangeListener {
                     return;
                 }
                 int sleepTrace = preferenceStore.getInt(PreferenceConstants.SLEEP_TRACE);
+                String csvSepBuildNo = preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_BUILDNO).replace("\\r", "\r").replace("\\n", "\n");
+                String csvSepServer = preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_SERVER).replace("\\r", "\r").replace("\\n", "\n");
+                String csvSepRoute = preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_ROUTE).replace("\\r", "\r").replace("\\n", "\n");
                 executeBtn.setEnabled(false);
                 settingBtn.setEnabled(false);
                 Map<String, String> appGroupMap = new HashMap<String, String>();
@@ -579,15 +585,15 @@ public class Main implements PropertyChangeListener {
                             // ==================== 11. 最後の検出 ====================
                             csvLineList.add(trace.getLast_time_seen());
                             // ==================== 12. ビルド番号 ====================
-                            csvLineList.add(String.join(",", trace.getApp_version_tags()));
+                            csvLineList.add(String.join(csvSepBuildNo, trace.getApp_version_tags()));
                             // ==================== 13. 次のサーバにより報告 ====================
                             List<String> serverNameList = trace.getServers().stream().map(Server::getName).collect(Collectors.toList());
-                            csvLineList.add(String.join(",", serverNameList));
+                            csvLineList.add(String.join(csvSepServer, serverNameList));
                             // ==================== 14. ルート ====================
                             Api routesApi = new RoutesApi(preferenceStore, appId, trace_id);
                             List<Route> routes = (List<Route>) routesApi.get();
                             List<String> signatureList = routes.stream().map(Route::getSignature).collect(Collectors.toList());
-                            csvLineList.add(String.join("\r\n", signatureList));
+                            csvLineList.add(String.join(csvSepRoute, signatureList));
                             // ==================== 15. モジュール ====================
                             Application app = trace.getApplication();
                             String module = String.format("%s (%s) - %s", app.getName(), app.getContext_path(), app.getLanguage());

@@ -41,6 +41,9 @@ public class PreferenceConstants {
     public static final String SLEEP_TRACE = new String("com.contrastsecurity.csvdltool.sleep_trace");
 
     public static final String CSV_OUT_HEADER = new String("com.contrastsecurity.csvdltool.csv_out_header");
+    public static final String CSV_SEPARATOR_BUILDNO = new String("com.contrastsecurity.csvdltool.csv_separator_buildno");
+    public static final String CSV_SEPARATOR_SERVER = new String("com.contrastsecurity.csvdltool.csv_separator_server");
+    public static final String CSV_SEPARATOR_ROUTE = new String("com.contrastsecurity.csvdltool.csv_separator_route");
 
     public static final String INCLUDE_DESCRIPTION = new String("com.contrastsecurity.csvdltool.include_description");
 }

@@ -69,7 +69,8 @@ public class ConnectionPreferencePage extends PreferencePage {
 
         Group proxyGrp = new Group(composite, SWT.NONE);
         GridLayout proxyGrpLt = new GridLayout(1, false);
-        proxyGrpLt.marginWidth = 15;
+        proxyGrpLt.marginHeight = 10;
+        proxyGrpLt.marginWidth = 10;
         proxyGrpLt.horizontalSpacing = 10;
         proxyGrp.setLayout(proxyGrpLt);
         GridData proxyGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
@@ -87,7 +88,7 @@ public class ConnectionPreferencePage extends PreferencePage {
 
         Group proxyHostGrp = new Group(proxyGrp, SWT.NONE);
         GridLayout proxyHostGrppLt = new GridLayout(4, false);
-        proxyHostGrppLt.marginWidth = 15;
+        proxyHostGrppLt.marginWidth = 10;
         proxyHostGrppLt.horizontalSpacing = 10;
         proxyHostGrp.setLayout(proxyHostGrppLt);
         GridData proxyHostGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);

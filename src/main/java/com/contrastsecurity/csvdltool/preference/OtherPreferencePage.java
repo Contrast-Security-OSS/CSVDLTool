@@ -46,6 +46,9 @@ public class OtherPreferencePage extends PreferencePage {
 
     private Button outCsvHeaderFlg;
     private Text traceSleepTxt;
+    private Text csvSepBuildNoTxt;
+    private Text csvSepServerTxt;
+    private Text csvSepRouteTxt;
 
     public OtherPreferencePage() {
         super("その他設定");
@@ -64,20 +67,51 @@ public class OtherPreferencePage extends PreferencePage {
         composite.setLayout(compositeLt);
 
         Group csvGrp = new Group(composite, SWT.NONE);
-        GridLayout dirGrpLt = new GridLayout(2, false);
-        dirGrpLt.marginWidth = 15;
-        dirGrpLt.horizontalSpacing = 10;
-        csvGrp.setLayout(dirGrpLt);
-        GridData dirGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
-        // dirGrpGrDt.horizontalSpan = 4;
-        csvGrp.setLayoutData(dirGrpGrDt);
-        csvGrp.setText("CSV");
+        GridLayout csvGrpLt = new GridLayout(1, false);
+        csvGrpLt.marginWidth = 10;
+        csvGrpLt.marginHeight = 10;
+        csvGrpLt.horizontalSpacing = 5;
+        csvGrpLt.verticalSpacing = 10;
+        csvGrp.setLayout(csvGrpLt);
+        GridData csvGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        // csvGrpGrDt.horizontalSpan = 2;
+        csvGrp.setLayoutData(csvGrpGrDt);
+        csvGrp.setText("CSV出力");
 
         outCsvHeaderFlg = new Button(csvGrp, SWT.CHECK);
+        GridData outCsvHeaderFlgGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        outCsvHeaderFlgGrDt.horizontalSpan = 2;
+        outCsvHeaderFlg.setLayoutData(outCsvHeaderFlgGrDt);
         outCsvHeaderFlg.setText("カラムヘッダを出力");
         if (preferenceStore.getBoolean(PreferenceConstants.CSV_OUT_HEADER)) {
             outCsvHeaderFlg.setSelection(true);
         }
+
+        Group csvSepGrp = new Group(csvGrp, SWT.NONE);
+        GridLayout csvSepGrpLt = new GridLayout(2, false);
+        csvSepGrpLt.marginWidth = 10;
+        csvSepGrpLt.marginHeight = 10;
+        csvSepGrpLt.horizontalSpacing = 10;
+        csvSepGrp.setLayout(csvSepGrpLt);
+        GridData csvSepGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        // csvSepGrpGrDt.horizontalSpan = 2;
+        csvSepGrp.setLayoutData(csvSepGrpGrDt);
+        csvSepGrp.setText("区切り文字");
+
+        new Label(csvSepGrp, SWT.LEFT).setText("ビルド番号：");
+        csvSepBuildNoTxt = new Text(csvSepGrp, SWT.BORDER);
+        csvSepBuildNoTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        csvSepBuildNoTxt.setText(preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_BUILDNO));
+
+        new Label(csvSepGrp, SWT.LEFT).setText("サーバ：");
+        csvSepServerTxt = new Text(csvSepGrp, SWT.BORDER);
+        csvSepServerTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        csvSepServerTxt.setText(preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_SERVER));
+
+        new Label(csvSepGrp, SWT.LEFT).setText("ルート：");
+        csvSepRouteTxt = new Text(csvSepGrp, SWT.BORDER);
+        csvSepRouteTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        csvSepRouteTxt.setText(preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_ROUTE));
 
         Group ctrlGrp = new Group(composite, SWT.NONE);
         GridLayout proxyGrpLt = new GridLayout(4, false);
@@ -130,6 +164,15 @@ public class OtherPreferencePage extends PreferencePage {
                 }
             }
             ps.setValue(PreferenceConstants.SLEEP_TRACE, this.traceSleepTxt.getText());
+        }
+        if (this.traceSleepTxt != null) {
+            ps.setValue(PreferenceConstants.CSV_SEPARATOR_BUILDNO, this.csvSepBuildNoTxt.getText());
+        }
+        if (this.traceSleepTxt != null) {
+            ps.setValue(PreferenceConstants.CSV_SEPARATOR_SERVER, this.csvSepServerTxt.getText());
+        }
+        if (this.traceSleepTxt != null) {
+            ps.setValue(PreferenceConstants.CSV_SEPARATOR_ROUTE, this.csvSepRouteTxt.getText());
         }
         if (!errors.isEmpty()) {
             MessageDialog.openError(getShell(), "プロキシ設定", String.join("\r\n", errors));

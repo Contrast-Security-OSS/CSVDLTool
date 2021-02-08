@@ -91,6 +91,7 @@ import com.contrastsecurity.csvdltool.model.ContrastSecurityYaml;
 import com.contrastsecurity.csvdltool.model.CustomGroup;
 import com.contrastsecurity.csvdltool.model.HttpRequest;
 import com.contrastsecurity.csvdltool.model.Note;
+import com.contrastsecurity.csvdltool.model.Property;
 import com.contrastsecurity.csvdltool.model.Route;
 import com.contrastsecurity.csvdltool.model.Server;
 import com.contrastsecurity.csvdltool.model.Story;
@@ -618,7 +619,29 @@ public class Main implements PropertyChangeListener {
                             }
                             // ==================== 20(17). コメント(最後尾) ====================
                             for (Note note : trace.getNotes()) {
-                                csvLineList.add(note.getNote());
+                                String statusVal = "";
+                                String subStatusVal = "";
+                                List<Property> noteProperties = note.getProperties();
+                                if (noteProperties != null) {
+                                    for (Property prop : noteProperties) {
+                                        if (prop.getName().equals("status.change.status")) {
+                                            statusVal = prop.getValue();
+                                        } else if (prop.getName().equals("status.change.substatus")) {
+                                            subStatusVal = prop.getValue();
+                                        }
+                                    }
+                                }
+                                StringBuilder strBuffer = new StringBuilder();
+                                if (!statusVal.isEmpty()) {
+                                    strBuffer.append(String.format("次のステータスに変更: %s", statusVal));
+                                }
+                                if (!subStatusVal.isEmpty()) {
+                                    strBuffer.append(String.format("[%s]", subStatusVal));
+                                }
+                                if (!note.getNote().isEmpty()) {
+                                    strBuffer.append(String.format(" %s", note.getNote()));
+                                }
+                                csvLineList.add(strBuffer.toString());
                             }
 
                             csvList.add(csvLineList);

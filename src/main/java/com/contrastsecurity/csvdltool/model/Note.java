@@ -1,5 +1,6 @@
 package com.contrastsecurity.csvdltool.model;
 
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -9,6 +10,7 @@ public class Note {
     private String creator;
     private String last_modification;
     private String last_updater;
+    private List<Property> properties;
 
     public String getNote() {
         return this.ncr(note);
@@ -48,6 +50,14 @@ public class Note {
 
     public void setLast_updater(String last_updater) {
         this.last_updater = last_updater;
+    }
+
+    public List<Property> getProperties() {
+        return properties;
+    }
+
+    public void setProperties(List<Property> properties) {
+        this.properties = properties;
     }
 
     @Override

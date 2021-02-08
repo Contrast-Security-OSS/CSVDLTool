@@ -20,6 +20,7 @@ public class Trace {
     private String last_time_seen;
     private Application application;
     private Request request;
+    private List<Server> servers;
     private List<Note> notes;
 
     public String getCategory_label() {
@@ -86,8 +87,8 @@ public class Trace {
         this.language = language;
     }
 
-    public String getApp_version_tags() {
-        return String.join("|", this.app_version_tags);
+    public List<String> getApp_version_tags() {
+        return this.app_version_tags;
     }
 
     public void setApp_version_tags(List<String> app_version_tags) {
@@ -126,6 +127,14 @@ public class Trace {
 
     public void setRequest(Request request) {
         this.request = request;
+    }
+
+    public List<Server> getServers() {
+        return servers;
+    }
+
+    public void setServers(List<Server> servers) {
+        this.servers = servers;
     }
 
     public List<Note> getNotes() {

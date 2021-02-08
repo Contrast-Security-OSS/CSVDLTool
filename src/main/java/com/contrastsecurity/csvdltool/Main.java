@@ -89,6 +89,7 @@ import com.contrastsecurity.csvdltool.model.ContrastSecurityYaml;
 import com.contrastsecurity.csvdltool.model.HttpRequest;
 import com.contrastsecurity.csvdltool.model.Note;
 import com.contrastsecurity.csvdltool.model.Route;
+import com.contrastsecurity.csvdltool.model.Server;
 import com.contrastsecurity.csvdltool.model.Story;
 import com.contrastsecurity.csvdltool.model.Trace;
 import com.contrastsecurity.csvdltool.preference.AboutPage;
@@ -547,9 +548,10 @@ public class Main implements PropertyChangeListener {
                             // ==================== 11. 最後の検出 ====================
                             csvLineList.add(trace.getLast_time_seen());
                             // ==================== 12. ビルド番号 ====================
-                            csvLineList.add(trace.getApp_version_tags());
+                            csvLineList.add(String.join(",", trace.getApp_version_tags()));
                             // ==================== 13. 次のサーバにより報告 ====================
-                            csvLineList.add("");
+                            List<String> serverNameList = trace.getServers().stream().map(Server::getName).collect(Collectors.toList());
+                            csvLineList.add(String.join(",", serverNameList));
                             // ==================== 14. ルート ====================
                             Api routesApi = new RoutesApi(preferenceStore, appId, trace_id);
                             List<Route> routes = (List<Route>) routesApi.get();

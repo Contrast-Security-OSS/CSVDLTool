@@ -165,17 +165,17 @@ public class OtherPreferencePage extends PreferencePage {
             }
             ps.setValue(PreferenceConstants.SLEEP_TRACE, this.traceSleepTxt.getText());
         }
-        if (this.traceSleepTxt != null) {
+        if (this.csvSepBuildNoTxt != null) {
             ps.setValue(PreferenceConstants.CSV_SEPARATOR_BUILDNO, this.csvSepBuildNoTxt.getText());
         }
-        if (this.traceSleepTxt != null) {
+        if (this.csvSepServerTxt != null) {
             ps.setValue(PreferenceConstants.CSV_SEPARATOR_SERVER, this.csvSepServerTxt.getText());
         }
-        if (this.traceSleepTxt != null) {
+        if (this.csvSepRouteTxt != null) {
             ps.setValue(PreferenceConstants.CSV_SEPARATOR_ROUTE, this.csvSepRouteTxt.getText());
         }
         if (!errors.isEmpty()) {
-            MessageDialog.openError(getShell(), "プロキシ設定", String.join("\r\n", errors));
+            MessageDialog.openError(getShell(), "その他設定", String.join("\r\n", errors));
             return false;
         }
         return true;

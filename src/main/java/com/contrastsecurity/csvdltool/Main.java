@@ -47,6 +47,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.PreferenceDialog;
@@ -129,6 +130,8 @@ public class Main implements PropertyChangeListener {
             "脆弱性のタイトル", "最初の検出", "最後の検出", "ビルド番号", "次のサーバにより報告", "ルート", "モジュール", "HTTP情報", "コメント"));
     private static final List<String> CSV_HEADER_FULL = new ArrayList<String>(Arrays.asList("アプリケーション名", "マージしたときの各アプリ名称", "カテゴリ", "ルール", "深刻度", "ステータス", "言語", "アプリケーションのグループ",
             "脆弱性のタイトル", "最初の検出", "最後の検出", "ビルド番号", "次のサーバにより報告", "ルート", "モジュール", "HTTP情報", "何が起こったか？", "どんなリスクであるか？", "修正方法", "コメント"));
+
+    private static final int CELL_TEXT_MAX = 32767;
 
     private PropertyChangeSupport support = new PropertyChangeSupport(this);
 
@@ -614,13 +617,14 @@ public class Main implements PropertyChangeListener {
                                     chapterLines.add(chapter.getIntroText());
                                     chapterLines.add(chapter.getBody());
                                 }
-                                csvLineList.add(String.join("\r\n", chapterLines));
+                                String chapterStr = String.join("\r\n", chapterLines);
+                                csvLineList.add(StringUtils.abbreviate(chapterStr, CELL_TEXT_MAX));
                                 // ==================== 18. どんなリスクであるか？ ====================
-                                csvLineList.add(story.getRisk().getText());
+                                csvLineList.add(StringUtils.abbreviate(story.getRisk().getText(), CELL_TEXT_MAX));
                                 // ==================== 19. 修正方法 ====================
                                 Api howToFixApi = new HowToFixApi(preferenceStore, trace_id);
                                 HowToFixJson howToFixJson = (HowToFixJson) howToFixApi.get();
-                                csvLineList.add(howToFixJson.getRecommendation().getText());
+                                csvLineList.add(StringUtils.abbreviate(howToFixJson.getRecommendation().getText(), CELL_TEXT_MAX));
                             }
                             // ==================== 20(17). コメント(最後尾) ====================
                             for (Note note : trace.getNotes()) {

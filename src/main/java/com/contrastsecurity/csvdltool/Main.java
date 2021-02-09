@@ -26,30 +26,24 @@ package com.contrastsecurity.csvdltool;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.jface.preference.PreferenceManager;
 import org.eclipse.jface.preference.PreferenceNode;
@@ -77,26 +71,9 @@ import org.yaml.snakeyaml.Yaml;
 
 import com.contrastsecurity.csvdltool.api.Api;
 import com.contrastsecurity.csvdltool.api.ApplicationsApi;
-import com.contrastsecurity.csvdltool.api.GroupsApi;
-import com.contrastsecurity.csvdltool.api.HowToFixApi;
-import com.contrastsecurity.csvdltool.api.HttpRequestApi;
-import com.contrastsecurity.csvdltool.api.RoutesApi;
-import com.contrastsecurity.csvdltool.api.StoryApi;
-import com.contrastsecurity.csvdltool.api.TraceApi;
-import com.contrastsecurity.csvdltool.api.TracesApi;
 import com.contrastsecurity.csvdltool.exception.ApiException;
-import com.contrastsecurity.csvdltool.json.HowToFixJson;
 import com.contrastsecurity.csvdltool.model.Application;
-import com.contrastsecurity.csvdltool.model.Chapter;
 import com.contrastsecurity.csvdltool.model.ContrastSecurityYaml;
-import com.contrastsecurity.csvdltool.model.CustomGroup;
-import com.contrastsecurity.csvdltool.model.HttpRequest;
-import com.contrastsecurity.csvdltool.model.Note;
-import com.contrastsecurity.csvdltool.model.Property;
-import com.contrastsecurity.csvdltool.model.Route;
-import com.contrastsecurity.csvdltool.model.Server;
-import com.contrastsecurity.csvdltool.model.Story;
-import com.contrastsecurity.csvdltool.model.Trace;
 import com.contrastsecurity.csvdltool.preference.AboutPage;
 import com.contrastsecurity.csvdltool.preference.BasePreferencePage;
 import com.contrastsecurity.csvdltool.preference.ConnectionPreferencePage;
@@ -125,13 +102,6 @@ public class Main implements PropertyChangeListener {
     private List<String> dstApps = new ArrayList<String>();
 
     private PreferenceStore preferenceStore;
-
-    private static final List<String> CSV_HEADER = new ArrayList<String>(Arrays.asList("アプリケーション名", "マージしたときの各アプリ名称", "カテゴリ", "ルール", "深刻度", "ステータス", "言語", "アプリケーションのグループ",
-            "脆弱性のタイトル", "最初の検出", "最後の検出", "ビルド番号", "次のサーバにより報告", "ルート", "モジュール", "HTTP情報", "コメント"));
-    private static final List<String> CSV_HEADER_FULL = new ArrayList<String>(Arrays.asList("アプリケーション名", "マージしたときの各アプリ名称", "カテゴリ", "ルール", "深刻度", "ステータス", "言語", "アプリケーションのグループ",
-            "脆弱性のタイトル", "最初の検出", "最後の検出", "ビルド番号", "次のサーバにより報告", "ルート", "モジュール", "HTTP情報", "何が起こったか？", "どんなリスクであるか？", "修正方法", "コメント"));
-
-    private static final int CELL_TEXT_MAX = 32767;
 
     private PropertyChangeSupport support = new PropertyChangeSupport(this);
 
@@ -522,170 +492,21 @@ public class Main implements PropertyChangeListener {
         executeBtn.setText("取得");
         executeBtn.setFont(new Font(display, "ＭＳ ゴシック", 20, SWT.NORMAL));
         executeBtn.addSelectionListener(new SelectionListener() {
-            @SuppressWarnings("unchecked")
             @Override
             public void widgetSelected(SelectionEvent event) {
                 if (dstApps.isEmpty()) {
                     MessageDialog.openInformation(shell, "取得", "取得対象のアプリケーションを選択してください。");
                     return;
                 }
-                int sleepTrace = preferenceStore.getInt(PreferenceConstants.SLEEP_TRACE);
-                String csvSepBuildNo = preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_BUILDNO).replace("\\r", "\r").replace("\\n", "\n");
-                String csvSepServer = preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_SERVER).replace("\\r", "\r").replace("\\n", "\n");
-                String csvSepRoute = preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_ROUTE).replace("\\r", "\r").replace("\\n", "\n");
-                executeBtn.setEnabled(false);
-                settingBtn.setEnabled(false);
-                Map<String, String> appGroupMap = new HashMap<String, String>();
-                List<List<String>> csvList = new ArrayList<List<String>>();
+                VulnGetWithProgress progress = new VulnGetWithProgress(shell, preferenceStore, dstApps, fullAppMap, includeDescChk.getSelection());
+                ProgressMonitorDialog progDialog = new ProgressMonitorDialog(shell);
                 try {
-                    // アプリケーショングループの情報を取得
-                    Api groupsApi = new GroupsApi(preferenceStore);
-                    List<CustomGroup> customGroups = (List<CustomGroup>) groupsApi.get();
-                    for (CustomGroup customGroup : customGroups) {
-                        List<Application> apps = customGroup.getApplications();
-                        if (apps != null) {
-                            for (Application app : apps) {
-                                appGroupMap.put(app.getName(), customGroup.getName());
-                            }
-                        }
-                    }
-                    Thread.sleep(1000);
-                    // 選択済みアプリの脆弱性情報を取得
-                    for (String appName : dstApps) {
-                        String appId = fullAppMap.get(appName);
-                        Api tracesApi = new TracesApi(preferenceStore, appId);
-                        List<String> traces = (List<String>) tracesApi.get();
-                        for (String trace_id : traces) {
-                            List<String> csvLineList = new ArrayList<String>();
-                            Api traceApi = new TraceApi(preferenceStore, appId, trace_id);
-                            Trace trace = (Trace) traceApi.get();
-                            Application realApp = trace.getApplication();
-                            // ==================== 01. アプリケーション名 ====================
-                            csvLineList.add(appName);
-                            // ==================== 02. マージしたときの、各アプリ名称（可能であれば） ====================
-                            csvLineList.add(realApp.getName());
-                            // ==================== 03. （脆弱性の）カテゴリ ====================
-                            csvLineList.add(trace.getCategory_label());
-                            // ==================== 04. （脆弱性の）ルール ====================
-                            csvLineList.add(trace.getRule_title());
-                            // ==================== 05. 深刻度 ====================
-                            csvLineList.add(trace.getSeverity_label());
-                            // ==================== 06. ステータス ====================
-                            csvLineList.add(trace.getStatus());
-                            // ==================== 07. 言語（Javaなど） ====================
-                            csvLineList.add(trace.getLanguage());
-                            // ==================== 08. グループ（アプリケーションのグループ） ====================
-                            if (appGroupMap.containsKey(appName)) {
-                                csvLineList.add(appGroupMap.get(appName));
-                            } else {
-                                csvLineList.add("");
-                            }
-                            // ==================== 09. 脆弱性のタイトル（例：SQLインジェクション：「/api/v1/approvers/」ページのリクエストボディ ） ====================
-                            csvLineList.add(trace.getTitle());
-                            // ==================== 10. 最初の検出 ====================
-                            csvLineList.add(trace.getFirst_time_seen());
-                            // ==================== 11. 最後の検出 ====================
-                            csvLineList.add(trace.getLast_time_seen());
-                            // ==================== 12. ビルド番号 ====================
-                            csvLineList.add(String.join(csvSepBuildNo, trace.getApp_version_tags()));
-                            // ==================== 13. 次のサーバにより報告 ====================
-                            List<String> serverNameList = trace.getServers().stream().map(Server::getName).collect(Collectors.toList());
-                            csvLineList.add(String.join(csvSepServer, serverNameList));
-                            // ==================== 14. ルート ====================
-                            Api routesApi = new RoutesApi(preferenceStore, appId, trace_id);
-                            List<Route> routes = (List<Route>) routesApi.get();
-                            List<String> signatureList = routes.stream().map(Route::getSignature).collect(Collectors.toList());
-                            csvLineList.add(String.join(csvSepRoute, signatureList));
-                            // ==================== 15. モジュール ====================
-                            Application app = trace.getApplication();
-                            String module = String.format("%s (%s) - %s", app.getName(), app.getContext_path(), app.getLanguage());
-                            csvLineList.add(module);
-                            // ==================== 16. HTTP情報 ====================
-                            Api httpRequestApi = new HttpRequestApi(preferenceStore, trace_id);
-                            HttpRequest httpRequest = (HttpRequest) httpRequestApi.get();
-                            if (httpRequest != null) {
-                                csvLineList.add(httpRequest.getText());
-                            } else {
-                                csvLineList.add(""); // HTTP情報がない場合もあります。
-                            }
-                            if (includeDescChk.getSelection()) {
-                                Api storyApi = new StoryApi(preferenceStore, trace_id);
-                                Story story = (Story) storyApi.get();
-                                // ==================== 17. 何が起こったか？ ====================
-                                List<String> chapterLines = new ArrayList<String>();
-                                for (Chapter chapter : story.getChapters()) {
-                                    chapterLines.add(chapter.getIntroText());
-                                    chapterLines.add(chapter.getBody());
-                                }
-                                String chapterStr = String.join("\r\n", chapterLines);
-                                csvLineList.add(StringUtils.abbreviate(chapterStr, CELL_TEXT_MAX));
-                                // ==================== 18. どんなリスクであるか？ ====================
-                                csvLineList.add(StringUtils.abbreviate(story.getRisk().getText(), CELL_TEXT_MAX));
-                                // ==================== 19. 修正方法 ====================
-                                Api howToFixApi = new HowToFixApi(preferenceStore, trace_id);
-                                HowToFixJson howToFixJson = (HowToFixJson) howToFixApi.get();
-                                csvLineList.add(StringUtils.abbreviate(howToFixJson.getRecommendation().getText(), CELL_TEXT_MAX));
-                            }
-                            // ==================== 20(17). コメント(最後尾) ====================
-                            for (Note note : trace.getNotes()) {
-                                String statusVal = "";
-                                String subStatusVal = "";
-                                List<Property> noteProperties = note.getProperties();
-                                if (noteProperties != null) {
-                                    for (Property prop : noteProperties) {
-                                        if (prop.getName().equals("status.change.status")) {
-                                            statusVal = prop.getValue();
-                                        } else if (prop.getName().equals("status.change.substatus")) {
-                                            subStatusVal = prop.getValue();
-                                        }
-                                    }
-                                }
-                                StringBuilder strBuffer = new StringBuilder();
-                                if (!statusVal.isEmpty()) {
-                                    strBuffer.append(String.format("次のステータスに変更: %s", statusVal));
-                                }
-                                if (!subStatusVal.isEmpty()) {
-                                    strBuffer.append(String.format("[%s]", subStatusVal));
-                                }
-                                if (!note.getNote().isEmpty()) {
-                                    strBuffer.append(String.format(" %s", note.getNote()));
-                                }
-                                csvLineList.add(strBuffer.toString());
-                            }
-
-                            csvList.add(csvLineList);
-                            Thread.sleep(sleepTrace);
-                        }
-                    }
-                } catch (ApiException re) {
-                    MessageDialog.openError(shell, "脆弱性情報の取得", re.getMessage());
-                } catch (Exception e) {
-                    StringWriter stringWriter = new StringWriter();
-                    PrintWriter printWriter = new PrintWriter(stringWriter);
-                    e.printStackTrace(printWriter);
-                    String trace = stringWriter.toString();
-                    logger.error(trace);
-                    MessageDialog.openError(shell, "脆弱性情報の取得", e.getMessage());
-                }
-
-                // ========== CSV出力 ==========
-                try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File("out.csv")), "shift-jis"))) {
-                    CSVPrinter printer = CSVFormat.EXCEL.print(bw);
-                    if (preferenceStore.getBoolean(PreferenceConstants.CSV_OUT_HEADER)) {
-                        if (includeDescChk.getSelection()) {
-                            printer.printRecord(CSV_HEADER_FULL);
-                        } else {
-                            printer.printRecord(CSV_HEADER);
-                        }
-                    }
-                    for (List<String> csvLine : csvList) {
-                        printer.printRecord(csvLine);
-                    }
-                } catch (IOException e) {
+                    progDialog.run(true, true, progress);
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                executeBtn.setEnabled(true);
-                settingBtn.setEnabled(true);
             }
 
             @Override

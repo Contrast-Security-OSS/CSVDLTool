@@ -287,7 +287,7 @@ public class Main implements PropertyChangeListener {
                 srcCount.setText(String.valueOf(srcList.getItemCount()));
             }
         });
-        this.srcList = new org.eclipse.swt.widgets.List(srcGrp, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
+        this.srcList = new org.eclipse.swt.widgets.List(srcGrp, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL);
         this.srcList.setLayoutData(new GridData(GridData.FILL_BOTH));
         this.srcList.setToolTipText("選択可能なアプリケーション一覧");
         this.srcList.addListener(SWT.MouseDoubleClick, new Listener() {
@@ -453,7 +453,7 @@ public class Main implements PropertyChangeListener {
             }
         });
 
-        this.dstList = new org.eclipse.swt.widgets.List(dstGrp, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
+        this.dstList = new org.eclipse.swt.widgets.List(dstGrp, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL);
         this.dstList.setLayoutData(new GridData(GridData.FILL_BOTH));
         this.dstList.setToolTipText("選択済みのアプリケーション一覧");
         this.dstList.addListener(SWT.MouseDoubleClick, new Listener() {

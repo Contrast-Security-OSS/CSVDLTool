@@ -135,6 +135,7 @@ public class Main implements PropertyChangeListener {
             this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_BUILDNO, ",");
             this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_SERVER, ",");
             this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_ROUTE, "\\r\\n");
+            this.preferenceStore.setDefault(PreferenceConstants.CSV_FILE_FORMAT, "yyyy-MM-dd_HHmmss'.csv'");
 
             Yaml yaml = new Yaml();
             InputStream is = new FileInputStream("contrast_security.yaml");

@@ -227,7 +227,11 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
 
         // ========== CSV出力 ==========
         monitor.beginTask("CSV出力", csvList.size());
-        String fileName = new SimpleDateFormat("yyyy-MM-dd_HHmmss'.csv'").format(new Date());
+        String csvFileFormat = preferenceStore.getString(PreferenceConstants.CSV_FILE_FORMAT);
+        if (csvFileFormat == null || csvFileFormat.isEmpty()) {
+            csvFileFormat = preferenceStore.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT);
+        }
+        String fileName = new SimpleDateFormat(csvFileFormat).format(new Date());
         try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(fileName)), "shift-jis"))) {
             CSVPrinter printer = CSVFormat.EXCEL.print(bw);
             if (preferenceStore.getBoolean(PreferenceConstants.CSV_OUT_HEADER)) {

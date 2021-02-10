@@ -49,6 +49,7 @@ public class OtherPreferencePage extends PreferencePage {
     private Text csvSepBuildNoTxt;
     private Text csvSepServerTxt;
     private Text csvSepRouteTxt;
+    private Text csvFileForamtTxt;
 
     public OtherPreferencePage() {
         super("その他設定");
@@ -113,6 +114,26 @@ public class OtherPreferencePage extends PreferencePage {
         csvSepRouteTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         csvSepRouteTxt.setText(preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_ROUTE));
 
+        Group csvFileFormatGrp = new Group(csvGrp, SWT.NONE);
+        GridLayout csvFileFormatGrpLt = new GridLayout(1, false);
+        csvFileFormatGrpLt.marginWidth = 10;
+        csvFileFormatGrpLt.marginHeight = 10;
+        csvFileFormatGrpLt.horizontalSpacing = 10;
+        csvFileFormatGrp.setLayout(csvFileFormatGrpLt);
+        GridData csvFileFormatGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        // csvFileFormatGrpGrDt.horizontalSpan = 2;
+        csvFileFormatGrp.setLayoutData(csvFileFormatGrpGrDt);
+        csvFileFormatGrp.setText("CSV出力ファイルフォーマット");
+
+        csvFileForamtTxt = new Text(csvFileFormatGrp, SWT.BORDER);
+        csvFileForamtTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        csvFileForamtTxt.setText(preferenceStore.getString(PreferenceConstants.CSV_FILE_FORMAT));
+        csvFileForamtTxt.setMessage(preferenceStore.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT));
+        Label csvFileFormatHint = new Label(csvFileFormatGrp, SWT.LEFT);
+        GridData csvFileFormatHintGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        csvFileFormatHint.setLayoutData(csvFileFormatHintGrDt);
+        csvFileFormatHint.setText("java.text.SimpleDateFormatの書式としてください。");
+
         Group ctrlGrp = new Group(composite, SWT.NONE);
         GridLayout proxyGrpLt = new GridLayout(4, false);
         proxyGrpLt.marginWidth = 15;
@@ -173,6 +194,9 @@ public class OtherPreferencePage extends PreferencePage {
         }
         if (this.csvSepRouteTxt != null) {
             ps.setValue(PreferenceConstants.CSV_SEPARATOR_ROUTE, this.csvSepRouteTxt.getText());
+        }
+        if (this.csvFileForamtTxt != null) {
+            ps.setValue(PreferenceConstants.CSV_FILE_FORMAT, this.csvFileForamtTxt.getText());
         }
         if (!errors.isEmpty()) {
             MessageDialog.openError(getShell(), "その他設定", String.join("\r\n", errors));

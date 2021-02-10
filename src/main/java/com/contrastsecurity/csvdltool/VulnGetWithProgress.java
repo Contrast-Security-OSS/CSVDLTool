@@ -5,8 +5,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
@@ -25,7 +23,6 @@ import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.PreferenceStore;
 import org.eclipse.swt.widgets.Shell;
@@ -38,7 +35,6 @@ import com.contrastsecurity.csvdltool.api.RoutesApi;
 import com.contrastsecurity.csvdltool.api.StoryApi;
 import com.contrastsecurity.csvdltool.api.TraceApi;
 import com.contrastsecurity.csvdltool.api.TracesApi;
-import com.contrastsecurity.csvdltool.exception.ApiException;
 import com.contrastsecurity.csvdltool.json.HowToFixJson;
 import com.contrastsecurity.csvdltool.model.Application;
 import com.contrastsecurity.csvdltool.model.Chapter;
@@ -219,15 +215,8 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
                 }
                 appIdx++;
             }
-        } catch (ApiException re) {
-            MessageDialog.openError(shell, "脆弱性情報の取得", re.getMessage());
         } catch (Exception e) {
-            StringWriter stringWriter = new StringWriter();
-            PrintWriter printWriter = new PrintWriter(stringWriter);
-            e.printStackTrace(printWriter);
-            String trace = stringWriter.toString();
-            logger.error(trace);
-            MessageDialog.openError(shell, "脆弱性情報の取得", e.getMessage());
+            throw new InvocationTargetException(e);
         }
 
         // ========== CSV出力 ==========

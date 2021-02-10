@@ -506,7 +506,12 @@ public class Main implements PropertyChangeListener {
                 try {
                     progDialog.run(true, true, progress);
                 } catch (InvocationTargetException e) {
-                    e.printStackTrace();
+                    StringWriter stringWriter = new StringWriter();
+                    PrintWriter printWriter = new PrintWriter(stringWriter);
+                    e.printStackTrace(printWriter);
+                    String trace = stringWriter.toString();
+                    logger.error(trace);
+                    MessageDialog.openError(shell, "脆弱性情報の取得", e.getTargetException().getMessage());
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

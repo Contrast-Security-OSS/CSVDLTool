@@ -123,10 +123,12 @@ public abstract class Api {
                     return EntityUtils.toString(httpResponse.getEntity());
                 } else if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
                     throw new ApiException(EntityUtils.toString(httpResponse.getEntity()));
+                } else if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_FORBIDDEN) {
+                    throw new ApiException(EntityUtils.toString(httpResponse.getEntity()));
                 } else {
                     logger.warn(httpResponse.getStatusLine().getStatusCode());
                     logger.warn(EntityUtils.toString(httpResponse.getEntity()));
-                    throw new ApiException("200, 401以外のステータスコードが返却されました。");
+                    throw new ApiException("200, 401, 403以外のステータスコードが返却されました。");
                 }
             } catch (Exception e) {
                 throw e;

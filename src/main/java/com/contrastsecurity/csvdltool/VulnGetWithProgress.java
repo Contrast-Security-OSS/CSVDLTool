@@ -9,6 +9,9 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -76,7 +79,7 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
     @SuppressWarnings("unchecked")
     @Override
     public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-        monitor.setTaskName("アプリケーショングループの情報を取得");
+        monitor.setTaskName("脆弱性情報の取得を開始しています...");
         int sleepTrace = preferenceStore.getInt(PreferenceConstants.SLEEP_TRACE);
         String csvSepBuildNo = preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_BUILDNO).replace("\\r", "\r").replace("\\n", "\n");
         String csvSepServer = preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_SERVER).replace("\\r", "\r").replace("\\n", "\n");
@@ -196,11 +199,13 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
                             }
                         }
                         StringBuilder strBuffer = new StringBuilder();
+                        LocalDateTime ldt = LocalDateTime.ofInstant(Instant.ofEpochMilli(Long.parseLong(note.getLast_modification())), ZoneId.systemDefault());
+                        strBuffer.append(String.format("[%s] ", ldt.toString()));
                         if (!statusVal.isEmpty()) {
                             strBuffer.append(String.format("次のステータスに変更: %s", statusVal));
                         }
                         if (!subStatusVal.isEmpty()) {
-                            strBuffer.append(String.format("[%s]", subStatusVal));
+                            strBuffer.append(String.format("(%s)", subStatusVal));
                         }
                         if (!note.getNote().isEmpty()) {
                             strBuffer.append(String.format(" %s", note.getNote()));

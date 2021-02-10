@@ -8,8 +8,10 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -225,7 +227,8 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
 
         // ========== CSV出力 ==========
         monitor.beginTask("CSV出力", csvList.size());
-        try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File("out.csv")), "shift-jis"))) {
+        String fileName = new SimpleDateFormat("yyyy-MM-dd_HHmmss'.csv'").format(new Date());
+        try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(fileName)), "shift-jis"))) {
             CSVPrinter printer = CSVFormat.EXCEL.print(bw);
             if (preferenceStore.getBoolean(PreferenceConstants.CSV_OUT_HEADER)) {
                 if (isIncludeDesc) {

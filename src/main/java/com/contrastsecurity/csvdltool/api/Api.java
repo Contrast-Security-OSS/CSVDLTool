@@ -69,7 +69,7 @@ public abstract class Api {
 
     private String getResponse() throws Exception {
         String url = this.getUrl();
-        logger.info(url);
+        logger.trace(url);
         HttpGet httpGet = new HttpGet(url);
         List<Header> headers = this.getHeaders();
         CloseableHttpClient httpClient = null;
@@ -136,6 +136,7 @@ public abstract class Api {
             PrintWriter printWriter = new PrintWriter(stringWriter);
             e.printStackTrace(printWriter);
             String trace = stringWriter.toString();
+            logger.error(url);
             logger.error(trace);
             throw e;
         } finally {

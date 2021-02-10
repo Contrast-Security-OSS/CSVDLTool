@@ -175,6 +175,8 @@ public class Main implements PropertyChangeListener {
 
             @Override
             public void shellClosed(ShellEvent event) {
+                preferenceStore.setValue(PreferenceConstants.MEM_WIDTH, shell.getSize().x);
+                preferenceStore.setValue(PreferenceConstants.MEM_HEIGHT, shell.getSize().y);
                 try {
                     preferenceStore.save();
                 } catch (IOException ioe) {
@@ -555,7 +557,13 @@ public class Main implements PropertyChangeListener {
         Logger logger = Logger.getLogger("csvdltool");
 
         uiUpdate();
-        shell.setSize(480, 360);
+        int width = this.preferenceStore.getInt(PreferenceConstants.MEM_WIDTH);
+        int height = this.preferenceStore.getInt(PreferenceConstants.MEM_HEIGHT);
+        if (width > 0 && height > 0) {
+            shell.setSize(width, height);
+        } else {
+            shell.pack();
+        }
         shell.open();
         try {
             while (!shell.isDisposed()) {

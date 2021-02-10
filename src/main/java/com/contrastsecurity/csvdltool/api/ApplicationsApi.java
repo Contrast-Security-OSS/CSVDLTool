@@ -18,7 +18,7 @@ public class ApplicationsApi extends Api {
     protected String getUrl() {
         String contrastUrl = preferenceStore.getString(PreferenceConstants.CONTRAST_URL);
         String orgId = preferenceStore.getString(PreferenceConstants.ORG_ID);
-        return String.format("%s/api/ng/%s/applications?expand=modules,skip_links", contrastUrl, orgId);
+        return String.format("%s/api/ng/%s/applications?expand=modules,license,skip_links", contrastUrl, orgId);
     }
 
     @Override

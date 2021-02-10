@@ -8,6 +8,7 @@ public class Application {
     private String app_id;
     private String context_path;
     private String language;
+    private License license;
 
     public String getName() {
         return name;
@@ -39,6 +40,14 @@ public class Application {
 
     public void setLanguage(String language) {
         this.language = language;
+    }
+
+    public License getLicense() {
+        return license;
+    }
+
+    public void setLicense(License license) {
+        this.license = license;
     }
 
     @Override

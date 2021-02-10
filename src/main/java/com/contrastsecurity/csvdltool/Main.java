@@ -236,6 +236,9 @@ public class Main implements PropertyChangeListener {
 
                     List<Application> applications = (List<Application>) applicationsApi.get();
                     for (Application app : applications) {
+                        if (app.getLicense().getLevel().equals("Unlicensed")) {
+                            continue;
+                        }
                         srcList.add(app.getName()); // memory src
                         srcApps.add(app.getName()); // UI list
                         fullAppMap.put(app.getName(), app.getApp_id()); // memory full

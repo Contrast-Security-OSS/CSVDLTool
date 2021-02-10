@@ -13,6 +13,7 @@ public class Note {
     private List<Property> properties;
 
     public String getNote() {
+        // 文字実体参照を変換
         return StringEscapeUtils.unescapeHtml4(note);
     }
 

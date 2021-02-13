@@ -7,11 +7,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Trace {
+    private String category;
     private String category_label;
     private String title;
     private String rule_title;
     private String uuid;
+    private String impact;
     private String impact_label;
+    private String severity;
     private String severity_label;
     private String status;
     private String language;
@@ -23,8 +26,19 @@ public class Trace {
     private List<Server> servers;
     private List<Note> notes;
 
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
     public String getCategory_label() {
-        return category_label;
+        if (this.category_label != null) {
+            return category_label;
+        }
+        return this.getCategory();
     }
 
     public void setCategory_label(String category_label) {
@@ -55,16 +69,38 @@ public class Trace {
         this.uuid = uuid;
     }
 
+    public String getImpact() {
+        return impact;
+    }
+
+    public void setImpact(String impact) {
+        this.impact = impact;
+    }
+
     public String getImpact_label() {
-        return impact_label;
+        if (this.impact_label != null) {
+            return impact_label;
+        }
+        return this.getImpact();
     }
 
     public void setImpact_label(String impact_label) {
         this.impact_label = impact_label;
     }
 
+    public String getSeverity() {
+        return severity;
+    }
+
+    public void setSeverity(String severity) {
+        this.severity = severity;
+    }
+
     public String getSeverity_label() {
-        return severity_label;
+        if (this.severity_label != null) {
+            return severity_label;
+        }
+        return this.getSeverity();
     }
 
     public void setSeverity_label(String severity_label) {

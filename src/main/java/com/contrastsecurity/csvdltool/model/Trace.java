@@ -7,14 +7,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Trace {
-    private String category;
-    private String category_label;
     private String title;
     private String rule_title;
     private String uuid;
-    private String impact;
+    private String category_label;
     private String impact_label;
-    private String severity;
     private String severity_label;
     private String status;
     private String language;
@@ -25,6 +22,11 @@ public class Trace {
     private Request request;
     private List<Server> servers;
     private List<Note> notes;
+
+    // 3.7.9までの対応
+    private String category;
+    private String impact;
+    private String severity;
 
     public String getCategory() {
         return category;

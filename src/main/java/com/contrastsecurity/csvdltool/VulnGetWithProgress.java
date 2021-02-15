@@ -58,12 +58,12 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
 
     private PreferenceStore preferenceStore;
     private List<String> dstApps;
-    private Map<String, String> fullAppMap;
+    private Map<String, AppInfo> fullAppMap;
     private boolean isIncludeDesc;
 
     Logger logger = Logger.getLogger("csvdltool");
 
-    public VulnGetWithProgress(PreferenceStore preferenceStore, List<String> dstApps, Map<String, String> fullAppMap, boolean isIncludeDesc) {
+    public VulnGetWithProgress(PreferenceStore preferenceStore, List<String> dstApps, Map<String, AppInfo> fullAppMap, boolean isIncludeDesc) {
         this.preferenceStore = preferenceStore;
         this.dstApps = dstApps;
         this.fullAppMap = fullAppMap;
@@ -103,8 +103,9 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
             // 選択済みアプリの脆弱性情報を取得
             monitor.setTaskName(String.format("脆弱性情報の取得(0/%d)", dstApps.size()));
             int appIdx = 1;
-            for (String appName : dstApps) {
-                String appId = fullAppMap.get(appName);
+            for (String appLabel : dstApps) {
+                String appName = fullAppMap.get(appLabel).getAppName();
+                String appId = fullAppMap.get(appLabel).getAppId();
                 Api tracesApi = new TracesApi(preferenceStore, appId);
                 List<String> traces = (List<String>) tracesApi.get();
                 monitor.beginTask(String.format("脆弱性情報の取得(%d/%d)", appIdx, dstApps.size()), traces.size());

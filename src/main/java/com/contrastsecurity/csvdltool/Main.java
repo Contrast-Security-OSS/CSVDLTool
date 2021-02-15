@@ -101,7 +101,7 @@ public class Main implements PropertyChangeListener {
     private Button includeDescChk;
     private Button settingBtn;
 
-    private Map<String, String> fullAppMap = new TreeMap<String, String>();
+    private Map<String, AppInfo> fullAppMap = new TreeMap<String, AppInfo>();
     private List<String> srcApps = new ArrayList<String>();
     private List<String> dstApps = new ArrayList<String>();
 
@@ -261,12 +261,15 @@ public class Main implements PropertyChangeListener {
                             continue;
                         }
                         if (appGroupMap.containsKey(app.getName())) {
-                            srcList.add(String.format("%s - %s", app.getName(), String.join(", ", appGroupMap.get(app.getName())))); // UI list
+                            String appLabel = String.format("%s - %s", app.getName(), String.join(", ", appGroupMap.get(app.getName())));
+                            fullAppMap.put(appLabel, new AppInfo(app.getName(), app.getApp_id()));
                         } else {
-                            srcList.add(app.getName()); // UI list
+                            fullAppMap.put(app.getName(), new AppInfo(app.getName(), app.getApp_id()));
                         }
-                        srcApps.add(app.getName()); // memory src
-                        fullAppMap.put(app.getName(), app.getApp_id()); // memory full
+                    }
+                    for (String appLabel : fullAppMap.keySet()) {
+                        srcList.add(appLabel); // UI list
+                        srcApps.add(appLabel); // memory src
                     }
                     srcCount.setText(String.valueOf(srcList.getItemCount()));
                 } catch (ApiException re) {
@@ -297,21 +300,21 @@ public class Main implements PropertyChangeListener {
                 srcApps.clear(); // memory src
                 String keyword = srcListFilter.getText();
                 if (keyword.isEmpty()) {
-                    for (String appName : fullAppMap.keySet()) {
-                        if (dstApps.contains(appName)) {
+                    for (String appLabel : fullAppMap.keySet()) {
+                        if (dstApps.contains(appLabel)) {
                             continue; // 既に選択済みのアプリはスキップ
                         }
-                        srcList.add(appName); // UI List src
-                        srcApps.add(appName); // memory src
+                        srcList.add(appLabel); // UI List src
+                        srcApps.add(appLabel); // memory src
                     }
                 } else {
-                    for (String appName : fullAppMap.keySet()) {
-                        if (appName.toLowerCase().contains(keyword.toLowerCase())) {
-                            if (dstApps.contains(appName)) {
+                    for (String appLabel : fullAppMap.keySet()) {
+                        if (appLabel.toLowerCase().contains(keyword.toLowerCase())) {
+                            if (dstApps.contains(appLabel)) {
                                 continue; // 既に選択済みのアプリはスキップ
                             }
-                            srcList.add(appName);
-                            srcApps.add(appName);
+                            srcList.add(appLabel);
+                            srcApps.add(appLabel);
                         }
                     }
                 }

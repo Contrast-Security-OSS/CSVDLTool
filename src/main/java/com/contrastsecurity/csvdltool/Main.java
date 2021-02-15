@@ -36,6 +36,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -71,9 +72,12 @@ import org.yaml.snakeyaml.Yaml;
 
 import com.contrastsecurity.csvdltool.api.Api;
 import com.contrastsecurity.csvdltool.api.ApplicationsApi;
+import com.contrastsecurity.csvdltool.api.GroupsApi;
 import com.contrastsecurity.csvdltool.exception.ApiException;
 import com.contrastsecurity.csvdltool.model.Application;
+import com.contrastsecurity.csvdltool.model.ApplicationInCustomGroup;
 import com.contrastsecurity.csvdltool.model.ContrastSecurityYaml;
+import com.contrastsecurity.csvdltool.model.CustomGroup;
 import com.contrastsecurity.csvdltool.preference.AboutPage;
 import com.contrastsecurity.csvdltool.preference.BasePreferencePage;
 import com.contrastsecurity.csvdltool.preference.ConnectionPreferencePage;
@@ -221,7 +225,6 @@ public class Main implements PropertyChangeListener {
             @SuppressWarnings("unchecked")
             @Override
             public void widgetSelected(SelectionEvent event) {
-                Api applicationsApi = new ApplicationsApi(preferenceStore);
                 try {
                     // src
                     srcListFilter.setText("");
@@ -234,13 +237,30 @@ public class Main implements PropertyChangeListener {
                     // full
                     fullAppMap.clear();
 
+                    // アプリケーショングループの情報を取得
+                    Map<String, String> appGroupMap = new HashMap<String, String>();
+                    Api groupsApi = new GroupsApi(preferenceStore);
+                    List<CustomGroup> customGroups = (List<CustomGroup>) groupsApi.get();
+                    for (CustomGroup customGroup : customGroups) {
+                        List<ApplicationInCustomGroup> apps = customGroup.getApplications();
+                        if (apps != null) {
+                            for (ApplicationInCustomGroup app : apps) {
+                                appGroupMap.put(app.getApplication().getName(), customGroup.getName());
+                            }
+                        }
+                    }
+                    Api applicationsApi = new ApplicationsApi(preferenceStore);
                     List<Application> applications = (List<Application>) applicationsApi.get();
                     for (Application app : applications) {
                         if (app.getLicense().getLevel().equals("Unlicensed")) {
                             continue;
                         }
-                        srcList.add(app.getName()); // memory src
-                        srcApps.add(app.getName()); // UI list
+                        if (appGroupMap.containsKey(app.getName())) {
+                            srcList.add(String.format("%s - %s", app.getName(), appGroupMap.get(app.getName()))); // UI list
+                        } else {
+                            srcList.add(app.getName()); // UI list
+                        }
+                        srcApps.add(app.getName()); // memory src
                         fullAppMap.put(app.getName(), app.getApp_id()); // memory full
                     }
                     srcCount.setText(String.valueOf(srcList.getItemCount()));
@@ -268,16 +288,16 @@ public class Main implements PropertyChangeListener {
         srcListFilter.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent event) {
-                srcList.removeAll(); // memory src
-                srcApps.clear(); // UI List src
+                srcList.removeAll(); // UI List src
+                srcApps.clear(); // memory src
                 String keyword = srcListFilter.getText();
                 if (keyword.isEmpty()) {
                     for (String appName : fullAppMap.keySet()) {
                         if (dstApps.contains(appName)) {
                             continue; // 既に選択済みのアプリはスキップ
                         }
-                        srcList.add(appName); // memory src
-                        srcApps.add(appName); // UI List src
+                        srcList.add(appName); // UI List src
+                        srcApps.add(appName); // memory src
                     }
                 } else {
                     for (String appName : fullAppMap.keySet()) {
@@ -433,16 +453,16 @@ public class Main implements PropertyChangeListener {
         dstListFilter.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent event) {
-                dstList.removeAll(); // memory dst
-                dstApps.clear(); // UI List dst
+                dstList.removeAll(); // UI List dst
+                dstApps.clear(); // memory dst
                 String keyword = dstListFilter.getText();
                 if (keyword.isEmpty()) {
                     for (String appName : fullAppMap.keySet()) {
                         if (srcApps.contains(appName)) {
                             continue; // 選択可能にあるアプリはスキップ
                         }
-                        dstList.add(appName); // memory dst
-                        dstApps.add(appName); // UI List dst
+                        dstList.add(appName); // UI List dst
+                        dstApps.add(appName); // memory dst
                     }
                 } else {
                     for (String appName : fullAppMap.keySet()) {
@@ -450,8 +470,8 @@ public class Main implements PropertyChangeListener {
                             if (srcApps.contains(appName)) {
                                 continue; // 選択可能にあるアプリはスキップ
                             }
-                            dstList.add(appName); // memory dst
-                            dstApps.add(appName); // UI List dst
+                            dstList.add(appName); // UI List dst
+                            dstApps.add(appName); // memory dst
                         }
                     }
                 }
@@ -504,7 +524,7 @@ public class Main implements PropertyChangeListener {
                     MessageDialog.openInformation(shell, "取得", "取得対象のアプリケーションを選択してください。");
                     return;
                 }
-                VulnGetWithProgress progress = new VulnGetWithProgress(shell, preferenceStore, dstApps, fullAppMap, includeDescChk.getSelection());
+                VulnGetWithProgress progress = new VulnGetWithProgress(preferenceStore, dstApps, fullAppMap, includeDescChk.getSelection());
                 ProgressMonitorDialog progDialog = new ProgressMonitorDialog(shell);
                 try {
                     progDialog.run(true, true, progress);

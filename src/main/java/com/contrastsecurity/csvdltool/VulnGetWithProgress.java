@@ -25,7 +25,6 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.PreferenceStore;
-import org.eclipse.swt.widgets.Shell;
 
 import com.contrastsecurity.csvdltool.api.Api;
 import com.contrastsecurity.csvdltool.api.GroupsApi;
@@ -37,6 +36,7 @@ import com.contrastsecurity.csvdltool.api.TraceApi;
 import com.contrastsecurity.csvdltool.api.TracesApi;
 import com.contrastsecurity.csvdltool.json.HowToFixJson;
 import com.contrastsecurity.csvdltool.model.Application;
+import com.contrastsecurity.csvdltool.model.ApplicationInCustomGroup;
 import com.contrastsecurity.csvdltool.model.Chapter;
 import com.contrastsecurity.csvdltool.model.CustomGroup;
 import com.contrastsecurity.csvdltool.model.HttpRequest;
@@ -56,7 +56,6 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
     private static final List<String> CSV_HEADER_FULL = new ArrayList<String>(Arrays.asList("アプリケーション名", "マージしたときの各アプリ名称", "カテゴリ", "ルール", "深刻度", "ステータス", "言語", "アプリケーションのグループ",
             "脆弱性のタイトル", "最初の検出", "最後の検出", "ビルド番号", "次のサーバにより報告", "ルート", "モジュール", "HTTP情報", "何が起こったか？", "どんなリスクであるか？", "修正方法", "コメント"));
 
-    private Shell shell;
     private PreferenceStore preferenceStore;
     private List<String> dstApps;
     private Map<String, String> fullAppMap;
@@ -64,8 +63,7 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
 
     Logger logger = Logger.getLogger("csvdltool");
 
-    public VulnGetWithProgress(Shell shell, PreferenceStore preferenceStore, List<String> dstApps, Map<String, String> fullAppMap, boolean isIncludeDesc) {
-        this.shell = shell;
+    public VulnGetWithProgress(PreferenceStore preferenceStore, List<String> dstApps, Map<String, String> fullAppMap, boolean isIncludeDesc) {
         this.preferenceStore = preferenceStore;
         this.dstApps = dstApps;
         this.fullAppMap = fullAppMap;
@@ -88,10 +86,10 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
             List<CustomGroup> customGroups = (List<CustomGroup>) groupsApi.get();
             monitor.beginTask("アプリケーショングループの情報を取得", customGroups.size());
             for (CustomGroup customGroup : customGroups) {
-                List<Application> apps = customGroup.getApplications();
+                List<ApplicationInCustomGroup> apps = customGroup.getApplications();
                 if (apps != null) {
-                    for (Application app : apps) {
-                        appGroupMap.put(app.getName(), customGroup.getName());
+                    for (ApplicationInCustomGroup app : apps) {
+                        appGroupMap.put(app.getApplication().getName(), customGroup.getName());
                     }
                 }
                 monitor.worked(1);

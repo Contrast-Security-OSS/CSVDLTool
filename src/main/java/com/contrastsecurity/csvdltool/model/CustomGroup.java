@@ -4,7 +4,7 @@ import java.util.List;
 
 public class CustomGroup {
     private String name;
-    private List<Application> applications;
+    private List<ApplicationInCustomGroup> applications;
 
     public String getName() {
         return name;
@@ -14,11 +14,11 @@ public class CustomGroup {
         this.name = name;
     }
 
-    public List<Application> getApplications() {
+    public List<ApplicationInCustomGroup> getApplications() {
         return applications;
     }
 
-    public void setApplications(List<Application> applications) {
+    public void setApplications(List<ApplicationInCustomGroup> applications) {
         this.applications = applications;
     }
 

@@ -78,7 +78,7 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
         String csvSepBuildNo = preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_BUILDNO).replace("\\r", "\r").replace("\\n", "\n");
         String csvSepServer = preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_SERVER).replace("\\r", "\r").replace("\\n", "\n");
         String csvSepRoute = preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_ROUTE).replace("\\r", "\r").replace("\\n", "\n");
-        Map<String, String> appGroupMap = new HashMap<String, String>();
+        Map<String, List<String>> appGroupMap = new HashMap<String, List<String>>();
         List<List<String>> csvList = new ArrayList<List<String>>();
         try {
             // アプリケーショングループの情報を取得
@@ -89,7 +89,12 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
                 List<ApplicationInCustomGroup> apps = customGroup.getApplications();
                 if (apps != null) {
                     for (ApplicationInCustomGroup app : apps) {
-                        appGroupMap.put(app.getApplication().getName(), customGroup.getName());
+                        String appName = app.getApplication().getName();
+                        if (appGroupMap.containsKey(appName)) {
+                            appGroupMap.get(appName).add(customGroup.getName());
+                        } else {
+                            appGroupMap.put(appName, new ArrayList<String>(Arrays.asList(customGroup.getName())));
+                        }
                     }
                 }
                 monitor.worked(1);
@@ -128,7 +133,7 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
                     csvLineList.add(trace.getLanguage());
                     // ==================== 08. グループ（アプリケーションのグループ） ====================
                     if (appGroupMap.containsKey(appName)) {
-                        csvLineList.add(appGroupMap.get(appName));
+                        csvLineList.add(String.join(", ", appGroupMap.get(appName)));
                     } else {
                         csvLineList.add("");
                     }

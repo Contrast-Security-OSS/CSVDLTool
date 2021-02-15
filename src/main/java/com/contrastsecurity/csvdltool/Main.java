@@ -238,14 +238,19 @@ public class Main implements PropertyChangeListener {
                     fullAppMap.clear();
 
                     // アプリケーショングループの情報を取得
-                    Map<String, String> appGroupMap = new HashMap<String, String>();
+                    Map<String, List<String>> appGroupMap = new HashMap<String, List<String>>();
                     Api groupsApi = new GroupsApi(preferenceStore);
                     List<CustomGroup> customGroups = (List<CustomGroup>) groupsApi.get();
                     for (CustomGroup customGroup : customGroups) {
                         List<ApplicationInCustomGroup> apps = customGroup.getApplications();
                         if (apps != null) {
                             for (ApplicationInCustomGroup app : apps) {
-                                appGroupMap.put(app.getApplication().getName(), customGroup.getName());
+                                String appName = app.getApplication().getName();
+                                if (appGroupMap.containsKey(appName)) {
+                                    appGroupMap.get(appName).add(customGroup.getName());
+                                } else {
+                                    appGroupMap.put(appName, new ArrayList<String>(Arrays.asList(customGroup.getName())));
+                                }
                             }
                         }
                     }
@@ -256,7 +261,7 @@ public class Main implements PropertyChangeListener {
                             continue;
                         }
                         if (appGroupMap.containsKey(app.getName())) {
-                            srcList.add(String.format("%s - %s", app.getName(), appGroupMap.get(app.getName()))); // UI list
+                            srcList.add(String.format("%s - %s", app.getName(), String.join(", ", appGroupMap.get(app.getName())))); // UI list
                         } else {
                             srcList.add(app.getName()); // UI list
                         }

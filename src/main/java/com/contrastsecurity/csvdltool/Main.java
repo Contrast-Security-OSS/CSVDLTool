@@ -36,10 +36,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
@@ -70,14 +68,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.yaml.snakeyaml.Yaml;
 
-import com.contrastsecurity.csvdltool.api.Api;
-import com.contrastsecurity.csvdltool.api.ApplicationsApi;
-import com.contrastsecurity.csvdltool.api.GroupsApi;
-import com.contrastsecurity.csvdltool.exception.ApiException;
-import com.contrastsecurity.csvdltool.model.Application;
-import com.contrastsecurity.csvdltool.model.ApplicationInCustomGroup;
 import com.contrastsecurity.csvdltool.model.ContrastSecurityYaml;
-import com.contrastsecurity.csvdltool.model.CustomGroup;
 import com.contrastsecurity.csvdltool.preference.AboutPage;
 import com.contrastsecurity.csvdltool.preference.BasePreferencePage;
 import com.contrastsecurity.csvdltool.preference.ConnectionPreferencePage;
@@ -101,7 +92,7 @@ public class Main implements PropertyChangeListener {
     private Button includeDescChk;
     private Button settingBtn;
 
-    private Map<String, AppInfo> fullAppMap = new TreeMap<String, AppInfo>();
+    private Map<String, AppInfo> fullAppMap;
     private List<String> srcApps = new ArrayList<String>();
     private List<String> dstApps = new ArrayList<String>();
 
@@ -220,64 +211,44 @@ public class Main implements PropertyChangeListener {
         GridData appLoadBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
         appLoadBtnGrDt.horizontalSpan = 3;
         appLoadBtn.setLayoutData(appLoadBtnGrDt);
-        appLoadBtn.setText("アプリ一覧の読み込み");
+        appLoadBtn.setText("アプリケーション一覧の読み込み");
         appLoadBtn.addSelectionListener(new SelectionListener() {
             @SuppressWarnings("unchecked")
             @Override
             public void widgetSelected(SelectionEvent event) {
-                try {
-                    // src
-                    srcListFilter.setText("");
-                    srcList.removeAll();
-                    srcApps.clear();
-                    // dst
-                    dstListFilter.setText("");
-                    dstList.removeAll();
-                    dstApps.clear();
-                    // full
+                // src
+                srcListFilter.setText("");
+                srcList.removeAll();
+                srcApps.clear();
+                // dst
+                dstListFilter.setText("");
+                dstList.removeAll();
+                dstApps.clear();
+                // full
+                if (fullAppMap != null) {
                     fullAppMap.clear();
-
-                    // アプリケーショングループの情報を取得
-                    Map<String, List<String>> appGroupMap = new HashMap<String, List<String>>();
-                    Api groupsApi = new GroupsApi(preferenceStore);
-                    List<CustomGroup> customGroups = (List<CustomGroup>) groupsApi.get();
-                    for (CustomGroup customGroup : customGroups) {
-                        List<ApplicationInCustomGroup> apps = customGroup.getApplications();
-                        if (apps != null) {
-                            for (ApplicationInCustomGroup app : apps) {
-                                String appName = app.getApplication().getName();
-                                if (appGroupMap.containsKey(appName)) {
-                                    appGroupMap.get(appName).add(customGroup.getName());
-                                } else {
-                                    appGroupMap.put(appName, new ArrayList<String>(Arrays.asList(customGroup.getName())));
-                                }
-                            }
-                        }
-                    }
-                    Api applicationsApi = new ApplicationsApi(preferenceStore);
-                    List<Application> applications = (List<Application>) applicationsApi.get();
-                    for (Application app : applications) {
-                        if (app.getLicense().getLevel().equals("Unlicensed")) {
-                            continue;
-                        }
-                        if (appGroupMap.containsKey(app.getName())) {
-                            String appLabel = String.format("%s - %s", app.getName(), String.join(", ", appGroupMap.get(app.getName())));
-                            fullAppMap.put(appLabel, new AppInfo(app.getName(), app.getApp_id()));
-                        } else {
-                            fullAppMap.put(app.getName(), new AppInfo(app.getName(), app.getApp_id()));
-                        }
-                    }
-                    for (String appLabel : fullAppMap.keySet()) {
-                        srcList.add(appLabel); // UI list
-                        srcApps.add(appLabel); // memory src
-                    }
-                    srcCount.setText(String.valueOf(srcList.getItemCount()));
-                } catch (ApiException re) {
-                    MessageDialog.openError(shell, "アプリ一覧の読み込み", re.getMessage());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    MessageDialog.openError(shell, "アプリ一覧の読み込み", e.getMessage());
                 }
+
+                AppsGetWithProgress progress = new AppsGetWithProgress(preferenceStore);
+                ProgressMonitorDialog progDialog = new ProgressMonitorDialog(shell);
+                try {
+                    progDialog.run(true, true, progress);
+                } catch (InvocationTargetException e) {
+                    StringWriter stringWriter = new StringWriter();
+                    PrintWriter printWriter = new PrintWriter(stringWriter);
+                    e.printStackTrace(printWriter);
+                    String trace = stringWriter.toString();
+                    logger.error(trace);
+                    MessageDialog.openError(shell, "アプリケーション一覧の取得", e.getTargetException().getMessage());
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                fullAppMap = progress.getFullAppMap();
+                for (String appLabel : fullAppMap.keySet()) {
+                    srcList.add(appLabel); // UI list
+                    srcApps.add(appLabel); // memory src
+                }
+                srcCount.setText(String.valueOf(srcList.getItemCount()));
             }
 
             @Override
@@ -298,6 +269,10 @@ public class Main implements PropertyChangeListener {
             public void modifyText(ModifyEvent event) {
                 srcList.removeAll(); // UI List src
                 srcApps.clear(); // memory src
+                if (fullAppMap == null) {
+                    srcCount.setText(String.valueOf(srcList.getItemCount()));
+                    return;
+                }
                 String keyword = srcListFilter.getText();
                 if (keyword.isEmpty()) {
                     for (String appLabel : fullAppMap.keySet()) {
@@ -463,6 +438,10 @@ public class Main implements PropertyChangeListener {
             public void modifyText(ModifyEvent event) {
                 dstList.removeAll(); // UI List dst
                 dstApps.clear(); // memory dst
+                if (fullAppMap == null) {
+                    dstCount.setText(String.valueOf(dstList.getItemCount()));
+                    return;
+                }
                 String keyword = dstListFilter.getText();
                 if (keyword.isEmpty()) {
                     for (String appName : fullAppMap.keySet()) {

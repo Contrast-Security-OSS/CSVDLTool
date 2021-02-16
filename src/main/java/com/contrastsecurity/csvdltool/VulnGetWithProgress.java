@@ -6,9 +6,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -23,7 +25,6 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -57,7 +58,11 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
     private static final List<String> CSV_HEADER = new ArrayList<String>(Arrays.asList("アプリケーション名", "マージしたときの各アプリ名称", "カテゴリ", "ルール", "深刻度", "ステータス", "言語", "アプリケーションのグループ",
             "脆弱性のタイトル", "最初の検出", "最後の検出", "ビルド番号", "次のサーバにより報告", "ルート", "モジュール", "HTTP情報", "コメント"));
     private static final List<String> CSV_HEADER_FULL = new ArrayList<String>(Arrays.asList("アプリケーション名", "マージしたときの各アプリ名称", "カテゴリ", "ルール", "深刻度", "ステータス", "言語", "アプリケーションのグループ",
-            "脆弱性のタイトル", "最初の検出", "最後の検出", "ビルド番号", "次のサーバにより報告", "ルート", "モジュール", "HTTP情報", "何が起こったか？", "どんなリスクであるか？", "修正方法", "コメント"));
+            "脆弱性のタイトル", "最初の検出", "最後の検出", "ビルド番号", "次のサーバにより報告", "ルート", "モジュール", "HTTP情報", "詳細", "コメント"));
+
+    private static final String WHAT_HAPPEN = "==================== 何が起こったか？ ====================";
+    private static final String RISK = "==================== どんなリスクであるか？ ====================";
+    private static final String HOWTOFIX = "==================== 修正方法 ====================";
 
     private PreferenceStore preferenceStore;
     private List<String> dstApps;
@@ -182,22 +187,28 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
                         csvLineList.add(""); // HTTP情報がない場合もあります。
                     }
                     if (isIncludeDesc) {
+                        csvLineList.add(String.format("=HYPERLINK(\".\\%s.txt\",\"%s\")", trace.getUuid(), trace.getUuid()));
+                        String textFileName = String.format("%s\\%s.txt", timestamp, trace.getUuid());
+                        Path textFilePath = Paths.get(textFileName);
+
                         Api storyApi = new StoryApi(preferenceStore, trace_id);
                         Story story = (Story) storyApi.get();
                         // ==================== 17. 何が起こったか？ ====================
                         List<String> chapterLines = new ArrayList<String>();
+                        chapterLines.add(WHAT_HAPPEN);
                         for (Chapter chapter : story.getChapters()) {
                             chapterLines.add(chapter.getIntroText());
                             chapterLines.add(chapter.getBody());
                         }
-                        String chapterStr = String.join("\r\n", chapterLines);
-                        csvLineList.add(StringUtils.abbreviate(chapterStr, CELL_TEXT_MAX));
+                        Files.write(textFilePath, chapterLines, Charset.forName("MS932"), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.APPEND);
                         // ==================== 18. どんなリスクであるか？ ====================
-                        csvLineList.add(StringUtils.abbreviate(story.getRisk().getText(), CELL_TEXT_MAX));
+                        Files.write(textFilePath, Arrays.asList(RISK, story.getRisk().getText()), Charset.forName("MS932"), StandardOpenOption.CREATE, StandardOpenOption.WRITE,
+                                StandardOpenOption.APPEND);
                         // ==================== 19. 修正方法 ====================
                         Api howToFixApi = new HowToFixApi(preferenceStore, trace_id);
                         HowToFixJson howToFixJson = (HowToFixJson) howToFixApi.get();
-                        csvLineList.add(StringUtils.abbreviate(howToFixJson.getRecommendation().getText(), CELL_TEXT_MAX));
+                        Files.write(textFilePath, Arrays.asList(HOWTOFIX, howToFixJson.getRecommendation().getText()), Charset.forName("MS932"), StandardOpenOption.CREATE,
+                                StandardOpenOption.WRITE, StandardOpenOption.APPEND);
                     }
                     // ==================== 20(17). コメント(最後尾) ====================
                     for (Note note : trace.getNotes()) {

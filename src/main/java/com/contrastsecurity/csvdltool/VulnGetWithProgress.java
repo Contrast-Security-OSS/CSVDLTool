@@ -141,6 +141,12 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
                     Trace trace = (Trace) traceApi.get();
                     monitor.subTask(String.format("%s - %s", appName, trace.getTitle()));
                     Application realApp = trace.getApplication();
+                    if (isOnlyParentApp) {
+                        if (!appName.equals(realApp.getName())) {
+                            monitor.worked(1);
+                            continue;
+                        }
+                    }
                     // ==================== 01. アプリケーション名 ====================
                     csvLineList.add(appName);
                     // ==================== 02. マージしたときの、各アプリ名称（可能であれば） ====================

@@ -162,7 +162,39 @@ public class OtherPreferencePage extends PreferencePage {
         traceSleepTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         traceSleepTxt.setText(preferenceStore.getString(PreferenceConstants.SLEEP_TRACE));
 
-        Button applyBtn = new Button(composite, SWT.NULL);
+        Composite buttonGrp = new Composite(parent, SWT.NONE);
+        GridLayout buttonGrpLt = new GridLayout(2, false);
+        buttonGrpLt.marginHeight = 15;
+        buttonGrpLt.marginWidth = 5;
+        buttonGrpLt.horizontalSpacing = 7;
+        buttonGrpLt.verticalSpacing = 20;
+        buttonGrp.setLayout(buttonGrpLt);
+        GridData buttonGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        buttonGrpGrDt.horizontalAlignment = SWT.END;
+        buttonGrp.setLayoutData(buttonGrpGrDt);
+
+        Button defaultBtn = new Button(buttonGrp, SWT.NULL);
+        GridData defaultBtnGrDt = new GridData(SWT.RIGHT, SWT.BOTTOM, true, true, 1, 1);
+        defaultBtnGrDt.widthHint = 90;
+        defaultBtn.setLayoutData(defaultBtnGrDt);
+        defaultBtn.setText("デフォルトに戻す");
+        defaultBtn.addSelectionListener(new SelectionListener() {
+            public void widgetDefaultSelected(SelectionEvent e) {
+            }
+
+            public void widgetSelected(SelectionEvent e) {
+                outCsvHeaderFlg.setSelection(preferenceStore.getDefaultBoolean(PreferenceConstants.CSV_OUT_HEADER));
+                csvSepTagTxt.setText(preferenceStore.getDefaultString(PreferenceConstants.CSV_SEPARATOR_TAG));
+                csvSepBuildNoTxt.setText(preferenceStore.getDefaultString(PreferenceConstants.CSV_SEPARATOR_BUILDNO));
+                csvSepGroupTxt.setText(preferenceStore.getDefaultString(PreferenceConstants.CSV_SEPARATOR_GROUP));
+                csvSepServerTxt.setText(preferenceStore.getDefaultString(PreferenceConstants.CSV_SEPARATOR_SERVER));
+                csvSepRouteTxt.setText(preferenceStore.getDefaultString(PreferenceConstants.CSV_SEPARATOR_ROUTE));
+                csvFileForamtTxt.setText(preferenceStore.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT));
+                traceSleepTxt.setText(preferenceStore.getDefaultString(PreferenceConstants.SLEEP_TRACE));
+            }
+        });
+
+        Button applyBtn = new Button(buttonGrp, SWT.NULL);
         GridData applyBtnGrDt = new GridData(SWT.RIGHT, SWT.BOTTOM, true, true, 1, 1);
         applyBtnGrDt.widthHint = 90;
         applyBtn.setLayoutData(applyBtnGrDt);

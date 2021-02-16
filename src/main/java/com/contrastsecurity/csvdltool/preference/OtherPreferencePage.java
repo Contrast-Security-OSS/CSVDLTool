@@ -48,6 +48,7 @@ public class OtherPreferencePage extends PreferencePage {
     private Text traceSleepTxt;
     private Text csvSepTagTxt;
     private Text csvSepBuildNoTxt;
+    private Text csvSepGroupTxt;
     private Text csvSepServerTxt;
     private Text csvSepRouteTxt;
     private Text csvFileForamtTxt;
@@ -109,6 +110,11 @@ public class OtherPreferencePage extends PreferencePage {
         csvSepBuildNoTxt = new Text(csvSepGrp, SWT.BORDER);
         csvSepBuildNoTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         csvSepBuildNoTxt.setText(preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_BUILDNO));
+
+        new Label(csvSepGrp, SWT.LEFT).setText("アプリケーショングループ：");
+        csvSepGroupTxt = new Text(csvSepGrp, SWT.BORDER);
+        csvSepGroupTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        csvSepGroupTxt.setText(preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_GROUP));
 
         new Label(csvSepGrp, SWT.LEFT).setText("サーバ：");
         csvSepServerTxt = new Text(csvSepGrp, SWT.BORDER);
@@ -197,6 +203,9 @@ public class OtherPreferencePage extends PreferencePage {
         }
         if (this.csvSepBuildNoTxt != null) {
             ps.setValue(PreferenceConstants.CSV_SEPARATOR_BUILDNO, this.csvSepBuildNoTxt.getText());
+        }
+        if (this.csvSepGroupTxt != null) {
+            ps.setValue(PreferenceConstants.CSV_SEPARATOR_GROUP, this.csvSepGroupTxt.getText());
         }
         if (this.csvSepServerTxt != null) {
             ps.setValue(PreferenceConstants.CSV_SEPARATOR_SERVER, this.csvSepServerTxt.getText());

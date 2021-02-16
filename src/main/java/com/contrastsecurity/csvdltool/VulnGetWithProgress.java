@@ -56,7 +56,6 @@ import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
 
 public class VulnGetWithProgress implements IRunnableWithProgress {
 
-    private static final int CELL_TEXT_MAX = 32767;
     private static final List<String> CSV_HEADER = new ArrayList<String>(Arrays.asList("アプリケーション名", "マージしたときの各アプリ名称", "アプリケーションタグ", "カテゴリ", "ルール", "深刻度", "ステータス", "言語",
             "アプリケーションのグループ", "脆弱性のタイトル", "最初の検出", "最後の検出", "ビルド番号", "次のサーバにより報告", "ルート", "モジュール", "HTTP情報", "脆弱性タグ", "コメント"));
     private static final List<String> CSV_HEADER_FULL = new ArrayList<String>(Arrays.asList("アプリケーション名", "マージしたときの各アプリ名称", "アプリケーションタグ", "カテゴリ", "ルール", "深刻度", "ステータス", "言語",
@@ -94,6 +93,7 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
         int sleepTrace = preferenceStore.getInt(PreferenceConstants.SLEEP_TRACE);
         String csvSepTag = preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_TAG).replace("\\r", "\r").replace("\\n", "\n");
         String csvSepBuildNo = preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_BUILDNO).replace("\\r", "\r").replace("\\n", "\n");
+        String csvSepGroup = preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_GROUP).replace("\\r", "\r").replace("\\n", "\n");
         String csvSepServer = preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_SERVER).replace("\\r", "\r").replace("\\n", "\n");
         String csvSepRoute = preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_ROUTE).replace("\\r", "\r").replace("\\n", "\n");
         Map<String, List<String>> appGroupMap = new HashMap<String, List<String>>();
@@ -161,7 +161,7 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
                     csvLineList.add(trace.getLanguage());
                     // ==================== 09. グループ（アプリケーションのグループ） ====================
                     if (appGroupMap.containsKey(appName)) {
-                        csvLineList.add(String.join(", ", appGroupMap.get(appName)));
+                        csvLineList.add(String.join(csvSepGroup, appGroupMap.get(appName)));
                     } else {
                         csvLineList.add("");
                     }

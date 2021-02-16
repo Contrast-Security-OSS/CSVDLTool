@@ -130,6 +130,7 @@ public class Main implements PropertyChangeListener {
             this.preferenceStore.setDefault(PreferenceConstants.CSV_OUT_HEADER, true);
             this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_TAG, ",");
             this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_BUILDNO, ",");
+            this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_GROUP, ",");
             this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_SERVER, ",");
             this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_ROUTE, "\\r\\n");
             this.preferenceStore.setDefault(PreferenceConstants.CSV_FILE_FORMAT, "yyyy-MM-dd_HHmmss");

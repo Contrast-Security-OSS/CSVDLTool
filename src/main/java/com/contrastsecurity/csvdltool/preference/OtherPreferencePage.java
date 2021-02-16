@@ -46,6 +46,7 @@ public class OtherPreferencePage extends PreferencePage {
 
     private Button outCsvHeaderFlg;
     private Text traceSleepTxt;
+    private Text csvSepTagTxt;
     private Text csvSepBuildNoTxt;
     private Text csvSepServerTxt;
     private Text csvSepRouteTxt;
@@ -98,6 +99,11 @@ public class OtherPreferencePage extends PreferencePage {
         // csvSepGrpGrDt.horizontalSpan = 2;
         csvSepGrp.setLayoutData(csvSepGrpGrDt);
         csvSepGrp.setText("区切り文字");
+
+        new Label(csvSepGrp, SWT.LEFT).setText("タグ：");
+        csvSepTagTxt = new Text(csvSepGrp, SWT.BORDER);
+        csvSepTagTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        csvSepTagTxt.setText(preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_TAG));
 
         new Label(csvSepGrp, SWT.LEFT).setText("ビルド番号：");
         csvSepBuildNoTxt = new Text(csvSepGrp, SWT.BORDER);
@@ -185,6 +191,9 @@ public class OtherPreferencePage extends PreferencePage {
                 }
             }
             ps.setValue(PreferenceConstants.SLEEP_TRACE, this.traceSleepTxt.getText());
+        }
+        if (this.csvSepTagTxt != null) {
+            ps.setValue(PreferenceConstants.CSV_SEPARATOR_TAG, this.csvSepTagTxt.getText());
         }
         if (this.csvSepBuildNoTxt != null) {
             ps.setValue(PreferenceConstants.CSV_SEPARATOR_BUILDNO, this.csvSepBuildNoTxt.getText());

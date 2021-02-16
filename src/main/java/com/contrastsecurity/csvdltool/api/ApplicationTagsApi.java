@@ -4,34 +4,34 @@ import java.lang.reflect.Type;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 
-import com.contrastsecurity.csvdltool.json.TraceTagsJson;
+import com.contrastsecurity.csvdltool.json.ApplicationTagsJson;
 import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-public class TraceTagsApi extends Api {
+public class ApplicationTagsApi extends Api {
 
-    private String trace_id;
+    private String appId;
 
-    public TraceTagsApi(IPreferenceStore preferenceStore, String trace_id) {
+    public ApplicationTagsApi(IPreferenceStore preferenceStore, String appId) {
         super(preferenceStore);
-        this.trace_id = trace_id;
+        this.appId = appId;
     }
 
     @Override
     protected String getUrl() {
         String contrastUrl = preferenceStore.getString(PreferenceConstants.CONTRAST_URL);
         String orgId = preferenceStore.getString(PreferenceConstants.ORG_ID);
-        return String.format("%s/api/ng/%s/tags/traces/trace/%s?expand=skip_links", contrastUrl, orgId, this.trace_id);
+        return String.format("%s/api/ng/%s/tags/application/list/%s", contrastUrl, orgId, this.appId);
     }
 
     @Override
     protected Object convert(String response) {
         Gson gson = new Gson();
-        Type traceTagsType = new TypeToken<TraceTagsJson>() {
+        Type applicationTagsType = new TypeToken<ApplicationTagsJson>() {
         }.getType();
-        TraceTagsJson traceTagsJson = gson.fromJson(response, traceTagsType);
-        return traceTagsJson.getTags();
+        ApplicationTagsJson applicationTagsJson = gson.fromJson(response, applicationTagsType);
+        return applicationTagsJson.getTags();
     }
 
 }

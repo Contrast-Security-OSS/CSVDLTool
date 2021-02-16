@@ -93,7 +93,6 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
         try {
             // 長文情報（何が起こったか？など）を出力する場合はフォルダに出力
             if (this.isIncludeDesc) {
-
                 Path dir = Paths.get(timestamp);
                 Files.createDirectory(dir);
             }

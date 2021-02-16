@@ -132,7 +132,7 @@ public class OtherPreferencePage extends PreferencePage {
         Label csvFileFormatHint = new Label(csvFileFormatGrp, SWT.LEFT);
         GridData csvFileFormatHintGrDt = new GridData(GridData.FILL_HORIZONTAL);
         csvFileFormatHint.setLayoutData(csvFileFormatHintGrDt);
-        csvFileFormatHint.setText("java.text.SimpleDateFormatの書式としてください。");
+        csvFileFormatHint.setText("java.text.SimpleDateFormatの書式としてください。\r\n例) 'contrast_'yyyy-MM-dd_HHmmss");
 
         Group ctrlGrp = new Group(composite, SWT.NONE);
         GridLayout proxyGrpLt = new GridLayout(4, false);

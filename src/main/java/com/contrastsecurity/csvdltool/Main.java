@@ -90,6 +90,7 @@ public class Main implements PropertyChangeListener {
     private Label dstCount;
     private Button executeBtn;
     private Button includeDescChk;
+    private Button onlyParentAppChk;
     private Button settingBtn;
 
     private Map<String, AppInfo> fullAppMap;
@@ -130,7 +131,7 @@ public class Main implements PropertyChangeListener {
             this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_BUILDNO, ",");
             this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_SERVER, ",");
             this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_ROUTE, "\\r\\n");
-            this.preferenceStore.setDefault(PreferenceConstants.CSV_FILE_FORMAT, "yyyy-MM-dd_HHmmss'.csv'");
+            this.preferenceStore.setDefault(PreferenceConstants.CSV_FILE_FORMAT, "yyyy-MM-dd_HHmmss");
 
             Yaml yaml = new Yaml();
             InputStream is = new FileInputStream("contrast_security.yaml");
@@ -173,6 +174,8 @@ public class Main implements PropertyChangeListener {
             public void shellClosed(ShellEvent event) {
                 preferenceStore.setValue(PreferenceConstants.MEM_WIDTH, shell.getSize().x);
                 preferenceStore.setValue(PreferenceConstants.MEM_HEIGHT, shell.getSize().y);
+                preferenceStore.setValue(PreferenceConstants.ONLY_PARENT_APP_CHECK, onlyParentAppChk.getSelection());
+                preferenceStore.setValue(PreferenceConstants.INCLUDE_DESCRIPTION, includeDescChk.getSelection());
                 try {
                     preferenceStore.save();
                 } catch (IOException ioe) {
@@ -511,7 +514,7 @@ public class Main implements PropertyChangeListener {
                     MessageDialog.openInformation(shell, "取得", "取得対象のアプリケーションを選択してください。");
                     return;
                 }
-                VulnGetWithProgress progress = new VulnGetWithProgress(preferenceStore, dstApps, fullAppMap, includeDescChk.getSelection());
+                VulnGetWithProgress progress = new VulnGetWithProgress(preferenceStore, dstApps, fullAppMap, onlyParentAppChk.getSelection(), includeDescChk.getSelection());
                 ProgressMonitorDialog progDialog = new ProgressMonitorDialog(shell);
                 try {
                     progDialog.run(true, true, progress);
@@ -532,8 +535,14 @@ public class Main implements PropertyChangeListener {
             }
         });
 
+        onlyParentAppChk = new Button(buttonGrp, SWT.CHECK);
+        onlyParentAppChk.setText("マージされたアプリの場合、親アプリの脆弱性だけを出力する。");
+        if (preferenceStore.getBoolean(PreferenceConstants.ONLY_PARENT_APP_CHECK)) {
+            onlyParentAppChk.setSelection(true);
+        }
+
         includeDescChk = new Button(buttonGrp, SWT.CHECK);
-        includeDescChk.setText("何が起こったか？どんなリスクであるか？修正方法を含める");
+        includeDescChk.setText("何が起こったか？どんなリスクであるか？修正方法の３つの項目も添付出力する。");
         if (preferenceStore.getBoolean(PreferenceConstants.INCLUDE_DESCRIPTION)) {
             includeDescChk.setSelection(true);
         }

@@ -6,6 +6,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -59,14 +62,16 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
     private PreferenceStore preferenceStore;
     private List<String> dstApps;
     private Map<String, AppInfo> fullAppMap;
+    private boolean isOnlyParentApp;
     private boolean isIncludeDesc;
 
     Logger logger = Logger.getLogger("csvdltool");
 
-    public VulnGetWithProgress(PreferenceStore preferenceStore, List<String> dstApps, Map<String, AppInfo> fullAppMap, boolean isIncludeDesc) {
+    public VulnGetWithProgress(PreferenceStore preferenceStore, List<String> dstApps, Map<String, AppInfo> fullAppMap, boolean isOnlyParentApp, boolean isIncludeDesc) {
         this.preferenceStore = preferenceStore;
         this.dstApps = dstApps;
         this.fullAppMap = fullAppMap;
+        this.isOnlyParentApp = isOnlyParentApp;
         this.isIncludeDesc = isIncludeDesc;
     }
 
@@ -74,6 +79,11 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
     @Override
     public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
         monitor.setTaskName("脆弱性情報の取得を開始しています...");
+        String csvFileFormat = preferenceStore.getString(PreferenceConstants.CSV_FILE_FORMAT);
+        if (csvFileFormat == null || csvFileFormat.isEmpty()) {
+            csvFileFormat = preferenceStore.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT);
+        }
+        String timestamp = new SimpleDateFormat(csvFileFormat).format(new Date());
         int sleepTrace = preferenceStore.getInt(PreferenceConstants.SLEEP_TRACE);
         String csvSepBuildNo = preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_BUILDNO).replace("\\r", "\r").replace("\\n", "\n");
         String csvSepServer = preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_SERVER).replace("\\r", "\r").replace("\\n", "\n");
@@ -81,6 +91,12 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
         Map<String, List<String>> appGroupMap = new HashMap<String, List<String>>();
         List<List<String>> csvList = new ArrayList<List<String>>();
         try {
+            // 長文情報（何が起こったか？など）を出力する場合はフォルダに出力
+            if (this.isIncludeDesc) {
+
+                Path dir = Paths.get(timestamp);
+                Files.createDirectory(dir);
+            }
             // アプリケーショングループの情報を取得
             Api groupsApi = new GroupsApi(preferenceStore);
             List<CustomGroup> customGroups = (List<CustomGroup>) groupsApi.get();
@@ -225,12 +241,11 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
 
         // ========== CSV出力 ==========
         monitor.beginTask("CSV出力", csvList.size());
-        String csvFileFormat = preferenceStore.getString(PreferenceConstants.CSV_FILE_FORMAT);
-        if (csvFileFormat == null || csvFileFormat.isEmpty()) {
-            csvFileFormat = preferenceStore.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT);
+        String filePath = timestamp + ".csv";
+        if (isIncludeDesc) {
+            filePath = timestamp + "\\output.csv";
         }
-        String fileName = new SimpleDateFormat(csvFileFormat).format(new Date());
-        try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(fileName)), "shift-jis"))) {
+        try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(filePath)), "shift-jis"))) {
             CSVPrinter printer = CSVFormat.EXCEL.print(bw);
             if (preferenceStore.getBoolean(PreferenceConstants.CSV_OUT_HEADER)) {
                 if (isIncludeDesc) {

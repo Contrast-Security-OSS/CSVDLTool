@@ -135,7 +135,7 @@ public class OtherPreferencePage extends PreferencePage {
         GridData csvFileFormatGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
         // csvFileFormatGrpGrDt.horizontalSpan = 2;
         csvFileFormatGrp.setLayoutData(csvFileFormatGrpGrDt);
-        csvFileFormatGrp.setText("CSV出力ファイルフォーマット");
+        csvFileFormatGrp.setText("CSV出力ファイルフォーマット（またはフォルダ名）");
 
         csvFileForamtTxt = new Text(csvFileFormatGrp, SWT.BORDER);
         csvFileForamtTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));

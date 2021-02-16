@@ -544,7 +544,7 @@ public class Main implements PropertyChangeListener {
         }
 
         includeDescChk = new Button(buttonGrp, SWT.CHECK);
-        includeDescChk.setText("何が起こったか？どんなリスクであるか？修正方法の３つの項目も添付出力する。");
+        includeDescChk.setText("何が起こったか？どんなリスクであるか？修正方法の３つの項目も添付出力する。（フォルダ出力）");
         if (preferenceStore.getBoolean(PreferenceConstants.INCLUDE_DESCRIPTION)) {
             includeDescChk.setSelection(true);
         }

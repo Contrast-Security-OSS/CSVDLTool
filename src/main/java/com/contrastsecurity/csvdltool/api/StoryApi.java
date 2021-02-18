@@ -29,7 +29,7 @@ public class StoryApi extends Api {
             return this.convert(response);
         } catch (Exception e) {
             Risk risk = new Risk();
-            risk.setText("取得に失敗しました。");
+            risk.setText("***** 取得に失敗しました。 *****");
             Story story = new Story();
             story.setRisk(risk);
             story.setChapters(new ArrayList<Chapter>());

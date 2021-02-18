@@ -26,7 +26,7 @@ public class HowToFixApi extends Api {
             return this.convert(response);
         } catch (Exception e) {
             Recommendation recommendation = new Recommendation();
-            recommendation.setText("取得に失敗しました。");
+            recommendation.setText("***** 取得に失敗しました。 *****");
             HowToFixJson howToFixJson = new HowToFixJson();
             howToFixJson.setRecommendation(recommendation);
             howToFixJson.setCwe("");

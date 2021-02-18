@@ -19,6 +19,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.csv.CSVFormat;
@@ -57,9 +59,9 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
 
     private static final String FILE_ENCODING = "Shift_JIS";
 
-    private static final List<String> CSV_HEADER = new ArrayList<String>(Arrays.asList("アプリケーション名", "マージしたときの各アプリ名称", "アプリケーションタグ", "カテゴリ", "ルール", "深刻度", "ステータス", "言語",
+    private static final List<String> CSV_HEADER = new ArrayList<String>(Arrays.asList("アプリケーション名", "マージしたときの各アプリ名称", "アプリケーションタグ", "カテゴリ", "ルール", "深刻度", "CWE", "ステータス", "言語",
             "アプリケーションのグループ", "脆弱性のタイトル", "最初の検出", "最後の検出", "ビルド番号", "次のサーバにより報告", "ルート", "モジュール", "脆弱性タグ"));
-    private static final List<String> CSV_HEADER_FULL = new ArrayList<String>(Arrays.asList("アプリケーション名", "マージしたときの各アプリ名称", "アプリケーションタグ", "カテゴリ", "ルール", "深刻度", "ステータス", "言語",
+    private static final List<String> CSV_HEADER_FULL = new ArrayList<String>(Arrays.asList("アプリケーション名", "マージしたときの各アプリ名称", "アプリケーションタグ", "カテゴリ", "ルール", "深刻度", "CWE", "ステータス", "言語",
             "アプリケーションのグループ", "脆弱性のタイトル", "最初の検出", "最後の検出", "ビルド番号", "次のサーバにより報告", "ルート", "モジュール", "脆弱性タグ", "詳細"));
 
     private static final String HTTP_INFO = "==================== HTTP情報 ====================";
@@ -92,6 +94,7 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
         if (csvFileFormat == null || csvFileFormat.isEmpty()) {
             csvFileFormat = preferenceStore.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT);
         }
+        Pattern cwePtn = Pattern.compile("\\/(\\d+)\\.html$");
         String timestamp = new SimpleDateFormat(csvFileFormat).format(new Date());
         int sleepTrace = preferenceStore.getInt(PreferenceConstants.SLEEP_TRACE);
         String csvSepTag = preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_TAG).replace("\\r", "\r").replace("\\n", "\n");
@@ -164,47 +167,57 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
                     csvLineList.add(trace.getRule_title());
                     // ==================== 06. 深刻度 ====================
                     csvLineList.add(trace.getSeverity_label());
-                    // ==================== 07. ステータス ====================
+                    // ==================== 07. CWE ====================
+                    Api howToFixApi = new HowToFixApi(preferenceStore, trace_id);
+                    HowToFixJson howToFixJson = (HowToFixJson) howToFixApi.get();
+                    String cweUrl = howToFixJson.getCwe();
+                    Matcher m = cwePtn.matcher(cweUrl);
+                    if (m.find()) {
+                        csvLineList.add(m.group(1));
+                    } else {
+                        csvLineList.add("");
+                    }
+                    // ==================== 08. ステータス ====================
                     csvLineList.add(trace.getStatus());
-                    // ==================== 08. 言語（Javaなど） ====================
+                    // ==================== 09. 言語（Javaなど） ====================
                     csvLineList.add(trace.getLanguage());
-                    // ==================== 09. グループ（アプリケーションのグループ） ====================
+                    // ==================== 10. グループ（アプリケーションのグループ） ====================
                     if (appGroupMap.containsKey(appName)) {
                         csvLineList.add(String.join(csvSepGroup, appGroupMap.get(appName)));
                     } else {
                         csvLineList.add("");
                     }
-                    // ==================== 10. 脆弱性のタイトル（例：SQLインジェクション：「/api/v1/approvers/」ページのリクエストボディ ） ====================
+                    // ==================== 11. 脆弱性のタイトル（例：SQLインジェクション：「/api/v1/approvers/」ページのリクエストボディ ） ====================
                     csvLineList.add(trace.getTitle());
-                    // ==================== 11. 最初の検出 ====================
+                    // ==================== 12. 最初の検出 ====================
                     csvLineList.add(trace.getFirst_time_seen());
-                    // ==================== 12. 最後の検出 ====================
+                    // ==================== 13. 最後の検出 ====================
                     csvLineList.add(trace.getLast_time_seen());
-                    // ==================== 13. ビルド番号 ====================
+                    // ==================== 14. ビルド番号 ====================
                     csvLineList.add(String.join(csvSepBuildNo, trace.getApp_version_tags()));
-                    // ==================== 14. 次のサーバにより報告 ====================
+                    // ==================== 15. 次のサーバにより報告 ====================
                     List<String> serverNameList = trace.getServers().stream().map(Server::getName).collect(Collectors.toList());
                     csvLineList.add(String.join(csvSepServer, serverNameList));
-                    // ==================== 15. ルート ====================
+                    // ==================== 16. ルート ====================
                     Api routesApi = new RoutesApi(preferenceStore, appId, trace_id);
                     List<Route> routes = (List<Route>) routesApi.get();
                     List<String> signatureList = routes.stream().map(Route::getSignature).collect(Collectors.toList());
                     csvLineList.add(String.join(csvSepRoute, signatureList));
-                    // ==================== 16. モジュール ====================
+                    // ==================== 17. モジュール ====================
                     Application app = trace.getApplication();
                     String module = String.format("%s (%s) - %s", app.getName(), app.getContext_path(), app.getLanguage());
                     csvLineList.add(module);
-                    // ==================== 17. 脆弱性タグ ====================
+                    // ==================== 18. 脆弱性タグ ====================
                     Api traceTagsApi = new TraceTagsApi(preferenceStore, trace_id);
                     List<String> traceTags = (List<String>) traceTagsApi.get();
                     csvLineList.add(String.join(csvSepTag, traceTags));
                     if (isIncludeDesc) {
-                        // ==================== 18. 詳細（長文データ） ====================
+                        // ==================== 19. 詳細（長文データ） ====================
                         csvLineList.add(String.format("=HYPERLINK(\".\\%s.txt\",\"%s\")", trace.getUuid(), trace.getUuid()));
                         String textFileName = String.format("%s\\%s.txt", timestamp, trace.getUuid());
                         File file = new File(textFileName);
 
-                        // ==================== 18-1. HTTP情報 ====================
+                        // ==================== 19-1. HTTP情報 ====================
                         Api httpRequestApi = new HttpRequestApi(preferenceStore, trace_id);
                         HttpRequest httpRequest = (HttpRequest) httpRequestApi.get();
                         if (httpRequest != null) {
@@ -214,7 +227,7 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
                         }
                         Api storyApi = new StoryApi(preferenceStore, trace_id);
                         Story story = (Story) storyApi.get();
-                        // ==================== 18-2. 何が起こったか？ ====================
+                        // ==================== 19-2. 何が起こったか？ ====================
                         List<String> chapterLines = new ArrayList<String>();
                         chapterLines.add(WHAT_HAPPEN);
                         for (Chapter chapter : story.getChapters()) {
@@ -222,18 +235,16 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
                             chapterLines.add(chapter.getBody());
                         }
                         FileUtils.writeLines(file, FILE_ENCODING, chapterLines, true);
-                        // ==================== 18-3. どんなリスクであるか？ ====================
+                        // ==================== 19-3. どんなリスクであるか？ ====================
                         FileUtils.writeLines(file, FILE_ENCODING, Arrays.asList(RISK, story.getRisk().getText()), true);
-                        // ==================== 18-4. 修正方法 ====================
-                        Api howToFixApi = new HowToFixApi(preferenceStore, trace_id);
-                        HowToFixJson howToFixJson = (HowToFixJson) howToFixApi.get();
+                        // ==================== 19-4. 修正方法 ====================
                         List<String> howToFixLines = new ArrayList<String>();
                         howToFixLines.add(HOWTOFIX);
                         howToFixLines.add(howToFixJson.getRecommendation().getText());
                         howToFixLines.add(String.format("CWE: %s", howToFixJson.getCwe()));
                         howToFixLines.add(String.format("OWASP: %s", howToFixJson.getOwasp()));
                         FileUtils.writeLines(file, FILE_ENCODING, howToFixLines, true);
-                        // ==================== 18-5. コメント ====================
+                        // ==================== 19-5. コメント ====================
                         List<String> noteLines = new ArrayList<String>();
                         noteLines.add(COMMENT);
                         for (Note note : trace.getNotes()) {

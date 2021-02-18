@@ -227,7 +227,12 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
                         // ==================== 18-4. 修正方法 ====================
                         Api howToFixApi = new HowToFixApi(preferenceStore, trace_id);
                         HowToFixJson howToFixJson = (HowToFixJson) howToFixApi.get();
-                        FileUtils.writeLines(file, FILE_ENCODING, Arrays.asList(HOWTOFIX, howToFixJson.getRecommendation().getText()), true);
+                        List<String> howToFixLines = new ArrayList<String>();
+                        howToFixLines.add(HOWTOFIX);
+                        howToFixLines.add(howToFixJson.getRecommendation().getText());
+                        howToFixLines.add(String.format("CWE: %s", howToFixJson.getCwe()));
+                        howToFixLines.add(String.format("OWASP: %s", howToFixJson.getOwasp()));
+                        FileUtils.writeLines(file, FILE_ENCODING, howToFixLines, true);
                         // ==================== 18-5. コメント ====================
                         List<String> noteLines = new ArrayList<String>();
                         noteLines.add(COMMENT);

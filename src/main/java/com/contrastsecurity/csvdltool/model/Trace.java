@@ -115,7 +115,7 @@ public class Trace {
     }
 
     public String getStatus() {
-        Pattern p = Pattern.compile("^[A-Za-z\s]+$");
+        Pattern p = Pattern.compile("^[A-Za-z\\s]+$");
         Matcher m = p.matcher(this.status);
         if (m.matches()) {
             return StatusEnum.valueOf(this.status.replaceAll(" ", "").toUpperCase()).getLabel();

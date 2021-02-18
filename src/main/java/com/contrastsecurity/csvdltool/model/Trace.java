@@ -5,6 +5,11 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import com.contrastsecurity.csvdltool.SeverityEnum;
+import com.contrastsecurity.csvdltool.StatusEnum;
 
 public class Trace {
     private String title;
@@ -102,7 +107,7 @@ public class Trace {
         if (this.severity_label != null) {
             return severity_label;
         }
-        return this.getSeverity();
+        return SeverityEnum.valueOf(this.getSeverity().toUpperCase()).getLabel();
     }
 
     public void setSeverity_label(String severity_label) {
@@ -110,7 +115,12 @@ public class Trace {
     }
 
     public String getStatus() {
-        return status;
+        Pattern p = Pattern.compile("^[A-Za-z\s]+$");
+        Matcher m = p.matcher(this.status);
+        if (m.matches()) {
+            return StatusEnum.valueOf(this.status.replaceAll(" ", "").toUpperCase()).getLabel();
+        }
+        return this.status;
     }
 
     public void setStatus(String status) {

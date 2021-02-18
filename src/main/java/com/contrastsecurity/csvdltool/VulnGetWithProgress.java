@@ -55,6 +55,8 @@ import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
 
 public class VulnGetWithProgress implements IRunnableWithProgress {
 
+    private static final String FILE_ENCODING = "Shift_JIS";
+
     private static final List<String> CSV_HEADER = new ArrayList<String>(Arrays.asList("アプリケーション名", "マージしたときの各アプリ名称", "アプリケーションタグ", "カテゴリ", "ルール", "深刻度", "ステータス", "言語",
             "アプリケーションのグループ", "脆弱性のタイトル", "最初の検出", "最後の検出", "ビルド番号", "次のサーバにより報告", "ルート", "モジュール", "脆弱性タグ"));
     private static final List<String> CSV_HEADER_FULL = new ArrayList<String>(Arrays.asList("アプリケーション名", "マージしたときの各アプリ名称", "アプリケーションタグ", "カテゴリ", "ルール", "深刻度", "ステータス", "言語",
@@ -206,9 +208,9 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
                         Api httpRequestApi = new HttpRequestApi(preferenceStore, trace_id);
                         HttpRequest httpRequest = (HttpRequest) httpRequestApi.get();
                         if (httpRequest != null) {
-                            FileUtils.writeLines(file, "Shift_JIS", Arrays.asList(HTTP_INFO, httpRequest.getText()), true);
+                            FileUtils.writeLines(file, FILE_ENCODING, Arrays.asList(HTTP_INFO, httpRequest.getText()), true);
                         } else {
-                            FileUtils.writeLines(file, "Shift_JIS", Arrays.asList(HTTP_INFO, "なし"), true);
+                            FileUtils.writeLines(file, FILE_ENCODING, Arrays.asList(HTTP_INFO, "なし"), true);
                         }
                         Api storyApi = new StoryApi(preferenceStore, trace_id);
                         Story story = (Story) storyApi.get();
@@ -219,13 +221,13 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
                             chapterLines.add(chapter.getIntroText());
                             chapterLines.add(chapter.getBody());
                         }
-                        FileUtils.writeLines(file, "Shift_JIS", chapterLines, true);
+                        FileUtils.writeLines(file, FILE_ENCODING, chapterLines, true);
                         // ==================== 18-3. どんなリスクであるか？ ====================
-                        FileUtils.writeLines(file, "Shift_JIS", Arrays.asList(RISK, story.getRisk().getText()), true);
+                        FileUtils.writeLines(file, FILE_ENCODING, Arrays.asList(RISK, story.getRisk().getText()), true);
                         // ==================== 18-4. 修正方法 ====================
                         Api howToFixApi = new HowToFixApi(preferenceStore, trace_id);
                         HowToFixJson howToFixJson = (HowToFixJson) howToFixApi.get();
-                        FileUtils.writeLines(file, "Shift_JIS", Arrays.asList(HOWTOFIX, howToFixJson.getRecommendation().getText()), true);
+                        FileUtils.writeLines(file, FILE_ENCODING, Arrays.asList(HOWTOFIX, howToFixJson.getRecommendation().getText()), true);
                         // ==================== 18-5. コメント ====================
                         List<String> noteLines = new ArrayList<String>();
                         noteLines.add(COMMENT);
@@ -256,7 +258,7 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
                             }
                             noteLines.add(strBuffer.toString());
                         }
-                        FileUtils.writeLines(file, "Shift_JIS", noteLines, true);
+                        FileUtils.writeLines(file, FILE_ENCODING, noteLines, true);
                     }
 
                     csvList.add(csvLineList);
@@ -275,7 +277,7 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
         if (isIncludeDesc) {
             filePath = timestamp + "\\output.csv";
         }
-        try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(filePath)), "shift-jis"))) {
+        try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(filePath)), FILE_ENCODING))) {
             CSVPrinter printer = CSVFormat.EXCEL.print(bw);
             if (preferenceStore.getBoolean(PreferenceConstants.CSV_OUT_HEADER)) {
                 if (isIncludeDesc) {

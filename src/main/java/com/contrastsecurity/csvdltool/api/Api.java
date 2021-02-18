@@ -67,7 +67,7 @@ public abstract class Api {
         return headers;
     }
 
-    private String getResponse() throws Exception {
+    protected String getResponse() throws Exception {
         String url = this.getUrl();
         logger.trace(url);
         HttpGet httpGet = new HttpGet(url);

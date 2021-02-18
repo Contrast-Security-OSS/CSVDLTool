@@ -5,6 +5,7 @@ import java.lang.reflect.Type;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 import com.contrastsecurity.csvdltool.json.HowToFixJson;
+import com.contrastsecurity.csvdltool.model.Recommendation;
 import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -16,6 +17,22 @@ public class HowToFixApi extends Api {
     public HowToFixApi(IPreferenceStore preferenceStore, String trace_id) {
         super(preferenceStore);
         this.trace_id = trace_id;
+    }
+
+    @Override
+    public Object get() throws Exception {
+        try {
+            String response = this.getResponse();
+            return this.convert(response);
+        } catch (Exception e) {
+            Recommendation recommendation = new Recommendation();
+            recommendation.setText("取得に失敗しました。");
+            HowToFixJson howToFixJson = new HowToFixJson();
+            howToFixJson.setRecommendation(recommendation);
+            howToFixJson.setCwe("");
+            howToFixJson.setOwasp("");
+            return howToFixJson;
+        }
     }
 
     @Override

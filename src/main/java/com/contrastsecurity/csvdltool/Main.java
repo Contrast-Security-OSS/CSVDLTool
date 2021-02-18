@@ -205,6 +205,7 @@ public class Main implements PropertyChangeListener {
 
         GridLayout baseLayout = new GridLayout(1, false);
         baseLayout.marginWidth = 5;
+        baseLayout.marginBottom = 5;
         shell.setLayout(baseLayout);
 
         Group appListGrp = new Group(shell, SWT.NONE);
@@ -218,7 +219,6 @@ public class Main implements PropertyChangeListener {
         appLoadBtn.setLayoutData(appLoadBtnGrDt);
         appLoadBtn.setText("アプリケーション一覧の読み込み");
         appLoadBtn.addSelectionListener(new SelectionListener() {
-            @SuppressWarnings("unchecked")
             @Override
             public void widgetSelected(SelectionEvent event) {
                 // src
@@ -623,6 +623,7 @@ public class Main implements PropertyChangeListener {
             this.executeBtn.setEnabled(enableFlg.booleanValue());
         } else if ("optionInputs".equals(event.getPropertyName())) {
             String oldValue = (String) event.getOldValue();
+            System.out.println(oldValue);
         }
     }
 

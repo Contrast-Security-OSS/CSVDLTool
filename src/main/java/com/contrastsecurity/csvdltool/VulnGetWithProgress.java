@@ -6,11 +6,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.InvocationTargetException;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -25,6 +23,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -57,13 +56,15 @@ import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
 public class VulnGetWithProgress implements IRunnableWithProgress {
 
     private static final List<String> CSV_HEADER = new ArrayList<String>(Arrays.asList("アプリケーション名", "マージしたときの各アプリ名称", "アプリケーションタグ", "カテゴリ", "ルール", "深刻度", "ステータス", "言語",
-            "アプリケーションのグループ", "脆弱性のタイトル", "最初の検出", "最後の検出", "ビルド番号", "次のサーバにより報告", "ルート", "モジュール", "HTTP情報", "脆弱性タグ", "コメント"));
+            "アプリケーションのグループ", "脆弱性のタイトル", "最初の検出", "最後の検出", "ビルド番号", "次のサーバにより報告", "ルート", "モジュール", "脆弱性タグ"));
     private static final List<String> CSV_HEADER_FULL = new ArrayList<String>(Arrays.asList("アプリケーション名", "マージしたときの各アプリ名称", "アプリケーションタグ", "カテゴリ", "ルール", "深刻度", "ステータス", "言語",
-            "アプリケーションのグループ", "脆弱性のタイトル", "最初の検出", "最後の検出", "ビルド番号", "次のサーバにより報告", "ルート", "モジュール", "HTTP情報", "詳細", "脆弱性タグ", "コメント"));
+            "アプリケーションのグループ", "脆弱性のタイトル", "最初の検出", "最後の検出", "ビルド番号", "次のサーバにより報告", "ルート", "モジュール", "脆弱性タグ", "詳細"));
 
+    private static final String HTTP_INFO = "==================== HTTP情報 ====================";
     private static final String WHAT_HAPPEN = "==================== 何が起こったか？ ====================";
     private static final String RISK = "==================== どんなリスクであるか？ ====================";
     private static final String HOWTOFIX = "==================== 修正方法 ====================";
+    private static final String COMMENT = "==================== コメント ====================";
 
     private PreferenceStore preferenceStore;
     private List<String> dstApps;
@@ -191,70 +192,71 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
                     Application app = trace.getApplication();
                     String module = String.format("%s (%s) - %s", app.getName(), app.getContext_path(), app.getLanguage());
                     csvLineList.add(module);
-                    // ==================== 17. HTTP情報 ====================
-                    Api httpRequestApi = new HttpRequestApi(preferenceStore, trace_id);
-                    HttpRequest httpRequest = (HttpRequest) httpRequestApi.get();
-                    if (httpRequest != null) {
-                        csvLineList.add(httpRequest.getText());
-                    } else {
-                        csvLineList.add(""); // HTTP情報がない場合もあります。
-                    }
+                    // ==================== 17. 脆弱性タグ ====================
+                    Api traceTagsApi = new TraceTagsApi(preferenceStore, trace_id);
+                    List<String> traceTags = (List<String>) traceTagsApi.get();
+                    csvLineList.add(String.join(csvSepTag, traceTags));
                     if (isIncludeDesc) {
-                        // ==================== 18. 詳細 ====================
+                        // ==================== 18. 詳細（長文データ） ====================
                         csvLineList.add(String.format("=HYPERLINK(\".\\%s.txt\",\"%s\")", trace.getUuid(), trace.getUuid()));
                         String textFileName = String.format("%s\\%s.txt", timestamp, trace.getUuid());
-                        Path textFilePath = Paths.get(textFileName);
+                        File file = new File(textFileName);
 
+                        // ==================== 18-1. HTTP情報 ====================
+                        Api httpRequestApi = new HttpRequestApi(preferenceStore, trace_id);
+                        HttpRequest httpRequest = (HttpRequest) httpRequestApi.get();
+                        if (httpRequest != null) {
+                            FileUtils.writeLines(file, "Shift_JIS", Arrays.asList(HTTP_INFO, httpRequest.getText()), true);
+                        } else {
+                            FileUtils.writeLines(file, "Shift_JIS", Arrays.asList(HTTP_INFO, "なし"), true);
+                        }
                         Api storyApi = new StoryApi(preferenceStore, trace_id);
                         Story story = (Story) storyApi.get();
-                        // ==================== 18-1. 何が起こったか？ ====================
+                        // ==================== 18-2. 何が起こったか？ ====================
                         List<String> chapterLines = new ArrayList<String>();
                         chapterLines.add(WHAT_HAPPEN);
                         for (Chapter chapter : story.getChapters()) {
                             chapterLines.add(chapter.getIntroText());
                             chapterLines.add(chapter.getBody());
                         }
-                        Files.write(textFilePath, chapterLines, Charset.forName("MS932"), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.APPEND);
-                        // ==================== 18-2. どんなリスクであるか？ ====================
-                        Files.write(textFilePath, Arrays.asList(RISK, story.getRisk().getText()), Charset.forName("MS932"), StandardOpenOption.CREATE, StandardOpenOption.WRITE,
-                                StandardOpenOption.APPEND);
-                        // ==================== 18-3. 修正方法 ====================
+                        FileUtils.writeLines(file, "Shift_JIS", chapterLines, true);
+                        // ==================== 18-3. どんなリスクであるか？ ====================
+                        FileUtils.writeLines(file, "Shift_JIS", Arrays.asList(RISK, story.getRisk().getText()), true);
+                        // ==================== 18-4. 修正方法 ====================
                         Api howToFixApi = new HowToFixApi(preferenceStore, trace_id);
                         HowToFixJson howToFixJson = (HowToFixJson) howToFixApi.get();
-                        Files.write(textFilePath, Arrays.asList(HOWTOFIX, howToFixJson.getRecommendation().getText()), Charset.forName("MS932"), StandardOpenOption.CREATE,
-                                StandardOpenOption.WRITE, StandardOpenOption.APPEND);
-                    }
-                    // ==================== 19(18). 脆弱性タグ ====================
-                    Api traceTagsApi = new TraceTagsApi(preferenceStore, trace_id);
-                    List<String> traceTags = (List<String>) traceTagsApi.get();
-                    csvLineList.add(String.join(csvSepTag, traceTags));
-                    // ==================== 20(19). コメント(最後尾) ====================
-                    for (Note note : trace.getNotes()) {
-                        String statusVal = "";
-                        String subStatusVal = "";
-                        List<Property> noteProperties = note.getProperties();
-                        if (noteProperties != null) {
-                            for (Property prop : noteProperties) {
-                                if (prop.getName().equals("status.change.status")) {
-                                    statusVal = prop.getValue();
-                                } else if (prop.getName().equals("status.change.substatus")) {
-                                    subStatusVal = prop.getValue();
+                        FileUtils.writeLines(file, "Shift_JIS", Arrays.asList(HOWTOFIX, howToFixJson.getRecommendation().getText()), true);
+                        // ==================== 18-5. コメント ====================
+                        List<String> noteLines = new ArrayList<String>();
+                        noteLines.add(COMMENT);
+                        for (Note note : trace.getNotes()) {
+                            String statusVal = "";
+                            String subStatusVal = "";
+                            List<Property> noteProperties = note.getProperties();
+                            if (noteProperties != null) {
+                                for (Property prop : noteProperties) {
+                                    if (prop.getName().equals("status.change.status")) {
+                                        statusVal = prop.getValue();
+                                    } else if (prop.getName().equals("status.change.substatus")) {
+                                        subStatusVal = prop.getValue();
+                                    }
                                 }
                             }
+                            StringBuilder strBuffer = new StringBuilder();
+                            LocalDateTime ldt = LocalDateTime.ofInstant(Instant.ofEpochMilli(Long.parseLong(note.getLast_modification())), ZoneId.systemDefault());
+                            strBuffer.append(String.format("[%s] ", ldt.toString()));
+                            if (!statusVal.isEmpty()) {
+                                strBuffer.append(String.format("次のステータスに変更: %s", statusVal));
+                            }
+                            if (!subStatusVal.isEmpty()) {
+                                strBuffer.append(String.format("(%s)", subStatusVal));
+                            }
+                            if (!note.getNote().isEmpty()) {
+                                strBuffer.append(String.format(" %s", note.getNote()));
+                            }
+                            noteLines.add(strBuffer.toString());
                         }
-                        StringBuilder strBuffer = new StringBuilder();
-                        LocalDateTime ldt = LocalDateTime.ofInstant(Instant.ofEpochMilli(Long.parseLong(note.getLast_modification())), ZoneId.systemDefault());
-                        strBuffer.append(String.format("[%s] ", ldt.toString()));
-                        if (!statusVal.isEmpty()) {
-                            strBuffer.append(String.format("次のステータスに変更: %s", statusVal));
-                        }
-                        if (!subStatusVal.isEmpty()) {
-                            strBuffer.append(String.format("(%s)", subStatusVal));
-                        }
-                        if (!note.getNote().isEmpty()) {
-                            strBuffer.append(String.format(" %s", note.getNote()));
-                        }
-                        csvLineList.add(strBuffer.toString());
+                        FileUtils.writeLines(file, "Shift_JIS", noteLines, true);
                     }
 
                     csvList.add(csvLineList);

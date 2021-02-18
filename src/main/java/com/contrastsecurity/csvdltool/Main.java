@@ -544,7 +544,8 @@ public class Main implements PropertyChangeListener {
         }
 
         includeDescChk = new Button(buttonGrp, SWT.CHECK);
-        includeDescChk.setText("何が起こったか？どんなリスクであるか？修正方法の３つの項目も添付出力する。（フォルダ出力）");
+        includeDescChk.setText("改行を含む長文の項目（HTTP情報、修正方法、コメントなど）も添付ファイルで出力する。（フォルダ出力）");
+        includeDescChk.setToolTipText("HTTP情報、コメント、何が起こったか？、どんなリスクであるか？、修正方法の５つの項目が添付ファイルで出力されます。");
         if (preferenceStore.getBoolean(PreferenceConstants.INCLUDE_DESCRIPTION)) {
             includeDescChk.setSelection(true);
         }

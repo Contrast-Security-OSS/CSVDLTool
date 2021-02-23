@@ -191,7 +191,7 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
                     } catch (Exception e) {
                         shell.getDisplay().syncExec(new Runnable() {
                             public void run() {
-                                if (!MessageDialog.openConfirm(shell, "脆弱性情報の取得", "修正方法、CWE、OWASPの情報を取得する際に例外が発生しました。\r\n例外についてはログでご確認ください。\r\n処理を続けますか？")) {
+                                if (!MessageDialog.openConfirm(shell, "脆弱性情報の取得", "修正方法、CWE、OWASPの情報を取得する際に例外が発生しました。\r\n例外についてはログでご確認ください。処理を続けますか？")) {
                                     monitor.setCanceled(true);
                                 }
                             }
@@ -262,7 +262,7 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
                         } catch (Exception e) {
                             shell.getDisplay().syncExec(new Runnable() {
                                 public void run() {
-                                    if (!MessageDialog.openConfirm(shell, "脆弱性情報の取得", "何が起こったか？、どんなリスクであるか？の情報を取得する際に例外が発生しました。\r\n例外についてはログでご確認ください。\r\n処理を続けますか？")) {
+                                    if (!MessageDialog.openConfirm(shell, "脆弱性情報の取得", "何が起こったか？、どんなリスクであるか？の情報を取得する際に例外が発生しました。\r\n例外についてはログでご確認ください。処理を続けますか？")) {
                                         monitor.setCanceled(true);
                                     }
                                 }

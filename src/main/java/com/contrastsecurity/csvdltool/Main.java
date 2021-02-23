@@ -524,7 +524,7 @@ public class Main implements PropertyChangeListener {
                     MessageDialog.openInformation(shell, "取得", "取得対象のアプリケーションを選択してください。");
                     return;
                 }
-                VulnGetWithProgress progress = new VulnGetWithProgress(preferenceStore, dstApps, fullAppMap, onlyParentAppChk.getSelection(), includeDescChk.getSelection());
+                VulnGetWithProgress progress = new VulnGetWithProgress(shell, preferenceStore, dstApps, fullAppMap, onlyParentAppChk.getSelection(), includeDescChk.getSelection());
                 ProgressMonitorDialog progDialog = new ProgressMonitorDialog(shell);
                 try {
                     progDialog.run(true, true, progress);
@@ -534,13 +534,15 @@ public class Main implements PropertyChangeListener {
                     e.printStackTrace(printWriter);
                     String trace = stringWriter.toString();
                     logger.error(trace);
-                    String errorMsg = e.getTargetException().getMessage();
+                    String exceptionMsg = e.getTargetException().getMessage();
                     if (e.getTargetException() instanceof ApiException) {
-                        MessageDialog.openWarning(shell, "脆弱性情報の取得", String.format("TeamServerからエラーが返されました。\r\n%s", errorMsg));
+                        MessageDialog.openWarning(shell, "脆弱性情報の取得", String.format("TeamServerからエラーが返されました。\r\n%s", exceptionMsg));
                     } else if (e.getTargetException() instanceof NonApiException) {
-                        MessageDialog.openError(shell, "脆弱性情報の取得", String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", errorMsg));
+                        MessageDialog.openError(shell, "脆弱性情報の取得", String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", exceptionMsg));
+                    } else if (e.getTargetException() instanceof InterruptedException) {
+                        MessageDialog.openInformation(shell, "脆弱性情報の取得", exceptionMsg);
                     } else {
-                        MessageDialog.openError(shell, "脆弱性情報の取得", String.format("不明なエラーです。ログファイルをご確認ください。\r\n%s", errorMsg));
+                        MessageDialog.openError(shell, "脆弱性情報の取得", String.format("不明なエラーです。ログファイルをご確認ください。\r\n%s", exceptionMsg));
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();

@@ -28,8 +28,10 @@ import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.PreferenceStore;
+import org.eclipse.swt.widgets.Shell;
 
 import com.contrastsecurity.csvdltool.api.Api;
 import com.contrastsecurity.csvdltool.api.ApplicationTagsApi;
@@ -49,6 +51,8 @@ import com.contrastsecurity.csvdltool.model.CustomGroup;
 import com.contrastsecurity.csvdltool.model.HttpRequest;
 import com.contrastsecurity.csvdltool.model.Note;
 import com.contrastsecurity.csvdltool.model.Property;
+import com.contrastsecurity.csvdltool.model.Recommendation;
+import com.contrastsecurity.csvdltool.model.Risk;
 import com.contrastsecurity.csvdltool.model.Route;
 import com.contrastsecurity.csvdltool.model.Server;
 import com.contrastsecurity.csvdltool.model.Story;
@@ -72,6 +76,7 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
     private static final String HOWTOFIX = "==================== 修正方法 ====================";
     private static final String COMMENT = "==================== コメント ====================";
 
+    private Shell shell;
     private PreferenceStore preferenceStore;
     private List<String> dstApps;
     private Map<String, AppInfo> fullAppMap;
@@ -80,7 +85,9 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
 
     Logger logger = Logger.getLogger("csvdltool");
 
-    public VulnGetWithProgress(PreferenceStore preferenceStore, List<String> dstApps, Map<String, AppInfo> fullAppMap, boolean isOnlyParentApp, boolean isIncludeDesc) {
+    public VulnGetWithProgress(Shell shell, PreferenceStore preferenceStore, List<String> dstApps, Map<String, AppInfo> fullAppMap, boolean isOnlyParentApp,
+            boolean isIncludeDesc) {
+        this.shell = shell;
         this.preferenceStore = preferenceStore;
         this.dstApps = dstApps;
         this.fullAppMap = fullAppMap;
@@ -171,12 +178,30 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
                     csvLineList.add(trace.getSeverity_label());
                     // ==================== 07. CWE ====================
                     Api howToFixApi = new HowToFixApi(preferenceStore, trace_id);
-                    HowToFixJson howToFixJson = (HowToFixJson) howToFixApi.get();
-                    String cweUrl = howToFixJson.getCwe();
-                    Matcher m = cwePtn.matcher(cweUrl);
-                    if (m.find()) {
-                        csvLineList.add(m.group(1));
-                    } else {
+                    HowToFixJson howToFixJson = null;
+                    try {
+                        howToFixJson = (HowToFixJson) howToFixApi.get();
+                        String cweUrl = howToFixJson.getCwe();
+                        Matcher m = cwePtn.matcher(cweUrl);
+                        if (m.find()) {
+                            csvLineList.add(m.group(1));
+                        } else {
+                            csvLineList.add("");
+                        }
+                    } catch (Exception e) {
+                        shell.getDisplay().syncExec(new Runnable() {
+                            public void run() {
+                                if (!MessageDialog.openConfirm(shell, "脆弱性情報の取得", "例外が発生しました。処理を続けますか？\r\n例外についてはログでご確認ください。")) {
+                                    monitor.setCanceled(true);
+                                }
+                            }
+                        });
+                        Recommendation recommendation = new Recommendation();
+                        recommendation.setText("***** 取得に失敗しました。 *****");
+                        howToFixJson = new HowToFixJson();
+                        howToFixJson.setRecommendation(recommendation);
+                        howToFixJson.setCwe("");
+                        howToFixJson.setOwasp("");
                         csvLineList.add("");
                     }
                     // ==================== 08. ステータス ====================
@@ -230,7 +255,23 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
                             FileUtils.writeLines(file, FILE_ENCODING, Arrays.asList(HTTP_INFO, "なし"), true);
                         }
                         Api storyApi = new StoryApi(preferenceStore, trace_id);
-                        Story story = (Story) storyApi.get();
+                        Story story = null;
+                        try {
+                            story = (Story) storyApi.get();
+                        } catch (Exception e) {
+                            shell.getDisplay().syncExec(new Runnable() {
+                                public void run() {
+                                    if (!MessageDialog.openConfirm(shell, "脆弱性情報の取得", "例外が発生しました。処理を続けますか？\r\n例外についてはログでご確認ください。")) {
+                                        monitor.setCanceled(true);
+                                    }
+                                }
+                            });
+                            Risk risk = new Risk();
+                            risk.setText("***** 取得に失敗しました。 *****");
+                            story = new Story();
+                            story.setRisk(risk);
+                            story.setChapters(new ArrayList<Chapter>());
+                        }
                         // ==================== 18-3. 何が起こったか？ ====================
                         List<String> chapterLines = new ArrayList<String>();
                         chapterLines.add(WHAT_HAPPEN);

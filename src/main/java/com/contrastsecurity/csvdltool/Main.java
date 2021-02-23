@@ -68,6 +68,8 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.yaml.snakeyaml.Yaml;
 
+import com.contrastsecurity.csvdltool.exception.ApiException;
+import com.contrastsecurity.csvdltool.exception.NonApiException;
 import com.contrastsecurity.csvdltool.model.ContrastSecurityYaml;
 import com.contrastsecurity.csvdltool.preference.AboutPage;
 import com.contrastsecurity.csvdltool.preference.BasePreferencePage;
@@ -243,7 +245,14 @@ public class Main implements PropertyChangeListener {
                     e.printStackTrace(printWriter);
                     String trace = stringWriter.toString();
                     logger.error(trace);
-                    MessageDialog.openError(shell, "アプリケーション一覧の取得", e.getTargetException().getMessage());
+                    String errorMsg = e.getTargetException().getMessage();
+                    if (e.getTargetException() instanceof ApiException) {
+                        MessageDialog.openWarning(shell, "アプリケーション一覧の取得", String.format("TeamServerからエラーが返されました。\r\n%s", errorMsg));
+                    } else if (e.getTargetException() instanceof NonApiException) {
+                        MessageDialog.openError(shell, "アプリケーション一覧の取得", String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", errorMsg));
+                    } else {
+                        MessageDialog.openError(shell, "アプリケーション一覧の取得", String.format("不明なエラーです。ログファイルをご確認ください。\r\n%s", errorMsg));
+                    }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -525,7 +534,14 @@ public class Main implements PropertyChangeListener {
                     e.printStackTrace(printWriter);
                     String trace = stringWriter.toString();
                     logger.error(trace);
-                    MessageDialog.openError(shell, "脆弱性情報の取得", e.getTargetException().getMessage());
+                    String errorMsg = e.getTargetException().getMessage();
+                    if (e.getTargetException() instanceof ApiException) {
+                        MessageDialog.openWarning(shell, "脆弱性情報の取得", String.format("TeamServerからエラーが返されました。\r\n%s", errorMsg));
+                    } else if (e.getTargetException() instanceof NonApiException) {
+                        MessageDialog.openError(shell, "脆弱性情報の取得", String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", errorMsg));
+                    } else {
+                        MessageDialog.openError(shell, "脆弱性情報の取得", String.format("不明なエラーです。ログファイルをご確認ください。\r\n%s", errorMsg));
+                    }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

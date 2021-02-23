@@ -32,6 +32,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 import com.contrastsecurity.csvdltool.exception.ApiException;
+import com.contrastsecurity.csvdltool.exception.NonApiException;
 import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
 
 public abstract class Api {
@@ -128,7 +129,7 @@ public abstract class Api {
                 } else {
                     logger.warn(httpResponse.getStatusLine().getStatusCode());
                     logger.warn(EntityUtils.toString(httpResponse.getEntity()));
-                    throw new ApiException("200, 401, 403以外のステータスコードが返却されました。");
+                    throw new NonApiException(String.valueOf(httpResponse.getStatusLine().getStatusCode()));
                 }
             } catch (Exception e) {
                 throw e;

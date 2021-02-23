@@ -43,6 +43,7 @@ import org.eclipse.swt.widgets.Text;
 import com.contrastsecurity.csvdltool.api.Api;
 import com.contrastsecurity.csvdltool.api.OrganizationApi;
 import com.contrastsecurity.csvdltool.exception.ApiException;
+import com.contrastsecurity.csvdltool.exception.NonApiException;
 import com.contrastsecurity.csvdltool.model.Organization;
 
 public class BasePreferencePage extends PreferencePage {
@@ -135,10 +136,12 @@ public class BasePreferencePage extends PreferencePage {
                     Organization organization = (Organization) api.get();
                     orgNameTxt.setText(organization.getName());
                     orgIdTxt.setText(organization.getOrganization_uuid());
-                } catch (ApiException re) {
-                    MessageDialog.openError(composite.getShell(), "組織情報の取得", re.getMessage());
+                } catch (ApiException e) {
+                    MessageDialog.openWarning(composite.getShell(), "組織情報の取得", String.format("TeamServerからエラーが返されました。\r\n%s", e.getMessage()));
+                } catch (NonApiException e) {
+                    MessageDialog.openError(composite.getShell(), "組織情報の取得", String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", e.getMessage()));
                 } catch (Exception e) {
-                    MessageDialog.openError(composite.getShell(), "組織情報の取得", e.getMessage());
+                    MessageDialog.openError(composite.getShell(), "組織情報の取得", String.format("不明なエラーです。ログファイルをご確認ください。\r\n%s", e.getMessage()));
                 }
             }
         });

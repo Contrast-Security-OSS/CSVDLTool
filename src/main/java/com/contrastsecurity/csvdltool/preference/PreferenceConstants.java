@@ -45,7 +45,6 @@ public class PreferenceConstants {
     public static final String CSV_SEPARATOR_BUILDNO = new String("com.contrastsecurity.csvdltool.csv_separator_buildno");
     public static final String CSV_SEPARATOR_GROUP = new String("com.contrastsecurity.csvdltool.csv_separator_group");
     public static final String CSV_SEPARATOR_SERVER = new String("com.contrastsecurity.csvdltool.csv_separator_server");
-    public static final String CSV_SEPARATOR_ROUTE = new String("com.contrastsecurity.csvdltool.csv_separator_route");
     public static final String CSV_FILE_FORMAT = new String("com.contrastsecurity.csvdltool.csv_file_format");
 
     public static final String ONLY_PARENT_APP_CHECK = new String("com.contrastsecurity.csvdltool.only_parent_app_check");

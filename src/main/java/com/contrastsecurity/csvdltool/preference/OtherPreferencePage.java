@@ -50,7 +50,6 @@ public class OtherPreferencePage extends PreferencePage {
     private Text csvSepBuildNoTxt;
     private Text csvSepGroupTxt;
     private Text csvSepServerTxt;
-    private Text csvSepRouteTxt;
     private Text csvFileForamtTxt;
 
     public OtherPreferencePage() {
@@ -121,11 +120,6 @@ public class OtherPreferencePage extends PreferencePage {
         csvSepServerTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         csvSepServerTxt.setText(preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_SERVER));
 
-        new Label(csvSepGrp, SWT.LEFT).setText("ルート：");
-        csvSepRouteTxt = new Text(csvSepGrp, SWT.BORDER);
-        csvSepRouteTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        csvSepRouteTxt.setText(preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_ROUTE));
-
         Group csvFileFormatGrp = new Group(csvGrp, SWT.NONE);
         GridLayout csvFileFormatGrpLt = new GridLayout(1, false);
         csvFileFormatGrpLt.marginWidth = 10;
@@ -188,7 +182,6 @@ public class OtherPreferencePage extends PreferencePage {
                 csvSepBuildNoTxt.setText(preferenceStore.getDefaultString(PreferenceConstants.CSV_SEPARATOR_BUILDNO));
                 csvSepGroupTxt.setText(preferenceStore.getDefaultString(PreferenceConstants.CSV_SEPARATOR_GROUP));
                 csvSepServerTxt.setText(preferenceStore.getDefaultString(PreferenceConstants.CSV_SEPARATOR_SERVER));
-                csvSepRouteTxt.setText(preferenceStore.getDefaultString(PreferenceConstants.CSV_SEPARATOR_ROUTE));
                 csvFileForamtTxt.setText(preferenceStore.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT));
                 traceSleepTxt.setText(preferenceStore.getDefaultString(PreferenceConstants.SLEEP_TRACE));
             }
@@ -241,9 +234,6 @@ public class OtherPreferencePage extends PreferencePage {
         }
         if (this.csvSepServerTxt != null) {
             ps.setValue(PreferenceConstants.CSV_SEPARATOR_SERVER, this.csvSepServerTxt.getText());
-        }
-        if (this.csvSepRouteTxt != null) {
-            ps.setValue(PreferenceConstants.CSV_SEPARATOR_ROUTE, this.csvSepRouteTxt.getText());
         }
         if (this.csvFileForamtTxt != null) {
             ps.setValue(PreferenceConstants.CSV_FILE_FORMAT, this.csvFileForamtTxt.getText());

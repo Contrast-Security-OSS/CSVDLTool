@@ -64,6 +64,7 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
     private static final List<String> CSV_HEADER_FULL = new ArrayList<String>(Arrays.asList("アプリケーション名", "マージしたときの各アプリ名称", "アプリケーションタグ", "カテゴリ", "ルール", "深刻度", "CWE", "ステータス", "言語",
             "アプリケーションのグループ", "脆弱性のタイトル", "最初の検出", "最後の検出", "ビルド番号", "次のサーバにより報告", "ルート", "モジュール", "脆弱性タグ", "詳細"));
 
+    private static final String ROUTE = "==================== ルート ====================";
     private static final String HTTP_INFO = "==================== HTTP情報 ====================";
     private static final String WHAT_HAPPEN = "==================== 何が起こったか？ ====================";
     private static final String RISK = "==================== どんなリスクであるか？ ====================";
@@ -101,7 +102,6 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
         String csvSepBuildNo = preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_BUILDNO).replace("\\r", "\r").replace("\\n", "\n");
         String csvSepGroup = preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_GROUP).replace("\\r", "\r").replace("\\n", "\n");
         String csvSepServer = preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_SERVER).replace("\\r", "\r").replace("\\n", "\n");
-        String csvSepRoute = preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_ROUTE).replace("\\r", "\r").replace("\\n", "\n");
         Map<String, List<String>> appGroupMap = new HashMap<String, List<String>>();
         List<List<String>> csvList = new ArrayList<List<String>>();
         try {
@@ -198,26 +198,28 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
                     // ==================== 15. 次のサーバにより報告 ====================
                     List<String> serverNameList = trace.getServers().stream().map(Server::getName).collect(Collectors.toList());
                     csvLineList.add(String.join(csvSepServer, serverNameList));
-                    // ==================== 16. ルート ====================
-                    Api routesApi = new RoutesApi(preferenceStore, appId, trace_id);
-                    List<Route> routes = (List<Route>) routesApi.get();
-                    List<String> signatureList = routes.stream().map(Route::getSignature).collect(Collectors.toList());
-                    csvLineList.add(String.join(csvSepRoute, signatureList));
-                    // ==================== 17. モジュール ====================
+                    // ==================== 16. モジュール ====================
                     Application app = trace.getApplication();
                     String module = String.format("%s (%s) - %s", app.getName(), app.getContext_path(), app.getLanguage());
                     csvLineList.add(module);
-                    // ==================== 18. 脆弱性タグ ====================
+                    // ==================== 17. 脆弱性タグ ====================
                     Api traceTagsApi = new TraceTagsApi(preferenceStore, trace_id);
                     List<String> traceTags = (List<String>) traceTagsApi.get();
                     csvLineList.add(String.join(csvSepTag, traceTags));
                     if (isIncludeDesc) {
-                        // ==================== 19. 詳細（長文データ） ====================
+                        // ==================== 18. 詳細（長文データ） ====================
                         csvLineList.add(String.format("=HYPERLINK(\".\\%s.txt\",\"%s\")", trace.getUuid(), trace.getUuid()));
                         String textFileName = String.format("%s\\%s.txt", timestamp, trace.getUuid());
                         File file = new File(textFileName);
 
-                        // ==================== 19-1. HTTP情報 ====================
+                        // ==================== 18-1. ルート ====================
+                        Api routesApi = new RoutesApi(preferenceStore, appId, trace_id);
+                        List<Route> routes = (List<Route>) routesApi.get();
+                        List<String> signatureList = routes.stream().map(Route::getSignature).collect(Collectors.toList());
+                        signatureList.add(0, ROUTE);
+                        FileUtils.writeLines(file, FILE_ENCODING, signatureList, true);
+
+                        // ==================== 18-2. HTTP情報 ====================
                         Api httpRequestApi = new HttpRequestApi(preferenceStore, trace_id);
                         HttpRequest httpRequest = (HttpRequest) httpRequestApi.get();
                         if (httpRequest != null) {
@@ -227,7 +229,7 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
                         }
                         Api storyApi = new StoryApi(preferenceStore, trace_id);
                         Story story = (Story) storyApi.get();
-                        // ==================== 19-2. 何が起こったか？ ====================
+                        // ==================== 18-3. 何が起こったか？ ====================
                         List<String> chapterLines = new ArrayList<String>();
                         chapterLines.add(WHAT_HAPPEN);
                         for (Chapter chapter : story.getChapters()) {
@@ -235,16 +237,16 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
                             chapterLines.add(chapter.getBody());
                         }
                         FileUtils.writeLines(file, FILE_ENCODING, chapterLines, true);
-                        // ==================== 19-3. どんなリスクであるか？ ====================
+                        // ==================== 18-4. どんなリスクであるか？ ====================
                         FileUtils.writeLines(file, FILE_ENCODING, Arrays.asList(RISK, story.getRisk().getText()), true);
-                        // ==================== 19-4. 修正方法 ====================
+                        // ==================== 18-5. 修正方法 ====================
                         List<String> howToFixLines = new ArrayList<String>();
                         howToFixLines.add(HOWTOFIX);
                         howToFixLines.add(howToFixJson.getRecommendation().getText());
                         howToFixLines.add(String.format("CWE: %s", howToFixJson.getCwe()));
                         howToFixLines.add(String.format("OWASP: %s", howToFixJson.getOwasp()));
                         FileUtils.writeLines(file, FILE_ENCODING, howToFixLines, true);
-                        // ==================== 19-5. コメント ====================
+                        // ==================== 18-6. コメント ====================
                         List<String> noteLines = new ArrayList<String>();
                         noteLines.add(COMMENT);
                         for (Note note : trace.getNotes()) {

@@ -132,7 +132,6 @@ public class Main implements PropertyChangeListener {
             this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_BUILDNO, ",");
             this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_GROUP, ",");
             this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_SERVER, ",");
-            this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_ROUTE, "\\r\\n");
             this.preferenceStore.setDefault(PreferenceConstants.CSV_FILE_FORMAT, "yyyy-MM-dd_HHmmss");
 
             Yaml yaml = new Yaml();
@@ -544,8 +543,8 @@ public class Main implements PropertyChangeListener {
         }
 
         includeDescChk = new Button(buttonGrp, SWT.CHECK);
-        includeDescChk.setText("改行を含む長文の項目（HTTP情報、修正方法、コメントなど）も添付ファイルで出力する。（フォルダ出力）");
-        includeDescChk.setToolTipText("HTTP情報、コメント、何が起こったか？、どんなリスクであるか？、修正方法の５つの項目が添付ファイルで出力されます。");
+        includeDescChk.setText("改行を含む長文の項目（ルート、HTTP情報、修正方法、コメントなど）も添付ファイルで出力する。（フォルダ出力）");
+        includeDescChk.setToolTipText("ルート、HTTP情報、コメント、何が起こったか？、どんなリスクであるか？、修正方法の５つの項目が添付ファイルで出力されます。");
         if (preferenceStore.getBoolean(PreferenceConstants.INCLUDE_DESCRIPTION)) {
             includeDescChk.setSelection(true);
         }

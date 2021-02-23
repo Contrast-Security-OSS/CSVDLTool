@@ -96,6 +96,7 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
             csvFileFormat = preferenceStore.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT);
         }
         Pattern cwePtn = Pattern.compile("\\/(\\d+)\\.html$");
+        Pattern stsPtn = Pattern.compile("^[A-Za-z\\s]+$");
         String timestamp = new SimpleDateFormat(csvFileFormat).format(new Date());
         int sleepTrace = preferenceStore.getInt(PreferenceConstants.SLEEP_TRACE);
         String csvSepTag = preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_TAG).replace("\\r", "\r").replace("\\n", "\n");
@@ -262,19 +263,30 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
                                     }
                                 }
                             }
-                            StringBuilder strBuffer = new StringBuilder();
                             LocalDateTime ldt = LocalDateTime.ofInstant(Instant.ofEpochMilli(Long.parseLong(note.getLast_modification())), ZoneId.systemDefault());
-                            strBuffer.append(String.format("[%s] ", ldt.toString()));
+                            // 日時と投稿者
+                            noteLines.add(String.format("[%s] %s", ldt.toString(), note.getLast_updater()));
+                            // ステータス変更
+                            StringBuilder statusBuffer = new StringBuilder();
                             if (!statusVal.isEmpty()) {
-                                strBuffer.append(String.format("次のステータスに変更: %s", statusVal));
+                                Matcher stsM = stsPtn.matcher(statusVal);
+                                if (stsM.matches()) {
+                                    String jpSts = StatusEnum.valueOf(statusVal.replaceAll(" ", "").toUpperCase()).getLabel();
+                                    statusBuffer.append(String.format("次のステータスに変更: %s", jpSts));
+                                } else {
+                                    statusBuffer.append(String.format("次のステータスに変更: %s", statusVal));
+                                }
                             }
                             if (!subStatusVal.isEmpty()) {
-                                strBuffer.append(String.format("(%s)", subStatusVal));
+                                statusBuffer.append(String.format("(%s)", subStatusVal));
                             }
+                            if (statusBuffer.length() > 0) {
+                                noteLines.add(statusBuffer.toString());
+                            }
+                            // コメント本文
                             if (!note.getNote().isEmpty()) {
-                                strBuffer.append(String.format(" %s", note.getNote()));
+                                noteLines.add(note.getNote());
                             }
-                            noteLines.add(strBuffer.toString());
                         }
                         FileUtils.writeLines(file, FILE_ENCODING, noteLines, true);
                     }

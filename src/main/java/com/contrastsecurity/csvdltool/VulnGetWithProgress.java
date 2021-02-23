@@ -57,7 +57,8 @@ import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
 
 public class VulnGetWithProgress implements IRunnableWithProgress {
 
-    private static final String FILE_ENCODING = "Shift_JIS";
+    private static final String CSV_ENCODING = "Shift_JIS";
+    private static final String FILE_ENCODING = "UTF-8";
 
     private static final List<String> CSV_HEADER = new ArrayList<String>(Arrays.asList("アプリケーション名", "マージしたときの各アプリ名称", "アプリケーションタグ", "カテゴリ", "ルール", "深刻度", "CWE", "ステータス", "言語",
             "アプリケーションのグループ", "脆弱性のタイトル", "最初の検出", "最後の検出", "ビルド番号", "次のサーバにより報告", "ルート", "モジュール", "脆弱性タグ"));
@@ -307,7 +308,7 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
         if (isIncludeDesc) {
             filePath = timestamp + "\\output.csv";
         }
-        try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(filePath)), FILE_ENCODING))) {
+        try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(filePath)), CSV_ENCODING))) {
             CSVPrinter printer = CSVFormat.EXCEL.print(bw);
             if (preferenceStore.getBoolean(PreferenceConstants.CSV_OUT_HEADER)) {
                 if (isIncludeDesc) {

@@ -65,9 +65,9 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
     private static final String FILE_ENCODING = "UTF-8";
 
     private static final List<String> CSV_HEADER = new ArrayList<String>(Arrays.asList("アプリケーション名", "マージしたときの各アプリ名称", "アプリケーションタグ", "カテゴリ", "ルール", "深刻度", "CWE", "ステータス", "言語",
-            "アプリケーションのグループ", "脆弱性のタイトル", "最初の検出", "最後の検出", "ビルド番号", "次のサーバにより報告", "ルート", "モジュール", "脆弱性タグ"));
+            "アプリケーションのグループ", "脆弱性のタイトル", "最初の検出", "最後の検出", "ビルド番号", "次のサーバにより報告", "モジュール", "脆弱性タグ"));
     private static final List<String> CSV_HEADER_FULL = new ArrayList<String>(Arrays.asList("アプリケーション名", "マージしたときの各アプリ名称", "アプリケーションタグ", "カテゴリ", "ルール", "深刻度", "CWE", "ステータス", "言語",
-            "アプリケーションのグループ", "脆弱性のタイトル", "最初の検出", "最後の検出", "ビルド番号", "次のサーバにより報告", "ルート", "モジュール", "脆弱性タグ", "詳細"));
+            "アプリケーションのグループ", "脆弱性のタイトル", "最初の検出", "最後の検出", "ビルド番号", "次のサーバにより報告", "モジュール", "脆弱性タグ", "詳細"));
 
     private static final String ROUTE = "==================== ルート ====================";
     private static final String HTTP_INFO = "==================== HTTP情報 ====================";

@@ -2,11 +2,9 @@
 /build
 /.gradle
 /.settings
-/teratermstation.log
 /ini
 /log
 /work
-/teratermstation.properties
 /contrast_security.yaml
 /csvdltool.properties
 /csvdltool.log

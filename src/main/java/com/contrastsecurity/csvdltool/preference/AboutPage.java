@@ -23,6 +23,9 @@
 
 package com.contrastsecurity.csvdltool.preference;
 
+import java.awt.Desktop;
+import java.net.URI;
+
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
@@ -31,6 +34,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 
 public class AboutPage extends PreferencePage {
 
@@ -72,11 +76,19 @@ public class AboutPage extends PreferencePage {
         GridData licenseGroupGrDt = new GridData(GridData.FILL_BOTH);
         licenseGrp.setLayoutData(licenseGroupGrDt);
 
-        Label licenseLbl = new Label(licenseGrp, SWT.NONE);
-        licenseLbl.setText("This software includes the work that is distributed in the Apache License 2.0");
-
-        Label snakeYamlLbl = new Label(licenseGrp, SWT.NONE);
-        snakeYamlLbl.setText("- SnakeYAML");
+        Link licenseLinkLbl = new Link(licenseGrp, SWT.NONE);
+        licenseLinkLbl.setText("This software includes the work that is distributed in the <a>Apache License 2.0</a>");
+        licenseLinkLbl.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
+            public void widgetSelected(org.eclipse.swt.events.SelectionEvent event) {
+                try {
+                    if (Desktop.isDesktopSupported()) {
+                        Desktop.getDesktop().browse(new URI("http://www.apache.org/licenses/LICENSE-2.0"));
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
 
         noDefaultAndApplyButton();
         return parent;

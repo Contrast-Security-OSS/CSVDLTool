@@ -89,6 +89,36 @@ public class AboutPage extends PreferencePage {
                 }
             }
         });
+        new Link(licenseGrp, SWT.NONE).setText("- commons-codec 1.11");
+        new Link(licenseGrp, SWT.NONE).setText("- commons-csv 1.8");
+        new Link(licenseGrp, SWT.NONE).setText("- commons-io 2.8.0");
+        new Link(licenseGrp, SWT.NONE).setText("- commons-lang3 3.4");
+        new Link(licenseGrp, SWT.NONE).setText("- commons-logging 1.2");
+        new Link(licenseGrp, SWT.NONE).setText("- gson 2.8.6");
+        new Link(licenseGrp, SWT.NONE).setText("- httpclient 4.5.13");
+        new Link(licenseGrp, SWT.NONE).setText("- httpcore 4.4.13");
+        new Link(licenseGrp, SWT.NONE).setText("- log4j 1.2.17");
+        new Link(licenseGrp, SWT.NONE).setText("- snakeyaml 1.16");
+
+        Link eplLicenseLinkLbl = new Link(licenseGrp, SWT.NONE);
+        eplLicenseLinkLbl.setText("This software includes the work that is distributed in the <a>Eclipse Public License 1.0</a>");
+        eplLicenseLinkLbl.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
+            public void widgetSelected(org.eclipse.swt.events.SelectionEvent event) {
+                try {
+                    if (Desktop.isDesktopSupported()) {
+                        Desktop.getDesktop().browse(new URI("https://www.eclipse.org/legal/epl-v10.html"));
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        new Link(licenseGrp, SWT.NONE).setText("- commands 3.3.0-I20070605-0010");
+        new Link(licenseGrp, SWT.NONE).setText("- common 3.3.0-v20070426");
+        new Link(licenseGrp, SWT.NONE).setText("- ide 3.3.0-I20070620");
+        new Link(licenseGrp, SWT.NONE).setText("- workbench 3.3.0-I20070608-1100");
+        new Link(licenseGrp, SWT.NONE).setText("- jface 3.3.0-I20070606-0010");
+        new Link(licenseGrp, SWT.NONE).setText("- org.eclipse.swt.win32.win32.x86 4.3");
 
         noDefaultAndApplyButton();
         return parent;

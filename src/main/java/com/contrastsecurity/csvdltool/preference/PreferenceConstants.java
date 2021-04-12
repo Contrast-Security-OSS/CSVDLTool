@@ -49,6 +49,7 @@ public class PreferenceConstants {
 
     public static final String ONLY_PARENT_APP_CHECK = new String("com.contrastsecurity.csvdltool.only_parent_app_check");
     public static final String INCLUDE_DESCRIPTION = new String("com.contrastsecurity.csvdltool.include_description");
+    public static final String INCLUDE_STACKTRACE = new String("com.contrastsecurity.csvdltool.include_stacktrace");
 
     public static final String MEM_WIDTH = new String("com.contrastsecurity.csvdltool.mem_width");
     public static final String MEM_HEIGHT = new String("com.contrastsecurity.csvdltool.mem_height");

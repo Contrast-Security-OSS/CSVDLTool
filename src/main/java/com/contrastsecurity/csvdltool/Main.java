@@ -74,9 +74,10 @@ import com.contrastsecurity.csvdltool.exception.NonApiException;
 import com.contrastsecurity.csvdltool.model.ContrastSecurityYaml;
 import com.contrastsecurity.csvdltool.preference.AboutPage;
 import com.contrastsecurity.csvdltool.preference.BasePreferencePage;
-import com.contrastsecurity.csvdltool.preference.ConnectionPreferencePage;
-import com.contrastsecurity.csvdltool.preference.OtherPreferencePage;
 import com.contrastsecurity.csvdltool.preference.CSVColumnPreferencePage;
+import com.contrastsecurity.csvdltool.preference.ConnectionPreferencePage;
+import com.contrastsecurity.csvdltool.preference.MyPreferenceDialog;
+import com.contrastsecurity.csvdltool.preference.OtherPreferencePage;
 import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
 
 public class Main implements PropertyChangeListener {
@@ -629,7 +630,7 @@ public class Main implements PropertyChangeListener {
                 mgr.addTo(baseNode.getId(), otherNode);
                 PreferenceNode aboutNode = new PreferenceNode("about", new AboutPage());
                 mgr.addToRoot(aboutNode);
-                PreferenceDialog dialog = new PreferenceDialog(shell, mgr);
+                PreferenceDialog dialog = new MyPreferenceDialog(shell, mgr);
                 dialog.setPreferenceStore(preferenceStore);
                 dialog.open();
                 try {

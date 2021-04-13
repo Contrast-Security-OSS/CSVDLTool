@@ -50,6 +50,7 @@ import org.eclipse.jface.preference.PreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.ShellEvent;
@@ -91,8 +92,9 @@ public class Main implements PropertyChangeListener {
     private Label srcCount;
     private Label dstCount;
     private Button executeBtn;
-    private Button includeDescChk;
     private Button onlyParentAppChk;
+    private Button includeDescChk;
+    private Button includeStackTraceChk;
     private Button settingBtn;
 
     private Map<String, AppInfo> fullAppMap;
@@ -179,6 +181,7 @@ public class Main implements PropertyChangeListener {
                 preferenceStore.setValue(PreferenceConstants.MEM_HEIGHT, shell.getSize().y);
                 preferenceStore.setValue(PreferenceConstants.ONLY_PARENT_APP_CHECK, onlyParentAppChk.getSelection());
                 preferenceStore.setValue(PreferenceConstants.INCLUDE_DESCRIPTION, includeDescChk.getSelection());
+                preferenceStore.setValue(PreferenceConstants.INCLUDE_STACKTRACE, includeStackTraceChk.getSelection());
                 try {
                     preferenceStore.save();
                 } catch (IOException ioe) {
@@ -524,7 +527,8 @@ public class Main implements PropertyChangeListener {
                     MessageDialog.openInformation(shell, "取得", "取得対象のアプリケーションを選択してください。");
                     return;
                 }
-                VulnGetWithProgress progress = new VulnGetWithProgress(shell, preferenceStore, dstApps, fullAppMap, onlyParentAppChk.getSelection(), includeDescChk.getSelection());
+                VulnGetWithProgress progress = new VulnGetWithProgress(shell, preferenceStore, dstApps, fullAppMap, onlyParentAppChk.getSelection(), includeDescChk.getSelection(),
+                        includeStackTraceChk.getSelection());
                 ProgressMonitorDialog progDialog = new ProgressMonitorDialog(shell);
                 try {
                     progDialog.run(true, true, progress);
@@ -566,6 +570,30 @@ public class Main implements PropertyChangeListener {
         if (preferenceStore.getBoolean(PreferenceConstants.INCLUDE_DESCRIPTION)) {
             includeDescChk.setSelection(true);
         }
+        includeDescChk.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                Button chk = (Button) e.getSource();
+                if (!chk.getSelection()) {
+                    includeStackTraceChk.setSelection(false);
+                }
+            }
+        });
+
+        includeStackTraceChk = new Button(buttonGrp, SWT.CHECK);
+        includeStackTraceChk.setText("脆弱性の詳細（スタックトレース）も添付ファイルで出力する。（フォルダ出力）");
+        if (preferenceStore.getBoolean(PreferenceConstants.INCLUDE_STACKTRACE)) {
+            includeStackTraceChk.setSelection(true);
+        }
+        includeStackTraceChk.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                Button chk = (Button) e.getSource();
+                if (chk.getSelection()) {
+                    includeDescChk.setSelection(true);
+                }
+            }
+        });
 
         // ========== 設定ボタン ==========
         settingBtn = new Button(shell, SWT.PUSH);

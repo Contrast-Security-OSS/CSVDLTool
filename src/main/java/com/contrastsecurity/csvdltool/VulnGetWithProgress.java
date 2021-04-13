@@ -58,6 +58,8 @@ import org.eclipse.swt.widgets.Shell;
 
 import com.contrastsecurity.csvdltool.api.Api;
 import com.contrastsecurity.csvdltool.api.ApplicationTagsApi;
+import com.contrastsecurity.csvdltool.api.EventDetailApi;
+import com.contrastsecurity.csvdltool.api.EventSummaryApi;
 import com.contrastsecurity.csvdltool.api.GroupsApi;
 import com.contrastsecurity.csvdltool.api.HowToFixApi;
 import com.contrastsecurity.csvdltool.api.HttpRequestApi;
@@ -70,7 +72,10 @@ import com.contrastsecurity.csvdltool.json.HowToFixJson;
 import com.contrastsecurity.csvdltool.model.Application;
 import com.contrastsecurity.csvdltool.model.ApplicationInCustomGroup;
 import com.contrastsecurity.csvdltool.model.Chapter;
+import com.contrastsecurity.csvdltool.model.CollapsedEventSummary;
 import com.contrastsecurity.csvdltool.model.CustomGroup;
+import com.contrastsecurity.csvdltool.model.EventDetail;
+import com.contrastsecurity.csvdltool.model.EventSummary;
 import com.contrastsecurity.csvdltool.model.HttpRequest;
 import com.contrastsecurity.csvdltool.model.Note;
 import com.contrastsecurity.csvdltool.model.Property;
@@ -98,6 +103,7 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
     private static final String RISK = "==================== どんなリスクであるか？ ====================";
     private static final String HOWTOFIX = "==================== 修正方法 ====================";
     private static final String COMMENT = "==================== コメント ====================";
+    private static final String STACK_TRACE = "==================== 詳細 ====================";
 
     private Shell shell;
     private PreferenceStore preferenceStore;
@@ -105,17 +111,19 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
     private Map<String, AppInfo> fullAppMap;
     private boolean isOnlyParentApp;
     private boolean isIncludeDesc;
+    private boolean isIncludeStackTrace;
 
     Logger logger = Logger.getLogger("csvdltool");
 
-    public VulnGetWithProgress(Shell shell, PreferenceStore preferenceStore, List<String> dstApps, Map<String, AppInfo> fullAppMap, boolean isOnlyParentApp,
-            boolean isIncludeDesc) {
+    public VulnGetWithProgress(Shell shell, PreferenceStore preferenceStore, List<String> dstApps, Map<String, AppInfo> fullAppMap, boolean isOnlyParentApp, boolean isIncludeDesc,
+            boolean isIncludeStackTrace) {
         this.shell = shell;
         this.preferenceStore = preferenceStore;
         this.dstApps = dstApps;
         this.fullAppMap = fullAppMap;
         this.isOnlyParentApp = isOnlyParentApp;
         this.isIncludeDesc = isIncludeDesc;
+        this.isIncludeStackTrace = isIncludeStackTrace;
     }
 
     @SuppressWarnings("unchecked")
@@ -357,6 +365,31 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
                             }
                         }
                         FileUtils.writeLines(file, FILE_ENCODING, noteLines, true);
+                    }
+                    if (isIncludeStackTrace) {
+                        String textFileName = String.format("%s\\%s.txt", timestamp, trace.getUuid());
+                        File file = new File(textFileName);
+                        // ==================== 19. スタックトレース ====================
+                        List<String> detailLines = new ArrayList<String>();
+                        detailLines.add(STACK_TRACE);
+                        Api eventSummaryApi = new EventSummaryApi(preferenceStore, trace_id);
+                        List<EventSummary> eventSummaries = (List<EventSummary>) eventSummaryApi.get();
+                        for (EventSummary es : eventSummaries) {
+                            if (es.getCollapsedEvents() != null && es.getCollapsedEvents().isEmpty()) {
+                                detailLines.add(String.format("[%s]", es.getDescription()));
+                                Api eventDetailApi = new EventDetailApi(preferenceStore, trace_id, es.getId());
+                                EventDetail ed = (EventDetail) eventDetailApi.get();
+                                detailLines.addAll(ed.getDetailLines());
+                            } else {
+                                for (CollapsedEventSummary ce : es.getCollapsedEvents()) {
+                                    detailLines.add(String.format("[%s]", es.getDescription()));
+                                    Api eventDetailApi = new EventDetailApi(preferenceStore, trace_id, ce.getId());
+                                    EventDetail ed = (EventDetail) eventDetailApi.get();
+                                    detailLines.addAll(ed.getDetailLines());
+                                }
+                            }
+                        }
+                        FileUtils.writeLines(file, FILE_ENCODING, detailLines, true);
                     }
 
                     csvList.add(csvLineList);

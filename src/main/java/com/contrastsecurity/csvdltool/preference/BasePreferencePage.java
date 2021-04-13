@@ -148,6 +148,7 @@ public class BasePreferencePage extends PreferencePage {
                     Organization organization = (Organization) orgApi.get();
                     orgNameTxt.setText(organization.getName());
                     orgIdTxt.setText(organization.getOrganization_uuid());
+                    MessageDialog.openInformation(composite.getShell(), "組織情報の取得", "組織情報を取得しました。");
                 } catch (ApiException e) {
                     MessageDialog.openWarning(composite.getShell(), "組織情報の取得", String.format("TeamServerからエラーが返されました。\r\n%s", e.getMessage()));
                 } catch (NonApiException e) {

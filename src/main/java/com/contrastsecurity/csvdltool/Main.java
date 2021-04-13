@@ -191,6 +191,17 @@ public class Main implements PropertyChangeListener {
 
             @Override
             public void shellActivated(ShellEvent event) {
+                String orgName = preferenceStore.getString(PreferenceConstants.ORG_NAME);
+                String orgId = preferenceStore.getString(PreferenceConstants.ORG_ID);
+                if (orgName == null || orgName.isEmpty() || orgId == null || orgId.isEmpty()) {
+                    appLoadBtn.setEnabled(false);
+                    executeBtn.setEnabled(false);
+                    settingBtn.setText("このボタンから基本設定を行ってください。");
+                } else {
+                    appLoadBtn.setEnabled(true);
+                    executeBtn.setEnabled(true);
+                    settingBtn.setText("設定");
+                }
             }
         });
 
@@ -222,6 +233,7 @@ public class Main implements PropertyChangeListener {
         appLoadBtnGrDt.horizontalSpan = 3;
         appLoadBtn.setLayoutData(appLoadBtnGrDt);
         appLoadBtn.setText("アプリケーション一覧の読み込み");
+        appLoadBtn.setToolTipText("TeamServerにオンボードされているアプリケーションを読み込みます。");
         appLoadBtn.addSelectionListener(new SelectionListener() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -519,6 +531,7 @@ public class Main implements PropertyChangeListener {
         executeBtnGrDt.heightHint = 50;
         executeBtn.setLayoutData(executeBtnGrDt);
         executeBtn.setText("取得");
+        executeBtn.setToolTipText("脆弱性情報を取得し、CSV形式で出力します。");
         executeBtn.setFont(new Font(display, "ＭＳ ゴシック", 20, SWT.NORMAL));
         executeBtn.addSelectionListener(new SelectionListener() {
             @Override
@@ -663,13 +676,13 @@ public class Main implements PropertyChangeListener {
 
     @Override
     public void propertyChange(PropertyChangeEvent event) {
-        if ("authInput".equals(event.getPropertyName())) {
-            Boolean enableFlg = (Boolean) event.getNewValue();
-            this.executeBtn.setEnabled(enableFlg.booleanValue());
-        } else if ("optionInputs".equals(event.getPropertyName())) {
-            String oldValue = (String) event.getOldValue();
-            System.out.println(oldValue);
-        }
+        // if ("authInput".equals(event.getPropertyName())) {
+        // Boolean enableFlg = (Boolean) event.getNewValue();
+        // this.executeBtn.setEnabled(enableFlg.booleanValue());
+        // } else if ("optionInputs".equals(event.getPropertyName())) {
+        // String oldValue = (String) event.getOldValue();
+        // System.out.println(oldValue);
+        // }
     }
 
     /**

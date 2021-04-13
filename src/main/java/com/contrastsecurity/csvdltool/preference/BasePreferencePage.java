@@ -85,6 +85,7 @@ public class BasePreferencePage extends PreferencePage {
         contrastUrlTxt = new Text(baseGrp, SWT.BORDER);
         contrastUrlTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         contrastUrlTxt.setText(preferenceStore.getString(PreferenceConstants.CONTRAST_URL));
+        contrastUrlTxt.setMessage("4つの項目をすべて埋めててください。");
         contrastUrlTxt.addListener(SWT.FocusIn, new Listener() {
             public void handleEvent(Event e) {
                 contrastUrlTxt.selectAll();
@@ -95,6 +96,7 @@ public class BasePreferencePage extends PreferencePage {
         apiKeyTxt = new Text(baseGrp, SWT.BORDER);
         apiKeyTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         apiKeyTxt.setText(preferenceStore.getString(PreferenceConstants.API_KEY));
+        apiKeyTxt.setMessage("これらの情報はすべてTeamServerの");
         apiKeyTxt.addListener(SWT.FocusIn, new Listener() {
             public void handleEvent(Event e) {
                 apiKeyTxt.selectAll();
@@ -104,6 +106,7 @@ public class BasePreferencePage extends PreferencePage {
         serviceKeyTxt = new Text(baseGrp, SWT.BORDER);
         serviceKeyTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         serviceKeyTxt.setText(preferenceStore.getString(PreferenceConstants.SERVICE_KEY));
+        serviceKeyTxt.setMessage("「あなたのアカウント」で確認できます。");
         serviceKeyTxt.addListener(SWT.FocusIn, new Listener() {
             public void handleEvent(Event e) {
                 serviceKeyTxt.selectAll();
@@ -114,6 +117,7 @@ public class BasePreferencePage extends PreferencePage {
         userNameTxt = new Text(baseGrp, SWT.BORDER);
         userNameTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         userNameTxt.setText(preferenceStore.getString(PreferenceConstants.USERNAME));
+        userNameTxt.setMessage("すべて埋めたら、下のボタンで組織情報を取得します。");
         userNameTxt.addListener(SWT.FocusIn, new Listener() {
             public void handleEvent(Event e) {
                 userNameTxt.selectAll();
@@ -131,9 +135,17 @@ public class BasePreferencePage extends PreferencePage {
             }
 
             public void widgetSelected(SelectionEvent event) {
-                Api api = new OrganizationApi(preferenceStore, contrastUrlTxt.getText(), userNameTxt.getText(), serviceKeyTxt.getText(), apiKeyTxt.getText());
+                String url = contrastUrlTxt.getText();
+                String usr = userNameTxt.getText();
+                String svc = serviceKeyTxt.getText();
+                String api = apiKeyTxt.getText();
+                if (url.isEmpty() || usr.isEmpty() || svc.isEmpty() || api.isEmpty()) {
+                    MessageDialog.openInformation(composite.getShell(), "組織情報の取得", "4つの項目を埋めてください。");
+                    return;
+                }
+                Api orgApi = new OrganizationApi(preferenceStore, url, usr, svc, api);
                 try {
-                    Organization organization = (Organization) api.get();
+                    Organization organization = (Organization) orgApi.get();
                     orgNameTxt.setText(organization.getName());
                     orgIdTxt.setText(organization.getOrganization_uuid());
                 } catch (ApiException e) {

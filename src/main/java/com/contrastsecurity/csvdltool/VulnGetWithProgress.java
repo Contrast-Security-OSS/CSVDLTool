@@ -369,7 +369,7 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
                     if (isIncludeStackTrace) {
                         String textFileName = String.format("%s\\%s.txt", timestamp, trace.getUuid());
                         File file = new File(textFileName);
-                        // ==================== 19. スタックトレース ====================
+                        // ==================== 20. スタックトレース ====================
                         List<String> detailLines = new ArrayList<String>();
                         detailLines.add(STACK_TRACE);
                         Api eventSummaryApi = new EventSummaryApi(preferenceStore, trace_id);

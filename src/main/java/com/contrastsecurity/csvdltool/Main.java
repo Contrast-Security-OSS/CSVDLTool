@@ -76,6 +76,7 @@ import com.contrastsecurity.csvdltool.preference.AboutPage;
 import com.contrastsecurity.csvdltool.preference.BasePreferencePage;
 import com.contrastsecurity.csvdltool.preference.ConnectionPreferencePage;
 import com.contrastsecurity.csvdltool.preference.OtherPreferencePage;
+import com.contrastsecurity.csvdltool.preference.CSVColumnPreferencePage;
 import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
 
 public class Main implements PropertyChangeListener {
@@ -130,6 +131,7 @@ public class Main implements PropertyChangeListener {
             e.printStackTrace();
         }
         try {
+            this.preferenceStore.setDefault(PreferenceConstants.CSV_COLUMN, CSVColmunEnum.defaultValuesStr());
             this.preferenceStore.setDefault(PreferenceConstants.SLEEP_TRACE, 300);
             this.preferenceStore.setDefault(PreferenceConstants.CSV_OUT_HEADER, true);
             this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_TAG, ",");
@@ -619,9 +621,11 @@ public class Main implements PropertyChangeListener {
                 PreferenceManager mgr = new PreferenceManager();
                 PreferenceNode baseNode = new PreferenceNode("base", new BasePreferencePage());
                 PreferenceNode connectionNode = new PreferenceNode("connection", new ConnectionPreferencePage());
+                PreferenceNode csvColumnNode = new PreferenceNode("csvcolumn", new CSVColumnPreferencePage());
                 PreferenceNode otherNode = new PreferenceNode("other", new OtherPreferencePage());
                 mgr.addToRoot(baseNode);
                 mgr.addTo(baseNode.getId(), connectionNode);
+                mgr.addTo(baseNode.getId(), csvColumnNode);
                 mgr.addTo(baseNode.getId(), otherNode);
                 PreferenceNode aboutNode = new PreferenceNode("about", new AboutPage());
                 mgr.addToRoot(aboutNode);

@@ -52,11 +52,9 @@ public class PreferenceConstants {
 
     public static final String CSV_OUT_HEADER_LIB = new String("com.contrastsecurity.csvdltool.csv_out_header_lib");
     public static final String CSV_COLUMN_LIB = new String("com.contrastsecurity.csvdltool.csv_out_column_lib");
-    public static final String CSV_SEPARATOR_TAG_LIB = new String("com.contrastsecurity.csvdltool.csv_separator_tag_lib");
-    public static final String CSV_SEPARATOR_BUILDNO_LIB = new String("com.contrastsecurity.csvdltool.csv_separator_buildno_lib");
-    public static final String CSV_SEPARATOR_GROUP_LIB = new String("com.contrastsecurity.csvdltool.csv_separator_group_lib");
-    public static final String CSV_SEPARATOR_APPLICATION_LIB = new String("com.contrastsecurity.csvdltool.csv_separator_application_lib");
-    public static final String CSV_SEPARATOR_SERVER_LIB = new String("com.contrastsecurity.csvdltool.csv_separator_server_lib");
+    public static final String CSV_SEPARATOR_RELATED_APPLICATION = new String("com.contrastsecurity.csvdltool.csv_separator_related_application");
+    public static final String CSV_SEPARATOR_RELATED_SERVER = new String("com.contrastsecurity.csvdltool.csv_separator_related_server");
+    public static final String CSV_SEPARATOR_CVE = new String("com.contrastsecurity.csvdltool.csv_separator_cve");
     public static final String CSV_FILE_FORMAT_LIB = new String("com.contrastsecurity.csvdltool.csv_file_format_lib");
 
     public static final String VUL_ONLY_PARENT_APP = new String("com.contrastsecurity.csvdltool.only_parent_app_check");

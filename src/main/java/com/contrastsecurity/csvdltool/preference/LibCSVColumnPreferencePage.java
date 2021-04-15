@@ -52,6 +52,7 @@ import com.contrastsecurity.csvdltool.LibCSVColmunEnum;
 
 public class LibCSVColumnPreferencePage extends PreferencePage {
 
+    private Button outCsvHeaderFlg;
     private List<String> colmunList = new ArrayList<String>();
     private CheckboxTableViewer viewer;
 
@@ -127,11 +128,11 @@ public class LibCSVColumnPreferencePage extends PreferencePage {
         column.setResizable(layoutData.resizable);
         column.setText("項目名");
 
-        Composite buttonGrp = new Composite(csvColumnGrp, SWT.NONE);
-        buttonGrp.setLayoutData(new GridData(GridData.FILL_VERTICAL));
-        buttonGrp.setLayout(new GridLayout(1, true));
+        Composite chkButtonGrp = new Composite(csvColumnGrp, SWT.NONE);
+        chkButtonGrp.setLayoutData(new GridData(GridData.FILL_VERTICAL));
+        chkButtonGrp.setLayout(new GridLayout(1, true));
 
-        final Button allOnBtn = new Button(buttonGrp, SWT.NULL);
+        final Button allOnBtn = new Button(chkButtonGrp, SWT.NULL);
         allOnBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         allOnBtn.setText("すべてオン");
         allOnBtn.addSelectionListener(new SelectionAdapter() {
@@ -141,7 +142,7 @@ public class LibCSVColumnPreferencePage extends PreferencePage {
             }
         });
 
-        final Button allOffBtn = new Button(buttonGrp, SWT.NULL);
+        final Button allOffBtn = new Button(chkButtonGrp, SWT.NULL);
         allOffBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         allOffBtn.setText("すべてオフ");
         allOffBtn.addSelectionListener(new SelectionAdapter() {
@@ -151,13 +152,38 @@ public class LibCSVColumnPreferencePage extends PreferencePage {
             }
         });
 
-        final Button defaultBtn = new Button(buttonGrp, SWT.NULL);
-        defaultBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        outCsvHeaderFlg = new Button(csvColumnGrp, SWT.CHECK);
+        GridData outCsvHeaderFlgGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        outCsvHeaderFlgGrDt.horizontalSpan = 2;
+        outCsvHeaderFlg.setLayoutData(outCsvHeaderFlgGrDt);
+        outCsvHeaderFlg.setText("カラムヘッダを出力");
+        if (preferenceStore.getBoolean(PreferenceConstants.CSV_OUT_HEADER_LIB)) {
+            outCsvHeaderFlg.setSelection(true);
+        }
+
+        Composite buttonGrp = new Composite(parent, SWT.NONE);
+        GridLayout buttonGrpLt = new GridLayout(2, false);
+        buttonGrpLt.marginHeight = 15;
+        buttonGrpLt.marginWidth = 5;
+        buttonGrpLt.horizontalSpacing = 7;
+        buttonGrpLt.verticalSpacing = 20;
+        buttonGrp.setLayout(buttonGrpLt);
+        GridData buttonGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        buttonGrpGrDt.horizontalAlignment = SWT.END;
+        buttonGrp.setLayoutData(buttonGrpGrDt);
+
+        Button defaultBtn = new Button(buttonGrp, SWT.NULL);
+        GridData defaultBtnGrDt = new GridData(SWT.RIGHT, SWT.BOTTOM, true, true, 1, 1);
+        defaultBtnGrDt.widthHint = 90;
+        defaultBtn.setLayoutData(defaultBtnGrDt);
         defaultBtn.setText("デフォルトに戻す");
-        defaultBtn.addSelectionListener(new SelectionAdapter() {
-            @Override
+        defaultBtn.addSelectionListener(new SelectionListener() {
+            public void widgetDefaultSelected(SelectionEvent e) {
+            }
+
             public void widgetSelected(SelectionEvent e) {
-                String defaultColumns = preferenceStore.getDefaultString(PreferenceConstants.CSV_COLUMN_VUL);
+                outCsvHeaderFlg.setSelection(preferenceStore.getDefaultBoolean(PreferenceConstants.CSV_OUT_HEADER_LIB));
+                String defaultColumns = preferenceStore.getDefaultString(PreferenceConstants.CSV_COLUMN_LIB);
                 List<String> validColumnList = new ArrayList<String>();
                 if (defaultColumns.trim().length() > 0) {
                     for (String defaultColumn : defaultColumns.split(",")) {
@@ -169,10 +195,9 @@ public class LibCSVColumnPreferencePage extends PreferencePage {
             }
         });
 
-        Button applyBtn = new Button(composite, SWT.NULL);
+        Button applyBtn = new Button(buttonGrp, SWT.NULL);
         GridData applyBtnGrDt = new GridData(SWT.RIGHT, SWT.BOTTOM, true, true, 1, 1);
         applyBtnGrDt.widthHint = 90;
-        applyBtnGrDt.horizontalSpan = 3;
         applyBtn.setLayoutData(applyBtnGrDt);
         applyBtn.setText("適用");
         applyBtn.addSelectionListener(new SelectionListener() {
@@ -195,6 +220,7 @@ public class LibCSVColumnPreferencePage extends PreferencePage {
         if (ps == null) {
             return true;
         }
+        ps.setValue(PreferenceConstants.CSV_OUT_HEADER_LIB, this.outCsvHeaderFlg.getSelection());
         Object[] elements = viewer.getCheckedElements();
         List<String> checkedList = new ArrayList<String>();
         for (Object element : elements) {
@@ -208,7 +234,7 @@ public class LibCSVColumnPreferencePage extends PreferencePage {
         if (list.isEmpty()) {
             errors.add("CSV出力項目を１つ以上選択してください。");
         } else {
-            ps.setValue(PreferenceConstants.CSV_COLUMN_VUL, String.join(",", list));
+            ps.setValue(PreferenceConstants.CSV_COLUMN_LIB, String.join(",", list));
         }
         if (!errors.isEmpty()) {
             MessageDialog.openError(getShell(), "出力項目設定", String.join("\r\n", errors));

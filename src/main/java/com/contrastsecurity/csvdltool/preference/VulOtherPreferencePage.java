@@ -45,7 +45,7 @@ import org.eclipse.swt.widgets.Text;
 public class VulOtherPreferencePage extends PreferencePage {
 
     private Button outCsvHeaderFlg;
-    private Text traceSleepTxt;
+    private Text sleepTxt;
     private Text csvSepTagTxt;
     private Text csvSepBuildNoTxt;
     private Text csvSepGroupTxt;
@@ -152,9 +152,9 @@ public class VulOtherPreferencePage extends PreferencePage {
 
         // ========== 脆弱性取得ごとスリープ ========== //
         new Label(ctrlGrp, SWT.LEFT).setText("脆弱性取得間隔スリープ（ミリ秒）：");
-        traceSleepTxt = new Text(ctrlGrp, SWT.BORDER);
-        traceSleepTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        traceSleepTxt.setText(preferenceStore.getString(PreferenceConstants.SLEEP_VUL));
+        sleepTxt = new Text(ctrlGrp, SWT.BORDER);
+        sleepTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        sleepTxt.setText(preferenceStore.getString(PreferenceConstants.SLEEP_VUL));
 
         Composite buttonGrp = new Composite(parent, SWT.NONE);
         GridLayout buttonGrpLt = new GridLayout(2, false);
@@ -183,7 +183,7 @@ public class VulOtherPreferencePage extends PreferencePage {
                 csvSepGroupTxt.setText(preferenceStore.getDefaultString(PreferenceConstants.CSV_SEPARATOR_GROUP));
                 csvSepServerTxt.setText(preferenceStore.getDefaultString(PreferenceConstants.CSV_SEPARATOR_SERVER));
                 csvFileForamtTxt.setText(preferenceStore.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT_VUL));
-                traceSleepTxt.setText(preferenceStore.getDefaultString(PreferenceConstants.SLEEP_VUL));
+                sleepTxt.setText(preferenceStore.getDefaultString(PreferenceConstants.SLEEP_VUL));
             }
         });
 
@@ -213,15 +213,15 @@ public class VulOtherPreferencePage extends PreferencePage {
             return true;
         }
         ps.setValue(PreferenceConstants.CSV_OUT_HEADER_VUL, this.outCsvHeaderFlg.getSelection());
-        if (this.traceSleepTxt != null) {
-            if (this.traceSleepTxt.getText().isEmpty()) {
+        if (this.sleepTxt != null) {
+            if (this.sleepTxt.getText().isEmpty()) {
                 errors.add("・脆弱性取得間隔スリープを指定してください。");
             } else {
-                if (!StringUtils.isNumeric(this.traceSleepTxt.getText())) {
+                if (!StringUtils.isNumeric(this.sleepTxt.getText())) {
                     errors.add("・脆弱性取得間隔スリープは数値を指定してください。");
                 }
             }
-            ps.setValue(PreferenceConstants.SLEEP_VUL, this.traceSleepTxt.getText());
+            ps.setValue(PreferenceConstants.SLEEP_VUL, this.sleepTxt.getText());
         }
         if (this.csvSepTagTxt != null) {
             ps.setValue(PreferenceConstants.CSV_SEPARATOR_TAG, this.csvSepTagTxt.getText());

@@ -105,10 +105,9 @@ public class LibGetWithProgress implements IRunnableWithProgress {
         String timestamp = new SimpleDateFormat(csvFileFormat).format(new Date());
         int sleepTrace = preferenceStore.getInt(PreferenceConstants.SLEEP_LIB);
         String csvColumns = preferenceStore.getString(PreferenceConstants.CSV_COLUMN_LIB);
-        String csvSepTag = preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_TAG_LIB).replace("\\r", "\r").replace("\\n", "\n");
-        String csvSepBuildNo = preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_BUILDNO_LIB).replace("\\r", "\r").replace("\\n", "\n");
-        String csvSepGroup = preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_GROUP_LIB).replace("\\r", "\r").replace("\\n", "\n");
-        String csvSepServer = preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_SERVER_LIB).replace("\\r", "\r").replace("\\n", "\n");
+        String csvSepApplication = preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_RELATED_APPLICATION).replace("\\r", "\r").replace("\\n", "\n");
+        String csvSepServer = preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_RELATED_SERVER).replace("\\r", "\r").replace("\\n", "\n");
+        String csvSepCVE = preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_CVE).replace("\\r", "\r").replace("\\n", "\n");
         Map<String, List<String>> appGroupMap = new HashMap<String, List<String>>();
         List<List<String>> csvList = new ArrayList<List<String>>();
         try {
@@ -205,7 +204,7 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                     }
                     // ==================== 13. CVE ====================
                     if (csvColumns.contains(LibCSVColmunEnum.LIB_13.name())) {
-                        StringJoiner sj = new StringJoiner(",");
+                        StringJoiner sj = new StringJoiner(csvSepCVE);
                         for (Vuln vuln : library.getVulns()) {
                             sj.add(vuln.getName());
                         }

@@ -48,6 +48,8 @@ import org.eclipse.jface.preference.PreferenceManager;
 import org.eclipse.jface.preference.PreferenceNode;
 import org.eclipse.jface.preference.PreferenceStore;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -55,6 +57,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.events.ShellListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
@@ -93,10 +96,17 @@ public class Main implements PropertyChangeListener {
     private org.eclipse.swt.widgets.List dstList;
     private Label srcCount;
     private Label dstCount;
-    private Button executeBtn;
-    private Button onlyParentAppChk;
+    private CTabFolder tabFolder;
+
+    private Button vulExecuteBtn;
+    private Button vulOnlyParentAppChk;
     private Button includeDescChk;
     private Button includeStackTraceChk;
+
+    private Button libExecuteBtn;
+    private Button libOnlyParentAppChk;
+    private Button onlyHasCVEChk;
+
     private Button settingBtn;
 
     private Map<String, AppInfo> fullAppMap;
@@ -182,7 +192,7 @@ public class Main implements PropertyChangeListener {
             public void shellClosed(ShellEvent event) {
                 preferenceStore.setValue(PreferenceConstants.MEM_WIDTH, shell.getSize().x);
                 preferenceStore.setValue(PreferenceConstants.MEM_HEIGHT, shell.getSize().y);
-                preferenceStore.setValue(PreferenceConstants.ONLY_PARENT_APP_CHECK, onlyParentAppChk.getSelection());
+                preferenceStore.setValue(PreferenceConstants.ONLY_PARENT_APP_CHECK, vulOnlyParentAppChk.getSelection());
                 preferenceStore.setValue(PreferenceConstants.INCLUDE_DESCRIPTION, includeDescChk.getSelection());
                 preferenceStore.setValue(PreferenceConstants.INCLUDE_STACKTRACE, includeStackTraceChk.getSelection());
                 try {
@@ -198,11 +208,11 @@ public class Main implements PropertyChangeListener {
                 String orgId = preferenceStore.getString(PreferenceConstants.ORG_ID);
                 if (orgName == null || orgName.isEmpty() || orgId == null || orgId.isEmpty()) {
                     appLoadBtn.setEnabled(false);
-                    executeBtn.setEnabled(false);
+                    vulExecuteBtn.setEnabled(false);
                     settingBtn.setText("このボタンから基本設定を行ってください。");
                 } else {
                     appLoadBtn.setEnabled(true);
-                    executeBtn.setEnabled(true);
+                    vulExecuteBtn.setEnabled(true);
                     settingBtn.setText("設定");
                 }
             }
@@ -222,8 +232,9 @@ public class Main implements PropertyChangeListener {
         display.addFilter(SWT.KeyUp, listener);
 
         GridLayout baseLayout = new GridLayout(1, false);
-        baseLayout.marginWidth = 5;
-        baseLayout.marginBottom = 5;
+        baseLayout.marginWidth = 8;
+        baseLayout.marginBottom = 8;
+        baseLayout.verticalSpacing = 8;
         shell.setLayout(baseLayout);
 
         Group appListGrp = new Group(shell, SWT.NONE);
@@ -520,31 +531,43 @@ public class Main implements PropertyChangeListener {
         this.dstCount.setLayoutData(dstCountGrDt);
         this.dstCount.setText("0");
 
+        tabFolder = new CTabFolder(shell, SWT.NONE);
+        GridData tabFolderGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        tabFolder.setLayoutData(tabFolderGrDt);
+        tabFolder.setSelectionBackground(new Color[] { display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND), display.getSystemColor(SWT.COLOR_WIDGET_LIGHT_SHADOW) },
+                new int[] { 100 }, true);
+
+        CTabItem vulTabItem = new CTabItem(tabFolder, SWT.NONE);
+        vulTabItem.setText("脆弱性");
+
         // ========== グループ ==========
-        Group buttonGrp = new Group(shell, SWT.NULL);
-        buttonGrp.setLayout(new GridLayout(1, false));
+        Composite vulButtonGrp = new Composite(tabFolder, SWT.NULL);
+        GridLayout buttonGrpLt = new GridLayout(1, false);
+        buttonGrpLt.marginWidth = 10;
+        buttonGrpLt.marginHeight = 10;
+        vulButtonGrp.setLayout(buttonGrpLt);
         GridData buttonGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
         // buttonGrpGrDt.horizontalSpan = 3;
         // buttonGrpGrDt.widthHint = 100;
-        buttonGrp.setLayoutData(buttonGrpGrDt);
+        vulButtonGrp.setLayoutData(buttonGrpGrDt);
 
         // ========== 取得ボタン ==========
-        executeBtn = new Button(buttonGrp, SWT.PUSH);
+        vulExecuteBtn = new Button(vulButtonGrp, SWT.PUSH);
         GridData executeBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
         executeBtnGrDt.heightHint = 50;
-        executeBtn.setLayoutData(executeBtnGrDt);
-        executeBtn.setText("取得");
-        executeBtn.setToolTipText("脆弱性情報を取得し、CSV形式で出力します。");
-        executeBtn.setFont(new Font(display, "ＭＳ ゴシック", 20, SWT.NORMAL));
-        executeBtn.addSelectionListener(new SelectionListener() {
+        vulExecuteBtn.setLayoutData(executeBtnGrDt);
+        vulExecuteBtn.setText("取得");
+        vulExecuteBtn.setToolTipText("脆弱性情報を取得し、CSV形式で出力します。");
+        vulExecuteBtn.setFont(new Font(display, "ＭＳ ゴシック", 20, SWT.NORMAL));
+        vulExecuteBtn.addSelectionListener(new SelectionListener() {
             @Override
             public void widgetSelected(SelectionEvent event) {
                 if (dstApps.isEmpty()) {
                     MessageDialog.openInformation(shell, "取得", "取得対象のアプリケーションを選択してください。");
                     return;
                 }
-                VulnGetWithProgress progress = new VulnGetWithProgress(shell, preferenceStore, dstApps, fullAppMap, onlyParentAppChk.getSelection(), includeDescChk.getSelection(),
-                        includeStackTraceChk.getSelection());
+                VulnGetWithProgress progress = new VulnGetWithProgress(shell, preferenceStore, dstApps, fullAppMap, vulOnlyParentAppChk.getSelection(),
+                        includeDescChk.getSelection(), includeStackTraceChk.getSelection());
                 ProgressMonitorDialog progDialog = new ProgressMonitorDialog(shell);
                 try {
                     progDialog.run(true, true, progress);
@@ -574,13 +597,13 @@ public class Main implements PropertyChangeListener {
             }
         });
 
-        onlyParentAppChk = new Button(buttonGrp, SWT.CHECK);
-        onlyParentAppChk.setText("マージされたアプリの場合、親アプリの脆弱性だけを出力する。");
+        vulOnlyParentAppChk = new Button(vulButtonGrp, SWT.CHECK);
+        vulOnlyParentAppChk.setText("マージされたアプリの場合、親アプリの脆弱性だけを出力する。");
         if (preferenceStore.getBoolean(PreferenceConstants.ONLY_PARENT_APP_CHECK)) {
-            onlyParentAppChk.setSelection(true);
+            vulOnlyParentAppChk.setSelection(true);
         }
 
-        includeDescChk = new Button(buttonGrp, SWT.CHECK);
+        includeDescChk = new Button(vulButtonGrp, SWT.CHECK);
         includeDescChk.setText("改行を含む長文の項目（ルート、HTTP情報、修正方法、コメントなど）も添付ファイルで出力する。（フォルダ出力）");
         includeDescChk.setToolTipText("ルート、HTTP情報、コメント、何が起こったか？、どんなリスクであるか？、修正方法の５つの項目が添付ファイルで出力されます。");
         if (preferenceStore.getBoolean(PreferenceConstants.INCLUDE_DESCRIPTION)) {
@@ -596,7 +619,7 @@ public class Main implements PropertyChangeListener {
             }
         });
 
-        includeStackTraceChk = new Button(buttonGrp, SWT.CHECK);
+        includeStackTraceChk = new Button(vulButtonGrp, SWT.CHECK);
         includeStackTraceChk.setText("脆弱性の詳細（スタックトレース）も添付ファイルで出力する。（フォルダ出力）");
         if (preferenceStore.getBoolean(PreferenceConstants.INCLUDE_STACKTRACE)) {
             includeStackTraceChk.setSelection(true);
@@ -610,6 +633,84 @@ public class Main implements PropertyChangeListener {
                 }
             }
         });
+        vulTabItem.setControl(vulButtonGrp);
+
+        // #################### ライブラリ #################### //
+        CTabItem libTabItem = new CTabItem(tabFolder, SWT.NONE);
+        libTabItem.setText("ライブラリ");
+
+        // ========== グループ ==========
+        Composite libButtonGrp = new Composite(tabFolder, SWT.NULL);
+        GridLayout libButtonGrpLt = new GridLayout(1, false);
+        libButtonGrpLt.marginWidth = 10;
+        libButtonGrpLt.marginHeight = 10;
+        libButtonGrp.setLayout(libButtonGrpLt);
+        GridData libButtonGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        // libButtonGrpGrDt.horizontalSpan = 3;
+        // libButtonGrpGrDt.widthHint = 100;
+        libButtonGrp.setLayoutData(libButtonGrpGrDt);
+
+        // ========== 取得ボタン ==========
+        libExecuteBtn = new Button(libButtonGrp, SWT.PUSH);
+        GridData libExecuteBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        libExecuteBtnGrDt.heightHint = 50;
+        libExecuteBtn.setLayoutData(libExecuteBtnGrDt);
+        libExecuteBtn.setText("取得");
+        libExecuteBtn.setToolTipText("脆弱性情報を取得し、CSV形式で出力します。");
+        libExecuteBtn.setFont(new Font(display, "ＭＳ ゴシック", 20, SWT.NORMAL));
+        libExecuteBtn.addSelectionListener(new SelectionListener() {
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                if (dstApps.isEmpty()) {
+                    MessageDialog.openInformation(shell, "取得", "取得対象のアプリケーションを選択してください。");
+                    return;
+                }
+                VulnGetWithProgress progress = new VulnGetWithProgress(shell, preferenceStore, dstApps, fullAppMap, vulOnlyParentAppChk.getSelection(),
+                        includeDescChk.getSelection(), includeStackTraceChk.getSelection());
+                ProgressMonitorDialog progDialog = new ProgressMonitorDialog(shell);
+                try {
+                    progDialog.run(true, true, progress);
+                } catch (InvocationTargetException e) {
+                    StringWriter stringWriter = new StringWriter();
+                    PrintWriter printWriter = new PrintWriter(stringWriter);
+                    e.printStackTrace(printWriter);
+                    String trace = stringWriter.toString();
+                    logger.error(trace);
+                    String exceptionMsg = e.getTargetException().getMessage();
+                    if (e.getTargetException() instanceof ApiException) {
+                        MessageDialog.openWarning(shell, "脆弱性情報の取得", String.format("TeamServerからエラーが返されました。\r\n%s", exceptionMsg));
+                    } else if (e.getTargetException() instanceof NonApiException) {
+                        MessageDialog.openError(shell, "脆弱性情報の取得", String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", exceptionMsg));
+                    } else if (e.getTargetException() instanceof InterruptedException) {
+                        MessageDialog.openInformation(shell, "脆弱性情報の取得", exceptionMsg);
+                    } else {
+                        MessageDialog.openError(shell, "脆弱性情報の取得", String.format("不明なエラーです。ログファイルをご確認ください。\r\n%s", exceptionMsg));
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void widgetDefaultSelected(SelectionEvent event) {
+            }
+        });
+
+        libOnlyParentAppChk = new Button(libButtonGrp, SWT.CHECK);
+        libOnlyParentAppChk.setText("マージされたアプリの場合、親アプリのライブラリだけを出力する。");
+        if (preferenceStore.getBoolean(PreferenceConstants.ONLY_PARENT_APP_CHECK)) {
+            libOnlyParentAppChk.setSelection(true);
+        }
+
+        onlyHasCVEChk = new Button(libButtonGrp, SWT.CHECK);
+        onlyHasCVEChk.setText("CVEを含むライブラリのみ出力します。");
+        onlyHasCVEChk.setToolTipText("ルート、HTTP情報、コメント、何が起こったか？、どんなリスクであるか？、修正方法の５つの項目が添付ファイルで出力されます。");
+        if (preferenceStore.getBoolean(PreferenceConstants.INCLUDE_DESCRIPTION)) {
+            onlyHasCVEChk.setSelection(true);
+        }
+        libTabItem.setControl(libButtonGrp);
+
+        tabFolder.setSelection(0);
 
         // ========== 設定ボタン ==========
         settingBtn = new Button(shell, SWT.PUSH);

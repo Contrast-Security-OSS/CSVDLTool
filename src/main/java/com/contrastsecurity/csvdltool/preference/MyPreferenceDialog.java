@@ -14,6 +14,12 @@ public class MyPreferenceDialog extends PreferenceDialog {
     }
 
     @Override
+    protected void configureShell(Shell newShell) {
+        super.configureShell(newShell);
+        newShell.setText("CSVDLTool設定");
+    }
+
+    @Override
     protected TreeViewer createTreeViewer(Composite parent) {
         TreeViewer viewer = super.createTreeViewer(parent);
         viewer.setAutoExpandLevel(AbstractTreeViewer.ALL_LEVELS);

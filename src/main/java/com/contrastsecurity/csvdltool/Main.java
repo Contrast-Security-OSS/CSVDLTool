@@ -77,11 +77,13 @@ import com.contrastsecurity.csvdltool.exception.NonApiException;
 import com.contrastsecurity.csvdltool.model.ContrastSecurityYaml;
 import com.contrastsecurity.csvdltool.preference.AboutPage;
 import com.contrastsecurity.csvdltool.preference.BasePreferencePage;
-import com.contrastsecurity.csvdltool.preference.CSVColumnPreferencePage;
 import com.contrastsecurity.csvdltool.preference.ConnectionPreferencePage;
+import com.contrastsecurity.csvdltool.preference.LibCSVColumnPreferencePage;
+import com.contrastsecurity.csvdltool.preference.LibOtherPreferencePage;
 import com.contrastsecurity.csvdltool.preference.MyPreferenceDialog;
-import com.contrastsecurity.csvdltool.preference.OtherPreferencePage;
 import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
+import com.contrastsecurity.csvdltool.preference.VulCSVColumnPreferencePage;
+import com.contrastsecurity.csvdltool.preference.VulOtherPreferencePage;
 
 public class Main implements PropertyChangeListener {
 
@@ -142,14 +144,25 @@ public class Main implements PropertyChangeListener {
             e.printStackTrace();
         }
         try {
-            this.preferenceStore.setDefault(PreferenceConstants.CSV_COLUMN, CSVColmunEnum.defaultValuesStr());
-            this.preferenceStore.setDefault(PreferenceConstants.SLEEP_TRACE, 300);
-            this.preferenceStore.setDefault(PreferenceConstants.CSV_OUT_HEADER, true);
+            this.preferenceStore.setDefault(PreferenceConstants.CSV_COLUMN_VUL, VulCSVColmunEnum.defaultValuesStr());
+            this.preferenceStore.setDefault(PreferenceConstants.SLEEP_VUL, 300);
+            this.preferenceStore.setDefault(PreferenceConstants.CSV_OUT_HEADER_VUL, true);
             this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_TAG, ",");
             this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_BUILDNO, ",");
             this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_GROUP, ",");
             this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_SERVER, ",");
-            this.preferenceStore.setDefault(PreferenceConstants.CSV_FILE_FORMAT, "yyyy-MM-dd_HHmmss");
+            this.preferenceStore.setDefault(PreferenceConstants.CSV_FILE_FORMAT_VUL, "'vul'_yyyy-MM-dd_HHmmss");
+
+            this.preferenceStore.setDefault(PreferenceConstants.CSV_COLUMN_LIB, LibCSVColmunEnum.defaultValuesStr());
+            this.preferenceStore.setDefault(PreferenceConstants.SLEEP_LIB, 300);
+            this.preferenceStore.setDefault(PreferenceConstants.CSV_OUT_HEADER_LIB, true);
+            this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_TAG_LIB, ",");
+            this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_BUILDNO_LIB, ",");
+            this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_GROUP_LIB, ",");
+            this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_APPLICATION_LIB, ",");
+            this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_SERVER_LIB, ",");
+            this.preferenceStore.setDefault(PreferenceConstants.CSV_FILE_FORMAT_LIB, "'lib'_yyyy-MM-dd_HHmmss");
+            this.preferenceStore.setDefault(PreferenceConstants.OPENED_TAB_IDX, 0);
 
             Yaml yaml = new Yaml();
             InputStream is = new FileInputStream("contrast_security.yaml");
@@ -190,11 +203,15 @@ public class Main implements PropertyChangeListener {
 
             @Override
             public void shellClosed(ShellEvent event) {
+                int idx = tabFolder.getSelectionIndex();
+                preferenceStore.setValue(PreferenceConstants.OPENED_TAB_IDX, idx);
                 preferenceStore.setValue(PreferenceConstants.MEM_WIDTH, shell.getSize().x);
                 preferenceStore.setValue(PreferenceConstants.MEM_HEIGHT, shell.getSize().y);
-                preferenceStore.setValue(PreferenceConstants.ONLY_PARENT_APP_CHECK, vulOnlyParentAppChk.getSelection());
+                preferenceStore.setValue(PreferenceConstants.VUL_ONLY_PARENT_APP, vulOnlyParentAppChk.getSelection());
                 preferenceStore.setValue(PreferenceConstants.INCLUDE_DESCRIPTION, includeDescChk.getSelection());
                 preferenceStore.setValue(PreferenceConstants.INCLUDE_STACKTRACE, includeStackTraceChk.getSelection());
+                preferenceStore.setValue(PreferenceConstants.LIB_ONLY_PARENT_APP, libOnlyParentAppChk.getSelection());
+                preferenceStore.setValue(PreferenceConstants.ONLY_HAS_CVE, onlyHasCVEChk.getSelection());
                 try {
                     preferenceStore.save();
                 } catch (IOException ioe) {
@@ -537,6 +554,7 @@ public class Main implements PropertyChangeListener {
         tabFolder.setSelectionBackground(new Color[] { display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND), display.getSystemColor(SWT.COLOR_WIDGET_LIGHT_SHADOW) },
                 new int[] { 100 }, true);
 
+        // #################### 脆弱性 #################### //
         CTabItem vulTabItem = new CTabItem(tabFolder, SWT.NONE);
         vulTabItem.setText("脆弱性");
 
@@ -563,11 +581,11 @@ public class Main implements PropertyChangeListener {
             @Override
             public void widgetSelected(SelectionEvent event) {
                 if (dstApps.isEmpty()) {
-                    MessageDialog.openInformation(shell, "取得", "取得対象のアプリケーションを選択してください。");
+                    MessageDialog.openInformation(shell, "脆弱性情報取得", "取得対象のアプリケーションを選択してください。");
                     return;
                 }
-                VulnGetWithProgress progress = new VulnGetWithProgress(shell, preferenceStore, dstApps, fullAppMap, vulOnlyParentAppChk.getSelection(),
-                        includeDescChk.getSelection(), includeStackTraceChk.getSelection());
+                VulGetWithProgress progress = new VulGetWithProgress(shell, preferenceStore, dstApps, fullAppMap, vulOnlyParentAppChk.getSelection(), includeDescChk.getSelection(),
+                        includeStackTraceChk.getSelection());
                 ProgressMonitorDialog progDialog = new ProgressMonitorDialog(shell);
                 try {
                     progDialog.run(true, true, progress);
@@ -599,7 +617,7 @@ public class Main implements PropertyChangeListener {
 
         vulOnlyParentAppChk = new Button(vulButtonGrp, SWT.CHECK);
         vulOnlyParentAppChk.setText("マージされたアプリの場合、親アプリの脆弱性だけを出力する。");
-        if (preferenceStore.getBoolean(PreferenceConstants.ONLY_PARENT_APP_CHECK)) {
+        if (preferenceStore.getBoolean(PreferenceConstants.VUL_ONLY_PARENT_APP)) {
             vulOnlyParentAppChk.setSelection(true);
         }
 
@@ -656,17 +674,16 @@ public class Main implements PropertyChangeListener {
         libExecuteBtnGrDt.heightHint = 50;
         libExecuteBtn.setLayoutData(libExecuteBtnGrDt);
         libExecuteBtn.setText("取得");
-        libExecuteBtn.setToolTipText("脆弱性情報を取得し、CSV形式で出力します。");
+        libExecuteBtn.setToolTipText("ライブラリ情報を取得し、CSV形式で出力します。");
         libExecuteBtn.setFont(new Font(display, "ＭＳ ゴシック", 20, SWT.NORMAL));
         libExecuteBtn.addSelectionListener(new SelectionListener() {
             @Override
             public void widgetSelected(SelectionEvent event) {
                 if (dstApps.isEmpty()) {
-                    MessageDialog.openInformation(shell, "取得", "取得対象のアプリケーションを選択してください。");
+                    MessageDialog.openInformation(shell, "ライブラリ情報取得", "取得対象のアプリケーションを選択してください。");
                     return;
                 }
-                VulnGetWithProgress progress = new VulnGetWithProgress(shell, preferenceStore, dstApps, fullAppMap, vulOnlyParentAppChk.getSelection(),
-                        includeDescChk.getSelection(), includeStackTraceChk.getSelection());
+                LibGetWithProgress progress = new LibGetWithProgress(shell, preferenceStore, dstApps, fullAppMap, libOnlyParentAppChk.getSelection(), onlyHasCVEChk.getSelection());
                 ProgressMonitorDialog progDialog = new ProgressMonitorDialog(shell);
                 try {
                     progDialog.run(true, true, progress);
@@ -678,13 +695,13 @@ public class Main implements PropertyChangeListener {
                     logger.error(trace);
                     String exceptionMsg = e.getTargetException().getMessage();
                     if (e.getTargetException() instanceof ApiException) {
-                        MessageDialog.openWarning(shell, "脆弱性情報の取得", String.format("TeamServerからエラーが返されました。\r\n%s", exceptionMsg));
+                        MessageDialog.openWarning(shell, "ライブラリ情報の取得", String.format("TeamServerからエラーが返されました。\r\n%s", exceptionMsg));
                     } else if (e.getTargetException() instanceof NonApiException) {
-                        MessageDialog.openError(shell, "脆弱性情報の取得", String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", exceptionMsg));
+                        MessageDialog.openError(shell, "ライブラリ情報の取得", String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", exceptionMsg));
                     } else if (e.getTargetException() instanceof InterruptedException) {
-                        MessageDialog.openInformation(shell, "脆弱性情報の取得", exceptionMsg);
+                        MessageDialog.openInformation(shell, "ライブラリ情報の取得", exceptionMsg);
                     } else {
-                        MessageDialog.openError(shell, "脆弱性情報の取得", String.format("不明なエラーです。ログファイルをご確認ください。\r\n%s", exceptionMsg));
+                        MessageDialog.openError(shell, "ライブラリ情報の取得", String.format("不明なエラーです。ログファイルをご確認ください。\r\n%s", exceptionMsg));
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -698,19 +715,20 @@ public class Main implements PropertyChangeListener {
 
         libOnlyParentAppChk = new Button(libButtonGrp, SWT.CHECK);
         libOnlyParentAppChk.setText("マージされたアプリの場合、親アプリのライブラリだけを出力する。");
-        if (preferenceStore.getBoolean(PreferenceConstants.ONLY_PARENT_APP_CHECK)) {
+        if (preferenceStore.getBoolean(PreferenceConstants.LIB_ONLY_PARENT_APP)) {
             libOnlyParentAppChk.setSelection(true);
         }
 
         onlyHasCVEChk = new Button(libButtonGrp, SWT.CHECK);
         onlyHasCVEChk.setText("CVEを含むライブラリのみ出力します。");
         onlyHasCVEChk.setToolTipText("ルート、HTTP情報、コメント、何が起こったか？、どんなリスクであるか？、修正方法の５つの項目が添付ファイルで出力されます。");
-        if (preferenceStore.getBoolean(PreferenceConstants.INCLUDE_DESCRIPTION)) {
+        if (preferenceStore.getBoolean(PreferenceConstants.ONLY_HAS_CVE)) {
             onlyHasCVEChk.setSelection(true);
         }
         libTabItem.setControl(libButtonGrp);
 
-        tabFolder.setSelection(0);
+        int idx = this.preferenceStore.getInt(PreferenceConstants.OPENED_TAB_IDX);
+        tabFolder.setSelection(idx);
 
         // ========== 設定ボタン ==========
         settingBtn = new Button(shell, SWT.PUSH);
@@ -723,12 +741,16 @@ public class Main implements PropertyChangeListener {
                 PreferenceManager mgr = new PreferenceManager();
                 PreferenceNode baseNode = new PreferenceNode("base", new BasePreferencePage());
                 PreferenceNode connectionNode = new PreferenceNode("connection", new ConnectionPreferencePage());
-                PreferenceNode csvColumnNode = new PreferenceNode("csvcolumn", new CSVColumnPreferencePage());
-                PreferenceNode otherNode = new PreferenceNode("other", new OtherPreferencePage());
+                PreferenceNode vulCsvColumnNode = new PreferenceNode("vulcsvcolumn", new VulCSVColumnPreferencePage());
+                PreferenceNode vulOtherNode = new PreferenceNode("vulother", new VulOtherPreferencePage());
+                PreferenceNode libCsvColumnNode = new PreferenceNode("libcsvcolumn", new LibCSVColumnPreferencePage());
+                PreferenceNode libOtherNode = new PreferenceNode("libother", new LibOtherPreferencePage());
                 mgr.addToRoot(baseNode);
-                mgr.addTo(baseNode.getId(), connectionNode);
-                mgr.addTo(baseNode.getId(), csvColumnNode);
-                mgr.addTo(baseNode.getId(), otherNode);
+                mgr.addToRoot(connectionNode);
+                mgr.addToRoot(vulCsvColumnNode);
+                mgr.addTo(vulCsvColumnNode.getId(), vulOtherNode);
+                mgr.addToRoot(libCsvColumnNode);
+                mgr.addTo(libCsvColumnNode.getId(), libOtherNode);
                 PreferenceNode aboutNode = new PreferenceNode("about", new AboutPage());
                 mgr.addToRoot(aboutNode);
                 PreferenceDialog dialog = new MyPreferenceDialog(shell, mgr);

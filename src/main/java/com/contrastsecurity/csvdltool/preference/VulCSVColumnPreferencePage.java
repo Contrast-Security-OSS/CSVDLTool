@@ -48,15 +48,15 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 
-import com.contrastsecurity.csvdltool.CSVColmunEnum;
+import com.contrastsecurity.csvdltool.VulCSVColmunEnum;
 
-public class CSVColumnPreferencePage extends PreferencePage {
+public class VulCSVColumnPreferencePage extends PreferencePage {
 
     private List<String> colmunList = new ArrayList<String>();
     private CheckboxTableViewer viewer;
 
-    public CSVColumnPreferencePage() {
-        super("出力項目設定");
+    public VulCSVColumnPreferencePage() {
+        super("脆弱性情報の出力設定");
     }
 
     @Override
@@ -84,14 +84,22 @@ public class CSVColumnPreferencePage extends PreferencePage {
         csvColumnGrp.setText("CSV出力");
 
         // ========== 出力項目テーブル ========== //
-        for (CSVColmunEnum colEnum : CSVColmunEnum.values()) {
+        for (VulCSVColmunEnum colEnum : VulCSVColmunEnum.values()) {
             colmunList.add(colEnum.getCulumn());
         }
-        String targetColumns = preferenceStore.getString(PreferenceConstants.CSV_COLUMN);
+        String targetColumns = preferenceStore.getString(PreferenceConstants.CSV_COLUMN_VUL);
         List<String> validColumnList = new ArrayList<String>();
         if (targetColumns.trim().length() > 0) {
-            for (String targetColumn : targetColumns.split(",")) {
-                validColumnList.add(CSVColmunEnum.valueOf(targetColumn.trim()).getCulumn());
+            try {
+                for (String targetColumn : targetColumns.split(",")) {
+                    validColumnList.add(VulCSVColmunEnum.valueOf(targetColumn.trim()).getCulumn());
+                }
+            } catch (IllegalArgumentException iae) {
+                MessageDialog.openError(parent.getShell(), "出力項目設定", "設定値に問題があるためデフォルト設定に戻されました。\r\n再度、設定を行い適用してください。");
+                targetColumns = preferenceStore.getDefaultString(PreferenceConstants.CSV_COLUMN_VUL);
+                for (String targetColumn : targetColumns.split(",")) {
+                    validColumnList.add(VulCSVColmunEnum.valueOf(targetColumn.trim()).getCulumn());
+                }
             }
         }
         final Table table = new Table(csvColumnGrp, SWT.CHECK | SWT.BORDER);
@@ -149,11 +157,11 @@ public class CSVColumnPreferencePage extends PreferencePage {
         defaultBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                String defaultColumns = preferenceStore.getDefaultString(PreferenceConstants.CSV_COLUMN);
+                String defaultColumns = preferenceStore.getDefaultString(PreferenceConstants.CSV_COLUMN_VUL);
                 List<String> validColumnList = new ArrayList<String>();
                 if (defaultColumns.trim().length() > 0) {
                     for (String defaultColumn : defaultColumns.split(",")) {
-                        validColumnList.add(CSVColmunEnum.valueOf(defaultColumn.trim()).getCulumn());
+                        validColumnList.add(VulCSVColmunEnum.valueOf(defaultColumn.trim()).getCulumn());
                     }
                 }
                 viewer.setCheckedElements(validColumnList.toArray());
@@ -195,12 +203,12 @@ public class CSVColumnPreferencePage extends PreferencePage {
 
         List<String> list = new ArrayList<String>();
         for (String colName : checkedList) {
-            list.add(CSVColmunEnum.getByName(colName).name());
+            list.add(VulCSVColmunEnum.getByName(colName).name());
         }
         if (list.isEmpty()) {
             errors.add("CSV出力項目を１つ以上選択してください。");
         } else {
-            ps.setValue(PreferenceConstants.CSV_COLUMN, String.join(",", list));
+            ps.setValue(PreferenceConstants.CSV_COLUMN_VUL, String.join(",", list));
         }
         if (!errors.isEmpty()) {
             MessageDialog.openError(getShell(), "出力項目設定", String.join("\r\n", errors));

@@ -42,7 +42,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-public class OtherPreferencePage extends PreferencePage {
+public class LibOtherPreferencePage extends PreferencePage {
 
     private Button outCsvHeaderFlg;
     private Text traceSleepTxt;
@@ -52,7 +52,7 @@ public class OtherPreferencePage extends PreferencePage {
     private Text csvSepServerTxt;
     private Text csvFileForamtTxt;
 
-    public OtherPreferencePage() {
+    public LibOtherPreferencePage() {
         super("その他設定");
     }
 
@@ -85,7 +85,7 @@ public class OtherPreferencePage extends PreferencePage {
         outCsvHeaderFlgGrDt.horizontalSpan = 2;
         outCsvHeaderFlg.setLayoutData(outCsvHeaderFlgGrDt);
         outCsvHeaderFlg.setText("カラムヘッダを出力");
-        if (preferenceStore.getBoolean(PreferenceConstants.CSV_OUT_HEADER)) {
+        if (preferenceStore.getBoolean(PreferenceConstants.CSV_OUT_HEADER_LIB)) {
             outCsvHeaderFlg.setSelection(true);
         }
 
@@ -103,22 +103,22 @@ public class OtherPreferencePage extends PreferencePage {
         new Label(csvSepGrp, SWT.LEFT).setText("タグ：");
         csvSepTagTxt = new Text(csvSepGrp, SWT.BORDER);
         csvSepTagTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        csvSepTagTxt.setText(preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_TAG));
+        csvSepTagTxt.setText(preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_TAG_LIB));
 
         new Label(csvSepGrp, SWT.LEFT).setText("ビルド番号：");
         csvSepBuildNoTxt = new Text(csvSepGrp, SWT.BORDER);
         csvSepBuildNoTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        csvSepBuildNoTxt.setText(preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_BUILDNO));
+        csvSepBuildNoTxt.setText(preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_BUILDNO_LIB));
 
         new Label(csvSepGrp, SWT.LEFT).setText("アプリケーショングループ：");
         csvSepGroupTxt = new Text(csvSepGrp, SWT.BORDER);
         csvSepGroupTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        csvSepGroupTxt.setText(preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_GROUP));
+        csvSepGroupTxt.setText(preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_GROUP_LIB));
 
         new Label(csvSepGrp, SWT.LEFT).setText("サーバ：");
         csvSepServerTxt = new Text(csvSepGrp, SWT.BORDER);
         csvSepServerTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        csvSepServerTxt.setText(preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_SERVER));
+        csvSepServerTxt.setText(preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_SERVER_LIB));
 
         Group csvFileFormatGrp = new Group(csvGrp, SWT.NONE);
         GridLayout csvFileFormatGrpLt = new GridLayout(1, false);
@@ -133,12 +133,12 @@ public class OtherPreferencePage extends PreferencePage {
 
         csvFileForamtTxt = new Text(csvFileFormatGrp, SWT.BORDER);
         csvFileForamtTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        csvFileForamtTxt.setText(preferenceStore.getString(PreferenceConstants.CSV_FILE_FORMAT));
-        csvFileForamtTxt.setMessage(preferenceStore.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT));
+        csvFileForamtTxt.setText(preferenceStore.getString(PreferenceConstants.CSV_FILE_FORMAT_LIB));
+        csvFileForamtTxt.setMessage(preferenceStore.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT_LIB));
         Label csvFileFormatHint = new Label(csvFileFormatGrp, SWT.LEFT);
         GridData csvFileFormatHintGrDt = new GridData(GridData.FILL_HORIZONTAL);
         csvFileFormatHint.setLayoutData(csvFileFormatHintGrDt);
-        csvFileFormatHint.setText("java.text.SimpleDateFormatの書式としてください。\r\n例) 'contrast_'yyyy-MM-dd_HHmmss");
+        csvFileFormatHint.setText("java.text.SimpleDateFormatの書式としてください。\r\n例) 'lib_'yyyy-MM-dd_HHmmss");
 
         Group ctrlGrp = new Group(composite, SWT.NONE);
         GridLayout proxyGrpLt = new GridLayout(4, false);
@@ -154,7 +154,7 @@ public class OtherPreferencePage extends PreferencePage {
         new Label(ctrlGrp, SWT.LEFT).setText("脆弱性取得間隔スリープ（ミリ秒）：");
         traceSleepTxt = new Text(ctrlGrp, SWT.BORDER);
         traceSleepTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        traceSleepTxt.setText(preferenceStore.getString(PreferenceConstants.SLEEP_TRACE));
+        traceSleepTxt.setText(preferenceStore.getString(PreferenceConstants.SLEEP_LIB));
 
         Composite buttonGrp = new Composite(parent, SWT.NONE);
         GridLayout buttonGrpLt = new GridLayout(2, false);
@@ -177,13 +177,13 @@ public class OtherPreferencePage extends PreferencePage {
             }
 
             public void widgetSelected(SelectionEvent e) {
-                outCsvHeaderFlg.setSelection(preferenceStore.getDefaultBoolean(PreferenceConstants.CSV_OUT_HEADER));
-                csvSepTagTxt.setText(preferenceStore.getDefaultString(PreferenceConstants.CSV_SEPARATOR_TAG));
-                csvSepBuildNoTxt.setText(preferenceStore.getDefaultString(PreferenceConstants.CSV_SEPARATOR_BUILDNO));
-                csvSepGroupTxt.setText(preferenceStore.getDefaultString(PreferenceConstants.CSV_SEPARATOR_GROUP));
-                csvSepServerTxt.setText(preferenceStore.getDefaultString(PreferenceConstants.CSV_SEPARATOR_SERVER));
-                csvFileForamtTxt.setText(preferenceStore.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT));
-                traceSleepTxt.setText(preferenceStore.getDefaultString(PreferenceConstants.SLEEP_TRACE));
+                outCsvHeaderFlg.setSelection(preferenceStore.getDefaultBoolean(PreferenceConstants.CSV_OUT_HEADER_LIB));
+                csvSepTagTxt.setText(preferenceStore.getDefaultString(PreferenceConstants.CSV_SEPARATOR_TAG_LIB));
+                csvSepBuildNoTxt.setText(preferenceStore.getDefaultString(PreferenceConstants.CSV_SEPARATOR_BUILDNO_LIB));
+                csvSepGroupTxt.setText(preferenceStore.getDefaultString(PreferenceConstants.CSV_SEPARATOR_GROUP_LIB));
+                csvSepServerTxt.setText(preferenceStore.getDefaultString(PreferenceConstants.CSV_SEPARATOR_SERVER_LIB));
+                csvFileForamtTxt.setText(preferenceStore.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT_LIB));
+                traceSleepTxt.setText(preferenceStore.getDefaultString(PreferenceConstants.SLEEP_LIB));
             }
         });
 
@@ -212,7 +212,7 @@ public class OtherPreferencePage extends PreferencePage {
         if (ps == null) {
             return true;
         }
-        ps.setValue(PreferenceConstants.CSV_OUT_HEADER, this.outCsvHeaderFlg.getSelection());
+        ps.setValue(PreferenceConstants.CSV_OUT_HEADER_LIB, this.outCsvHeaderFlg.getSelection());
         if (this.traceSleepTxt != null) {
             if (this.traceSleepTxt.getText().isEmpty()) {
                 errors.add("・脆弱性取得間隔スリープを指定してください。");
@@ -221,22 +221,22 @@ public class OtherPreferencePage extends PreferencePage {
                     errors.add("・脆弱性取得間隔スリープは数値を指定してください。");
                 }
             }
-            ps.setValue(PreferenceConstants.SLEEP_TRACE, this.traceSleepTxt.getText());
+            ps.setValue(PreferenceConstants.SLEEP_LIB, this.traceSleepTxt.getText());
         }
         if (this.csvSepTagTxt != null) {
-            ps.setValue(PreferenceConstants.CSV_SEPARATOR_TAG, this.csvSepTagTxt.getText());
+            ps.setValue(PreferenceConstants.CSV_SEPARATOR_TAG_LIB, this.csvSepTagTxt.getText());
         }
         if (this.csvSepBuildNoTxt != null) {
-            ps.setValue(PreferenceConstants.CSV_SEPARATOR_BUILDNO, this.csvSepBuildNoTxt.getText());
+            ps.setValue(PreferenceConstants.CSV_SEPARATOR_BUILDNO_LIB, this.csvSepBuildNoTxt.getText());
         }
         if (this.csvSepGroupTxt != null) {
-            ps.setValue(PreferenceConstants.CSV_SEPARATOR_GROUP, this.csvSepGroupTxt.getText());
+            ps.setValue(PreferenceConstants.CSV_SEPARATOR_GROUP_LIB, this.csvSepGroupTxt.getText());
         }
         if (this.csvSepServerTxt != null) {
-            ps.setValue(PreferenceConstants.CSV_SEPARATOR_SERVER, this.csvSepServerTxt.getText());
+            ps.setValue(PreferenceConstants.CSV_SEPARATOR_SERVER_LIB, this.csvSepServerTxt.getText());
         }
         if (this.csvFileForamtTxt != null) {
-            ps.setValue(PreferenceConstants.CSV_FILE_FORMAT, this.csvFileForamtTxt.getText());
+            ps.setValue(PreferenceConstants.CSV_FILE_FORMAT_LIB, this.csvFileForamtTxt.getText());
         }
         if (!errors.isEmpty()) {
             MessageDialog.openError(getShell(), "その他設定", String.join("\r\n", errors));

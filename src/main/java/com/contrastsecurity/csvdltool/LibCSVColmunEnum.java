@@ -26,30 +26,29 @@ package com.contrastsecurity.csvdltool;
 import java.util.ArrayList;
 import java.util.List;
 
-public enum CSVColmunEnum {
-    COL_01("アプリケーション名", true),
-    COL_02("マージしたときの各アプリ名称", true),
-    COL_03("アプリケーションID", false),
-    COL_04("アプリケーションタグ", true),
-    COL_05("カテゴリ", true),
-    COL_06("ルール", true),
-    COL_07("深刻度", true),
-    COL_08("CWE", true),
-    COL_09("ステータス", true),
-    COL_10("言語", true),
-    COL_11("アプリケーションのグループ", true),
-    COL_12("脆弱性のタイトル", true),
-    COL_13("最初の検出", true),
-    COL_14("最後の検出", true),
-    COL_15("ビルド番号", true),
-    COL_16("次のサーバにより報告", true),
-    COL_17("モジュール", true),
-    COL_18("脆弱性タグ", true);
+public enum LibCSVColmunEnum {
+    LIB_01("アプリケーション名", true),
+    LIB_02("マージしたときの各アプリ名称", true),
+    LIB_03("アプリケーションID", false),
+    LIB_04("アプリケーションタグ", true),
+    LIB_05("ライブラリ名", true),
+    LIB_06("言語", true),
+    LIB_07("現在バージョン", true),
+    LIB_08("リリース日", true),
+    LIB_09("最新バージョン", true),
+    LIB_10("スコア", true),
+    LIB_11("SHA1", true),
+    LIB_12("CVE", true),
+    LIB_13("関連アプリケーション", true),
+    LIB_14("関連サーバ", true),
+    LIB_15("使用クラス数", true),
+    LIB_16("全体クラス数", true),
+    LIB_17("ライセンス", true);
 
     private String culumn;
     private boolean isDefault;
 
-    private CSVColmunEnum(String culumn, boolean isDefault) {
+    private LibCSVColmunEnum(String culumn, boolean isDefault) {
         this.culumn = culumn;
         this.isDefault = isDefault;
     }
@@ -58,19 +57,19 @@ public enum CSVColmunEnum {
         return culumn;
     }
 
-    public static CSVColmunEnum[] defaultValues() {
-        List<CSVColmunEnum> list = new ArrayList<CSVColmunEnum>();
-        for (CSVColmunEnum e : CSVColmunEnum.values()) {
+    public static LibCSVColmunEnum[] defaultValues() {
+        List<LibCSVColmunEnum> list = new ArrayList<LibCSVColmunEnum>();
+        for (LibCSVColmunEnum e : LibCSVColmunEnum.values()) {
             if (e.isDefault) {
                 list.add(e);
             }
         }
-        return list.toArray(new CSVColmunEnum[0]);
+        return list.toArray(new LibCSVColmunEnum[0]);
     }
 
     public static String defaultValuesStr() {
         List<String> list = new ArrayList<String>();
-        for (CSVColmunEnum e : CSVColmunEnum.values()) {
+        for (LibCSVColmunEnum e : LibCSVColmunEnum.values()) {
             if (e.isDefault) {
                 list.add(e.name());
             }
@@ -78,8 +77,8 @@ public enum CSVColmunEnum {
         return String.join(",", list);
     }
 
-    public static CSVColmunEnum getByName(String column) {
-        for (CSVColmunEnum value : CSVColmunEnum.values()) {
+    public static LibCSVColmunEnum getByName(String column) {
+        for (LibCSVColmunEnum value : LibCSVColmunEnum.values()) {
             if (value.getCulumn() == column) {
                 return value;
             }

@@ -87,7 +87,7 @@ import com.contrastsecurity.csvdltool.model.Story;
 import com.contrastsecurity.csvdltool.model.Trace;
 import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
 
-public class VulnGetWithProgress implements IRunnableWithProgress {
+public class VulGetWithProgress implements IRunnableWithProgress {
 
     private static final String CSV_ENCODING = "Shift_JIS";
     private static final String FILE_ENCODING = "UTF-8";
@@ -110,7 +110,7 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
 
     Logger logger = Logger.getLogger("csvdltool");
 
-    public VulnGetWithProgress(Shell shell, PreferenceStore preferenceStore, List<String> dstApps, Map<String, AppInfo> fullAppMap, boolean isOnlyParentApp, boolean isIncludeDesc,
+    public VulGetWithProgress(Shell shell, PreferenceStore preferenceStore, List<String> dstApps, Map<String, AppInfo> fullAppMap, boolean isOnlyParentApp, boolean isIncludeDesc,
             boolean isIncludeStackTrace) {
         this.shell = shell;
         this.preferenceStore = preferenceStore;
@@ -125,15 +125,15 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
     @Override
     public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
         monitor.setTaskName("脆弱性情報の取得を開始しています...");
-        String csvFileFormat = preferenceStore.getString(PreferenceConstants.CSV_FILE_FORMAT);
+        String csvFileFormat = preferenceStore.getString(PreferenceConstants.CSV_FILE_FORMAT_VUL);
         if (csvFileFormat == null || csvFileFormat.isEmpty()) {
-            csvFileFormat = preferenceStore.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT);
+            csvFileFormat = preferenceStore.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT_VUL);
         }
         Pattern cwePtn = Pattern.compile("\\/(\\d+)\\.html$");
         Pattern stsPtn = Pattern.compile("^[A-Za-z\\s]+$");
         String timestamp = new SimpleDateFormat(csvFileFormat).format(new Date());
-        int sleepTrace = preferenceStore.getInt(PreferenceConstants.SLEEP_TRACE);
-        String csvColumns = preferenceStore.getString(PreferenceConstants.CSV_COLUMN);
+        int sleepTrace = preferenceStore.getInt(PreferenceConstants.SLEEP_VUL);
+        String csvColumns = preferenceStore.getString(PreferenceConstants.CSV_COLUMN_VUL);
         String csvSepTag = preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_TAG).replace("\\r", "\r").replace("\\n", "\n");
         String csvSepBuildNo = preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_BUILDNO).replace("\\r", "\r").replace("\\n", "\n");
         String csvSepGroup = preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_GROUP).replace("\\r", "\r").replace("\\n", "\n");
@@ -190,33 +190,33 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
                         }
                     }
                     // ==================== 01. アプリケーション名 ====================
-                    if (csvColumns.contains(CSVColmunEnum.COL_01.name())) {
+                    if (csvColumns.contains(VulCSVColmunEnum.VUL_01.name())) {
                         csvLineList.add(appName);
                     }
                     // ==================== 02. マージしたときの、各アプリ名称（可能であれば） ====================
-                    if (csvColumns.contains(CSVColmunEnum.COL_02.name())) {
+                    if (csvColumns.contains(VulCSVColmunEnum.VUL_02.name())) {
                         csvLineList.add(realApp.getName());
                     }
                     // ==================== 03. アプリケーションID ====================
-                    if (csvColumns.contains(CSVColmunEnum.COL_03.name())) {
+                    if (csvColumns.contains(VulCSVColmunEnum.VUL_03.name())) {
                         csvLineList.add(realApp.getApp_id());
                     }
                     // ==================== 04. アプリケーションタグ ====================
-                    if (csvColumns.contains(CSVColmunEnum.COL_04.name())) {
+                    if (csvColumns.contains(VulCSVColmunEnum.VUL_04.name())) {
                         Api applicationTagsApi = new ApplicationTagsApi(preferenceStore, appId);
                         List<String> applicationTags = (List<String>) applicationTagsApi.get();
                         csvLineList.add(String.join(csvSepTag, applicationTags));
                     }
                     // ==================== 05. （脆弱性の）カテゴリ ====================
-                    if (csvColumns.contains(CSVColmunEnum.COL_05.name())) {
+                    if (csvColumns.contains(VulCSVColmunEnum.VUL_05.name())) {
                         csvLineList.add(trace.getCategory_label());
                     }
                     // ==================== 06. （脆弱性の）ルール ====================
-                    if (csvColumns.contains(CSVColmunEnum.COL_06.name())) {
+                    if (csvColumns.contains(VulCSVColmunEnum.VUL_06.name())) {
                         csvLineList.add(trace.getRule_title());
                     }
                     // ==================== 07. 深刻度 ====================
-                    if (csvColumns.contains(CSVColmunEnum.COL_07.name())) {
+                    if (csvColumns.contains(VulCSVColmunEnum.VUL_07.name())) {
                         csvLineList.add(trace.getSeverity_label());
                     }
                     // ==================== 08. CWE ====================
@@ -224,7 +224,7 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
                     HowToFixJson howToFixJson = null;
                     try {
                         howToFixJson = (HowToFixJson) howToFixApi.get();
-                        if (csvColumns.contains(CSVColmunEnum.COL_08.name())) {
+                        if (csvColumns.contains(VulCSVColmunEnum.VUL_08.name())) {
                             String cweUrl = howToFixJson.getCwe();
                             Matcher m = cwePtn.matcher(cweUrl);
                             if (m.find()) {
@@ -247,20 +247,20 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
                         howToFixJson.setRecommendation(recommendation);
                         howToFixJson.setCwe("");
                         howToFixJson.setOwasp("");
-                        if (csvColumns.contains(CSVColmunEnum.COL_08.name())) {
+                        if (csvColumns.contains(VulCSVColmunEnum.VUL_08.name())) {
                             csvLineList.add("");
                         }
                     }
                     // ==================== 09. ステータス ====================
-                    if (csvColumns.contains(CSVColmunEnum.COL_09.name())) {
+                    if (csvColumns.contains(VulCSVColmunEnum.VUL_09.name())) {
                         csvLineList.add(trace.getStatus());
                     }
                     // ==================== 10. 言語（Javaなど） ====================
-                    if (csvColumns.contains(CSVColmunEnum.COL_10.name())) {
+                    if (csvColumns.contains(VulCSVColmunEnum.VUL_10.name())) {
                         csvLineList.add(trace.getLanguage());
                     }
                     // ==================== 11. グループ（アプリケーションのグループ） ====================
-                    if (csvColumns.contains(CSVColmunEnum.COL_11.name())) {
+                    if (csvColumns.contains(VulCSVColmunEnum.VUL_11.name())) {
                         if (appGroupMap.containsKey(appName)) {
                             csvLineList.add(String.join(csvSepGroup, appGroupMap.get(appName)));
                         } else {
@@ -268,34 +268,34 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
                         }
                     }
                     // ==================== 12. 脆弱性のタイトル（例：SQLインジェクション：「/api/v1/approvers/」ページのリクエストボディ ） ====================
-                    if (csvColumns.contains(CSVColmunEnum.COL_12.name())) {
+                    if (csvColumns.contains(VulCSVColmunEnum.VUL_12.name())) {
                         csvLineList.add(trace.getTitle());
                     }
                     // ==================== 13. 最初の検出 ====================
-                    if (csvColumns.contains(CSVColmunEnum.COL_13.name())) {
+                    if (csvColumns.contains(VulCSVColmunEnum.VUL_13.name())) {
                         csvLineList.add(trace.getFirst_time_seen());
                     }
                     // ==================== 14. 最後の検出 ====================
-                    if (csvColumns.contains(CSVColmunEnum.COL_14.name())) {
+                    if (csvColumns.contains(VulCSVColmunEnum.VUL_14.name())) {
                         csvLineList.add(trace.getLast_time_seen());
                     }
                     // ==================== 15. ビルド番号 ====================
-                    if (csvColumns.contains(CSVColmunEnum.COL_15.name())) {
+                    if (csvColumns.contains(VulCSVColmunEnum.VUL_15.name())) {
                         csvLineList.add(String.join(csvSepBuildNo, trace.getApp_version_tags()));
                     }
                     // ==================== 16. 次のサーバにより報告 ====================
-                    if (csvColumns.contains(CSVColmunEnum.COL_16.name())) {
+                    if (csvColumns.contains(VulCSVColmunEnum.VUL_16.name())) {
                         List<String> serverNameList = trace.getServers().stream().map(Server::getName).collect(Collectors.toList());
                         csvLineList.add(String.join(csvSepServer, serverNameList));
                     }
                     // ==================== 17. モジュール ====================
-                    if (csvColumns.contains(CSVColmunEnum.COL_17.name())) {
+                    if (csvColumns.contains(VulCSVColmunEnum.VUL_17.name())) {
                         Application app = trace.getApplication();
                         String module = String.format("%s (%s) - %s", app.getName(), app.getContext_path(), app.getLanguage());
                         csvLineList.add(module);
                     }
                     // ==================== 18. 脆弱性タグ ====================
-                    if (csvColumns.contains(CSVColmunEnum.COL_18.name())) {
+                    if (csvColumns.contains(VulCSVColmunEnum.VUL_18.name())) {
                         Api traceTagsApi = new TraceTagsApi(preferenceStore, trace_id);
                         List<String> traceTags = (List<String>) traceTagsApi.get();
                         csvLineList.add(String.join(csvSepTag, traceTags));
@@ -444,10 +444,10 @@ public class VulnGetWithProgress implements IRunnableWithProgress {
         }
         try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(filePath)), CSV_ENCODING))) {
             CSVPrinter printer = CSVFormat.EXCEL.print(bw);
-            if (preferenceStore.getBoolean(PreferenceConstants.CSV_OUT_HEADER)) {
+            if (preferenceStore.getBoolean(PreferenceConstants.CSV_OUT_HEADER_VUL)) {
                 List<String> csvHeaderList = new ArrayList<String>();
                 for (String csvColumn : csvColumns.split(",")) {
-                    csvHeaderList.add(CSVColmunEnum.valueOf(csvColumn.trim()).getCulumn());
+                    csvHeaderList.add(VulCSVColmunEnum.valueOf(csvColumn.trim()).getCulumn());
                 }
                 if (isIncludeDesc) {
                     csvHeaderList.add("詳細");

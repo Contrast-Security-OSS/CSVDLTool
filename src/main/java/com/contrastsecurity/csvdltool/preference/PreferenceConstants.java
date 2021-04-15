@@ -63,8 +63,8 @@ public class PreferenceConstants {
     public static final String INCLUDE_DESCRIPTION = new String("com.contrastsecurity.csvdltool.include_description");
     public static final String INCLUDE_STACKTRACE = new String("com.contrastsecurity.csvdltool.include_stacktrace");
 
-    public static final String LIB_ONLY_PARENT_APP = new String("com.contrastsecurity.csvdltool.lib_only_parent_app_check");
     public static final String ONLY_HAS_CVE = new String("com.contrastsecurity.csvdltool.only_has_cve");
+    public static final String INCLUDE_CVE_DETAIL = new String("com.contrastsecurity.csvdltool.include_cve_detail");
 
     public static final String OPENED_TAB_IDX = new String("com.contrastsecurity.csvdltool.opened_tab_idx");
     public static final String MEM_WIDTH = new String("com.contrastsecurity.csvdltool.mem_width");

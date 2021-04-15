@@ -27,23 +27,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public enum LibCSVColmunEnum {
-    LIB_01("アプリケーション名", true),
-    LIB_02("マージしたときの各アプリ名称", true),
-    LIB_03("アプリケーションID", false),
-    LIB_04("アプリケーションタグ", true),
-    LIB_05("ライブラリ名", true),
-    LIB_06("言語", true),
-    LIB_07("現在バージョン", true),
-    LIB_08("リリース日", true),
-    LIB_09("最新バージョン", true),
-    LIB_10("スコア", true),
-    LIB_11("SHA1", true),
-    LIB_12("CVE", true),
-    LIB_13("関連アプリケーション", true),
-    LIB_14("関連サーバ", true),
-    LIB_15("使用クラス数", true),
-    LIB_16("全体クラス数", true),
-    LIB_17("ライセンス", true);
+    LIB_01("ライブラリ名", true),
+    LIB_02("言語", true),
+    LIB_03("現在バージョン", true),
+    LIB_04("リリース日", true),
+    LIB_05("最新バージョン", true),
+    LIB_06("リリース日", true),
+    LIB_07("スコア", true),
+    LIB_08("使用クラス数", true),
+    LIB_09("全体クラス数", true),
+    LIB_10("ライセンス", true),
+    LIB_11("関連アプリケーション", true),
+    LIB_12("関連サーバ", true),
+    LIB_13("詳細", true),
+    LIB_14("CVE", true);
 
     private String culumn;
     private boolean isDefault;

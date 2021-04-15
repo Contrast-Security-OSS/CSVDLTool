@@ -106,8 +106,8 @@ public class Main implements PropertyChangeListener {
     private Button includeStackTraceChk;
 
     private Button libExecuteBtn;
-    private Button libOnlyParentAppChk;
     private Button onlyHasCVEChk;
+    private Button includeCVEDetailChk;
 
     private Button settingBtn;
 
@@ -210,7 +210,6 @@ public class Main implements PropertyChangeListener {
                 preferenceStore.setValue(PreferenceConstants.VUL_ONLY_PARENT_APP, vulOnlyParentAppChk.getSelection());
                 preferenceStore.setValue(PreferenceConstants.INCLUDE_DESCRIPTION, includeDescChk.getSelection());
                 preferenceStore.setValue(PreferenceConstants.INCLUDE_STACKTRACE, includeStackTraceChk.getSelection());
-                preferenceStore.setValue(PreferenceConstants.LIB_ONLY_PARENT_APP, libOnlyParentAppChk.getSelection());
                 preferenceStore.setValue(PreferenceConstants.ONLY_HAS_CVE, onlyHasCVEChk.getSelection());
                 try {
                     preferenceStore.save();
@@ -683,7 +682,7 @@ public class Main implements PropertyChangeListener {
                     MessageDialog.openInformation(shell, "ライブラリ情報取得", "取得対象のアプリケーションを選択してください。");
                     return;
                 }
-                LibGetWithProgress progress = new LibGetWithProgress(shell, preferenceStore, dstApps, fullAppMap, libOnlyParentAppChk.getSelection(), onlyHasCVEChk.getSelection());
+                LibGetWithProgress progress = new LibGetWithProgress(shell, preferenceStore, dstApps, fullAppMap, onlyHasCVEChk.getSelection(), includeCVEDetailChk.getSelection());
                 ProgressMonitorDialog progDialog = new ProgressMonitorDialog(shell);
                 try {
                     progDialog.run(true, true, progress);
@@ -713,17 +712,16 @@ public class Main implements PropertyChangeListener {
             }
         });
 
-        libOnlyParentAppChk = new Button(libButtonGrp, SWT.CHECK);
-        libOnlyParentAppChk.setText("マージされたアプリの場合、親アプリのライブラリだけを出力する。");
-        if (preferenceStore.getBoolean(PreferenceConstants.LIB_ONLY_PARENT_APP)) {
-            libOnlyParentAppChk.setSelection(true);
-        }
-
         onlyHasCVEChk = new Button(libButtonGrp, SWT.CHECK);
-        onlyHasCVEChk.setText("CVEを含むライブラリのみ出力します。");
-        onlyHasCVEChk.setToolTipText("ルート、HTTP情報、コメント、何が起こったか？、どんなリスクであるか？、修正方法の５つの項目が添付ファイルで出力されます。");
+        onlyHasCVEChk.setText("CVE（脆弱性）を含むライブラリのみ出力する。");
         if (preferenceStore.getBoolean(PreferenceConstants.ONLY_HAS_CVE)) {
             onlyHasCVEChk.setSelection(true);
+        }
+        includeCVEDetailChk = new Button(libButtonGrp, SWT.CHECK);
+        includeCVEDetailChk.setText("CVEの詳細情報も出力する。（フォルダ出力）");
+        includeCVEDetailChk.setToolTipText("CVEの詳細情報が添付ファイルで出力されます。");
+        if (preferenceStore.getBoolean(PreferenceConstants.INCLUDE_CVE_DETAIL)) {
+            includeCVEDetailChk.setSelection(true);
         }
         libTabItem.setControl(libButtonGrp);
 

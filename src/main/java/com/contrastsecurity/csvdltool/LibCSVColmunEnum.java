@@ -39,8 +39,7 @@ public enum LibCSVColmunEnum {
     LIB_10("ライセンス", true),
     LIB_11("関連アプリケーション", true),
     LIB_12("関連サーバ", true),
-    LIB_13("詳細", true),
-    LIB_14("CVE", true);
+    LIB_13("CVE", true);
 
     private String culumn;
     private boolean isDefault;

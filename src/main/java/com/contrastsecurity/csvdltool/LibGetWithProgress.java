@@ -43,6 +43,7 @@ import java.util.StringJoiner;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -179,15 +180,15 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                         csvLineList.add(library.getGrade());
                     }
                     // ==================== 08. 使用クラス数 ====================
-                    if (csvColumns.contains(LibCSVColmunEnum.LIB_12.name())) {
+                    if (csvColumns.contains(LibCSVColmunEnum.LIB_08.name())) {
                         csvLineList.add(String.valueOf(library.getClasses_used()));
                     }
                     // ==================== 09. 全体クラス数 ====================
-                    if (csvColumns.contains(LibCSVColmunEnum.LIB_13.name())) {
+                    if (csvColumns.contains(LibCSVColmunEnum.LIB_09.name())) {
                         csvLineList.add(String.valueOf(library.getClass_count()));
                     }
                     // ==================== 10. ライセンス ====================
-                    if (csvColumns.contains(LibCSVColmunEnum.LIB_14.name())) {
+                    if (csvColumns.contains(LibCSVColmunEnum.LIB_10.name())) {
                         StringJoiner sj = new StringJoiner(",");
                         for (String license : library.getLicenses()) {
                             sj.add(license);
@@ -195,24 +196,30 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                         csvLineList.add(sj.toString());
                     }
                     // ==================== 11. 関連アプリケーション ====================
-                    if (csvColumns.contains(LibCSVColmunEnum.LIB_10.name())) {
-                        csvLineList.add(library.getHash());
-                    }
-                    // ==================== 12. 関連サーバ ====================
                     if (csvColumns.contains(LibCSVColmunEnum.LIB_11.name())) {
                         csvLineList.add(library.getHash());
                     }
-                    // ==================== 13. SHA1 ====================
-                    if (csvColumns.contains(LibCSVColmunEnum.LIB_08.name())) {
+                    // ==================== 12. 関連サーバ ====================
+                    if (csvColumns.contains(LibCSVColmunEnum.LIB_12.name())) {
                         csvLineList.add(library.getHash());
                     }
-                    // ==================== 14. CVE ====================
-                    if (csvColumns.contains(LibCSVColmunEnum.LIB_09.name())) {
+                    // ==================== 13. CVE ====================
+                    if (csvColumns.contains(LibCSVColmunEnum.LIB_13.name())) {
                         StringJoiner sj = new StringJoiner(",");
                         for (Vuln vuln : library.getVulns()) {
                             sj.add(vuln.getName());
                         }
                         csvLineList.add(sj.toString());
+                    }
+                    if (isIncludeCVEDetail) {
+                        // ==================== 14. 詳細 ====================
+                        csvLineList.add(library.getHash());
+                        csvLineList.add(String.format("=HYPERLINK(\".\\%s.txt\",\"%s\")", library.getHash(), library.getHash()));
+                        String textFileName = String.format("%s\\%s.txt", timestamp, library.getHash());
+                        File file = new File(textFileName);
+
+                        // ==================== 14-1. CVE ====================
+                        FileUtils.writeLines(file, FILE_ENCODING, Arrays.asList(HTTP_INFO, library.getHash()), true);
                     }
 
                     csvList.add(csvLineList);
@@ -237,6 +244,9 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                 List<String> csvHeaderList = new ArrayList<String>();
                 for (String csvColumn : csvColumns.split(",")) {
                     csvHeaderList.add(LibCSVColmunEnum.valueOf(csvColumn.trim()).getCulumn());
+                }
+                if (isIncludeCVEDetail) {
+                    csvHeaderList.add("詳細");
                 }
                 printer.printRecord(csvHeaderList);
             }

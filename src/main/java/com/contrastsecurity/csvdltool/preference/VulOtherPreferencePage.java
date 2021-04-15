@@ -90,22 +90,22 @@ public class VulOtherPreferencePage extends PreferencePage {
         csvSepGrp.setLayoutData(csvSepGrpGrDt);
         csvSepGrp.setText("区切り文字");
 
-        new Label(csvSepGrp, SWT.LEFT).setText("タグ：");
+        new Label(csvSepGrp, SWT.LEFT).setText("タグ（アプリ、脆弱性）：");
         csvSepTagTxt = new Text(csvSepGrp, SWT.BORDER);
         csvSepTagTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         csvSepTagTxt.setText(preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_TAG));
+
+        new Label(csvSepGrp, SWT.LEFT).setText("アプリケーションのグループ：");
+        csvSepGroupTxt = new Text(csvSepGrp, SWT.BORDER);
+        csvSepGroupTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        csvSepGroupTxt.setText(preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_GROUP));
 
         new Label(csvSepGrp, SWT.LEFT).setText("ビルド番号：");
         csvSepBuildNoTxt = new Text(csvSepGrp, SWT.BORDER);
         csvSepBuildNoTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         csvSepBuildNoTxt.setText(preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_BUILDNO));
 
-        new Label(csvSepGrp, SWT.LEFT).setText("アプリケーショングループ：");
-        csvSepGroupTxt = new Text(csvSepGrp, SWT.BORDER);
-        csvSepGroupTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        csvSepGroupTxt.setText(preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_GROUP));
-
-        new Label(csvSepGrp, SWT.LEFT).setText("サーバ：");
+        new Label(csvSepGrp, SWT.LEFT).setText("次のサーバにより報告：");
         csvSepServerTxt = new Text(csvSepGrp, SWT.BORDER);
         csvSepServerTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         csvSepServerTxt.setText(preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_SERVER));

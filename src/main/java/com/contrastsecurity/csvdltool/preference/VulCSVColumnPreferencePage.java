@@ -52,6 +52,7 @@ import com.contrastsecurity.csvdltool.VulCSVColmunEnum;
 
 public class VulCSVColumnPreferencePage extends PreferencePage {
 
+    private Button outCsvHeaderFlg;
     private List<String> colmunList = new ArrayList<String>();
     private CheckboxTableViewer viewer;
 
@@ -127,11 +128,11 @@ public class VulCSVColumnPreferencePage extends PreferencePage {
         column.setResizable(layoutData.resizable);
         column.setText("項目名");
 
-        Composite buttonGrp = new Composite(csvColumnGrp, SWT.NONE);
-        buttonGrp.setLayoutData(new GridData(GridData.FILL_VERTICAL));
-        buttonGrp.setLayout(new GridLayout(1, true));
+        Composite chkButtonGrp = new Composite(csvColumnGrp, SWT.NONE);
+        chkButtonGrp.setLayoutData(new GridData(GridData.FILL_VERTICAL));
+        chkButtonGrp.setLayout(new GridLayout(1, true));
 
-        final Button allOnBtn = new Button(buttonGrp, SWT.NULL);
+        final Button allOnBtn = new Button(chkButtonGrp, SWT.NULL);
         allOnBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         allOnBtn.setText("すべてオン");
         allOnBtn.addSelectionListener(new SelectionAdapter() {
@@ -141,7 +142,7 @@ public class VulCSVColumnPreferencePage extends PreferencePage {
             }
         });
 
-        final Button allOffBtn = new Button(buttonGrp, SWT.NULL);
+        final Button allOffBtn = new Button(chkButtonGrp, SWT.NULL);
         allOffBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         allOffBtn.setText("すべてオフ");
         allOffBtn.addSelectionListener(new SelectionAdapter() {
@@ -151,12 +152,37 @@ public class VulCSVColumnPreferencePage extends PreferencePage {
             }
         });
 
-        final Button defaultBtn = new Button(buttonGrp, SWT.NULL);
-        defaultBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        outCsvHeaderFlg = new Button(csvColumnGrp, SWT.CHECK);
+        GridData outCsvHeaderFlgGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        outCsvHeaderFlgGrDt.horizontalSpan = 2;
+        outCsvHeaderFlg.setLayoutData(outCsvHeaderFlgGrDt);
+        outCsvHeaderFlg.setText("カラムヘッダを出力");
+        if (preferenceStore.getBoolean(PreferenceConstants.CSV_OUT_HEADER_VUL)) {
+            outCsvHeaderFlg.setSelection(true);
+        }
+
+        Composite buttonGrp = new Composite(parent, SWT.NONE);
+        GridLayout buttonGrpLt = new GridLayout(2, false);
+        buttonGrpLt.marginHeight = 15;
+        buttonGrpLt.marginWidth = 5;
+        buttonGrpLt.horizontalSpacing = 7;
+        buttonGrpLt.verticalSpacing = 20;
+        buttonGrp.setLayout(buttonGrpLt);
+        GridData buttonGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        buttonGrpGrDt.horizontalAlignment = SWT.END;
+        buttonGrp.setLayoutData(buttonGrpGrDt);
+
+        Button defaultBtn = new Button(buttonGrp, SWT.NULL);
+        GridData defaultBtnGrDt = new GridData(SWT.RIGHT, SWT.BOTTOM, true, true, 1, 1);
+        defaultBtnGrDt.widthHint = 90;
+        defaultBtn.setLayoutData(defaultBtnGrDt);
         defaultBtn.setText("デフォルトに戻す");
-        defaultBtn.addSelectionListener(new SelectionAdapter() {
-            @Override
+        defaultBtn.addSelectionListener(new SelectionListener() {
+            public void widgetDefaultSelected(SelectionEvent e) {
+            }
+
             public void widgetSelected(SelectionEvent e) {
+                outCsvHeaderFlg.setSelection(preferenceStore.getDefaultBoolean(PreferenceConstants.CSV_OUT_HEADER_VUL));
                 String defaultColumns = preferenceStore.getDefaultString(PreferenceConstants.CSV_COLUMN_VUL);
                 List<String> validColumnList = new ArrayList<String>();
                 if (defaultColumns.trim().length() > 0) {
@@ -169,10 +195,9 @@ public class VulCSVColumnPreferencePage extends PreferencePage {
             }
         });
 
-        Button applyBtn = new Button(composite, SWT.NULL);
+        Button applyBtn = new Button(buttonGrp, SWT.NULL);
         GridData applyBtnGrDt = new GridData(SWT.RIGHT, SWT.BOTTOM, true, true, 1, 1);
         applyBtnGrDt.widthHint = 90;
-        applyBtnGrDt.horizontalSpan = 3;
         applyBtn.setLayoutData(applyBtnGrDt);
         applyBtn.setText("適用");
         applyBtn.addSelectionListener(new SelectionListener() {

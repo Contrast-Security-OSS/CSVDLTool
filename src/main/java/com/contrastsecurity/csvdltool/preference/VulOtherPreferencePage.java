@@ -44,7 +44,6 @@ import org.eclipse.swt.widgets.Text;
 
 public class VulOtherPreferencePage extends PreferencePage {
 
-    private Button outCsvHeaderFlg;
     private Text sleepTxt;
     private Text csvSepTagTxt;
     private Text csvSepBuildNoTxt;
@@ -79,15 +78,6 @@ public class VulOtherPreferencePage extends PreferencePage {
         // csvGrpGrDt.horizontalSpan = 2;
         csvGrp.setLayoutData(csvGrpGrDt);
         csvGrp.setText("CSV出力");
-
-        outCsvHeaderFlg = new Button(csvGrp, SWT.CHECK);
-        GridData outCsvHeaderFlgGrDt = new GridData(GridData.FILL_HORIZONTAL);
-        outCsvHeaderFlgGrDt.horizontalSpan = 2;
-        outCsvHeaderFlg.setLayoutData(outCsvHeaderFlgGrDt);
-        outCsvHeaderFlg.setText("カラムヘッダを出力");
-        if (preferenceStore.getBoolean(PreferenceConstants.CSV_OUT_HEADER_VUL)) {
-            outCsvHeaderFlg.setSelection(true);
-        }
 
         Group csvSepGrp = new Group(csvGrp, SWT.NONE);
         GridLayout csvSepGrpLt = new GridLayout(2, false);
@@ -177,7 +167,6 @@ public class VulOtherPreferencePage extends PreferencePage {
             }
 
             public void widgetSelected(SelectionEvent e) {
-                outCsvHeaderFlg.setSelection(preferenceStore.getDefaultBoolean(PreferenceConstants.CSV_OUT_HEADER_VUL));
                 csvSepTagTxt.setText(preferenceStore.getDefaultString(PreferenceConstants.CSV_SEPARATOR_TAG));
                 csvSepBuildNoTxt.setText(preferenceStore.getDefaultString(PreferenceConstants.CSV_SEPARATOR_BUILDNO));
                 csvSepGroupTxt.setText(preferenceStore.getDefaultString(PreferenceConstants.CSV_SEPARATOR_GROUP));
@@ -212,7 +201,6 @@ public class VulOtherPreferencePage extends PreferencePage {
         if (ps == null) {
             return true;
         }
-        ps.setValue(PreferenceConstants.CSV_OUT_HEADER_VUL, this.outCsvHeaderFlg.getSelection());
         if (this.sleepTxt != null) {
             if (this.sleepTxt.getText().isEmpty()) {
                 errors.add("・脆弱性取得間隔スリープを指定してください。");

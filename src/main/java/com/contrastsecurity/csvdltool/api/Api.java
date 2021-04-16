@@ -126,18 +126,18 @@ public abstract class Api {
                                     }
                                 }).build()).build();
                     } else {
-                        httpClient = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).setDefaultHeaders(headers)
-                                .setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE).setSSLContext(new SSLContextBuilder().loadTrustMaterial(null, new TrustStrategy() {
-                                    public boolean isTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
-                                        return true;
-                                    }
-                                }).build()).build();
+                        httpClient = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).setDefaultHeaders(headers).build();
                     }
                 }
             } else {
                 httpGet.setConfig(RequestConfig.custom().setSocketTimeout(3000).setConnectTimeout(3000).build());
                 if (preferenceStore.getBoolean(PreferenceConstants.IGNORE_SSLCERT_CHECK)) {
-                    httpClient = HttpClients.custom().setDefaultHeaders(headers).build();
+                    httpClient = HttpClients.custom().setDefaultHeaders(headers).setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
+                            .setSSLContext(new SSLContextBuilder().loadTrustMaterial(null, new TrustStrategy() {
+                                public boolean isTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
+                                    return true;
+                                }
+                            }).build()).build();
                 } else {
                     httpClient = HttpClients.custom().setDefaultHeaders(headers).build();
                 }

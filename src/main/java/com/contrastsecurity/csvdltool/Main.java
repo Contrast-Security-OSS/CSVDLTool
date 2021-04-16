@@ -144,6 +144,9 @@ public class Main implements PropertyChangeListener {
             e.printStackTrace();
         }
         try {
+            this.preferenceStore.setDefault(PreferenceConstants.CONNECTION_TIMEOUT, 3000);
+            this.preferenceStore.setDefault(PreferenceConstants.SOCKET_TIMEOUT, 3000);
+
             this.preferenceStore.setDefault(PreferenceConstants.CSV_COLUMN_VUL, VulCSVColmunEnum.defaultValuesStr());
             this.preferenceStore.setDefault(PreferenceConstants.SLEEP_VUL, 300);
             this.preferenceStore.setDefault(PreferenceConstants.CSV_OUT_HEADER_VUL, true);

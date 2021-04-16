@@ -38,8 +38,10 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 
 public class ConnectionPreferencePage extends PreferencePage {
@@ -50,6 +52,8 @@ public class ConnectionPreferencePage extends PreferencePage {
     private Text userTxt;
     private Text passTxt;
     private Button ignoreSSLCertCheckFlg;
+    private Text connectionTimeoutTxt;
+    private Text socketTimeoutTxt;
 
     public ConnectionPreferencePage() {
         super("接続設定");
@@ -149,7 +153,63 @@ public class ConnectionPreferencePage extends PreferencePage {
             ignoreSSLCertCheckFlg.setSelection(true);
         }
 
-        Button applyBtn = new Button(composite, SWT.NULL);
+        Group timeoutGrp = new Group(composite, SWT.NONE);
+        GridLayout timeoutGrpLt = new GridLayout(2, false);
+        timeoutGrpLt.marginWidth = 15;
+        timeoutGrpLt.horizontalSpacing = 10;
+        timeoutGrp.setLayout(timeoutGrpLt);
+        GridData timeoutGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        timeoutGrp.setLayoutData(timeoutGrpGrDt);
+        timeoutGrp.setText("タイムアウト（ミリ秒）");
+
+        // ========== ConnetionTimeout ========== //
+        new Label(timeoutGrp, SWT.LEFT).setText("ConnetionTimeout：");
+        connectionTimeoutTxt = new Text(timeoutGrp, SWT.BORDER);
+        connectionTimeoutTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        connectionTimeoutTxt.setText(preferenceStore.getString(PreferenceConstants.CONNECTION_TIMEOUT));
+        connectionTimeoutTxt.addListener(SWT.FocusIn, new Listener() {
+            public void handleEvent(Event e) {
+                connectionTimeoutTxt.selectAll();
+            }
+        });
+        // ========== SocketTimeout ========== //
+        new Label(timeoutGrp, SWT.LEFT).setText("SocketTimeout：");
+        socketTimeoutTxt = new Text(timeoutGrp, SWT.BORDER);
+        socketTimeoutTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        socketTimeoutTxt.setText(preferenceStore.getString(PreferenceConstants.SOCKET_TIMEOUT));
+        socketTimeoutTxt.addListener(SWT.FocusIn, new Listener() {
+            public void handleEvent(Event e) {
+                socketTimeoutTxt.selectAll();
+            }
+        });
+
+        Composite buttonGrp = new Composite(parent, SWT.NONE);
+        GridLayout buttonGrpLt = new GridLayout(2, false);
+        buttonGrpLt.marginHeight = 15;
+        buttonGrpLt.marginWidth = 5;
+        buttonGrpLt.horizontalSpacing = 7;
+        buttonGrpLt.verticalSpacing = 20;
+        buttonGrp.setLayout(buttonGrpLt);
+        GridData buttonGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        buttonGrpGrDt.horizontalAlignment = SWT.END;
+        buttonGrp.setLayoutData(buttonGrpGrDt);
+
+        Button defaultBtn = new Button(buttonGrp, SWT.NULL);
+        GridData defaultBtnGrDt = new GridData(SWT.RIGHT, SWT.BOTTOM, true, true, 1, 1);
+        defaultBtnGrDt.widthHint = 90;
+        defaultBtn.setLayoutData(defaultBtnGrDt);
+        defaultBtn.setText("デフォルトに戻す");
+        defaultBtn.addSelectionListener(new SelectionListener() {
+            public void widgetDefaultSelected(SelectionEvent e) {
+            }
+
+            public void widgetSelected(SelectionEvent e) {
+                connectionTimeoutTxt.setText(preferenceStore.getDefaultString(PreferenceConstants.CONNECTION_TIMEOUT));
+                socketTimeoutTxt.setText(preferenceStore.getDefaultString(PreferenceConstants.SOCKET_TIMEOUT));
+            }
+        });
+
+        Button applyBtn = new Button(buttonGrp, SWT.NULL);
         GridData applyBtnGrDt = new GridData(SWT.RIGHT, SWT.BOTTOM, true, true, 1, 1);
         applyBtnGrDt.widthHint = 90;
         applyBtn.setLayoutData(applyBtnGrDt);
@@ -202,6 +262,26 @@ public class ConnectionPreferencePage extends PreferencePage {
             ps.setValue(PreferenceConstants.PROXY_PASS, this.passTxt.getText());
         }
         ps.setValue(PreferenceConstants.IGNORE_SSLCERT_CHECK, this.ignoreSSLCertCheckFlg.getSelection());
+        if (this.connectionTimeoutTxt != null) {
+            if (this.connectionTimeoutTxt.getText().isEmpty()) {
+                errors.add("・ConnetionTimeoutを指定してください。");
+            } else {
+                if (!StringUtils.isNumeric(this.connectionTimeoutTxt.getText())) {
+                    errors.add("・ConnetionTimeoutは数値を指定してください。");
+                }
+            }
+            ps.setValue(PreferenceConstants.CONNECTION_TIMEOUT, this.connectionTimeoutTxt.getText());
+        }
+        if (this.socketTimeoutTxt != null) {
+            if (this.socketTimeoutTxt.getText().isEmpty()) {
+                errors.add("・SocketTimeoutを指定してください。");
+            } else {
+                if (!StringUtils.isNumeric(this.socketTimeoutTxt.getText())) {
+                    errors.add("・SocketTimeoutは数値を指定してください。");
+                }
+            }
+            ps.setValue(PreferenceConstants.SOCKET_TIMEOUT, this.socketTimeoutTxt.getText());
+        }
         if (!errors.isEmpty()) {
             MessageDialog.openError(getShell(), "接続設定", String.join("\r\n", errors));
             return false;

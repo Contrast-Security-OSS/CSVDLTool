@@ -98,10 +98,12 @@ public abstract class Api {
         List<Header> headers = this.getHeaders();
         CloseableHttpClient httpClient = null;
         try {
+            int connectTimeout = Integer.parseInt(this.preferenceStore.getString(PreferenceConstants.CONNECTION_TIMEOUT));
+            int sockettTimeout = Integer.parseInt(this.preferenceStore.getString(PreferenceConstants.SOCKET_TIMEOUT));
             if (this.preferenceStore.getBoolean(PreferenceConstants.PROXY_YUKO)) {
                 HttpHost proxy = new HttpHost(this.preferenceStore.getString(PreferenceConstants.PROXY_HOST),
                         Integer.parseInt(this.preferenceStore.getString(PreferenceConstants.PROXY_PORT)));
-                httpGet.setConfig(RequestConfig.custom().setSocketTimeout(3000).setConnectTimeout(3000).setProxy(proxy).build());
+                httpGet.setConfig(RequestConfig.custom().setSocketTimeout(sockettTimeout).setConnectTimeout(connectTimeout).setProxy(proxy).build());
                 String proxy_user = this.preferenceStore.getString(PreferenceConstants.PROXY_USER);
                 String proxy_pass = this.preferenceStore.getString(PreferenceConstants.PROXY_PASS);
                 if (proxy_user.isEmpty() || proxy_pass.isEmpty()) {
@@ -130,7 +132,7 @@ public abstract class Api {
                     }
                 }
             } else {
-                httpGet.setConfig(RequestConfig.custom().setSocketTimeout(3000).setConnectTimeout(3000).build());
+                httpGet.setConfig(RequestConfig.custom().setSocketTimeout(sockettTimeout).setConnectTimeout(connectTimeout).build());
                 if (preferenceStore.getBoolean(PreferenceConstants.IGNORE_SSLCERT_CHECK)) {
                     httpClient = HttpClients.custom().setDefaultHeaders(headers).setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
                             .setSSLContext(new SSLContextBuilder().loadTrustMaterial(null, new TrustStrategy() {

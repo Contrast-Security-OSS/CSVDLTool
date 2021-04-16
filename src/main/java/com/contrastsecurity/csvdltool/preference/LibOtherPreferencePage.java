@@ -45,6 +45,7 @@ import org.eclipse.swt.widgets.Text;
 public class LibOtherPreferencePage extends PreferencePage {
 
     private Text sleepTxt;
+    private Text csvSepLicenseTxt;
     private Text csvSepRelatedApplicationTxt;
     private Text csvSepRelatedServerTxt;
     private Text csvSepCVETxt;
@@ -89,6 +90,11 @@ public class LibOtherPreferencePage extends PreferencePage {
         csvSepGrp.setLayoutData(csvSepGrpGrDt);
         csvSepGrp.setText("区切り文字");
 
+        new Label(csvSepGrp, SWT.LEFT).setText("ライセンス：");
+        csvSepLicenseTxt = new Text(csvSepGrp, SWT.BORDER);
+        csvSepLicenseTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        csvSepLicenseTxt.setText(preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_LICENSE));
+
         new Label(csvSepGrp, SWT.LEFT).setText("関連アプリケーション：");
         csvSepRelatedApplicationTxt = new Text(csvSepGrp, SWT.BORDER);
         csvSepRelatedApplicationTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -103,6 +109,12 @@ public class LibOtherPreferencePage extends PreferencePage {
         csvSepCVETxt = new Text(csvSepGrp, SWT.BORDER);
         csvSepCVETxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         csvSepCVETxt.setText(preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_CVE));
+
+        Label descLabel = new Label(csvSepGrp, SWT.RIGHT);
+        descLabel.setText("※ 改行させたい場合は\\r\\nを指定してください。");
+        GridData descLabelGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        descLabelGrDt.horizontalSpan = 2;
+        descLabel.setLayoutData(descLabelGrDt);
 
         Group csvFileFormatGrp = new Group(csvGrp, SWT.NONE);
         GridLayout csvFileFormatGrpLt = new GridLayout(1, false);
@@ -122,7 +134,7 @@ public class LibOtherPreferencePage extends PreferencePage {
         Label csvFileFormatHint = new Label(csvFileFormatGrp, SWT.LEFT);
         GridData csvFileFormatHintGrDt = new GridData(GridData.FILL_HORIZONTAL);
         csvFileFormatHint.setLayoutData(csvFileFormatHintGrDt);
-        csvFileFormatHint.setText("java.text.SimpleDateFormatの書式としてください。\r\n例) 'lib_'yyyy-MM-dd_HHmmss");
+        csvFileFormatHint.setText("※ java.text.SimpleDateFormatの書式としてください。\r\n例) 'lib_'yyyy-MM-dd_HHmmss");
 
         Group ctrlGrp = new Group(composite, SWT.NONE);
         GridLayout proxyGrpLt = new GridLayout(4, false);
@@ -161,6 +173,7 @@ public class LibOtherPreferencePage extends PreferencePage {
             }
 
             public void widgetSelected(SelectionEvent e) {
+                csvSepLicenseTxt.setText(preferenceStore.getDefaultString(PreferenceConstants.CSV_SEPARATOR_LICENSE));
                 csvSepRelatedApplicationTxt.setText(preferenceStore.getDefaultString(PreferenceConstants.CSV_SEPARATOR_RELATED_APPLICATION));
                 csvSepRelatedServerTxt.setText(preferenceStore.getDefaultString(PreferenceConstants.CSV_SEPARATOR_RELATED_SERVER));
                 csvSepCVETxt.setText(preferenceStore.getDefaultString(PreferenceConstants.CSV_SEPARATOR_CVE));
@@ -203,6 +216,9 @@ public class LibOtherPreferencePage extends PreferencePage {
                 }
             }
             ps.setValue(PreferenceConstants.SLEEP_LIB, this.sleepTxt.getText());
+        }
+        if (this.csvSepLicenseTxt != null) {
+            ps.setValue(PreferenceConstants.CSV_SEPARATOR_LICENSE, this.csvSepLicenseTxt.getText());
         }
         if (this.csvSepRelatedApplicationTxt != null) {
             ps.setValue(PreferenceConstants.CSV_SEPARATOR_RELATED_APPLICATION, this.csvSepRelatedApplicationTxt.getText());

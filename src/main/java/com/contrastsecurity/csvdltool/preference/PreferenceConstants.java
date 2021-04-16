@@ -54,6 +54,7 @@ public class PreferenceConstants {
 
     public static final String CSV_OUT_HEADER_LIB = new String("com.contrastsecurity.csvdltool.csv_out_header_lib");
     public static final String CSV_COLUMN_LIB = new String("com.contrastsecurity.csvdltool.csv_out_column_lib");
+    public static final String CSV_SEPARATOR_LICENSE = new String("com.contrastsecurity.csvdltool.csv_separator_license");
     public static final String CSV_SEPARATOR_RELATED_APPLICATION = new String("com.contrastsecurity.csvdltool.csv_separator_related_application");
     public static final String CSV_SEPARATOR_RELATED_SERVER = new String("com.contrastsecurity.csvdltool.csv_separator_related_server");
     public static final String CSV_SEPARATOR_CVE = new String("com.contrastsecurity.csvdltool.csv_separator_cve");

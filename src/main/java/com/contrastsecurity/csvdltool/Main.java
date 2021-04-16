@@ -159,6 +159,7 @@ public class Main implements PropertyChangeListener {
             this.preferenceStore.setDefault(PreferenceConstants.CSV_COLUMN_LIB, LibCSVColmunEnum.defaultValuesStr());
             this.preferenceStore.setDefault(PreferenceConstants.SLEEP_LIB, 300);
             this.preferenceStore.setDefault(PreferenceConstants.CSV_OUT_HEADER_LIB, true);
+            this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_LICENSE, ",");
             this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_RELATED_APPLICATION, ",");
             this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_RELATED_SERVER, ",");
             this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_CVE, ",");

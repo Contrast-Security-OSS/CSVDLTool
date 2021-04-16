@@ -43,6 +43,8 @@ public class Library {
     private int total_vulnerabilities;
     private List<Vuln> vulns;
     private List<String> licenses;
+    private List<Application> apps;
+    private List<Server> servers;
 
     public String getHash() {
         return hash;
@@ -150,6 +152,22 @@ public class Library {
 
     public void setLicenses(List<String> licenses) {
         this.licenses = licenses;
+    }
+
+    public List<Application> getApps() {
+        return apps;
+    }
+
+    public void setApps(List<Application> apps) {
+        this.apps = apps;
+    }
+
+    public List<Server> getServers() {
+        return servers;
+    }
+
+    public void setServers(List<Server> servers) {
+        this.servers = servers;
     }
 
 }

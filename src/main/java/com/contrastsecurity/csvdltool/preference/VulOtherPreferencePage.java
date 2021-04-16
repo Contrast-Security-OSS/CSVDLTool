@@ -110,6 +110,12 @@ public class VulOtherPreferencePage extends PreferencePage {
         csvSepServerTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         csvSepServerTxt.setText(preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_SERVER));
 
+        Label descLabel = new Label(csvSepGrp, SWT.RIGHT);
+        descLabel.setText("※ 改行させたい場合は\\r\\nを指定してください。");
+        GridData descLabelGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        descLabelGrDt.horizontalSpan = 2;
+        descLabel.setLayoutData(descLabelGrDt);
+
         Group csvFileFormatGrp = new Group(csvGrp, SWT.NONE);
         GridLayout csvFileFormatGrpLt = new GridLayout(1, false);
         csvFileFormatGrpLt.marginWidth = 10;
@@ -128,7 +134,7 @@ public class VulOtherPreferencePage extends PreferencePage {
         Label csvFileFormatHint = new Label(csvFileFormatGrp, SWT.LEFT);
         GridData csvFileFormatHintGrDt = new GridData(GridData.FILL_HORIZONTAL);
         csvFileFormatHint.setLayoutData(csvFileFormatHintGrDt);
-        csvFileFormatHint.setText("java.text.SimpleDateFormatの書式としてください。\r\n例) 'vul_'yyyy-MM-dd_HHmmss");
+        csvFileFormatHint.setText("※ java.text.SimpleDateFormatの書式としてください。\r\n例) 'vul_'yyyy-MM-dd_HHmmss");
 
         Group ctrlGrp = new Group(composite, SWT.NONE);
         GridLayout proxyGrpLt = new GridLayout(4, false);

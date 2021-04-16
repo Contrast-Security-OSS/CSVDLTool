@@ -53,9 +53,11 @@ import org.eclipse.swt.widgets.Shell;
 import com.contrastsecurity.csvdltool.api.Api;
 import com.contrastsecurity.csvdltool.api.GroupsApi;
 import com.contrastsecurity.csvdltool.api.LibrariesApi;
+import com.contrastsecurity.csvdltool.model.Application;
 import com.contrastsecurity.csvdltool.model.ApplicationInCustomGroup;
 import com.contrastsecurity.csvdltool.model.CustomGroup;
 import com.contrastsecurity.csvdltool.model.Library;
+import com.contrastsecurity.csvdltool.model.Server;
 import com.contrastsecurity.csvdltool.model.Vuln;
 import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
 
@@ -105,6 +107,7 @@ public class LibGetWithProgress implements IRunnableWithProgress {
         String timestamp = new SimpleDateFormat(csvFileFormat).format(new Date());
         int sleepTrace = preferenceStore.getInt(PreferenceConstants.SLEEP_LIB);
         String csvColumns = preferenceStore.getString(PreferenceConstants.CSV_COLUMN_LIB);
+        String csvSepLicense = preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_LICENSE).replace("\\r", "\r").replace("\\n", "\n");
         String csvSepApplication = preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_RELATED_APPLICATION).replace("\\r", "\r").replace("\\n", "\n");
         String csvSepServer = preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_RELATED_SERVER).replace("\\r", "\r").replace("\\n", "\n");
         String csvSepCVE = preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_CVE).replace("\\r", "\r").replace("\\n", "\n");
@@ -188,7 +191,7 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                     }
                     // ==================== 10. ライセンス ====================
                     if (csvColumns.contains(LibCSVColmunEnum.LIB_10.name())) {
-                        StringJoiner sj = new StringJoiner(",");
+                        StringJoiner sj = new StringJoiner(csvSepLicense);
                         for (String license : library.getLicenses()) {
                             sj.add(license);
                         }
@@ -196,11 +199,19 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                     }
                     // ==================== 11. 関連アプリケーション ====================
                     if (csvColumns.contains(LibCSVColmunEnum.LIB_11.name())) {
-                        csvLineList.add(library.getHash());
+                        StringJoiner sj = new StringJoiner(csvSepApplication);
+                        for (Application app : library.getApps()) {
+                            sj.add(app.getName());
+                        }
+                        csvLineList.add(sj.toString());
                     }
                     // ==================== 12. 関連サーバ ====================
                     if (csvColumns.contains(LibCSVColmunEnum.LIB_12.name())) {
-                        csvLineList.add(library.getHash());
+                        StringJoiner sj = new StringJoiner(csvSepServer);
+                        for (Server server : library.getServers()) {
+                            sj.add(server.getName());
+                        }
+                        csvLineList.add(sj.toString());
                     }
                     // ==================== 13. CVE ====================
                     if (csvColumns.contains(LibCSVColmunEnum.LIB_13.name())) {

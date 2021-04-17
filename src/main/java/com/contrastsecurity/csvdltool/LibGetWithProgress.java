@@ -66,13 +66,6 @@ public class LibGetWithProgress implements IRunnableWithProgress {
     private static final String CSV_ENCODING = "Shift_JIS";
     private static final String FILE_ENCODING = "UTF-8";
 
-    private static final String ROUTE = "==================== ルート ====================";
-    private static final String HTTP_INFO = "==================== HTTP情報 ====================";
-    private static final String WHAT_HAPPEN = "==================== 何が起こったか？ ====================";
-    private static final String RISK = "==================== どんなリスクであるか？ ====================";
-    private static final String HOWTOFIX = "==================== 修正方法 ====================";
-    private static final String COMMENT = "==================== コメント ====================";
-
     private Shell shell;
     private PreferenceStore preferenceStore;
     private List<String> dstApps;
@@ -223,13 +216,30 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                     }
                     if (isIncludeCVEDetail) {
                         // ==================== 14. 詳細 ====================
-                        csvLineList.add(library.getHash());
                         csvLineList.add(String.format("=HYPERLINK(\".\\%s.txt\",\"%s\")", library.getHash(), library.getHash()));
                         String textFileName = String.format("%s\\%s.txt", timestamp, library.getHash());
                         File file = new File(textFileName);
-
-                        // ==================== 14-1. CVE ====================
-                        FileUtils.writeLines(file, FILE_ENCODING, Arrays.asList(HTTP_INFO, library.getHash()), true);
+                        for (Vuln vuln : library.getVulns()) {
+                            // ==================== 14-1. タイトル ====================
+                            FileUtils.writeLines(file, FILE_ENCODING,
+                                    Arrays.asList(
+                                            String.format("=============== %s(CVSS %s) %s ===============", vuln.getName(), vuln.getSeverity_value(), vuln.getSeverity_code())),
+                                    true);
+                            // ==================== 14-2. 説明 ====================
+                            FileUtils.writeLines(file, FILE_ENCODING, Arrays.asList(vuln.getDescription()), true);
+                            // ==================== 14-3. 機密性への影響 ====================
+                            FileUtils.writeLines(file, FILE_ENCODING, Arrays.asList(String.format("機密性への影響: %s", vuln.getConfidentiality_impact())), true);
+                            // ==================== 14-4. 完全性への影響 ====================
+                            FileUtils.writeLines(file, FILE_ENCODING, Arrays.asList(String.format("完全性への影響: %s", vuln.getIntegrity_impact())), true);
+                            // ==================== 14-5. 可用性への影響 ====================
+                            FileUtils.writeLines(file, FILE_ENCODING, Arrays.asList(String.format("可用性への影響: %s", vuln.getAvailability_impact())), true);
+                            // ==================== 14-6. 攻撃前の認証要否 ====================
+                            FileUtils.writeLines(file, FILE_ENCODING, Arrays.asList(String.format("攻撃前の認証要否: %s", vuln.getAuthentication())), true);
+                            // ==================== 14-7. 攻撃元区分 ====================
+                            FileUtils.writeLines(file, FILE_ENCODING, Arrays.asList(String.format("攻撃元区分: %s", vuln.getAccess_vector())), true);
+                            // ==================== 14-8. 攻撃条件複雑さ ====================
+                            FileUtils.writeLines(file, FILE_ENCODING, Arrays.asList(String.format("攻撃条件複雑さ: %s", vuln.getAccess_complexity())), true);
+                        }
                     }
 
                     csvList.add(csvLineList);

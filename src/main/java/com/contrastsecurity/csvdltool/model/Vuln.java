@@ -26,7 +26,14 @@ package com.contrastsecurity.csvdltool.model;
 public class Vuln {
     private String name;
     private String description;
+    private String severity_value;
     private String severity_code;
+    private String authentication;
+    private String access_vector;
+    private String access_complexity;
+    private String availability_impact;
+    private String confidentiality_impact;
+    private String integrity_impact;
 
     public String getName() {
         return name;
@@ -44,12 +51,68 @@ public class Vuln {
         this.description = description;
     }
 
+    public String getSeverity_value() {
+        return severity_value;
+    }
+
+    public void setSeverity_value(String severity_value) {
+        this.severity_value = severity_value;
+    }
+
     public String getSeverity_code() {
         return severity_code;
     }
 
     public void setSeverity_code(String severity_code) {
         this.severity_code = severity_code;
+    }
+
+    public String getAuthentication() {
+        return authentication;
+    }
+
+    public void setAuthentication(String authentication) {
+        this.authentication = authentication;
+    }
+
+    public String getAccess_vector() {
+        return access_vector;
+    }
+
+    public void setAccess_vector(String access_vector) {
+        this.access_vector = access_vector;
+    }
+
+    public String getAccess_complexity() {
+        return access_complexity;
+    }
+
+    public void setAccess_complexity(String access_complexity) {
+        this.access_complexity = access_complexity;
+    }
+
+    public String getAvailability_impact() {
+        return availability_impact;
+    }
+
+    public void setAvailability_impact(String availability_impact) {
+        this.availability_impact = availability_impact;
+    }
+
+    public String getConfidentiality_impact() {
+        return confidentiality_impact;
+    }
+
+    public void setConfidentiality_impact(String confidentiality_impact) {
+        this.confidentiality_impact = confidentiality_impact;
+    }
+
+    public String getIntegrity_impact() {
+        return integrity_impact;
+    }
+
+    public void setIntegrity_impact(String integrity_impact) {
+        this.integrity_impact = integrity_impact;
     }
 
 }

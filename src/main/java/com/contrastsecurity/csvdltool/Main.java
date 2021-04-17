@@ -213,6 +213,7 @@ public class Main implements PropertyChangeListener {
                 preferenceStore.setValue(PreferenceConstants.INCLUDE_DESCRIPTION, includeDescChk.getSelection());
                 preferenceStore.setValue(PreferenceConstants.INCLUDE_STACKTRACE, includeStackTraceChk.getSelection());
                 preferenceStore.setValue(PreferenceConstants.ONLY_HAS_CVE, onlyHasCVEChk.getSelection());
+                preferenceStore.setValue(PreferenceConstants.INCLUDE_CVE_DETAIL, includeCVEDetailChk.getSelection());
                 try {
                     preferenceStore.save();
                 } catch (IOException ioe) {
@@ -363,6 +364,9 @@ public class Main implements PropertyChangeListener {
             @Override
             public void handleEvent(Event event) {
                 int idx = srcList.getSelectionIndex();
+                if (idx < 0) {
+                    return;
+                }
                 dstList.add(srcApps.get(idx));
                 dstApps.add(srcApps.get(idx));
                 srcList.remove(idx);
@@ -533,6 +537,9 @@ public class Main implements PropertyChangeListener {
             @Override
             public void handleEvent(Event event) {
                 int idx = dstList.getSelectionIndex();
+                if (idx < 0) {
+                    return;
+                }
                 srcList.add(dstApps.get(idx));
                 srcApps.add(dstApps.get(idx));
                 dstList.remove(idx);

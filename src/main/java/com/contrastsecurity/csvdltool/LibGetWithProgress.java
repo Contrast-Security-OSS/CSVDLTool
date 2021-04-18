@@ -36,7 +36,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
@@ -51,11 +50,8 @@ import org.eclipse.jface.preference.PreferenceStore;
 import org.eclipse.swt.widgets.Shell;
 
 import com.contrastsecurity.csvdltool.api.Api;
-import com.contrastsecurity.csvdltool.api.GroupsApi;
 import com.contrastsecurity.csvdltool.api.LibrariesApi;
 import com.contrastsecurity.csvdltool.model.Application;
-import com.contrastsecurity.csvdltool.model.ApplicationInCustomGroup;
-import com.contrastsecurity.csvdltool.model.CustomGroup;
 import com.contrastsecurity.csvdltool.model.Library;
 import com.contrastsecurity.csvdltool.model.Server;
 import com.contrastsecurity.csvdltool.model.Vuln;
@@ -104,7 +100,6 @@ public class LibGetWithProgress implements IRunnableWithProgress {
         String csvSepApplication = preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_RELATED_APPLICATION).replace("\\r", "\r").replace("\\n", "\n");
         String csvSepServer = preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_RELATED_SERVER).replace("\\r", "\r").replace("\\n", "\n");
         String csvSepCVE = preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_CVE).replace("\\r", "\r").replace("\\n", "\n");
-        Map<String, List<String>> appGroupMap = new HashMap<String, List<String>>();
         List<List<String>> csvList = new ArrayList<List<String>>();
         try {
             // 長文情報（何が起こったか？など）を出力する場合はフォルダに出力
@@ -112,25 +107,6 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                 Path dir = Paths.get(timestamp);
                 Files.createDirectory(dir);
             }
-            // アプリケーショングループの情報を取得
-            Api groupsApi = new GroupsApi(preferenceStore);
-            List<CustomGroup> customGroups = (List<CustomGroup>) groupsApi.get();
-            monitor.beginTask("アプリケーショングループの情報を取得", customGroups.size());
-            for (CustomGroup customGroup : customGroups) {
-                List<ApplicationInCustomGroup> apps = customGroup.getApplications();
-                if (apps != null) {
-                    for (ApplicationInCustomGroup app : apps) {
-                        String appName = app.getApplication().getName();
-                        if (appGroupMap.containsKey(appName)) {
-                            appGroupMap.get(appName).add(customGroup.getName());
-                        } else {
-                            appGroupMap.put(appName, new ArrayList<String>(Arrays.asList(customGroup.getName())));
-                        }
-                    }
-                }
-                monitor.worked(1);
-            }
-            Thread.sleep(1000);
             // 選択済みアプリの脆弱性情報を取得
             monitor.setTaskName(String.format("脆弱性情報の取得(0/%d)", dstApps.size()));
             int appIdx = 1;

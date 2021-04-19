@@ -85,7 +85,7 @@ public class VulCSVColumnPreferencePage extends PreferencePage {
         csvColumnGrp.setText("CSV出力");
 
         // ========== 出力項目テーブル ========== //
-        for (VulCSVColmunEnum colEnum : VulCSVColmunEnum.values()) {
+        for (VulCSVColmunEnum colEnum : VulCSVColmunEnum.sortedValues()) {
             colmunList.add(colEnum.getCulumn());
         }
         String targetColumns = preferenceStore.getString(PreferenceConstants.CSV_COLUMN_VUL);

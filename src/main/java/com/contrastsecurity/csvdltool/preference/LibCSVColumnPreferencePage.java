@@ -85,7 +85,7 @@ public class LibCSVColumnPreferencePage extends PreferencePage {
         csvColumnGrp.setText("CSV出力");
 
         // ========== 出力項目テーブル ========== //
-        for (LibCSVColmunEnum colEnum : LibCSVColmunEnum.values()) {
+        for (LibCSVColmunEnum colEnum : LibCSVColmunEnum.sortedValues()) {
             colmunList.add(colEnum.getCulumn());
         }
         String targetColumns = preferenceStore.getString(PreferenceConstants.CSV_COLUMN_LIB);

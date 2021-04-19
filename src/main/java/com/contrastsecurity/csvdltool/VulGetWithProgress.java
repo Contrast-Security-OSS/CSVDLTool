@@ -255,6 +255,10 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                     if (csvColumns.contains(VulCSVColmunEnum.VUL_09.name())) {
                         csvLineList.add(trace.getStatus());
                     }
+                    // ==================== 19. 保留中ステータス ====================
+                    if (csvColumns.contains(VulCSVColmunEnum.VUL_19.name())) {
+                        csvLineList.add(trace.getPending_status());
+                    }
                     // ==================== 10. 言語（Javaなど） ====================
                     if (csvColumns.contains(VulCSVColmunEnum.VUL_10.name())) {
                         csvLineList.add(trace.getLanguage());

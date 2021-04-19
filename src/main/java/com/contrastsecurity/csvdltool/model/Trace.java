@@ -42,6 +42,7 @@ public class Trace {
     private String impact_label;
     private String severity_label;
     private String status;
+    private String pending_status;
     private String language;
     private List<String> app_version_tags;
     private String first_time_seen;
@@ -148,6 +149,22 @@ public class Trace {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getPending_status() {
+        if (this.pending_status == null) {
+            return "";
+        }
+        Pattern p = Pattern.compile("^[A-Za-z\\s]+$");
+        Matcher m = p.matcher(this.pending_status);
+        if (m.matches()) {
+            return StatusEnum.valueOf(this.pending_status.replaceAll(" ", "").toUpperCase()).getLabel();
+        }
+        return this.pending_status;
+    }
+
+    public void setPending_status(String pending_status) {
+        this.pending_status = pending_status;
     }
 
     public String getLanguage() {

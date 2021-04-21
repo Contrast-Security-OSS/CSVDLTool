@@ -211,6 +211,14 @@ public class BasePreferencePage extends PreferencePage {
 
     @Override
     public boolean performOk() {
+        String url = contrastUrlTxt.getText();
+        String usr = userNameTxt.getText();
+        String svc = serviceKeyTxt.getText();
+        String api = apiKeyTxt.getText();
+        if (url.isEmpty() || usr.isEmpty() || svc.isEmpty() || api.isEmpty()) {
+            MessageDialog.openError(getShell(), "基本設定", "4つの項目を埋めて、組織情報を取得してください。");
+            return false;
+        }
         IPreferenceStore ps = getPreferenceStore();
         if (ps == null) {
             return true;

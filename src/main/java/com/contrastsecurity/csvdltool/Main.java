@@ -38,6 +38,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
@@ -305,6 +306,15 @@ public class Main implements PropertyChangeListener {
                     e.printStackTrace();
                 }
                 fullAppMap = progress.getFullAppMap();
+                if (fullAppMap.isEmpty()) {
+                    String userName = preferenceStore.getString(PreferenceConstants.USERNAME);
+                    StringJoiner sj = new StringJoiner("\r\n");
+                    sj.add("アプリケーションの取得件数が０件です。考えられる原因としては以下となります。");
+                    sj.add("・下記ユーザーのアプリケーションアクセスグループにView権限が設定されていない。");
+                    sj.add(String.format("　%s", userName));
+                    sj.add("・Assessライセンスが付与されているアプリケーションがない。");
+                    MessageDialog.openInformation(shell, "アプリケーション一覧の取得", sj.toString());
+                }
                 for (String appLabel : fullAppMap.keySet()) {
                     srcList.add(appLabel); // UI list
                     srcApps.add(appLabel); // memory src

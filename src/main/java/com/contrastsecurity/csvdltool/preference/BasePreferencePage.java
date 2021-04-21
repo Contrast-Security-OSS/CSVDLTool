@@ -30,6 +30,7 @@ import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -40,6 +41,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 
+import com.contrastsecurity.csvdltool.Main;
 import com.contrastsecurity.csvdltool.api.Api;
 import com.contrastsecurity.csvdltool.api.OrganizationApi;
 import com.contrastsecurity.csvdltool.exception.ApiException;
@@ -74,7 +76,7 @@ public class BasePreferencePage extends PreferencePage {
         composite.setLayout(compositeLt);
 
         Composite baseGrp = new Composite(composite, SWT.NONE);
-        GridLayout baseGrpLt = new GridLayout(2, false);
+        GridLayout baseGrpLt = new GridLayout(3, false);
         baseGrpLt.marginWidth = 15;
         baseGrpLt.horizontalSpacing = 10;
         baseGrp.setLayout(baseGrpLt);
@@ -82,6 +84,7 @@ public class BasePreferencePage extends PreferencePage {
         baseGrp.setLayoutData(baseGrpLtGrDt);
 
         new Label(baseGrp, SWT.LEFT).setText("Contrast URL：");
+        new Label(baseGrp, SWT.LEFT).setText("");
         contrastUrlTxt = new Text(baseGrp, SWT.BORDER);
         contrastUrlTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         contrastUrlTxt.setText(preferenceStore.getString(PreferenceConstants.CONTRAST_URL));
@@ -93,6 +96,7 @@ public class BasePreferencePage extends PreferencePage {
         });
 
         new Label(baseGrp, SWT.LEFT).setText("API Key：");
+        new Label(baseGrp, SWT.LEFT).setText("");
         apiKeyTxt = new Text(baseGrp, SWT.BORDER);
         apiKeyTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         apiKeyTxt.setText(preferenceStore.getString(PreferenceConstants.API_KEY));
@@ -102,7 +106,9 @@ public class BasePreferencePage extends PreferencePage {
                 apiKeyTxt.selectAll();
             }
         });
+
         new Label(baseGrp, SWT.LEFT).setText("Service Key：");
+        new Label(baseGrp, SWT.LEFT).setText("");
         serviceKeyTxt = new Text(baseGrp, SWT.BORDER);
         serviceKeyTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         serviceKeyTxt.setText(preferenceStore.getString(PreferenceConstants.SERVICE_KEY));
@@ -114,6 +120,10 @@ public class BasePreferencePage extends PreferencePage {
         });
 
         new Label(baseGrp, SWT.LEFT).setText("Username：");
+        Label icon = new Label(baseGrp, SWT.NONE);
+        Image iconImg = new Image(parent.getDisplay(), Main.class.getClassLoader().getResourceAsStream("help.png"));
+        icon.setImage(iconImg);
+        icon.setToolTipText("設定するユーザーの権限について\r\n・組織ロールはAdmin権限が必要です。\r\n・アプリケーションアクセスグループはView権限以上が必要です。");
         userNameTxt = new Text(baseGrp, SWT.BORDER);
         userNameTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         userNameTxt.setText(preferenceStore.getString(PreferenceConstants.USERNAME));
@@ -126,7 +136,9 @@ public class BasePreferencePage extends PreferencePage {
 
         Button getOrgBtn = new Button(baseGrp, SWT.NULL);
         GridData getOrgBtnGrDt = new GridData();
-        getOrgBtnGrDt.horizontalSpan = 2;
+        getOrgBtnGrDt.horizontalSpan = 3;
+        getOrgBtnGrDt.heightHint = 30;
+        getOrgBtnGrDt.widthHint = 150;
         getOrgBtnGrDt.horizontalAlignment = SWT.RIGHT;
         getOrgBtn.setLayoutData(getOrgBtnGrDt);
         getOrgBtn.setText("組織情報を取得");

@@ -92,13 +92,17 @@ public class EventDetail {
         detailLines.add(String.format("オブジェクト    : %s", this.object));
         detailLines.add(String.format("リターン        : %s", this.returnStr));
         List<String> paramList = new ArrayList<String>();
-        for (Parameter param : this.getParameters()) {
-            paramList.add(param.getParameter());
+        if (this.getParameters() != null) {
+            for (Parameter param : this.getParameters()) {
+                paramList.add(param.getParameter());
+            }
         }
         detailLines.add(String.format("パラメータ      : %s", String.join(", ", paramList)));
         detailLines.add("スタックトレース:");
-        for (StackTrace stackTrace : this.getStacktraces()) {
-            detailLines.add(stackTrace.getDescription());
+        if (this.getStacktraces() != null) {
+            for (StackTrace stackTrace : this.getStacktraces()) {
+                detailLines.add(stackTrace.getDescription());
+            }
         }
         return detailLines;
     }

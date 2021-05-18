@@ -232,7 +232,7 @@ public class LibGetWithProgress implements IRunnableWithProgress {
         monitor.beginTask("CSV出力", csvList.size());
         String filePath = timestamp + ".csv";
         if (isIncludeCVEDetail) {
-            filePath = timestamp + "\\output.csv";
+            filePath = timestamp + "\\" + timestamp + ".csv";
         }
         try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(filePath)), CSV_ENCODING))) {
             CSVPrinter printer = CSVFormat.EXCEL.print(bw);

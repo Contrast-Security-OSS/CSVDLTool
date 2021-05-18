@@ -190,7 +190,7 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                         }
                         csvLineList.add(sj.toString());
                     }
-                    if (isIncludeCVEDetail) {
+                    if (isIncludeCVEDetail && !library.getVulns().isEmpty()) {
                         // ==================== 14. 詳細 ====================
                         csvLineList.add(String.format("=HYPERLINK(\".\\%s.txt\",\"%s\")", library.getHash(), library.getHash()));
                         String textFileName = String.format("%s\\%s.txt", timestamp, library.getHash());

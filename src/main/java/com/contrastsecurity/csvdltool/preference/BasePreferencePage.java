@@ -23,6 +23,8 @@
 
 package com.contrastsecurity.csvdltool.preference;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -43,7 +45,9 @@ import org.eclipse.swt.widgets.Text;
 
 import com.contrastsecurity.csvdltool.Main;
 import com.contrastsecurity.csvdltool.api.Api;
+import com.contrastsecurity.csvdltool.api.ApiKeyApi;
 import com.contrastsecurity.csvdltool.api.OrganizationApi;
+import com.contrastsecurity.csvdltool.api.OrganizationsApi;
 import com.contrastsecurity.csvdltool.exception.ApiException;
 import com.contrastsecurity.csvdltool.exception.NonApiException;
 import com.contrastsecurity.csvdltool.model.Organization;
@@ -146,6 +150,7 @@ public class BasePreferencePage extends PreferencePage {
             public void widgetDefaultSelected(SelectionEvent event) {
             }
 
+            @SuppressWarnings("unchecked")
             public void widgetSelected(SelectionEvent event) {
                 String url = contrastUrlTxt.getText();
                 String usr = userNameTxt.getText();
@@ -156,8 +161,16 @@ public class BasePreferencePage extends PreferencePage {
                     return;
                 }
                 Api orgApi = new OrganizationApi(preferenceStore, url, usr, svc, api);
+                Api orgsApi = new OrganizationsApi(preferenceStore, url, usr, svc, api);
                 try {
                     Organization organization = (Organization) orgApi.get();
+                    List<Organization> organizations = (List<Organization>) orgsApi.get();
+                    for (Organization org : organizations) {
+                        System.out.println(org.getName());
+                        Api apiKeyApi = new ApiKeyApi(preferenceStore, org.getOrganization_uuid());
+                        String apiKey = (String) apiKeyApi.get();
+                        System.out.println(apiKey);
+                    }
                     orgNameTxt.setText(organization.getName());
                     orgIdTxt.setText(organization.getOrganization_uuid());
                     MessageDialog.openInformation(composite.getShell(), "組織情報の取得", "組織情報を取得しました。");

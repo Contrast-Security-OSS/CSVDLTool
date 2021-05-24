@@ -97,7 +97,7 @@ public class BasePreferencePage extends PreferencePage {
         contrastUrlTxt = new Text(baseGrp, SWT.BORDER);
         contrastUrlTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         contrastUrlTxt.setText(preferenceStore.getString(PreferenceConstants.CONTRAST_URL));
-        contrastUrlTxt.setMessage("5つの項目をすべて埋めててください。");
+        contrastUrlTxt.setMessage("http://xxx.xxx.xxx.xxx/Contrast");
         contrastUrlTxt.addListener(SWT.FocusIn, new Listener() {
             public void handleEvent(Event e) {
                 contrastUrlTxt.selectAll();
@@ -109,7 +109,7 @@ public class BasePreferencePage extends PreferencePage {
         serviceKeyTxt = new Text(baseGrp, SWT.BORDER);
         serviceKeyTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         serviceKeyTxt.setText(preferenceStore.getString(PreferenceConstants.SERVICE_KEY));
-        serviceKeyTxt.setMessage("すべて埋めたら");
+        serviceKeyTxt.setMessage("個人のサービスキー");
         serviceKeyTxt.addListener(SWT.FocusIn, new Listener() {
             public void handleEvent(Event e) {
                 serviceKeyTxt.selectAll();
@@ -120,11 +120,11 @@ public class BasePreferencePage extends PreferencePage {
         Label icon = new Label(baseGrp, SWT.NONE);
         Image iconImg = new Image(parent.getDisplay(), Main.class.getClassLoader().getResourceAsStream("help.png"));
         icon.setImage(iconImg);
-        icon.setToolTipText("設定するユーザーの権限について\r\n・組織ロールはAdmin権限が必要です。\r\n・アプリケーションアクセスグループはView権限以上が必要です。");
+        icon.setToolTipText("設定するユーザーの権限について\r\n・組織ロールはView権限以上が必要です。\r\n・Admin権限を持つユーザーの場合、アプリケーショングループの情報も取得できます。\r\n・アプリケーションアクセスグループはView権限以上が必要です。");
         userNameTxt = new Text(baseGrp, SWT.BORDER);
         userNameTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         userNameTxt.setText(preferenceStore.getString(PreferenceConstants.USERNAME));
-        userNameTxt.setMessage("下のボタンで組織情報を確認します。");
+        userNameTxt.setMessage("メールアドレス");
         userNameTxt.addListener(SWT.FocusIn, new Listener() {
             public void handleEvent(Event e) {
                 userNameTxt.selectAll();
@@ -145,6 +145,8 @@ public class BasePreferencePage extends PreferencePage {
         if (orgJsonStr.trim().length() > 0) {
             orgList = new Gson().fromJson(orgJsonStr, new TypeToken<List<Organization>>() {
             }.getType());
+        } else {
+            orgList = new ArrayList<Organization>();
         }
 
         table = new Table(orgTableGrp, SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION);

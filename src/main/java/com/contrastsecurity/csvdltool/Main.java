@@ -76,6 +76,7 @@ import org.yaml.snakeyaml.Yaml;
 import com.contrastsecurity.csvdltool.exception.ApiException;
 import com.contrastsecurity.csvdltool.exception.NonApiException;
 import com.contrastsecurity.csvdltool.model.ContrastSecurityYaml;
+import com.contrastsecurity.csvdltool.model.Organization;
 import com.contrastsecurity.csvdltool.preference.AboutPage;
 import com.contrastsecurity.csvdltool.preference.BasePreferencePage;
 import com.contrastsecurity.csvdltool.preference.ConnectionPreferencePage;
@@ -85,10 +86,12 @@ import com.contrastsecurity.csvdltool.preference.MyPreferenceDialog;
 import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
 import com.contrastsecurity.csvdltool.preference.VulCSVColumnPreferencePage;
 import com.contrastsecurity.csvdltool.preference.VulOtherPreferencePage;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 public class Main implements PropertyChangeListener {
 
-    public static final String WINDOW_TITLE = "CSVDLTool";
+    public static final String WINDOW_TITLE = "CSVDLTool - %s";
 
     private CSVDLToolShell shell;
 
@@ -190,7 +193,7 @@ public class Main implements PropertyChangeListener {
         imageArray[3] = new Image(display, Main.class.getClassLoader().getResourceAsStream("icon48.png"));
         imageArray[4] = new Image(display, Main.class.getClassLoader().getResourceAsStream("icon128.png"));
         shell.setImages(imageArray);
-        shell.setText(String.format(WINDOW_TITLE));
+        setWindowTitle();
         shell.addShellListener(new ShellListener() {
             @Override
             public void shellIconified(ShellEvent event) {
@@ -224,9 +227,8 @@ public class Main implements PropertyChangeListener {
 
             @Override
             public void shellActivated(ShellEvent event) {
-                String orgName = preferenceStore.getString(PreferenceConstants.ORG_NAME);
-                String orgId = preferenceStore.getString(PreferenceConstants.ORG_ID);
-                if (orgName == null || orgName.isEmpty() || orgId == null || orgId.isEmpty()) {
+                Organization org = getValidOrganization();
+                if (org == null) {
                     appLoadBtn.setEnabled(false);
                     vulExecuteBtn.setEnabled(false);
                     settingBtn.setText("このボタンから基本設定を行ってください。");
@@ -235,6 +237,7 @@ public class Main implements PropertyChangeListener {
                     vulExecuteBtn.setEnabled(true);
                     settingBtn.setText("設定");
                 }
+                setWindowTitle();
             }
         });
 
@@ -284,7 +287,7 @@ public class Main implements PropertyChangeListener {
                     fullAppMap.clear();
                 }
 
-                AppsGetWithProgress progress = new AppsGetWithProgress(preferenceStore);
+                AppsGetWithProgress progress = new AppsGetWithProgress(preferenceStore, getValidOrganization());
                 ProgressMonitorDialog progDialog = new ProgressMonitorDialog(shell);
                 try {
                     progDialog.run(true, true, progress);
@@ -602,8 +605,8 @@ public class Main implements PropertyChangeListener {
                     MessageDialog.openInformation(shell, "脆弱性情報取得", "取得対象のアプリケーションを選択してください。");
                     return;
                 }
-                VulGetWithProgress progress = new VulGetWithProgress(shell, preferenceStore, dstApps, fullAppMap, vulOnlyParentAppChk.getSelection(), includeDescChk.getSelection(),
-                        includeStackTraceChk.getSelection());
+                VulGetWithProgress progress = new VulGetWithProgress(shell, preferenceStore, getValidOrganization(), dstApps, fullAppMap, vulOnlyParentAppChk.getSelection(),
+                        includeDescChk.getSelection(), includeStackTraceChk.getSelection());
                 ProgressMonitorDialog progDialog = new ProgressMonitorDialog(shell);
                 try {
                     progDialog.run(true, true, progress);
@@ -701,7 +704,8 @@ public class Main implements PropertyChangeListener {
                     MessageDialog.openInformation(shell, "ライブラリ情報取得", "取得対象のアプリケーションを選択してください。");
                     return;
                 }
-                LibGetWithProgress progress = new LibGetWithProgress(shell, preferenceStore, dstApps, fullAppMap, onlyHasCVEChk.getSelection(), includeCVEDetailChk.getSelection());
+                LibGetWithProgress progress = new LibGetWithProgress(shell, preferenceStore, getValidOrganization(), dstApps, fullAppMap, onlyHasCVEChk.getSelection(),
+                        includeCVEDetailChk.getSelection());
                 ProgressMonitorDialog progDialog = new ProgressMonitorDialog(shell);
                 try {
                     progDialog.run(true, true, progress);
@@ -817,6 +821,33 @@ public class Main implements PropertyChangeListener {
 
     public PreferenceStore getPreferenceStore() {
         return preferenceStore;
+    }
+
+    public Organization getValidOrganization() {
+        String orgJsonStr = preferenceStore.getString(PreferenceConstants.TARGET_ORGS);
+        if (orgJsonStr.trim().length() > 0) {
+            List<Organization> orgList = new Gson().fromJson(orgJsonStr, new TypeToken<List<Organization>>() {
+            }.getType());
+            for (Organization org : orgList) {
+                if (org.isValid()) {
+                    return org;
+                }
+            }
+        }
+        return null;
+    }
+
+    public void setWindowTitle() {
+        String text = null;
+        Organization validOrg = getValidOrganization();
+        if (validOrg != null) {
+            text = validOrg.getName();
+        }
+        if (text == null || text.isEmpty()) {
+            this.shell.setText(String.format(WINDOW_TITLE, "組織未設定"));
+        } else {
+            this.shell.setText(String.format(WINDOW_TITLE, text));
+        }
     }
 
     @Override

@@ -53,6 +53,7 @@ import com.contrastsecurity.csvdltool.api.Api;
 import com.contrastsecurity.csvdltool.api.LibrariesApi;
 import com.contrastsecurity.csvdltool.model.Application;
 import com.contrastsecurity.csvdltool.model.Library;
+import com.contrastsecurity.csvdltool.model.Organization;
 import com.contrastsecurity.csvdltool.model.Server;
 import com.contrastsecurity.csvdltool.model.Vuln;
 import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
@@ -64,6 +65,7 @@ public class LibGetWithProgress implements IRunnableWithProgress {
 
     private Shell shell;
     private PreferenceStore preferenceStore;
+    private Organization organization;
     private List<String> dstApps;
     private Map<String, AppInfo> fullAppMap;
     private boolean isOnlyHasCVE;
@@ -71,10 +73,11 @@ public class LibGetWithProgress implements IRunnableWithProgress {
 
     Logger logger = Logger.getLogger("csvdltool");
 
-    public LibGetWithProgress(Shell shell, PreferenceStore preferenceStore, List<String> dstApps, Map<String, AppInfo> fullAppMap, boolean isOnlyHasCVE,
+    public LibGetWithProgress(Shell shell, PreferenceStore preferenceStore, Organization organization, List<String> dstApps, Map<String, AppInfo> fullAppMap, boolean isOnlyHasCVE,
             boolean isIncludeCVEDetail) {
         this.shell = shell;
         this.preferenceStore = preferenceStore;
+        this.organization = organization;
         this.dstApps = dstApps;
         this.fullAppMap = fullAppMap;
         this.isOnlyHasCVE = isOnlyHasCVE;
@@ -113,7 +116,7 @@ public class LibGetWithProgress implements IRunnableWithProgress {
             for (String appLabel : dstApps) {
                 String appName = fullAppMap.get(appLabel).getAppName();
                 String appId = fullAppMap.get(appLabel).getAppId();
-                Api librariesApi = new LibrariesApi(preferenceStore, appId, filter);
+                Api librariesApi = new LibrariesApi(preferenceStore, organization, appId, filter);
                 List<Library> libraries = (List<Library>) librariesApi.get();
                 monitor.beginTask(String.format("ライブラリ情報の取得(%d/%d)", appIdx, dstApps.size()), libraries.size());
                 for (Library library : libraries) {

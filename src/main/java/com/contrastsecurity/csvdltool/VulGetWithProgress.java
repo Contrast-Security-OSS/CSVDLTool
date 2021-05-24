@@ -78,6 +78,7 @@ import com.contrastsecurity.csvdltool.model.EventDetail;
 import com.contrastsecurity.csvdltool.model.EventSummary;
 import com.contrastsecurity.csvdltool.model.HttpRequest;
 import com.contrastsecurity.csvdltool.model.Note;
+import com.contrastsecurity.csvdltool.model.Organization;
 import com.contrastsecurity.csvdltool.model.Property;
 import com.contrastsecurity.csvdltool.model.Recommendation;
 import com.contrastsecurity.csvdltool.model.Risk;
@@ -102,6 +103,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
 
     private Shell shell;
     private PreferenceStore preferenceStore;
+    private Organization organization;
     private List<String> dstApps;
     private Map<String, AppInfo> fullAppMap;
     private boolean isOnlyParentApp;
@@ -110,10 +112,11 @@ public class VulGetWithProgress implements IRunnableWithProgress {
 
     Logger logger = Logger.getLogger("csvdltool");
 
-    public VulGetWithProgress(Shell shell, PreferenceStore preferenceStore, List<String> dstApps, Map<String, AppInfo> fullAppMap, boolean isOnlyParentApp, boolean isIncludeDesc,
-            boolean isIncludeStackTrace) {
+    public VulGetWithProgress(Shell shell, PreferenceStore preferenceStore, Organization organization, List<String> dstApps, Map<String, AppInfo> fullAppMap,
+            boolean isOnlyParentApp, boolean isIncludeDesc, boolean isIncludeStackTrace) {
         this.shell = shell;
         this.preferenceStore = preferenceStore;
+        this.organization = organization;
         this.dstApps = dstApps;
         this.fullAppMap = fullAppMap;
         this.isOnlyParentApp = isOnlyParentApp;
@@ -147,7 +150,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                 Files.createDirectory(dir);
             }
             // アプリケーショングループの情報を取得
-            Api groupsApi = new GroupsApi(preferenceStore);
+            Api groupsApi = new GroupsApi(preferenceStore, organization);
             List<CustomGroup> customGroups = (List<CustomGroup>) groupsApi.get();
             monitor.beginTask("アプリケーショングループの情報を取得", customGroups.size());
             for (CustomGroup customGroup : customGroups) {
@@ -171,7 +174,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
             for (String appLabel : dstApps) {
                 String appName = fullAppMap.get(appLabel).getAppName();
                 String appId = fullAppMap.get(appLabel).getAppId();
-                Api tracesApi = new TracesApi(preferenceStore, appId);
+                Api tracesApi = new TracesApi(preferenceStore, organization, appId);
                 List<String> traces = (List<String>) tracesApi.get();
                 monitor.beginTask(String.format("脆弱性情報の取得(%d/%d)", appIdx, dstApps.size()), traces.size());
                 for (String trace_id : traces) {
@@ -179,7 +182,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                         throw new InterruptedException("キャンセルされました。");
                     }
                     List<String> csvLineList = new ArrayList<String>();
-                    Api traceApi = new TraceApi(preferenceStore, appId, trace_id);
+                    Api traceApi = new TraceApi(preferenceStore, organization, appId, trace_id);
                     Trace trace = (Trace) traceApi.get();
                     monitor.subTask(String.format("%s - %s", appName, trace.getTitle()));
                     Application realApp = trace.getApplication();
@@ -203,7 +206,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                     }
                     // ==================== 04. アプリケーションタグ ====================
                     if (csvColumns.contains(VulCSVColmunEnum.VUL_04.name())) {
-                        Api applicationTagsApi = new ApplicationTagsApi(preferenceStore, appId);
+                        Api applicationTagsApi = new ApplicationTagsApi(preferenceStore, organization, appId);
                         List<String> applicationTags = (List<String>) applicationTagsApi.get();
                         csvLineList.add(String.join(csvSepTag, applicationTags));
                     }
@@ -220,7 +223,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                         csvLineList.add(trace.getSeverity_label());
                     }
                     // ==================== 08. CWE ====================
-                    Api howToFixApi = new HowToFixApi(preferenceStore, trace_id);
+                    Api howToFixApi = new HowToFixApi(preferenceStore, organization, trace_id);
                     HowToFixJson howToFixJson = null;
                     try {
                         howToFixJson = (HowToFixJson) howToFixApi.get();
@@ -300,7 +303,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                     }
                     // ==================== 18. 脆弱性タグ ====================
                     if (csvColumns.contains(VulCSVColmunEnum.VUL_18.name())) {
-                        Api traceTagsApi = new TraceTagsApi(preferenceStore, trace_id);
+                        Api traceTagsApi = new TraceTagsApi(preferenceStore, organization, trace_id);
                         List<String> traceTags = (List<String>) traceTagsApi.get();
                         csvLineList.add(String.join(csvSepTag, traceTags));
                     }
@@ -311,14 +314,14 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                         File file = new File(textFileName);
 
                         // ==================== 19-1. ルート ====================
-                        Api routesApi = new RoutesApi(preferenceStore, appId, trace_id);
+                        Api routesApi = new RoutesApi(preferenceStore, organization, appId, trace_id);
                         List<Route> routes = (List<Route>) routesApi.get();
                         List<String> signatureList = routes.stream().map(Route::getSignature).collect(Collectors.toList());
                         signatureList.add(0, ROUTE);
                         FileUtils.writeLines(file, FILE_ENCODING, signatureList, true);
 
                         // ==================== 19-2. HTTP情報 ====================
-                        Api httpRequestApi = new HttpRequestApi(preferenceStore, trace_id);
+                        Api httpRequestApi = new HttpRequestApi(preferenceStore, organization, trace_id);
                         HttpRequest httpRequest = (HttpRequest) httpRequestApi.get();
                         if (httpRequest != null) {
                             FileUtils.writeLines(file, FILE_ENCODING, Arrays.asList(HTTP_INFO, httpRequest.getText()), true);
@@ -326,7 +329,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                             FileUtils.writeLines(file, FILE_ENCODING, Arrays.asList(HTTP_INFO, "なし"), true);
                         }
 
-                        Api storyApi = new StoryApi(preferenceStore, trace_id);
+                        Api storyApi = new StoryApi(preferenceStore, organization, trace_id);
                         Story story = null;
                         try {
                             story = (Story) storyApi.get();
@@ -410,18 +413,18 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                         // ==================== 19-7. スタックトレース ====================
                         List<String> detailLines = new ArrayList<String>();
                         detailLines.add(STACK_TRACE);
-                        Api eventSummaryApi = new EventSummaryApi(preferenceStore, trace_id);
+                        Api eventSummaryApi = new EventSummaryApi(preferenceStore, organization, trace_id);
                         List<EventSummary> eventSummaries = (List<EventSummary>) eventSummaryApi.get();
                         for (EventSummary es : eventSummaries) {
                             if (es.getCollapsedEvents() != null && es.getCollapsedEvents().isEmpty()) {
                                 detailLines.add(String.format("[%s]", es.getDescription()));
-                                Api eventDetailApi = new EventDetailApi(preferenceStore, trace_id, es.getId());
+                                Api eventDetailApi = new EventDetailApi(preferenceStore, organization, trace_id, es.getId());
                                 EventDetail ed = (EventDetail) eventDetailApi.get();
                                 detailLines.addAll(ed.getDetailLines());
                             } else {
                                 for (CollapsedEventSummary ce : es.getCollapsedEvents()) {
                                     detailLines.add(String.format("[%s]", es.getDescription()));
-                                    Api eventDetailApi = new EventDetailApi(preferenceStore, trace_id, ce.getId());
+                                    Api eventDetailApi = new EventDetailApi(preferenceStore, organization, trace_id, ce.getId());
                                     EventDetail ed = (EventDetail) eventDetailApi.get();
                                     detailLines.addAll(ed.getDetailLines());
                                 }

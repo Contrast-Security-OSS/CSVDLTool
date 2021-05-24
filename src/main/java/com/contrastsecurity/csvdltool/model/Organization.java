@@ -29,6 +29,8 @@ import java.util.List;
 public class Organization {
     private String name;
     private String organization_uuid;
+    private String apikey;
+    private boolean valid;
 
     public String getName() {
         return name;
@@ -46,12 +48,37 @@ public class Organization {
         this.organization_uuid = organization_uuid;
     }
 
+    public String getApikey() {
+        return apikey;
+    }
+
+    public void setApikey(String apikey) {
+        this.apikey = apikey;
+    }
+
+    public boolean isValid() {
+        return valid;
+    }
+
+    public void setValid(boolean valid) {
+        this.valid = valid;
+    }
+
     @Override
     public String toString() {
         List<String> strList = new ArrayList<String>();
         strList.add("name: " + this.name);
         strList.add("organization_uuid: " + this.organization_uuid);
         return String.join(", ", strList);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Organization) {
+            Organization other = (Organization) obj;
+            return other.organization_uuid.equals(this.organization_uuid);
+        }
+        return false;
     }
 
 }

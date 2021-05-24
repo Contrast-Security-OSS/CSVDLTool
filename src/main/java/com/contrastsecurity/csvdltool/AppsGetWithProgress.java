@@ -42,16 +42,19 @@ import com.contrastsecurity.csvdltool.api.GroupsApi;
 import com.contrastsecurity.csvdltool.model.Application;
 import com.contrastsecurity.csvdltool.model.ApplicationInCustomGroup;
 import com.contrastsecurity.csvdltool.model.CustomGroup;
+import com.contrastsecurity.csvdltool.model.Organization;
 
 public class AppsGetWithProgress implements IRunnableWithProgress {
 
     private PreferenceStore preferenceStore;
+    private Organization organization;
     private Map<String, AppInfo> fullAppMap;
 
     Logger logger = Logger.getLogger("csvdltool");
 
-    public AppsGetWithProgress(PreferenceStore preferenceStore) {
+    public AppsGetWithProgress(PreferenceStore preferenceStore, Organization organization) {
         this.preferenceStore = preferenceStore;
+        this.organization = organization;
     }
 
     @SuppressWarnings("unchecked")
@@ -63,7 +66,7 @@ public class AppsGetWithProgress implements IRunnableWithProgress {
             // アプリケーショングループの情報を取得
             monitor.subTask("アプリケーショングループの情報を取得...");
             Map<String, List<String>> appGroupMap = new HashMap<String, List<String>>();
-            Api groupsApi = new GroupsApi(preferenceStore);
+            Api groupsApi = new GroupsApi(preferenceStore, organization);
             List<CustomGroup> customGroups = (List<CustomGroup>) groupsApi.get();
             monitor.worked(1);
             for (CustomGroup customGroup : customGroups) {
@@ -81,7 +84,7 @@ public class AppsGetWithProgress implements IRunnableWithProgress {
             }
             // アプリケーション一覧を取得
             monitor.subTask("アプリケーション一覧の情報を取得...");
-            Api applicationsApi = new ApplicationsApi(preferenceStore);
+            Api applicationsApi = new ApplicationsApi(preferenceStore, organization);
             List<Application> applications = (List<Application>) applicationsApi.get();
             monitor.worked(1);
             for (Application app : applications) {

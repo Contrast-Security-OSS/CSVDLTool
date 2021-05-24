@@ -28,19 +28,20 @@ import java.lang.reflect.Type;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 import com.contrastsecurity.csvdltool.json.ApplicationsJson;
+import com.contrastsecurity.csvdltool.model.Organization;
 import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 public class ApplicationsApi extends Api {
-    public ApplicationsApi(IPreferenceStore preferenceStore) {
-        super(preferenceStore);
+    public ApplicationsApi(IPreferenceStore preferenceStore, Organization organization) {
+        super(preferenceStore, organization);
     }
 
     @Override
     protected String getUrl() {
         String contrastUrl = preferenceStore.getString(PreferenceConstants.CONTRAST_URL);
-        String orgId = preferenceStore.getString(PreferenceConstants.ORG_ID);
+        String orgId = this.organization.getOrganization_uuid();
         return String.format("%s/api/ng/%s/applications?expand=modules,license,skip_links", contrastUrl, orgId);
     }
 

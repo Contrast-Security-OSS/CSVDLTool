@@ -28,6 +28,7 @@ import java.lang.reflect.Type;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 import com.contrastsecurity.csvdltool.json.HowToFixJson;
+import com.contrastsecurity.csvdltool.model.Organization;
 import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -36,15 +37,15 @@ public class HowToFixApi extends Api {
 
     private String trace_id;
 
-    public HowToFixApi(IPreferenceStore preferenceStore, String trace_id) {
-        super(preferenceStore);
+    public HowToFixApi(IPreferenceStore preferenceStore, Organization organization, String trace_id) {
+        super(preferenceStore, organization);
         this.trace_id = trace_id;
     }
 
     @Override
     protected String getUrl() {
         String contrastUrl = preferenceStore.getString(PreferenceConstants.CONTRAST_URL);
-        String orgId = preferenceStore.getString(PreferenceConstants.ORG_ID);
+        String orgId = this.organization.getOrganization_uuid();
         return String.format("%s/api/ng/%s/traces/%s/recommendation", contrastUrl, orgId, this.trace_id);
     }
 

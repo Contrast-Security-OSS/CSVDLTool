@@ -28,6 +28,7 @@ import java.lang.reflect.Type;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 import com.contrastsecurity.csvdltool.json.ApplicationTagsJson;
+import com.contrastsecurity.csvdltool.model.Organization;
 import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -36,15 +37,15 @@ public class ApplicationTagsApi extends Api {
 
     private String appId;
 
-    public ApplicationTagsApi(IPreferenceStore preferenceStore, String appId) {
-        super(preferenceStore);
+    public ApplicationTagsApi(IPreferenceStore preferenceStore, Organization organization, String appId) {
+        super(preferenceStore, organization);
         this.appId = appId;
     }
 
     @Override
     protected String getUrl() {
         String contrastUrl = preferenceStore.getString(PreferenceConstants.CONTRAST_URL);
-        String orgId = preferenceStore.getString(PreferenceConstants.ORG_ID);
+        String orgId = this.organization.getOrganization_uuid();
         return String.format("%s/api/ng/%s/tags/application/list/%s", contrastUrl, orgId, this.appId);
     }
 

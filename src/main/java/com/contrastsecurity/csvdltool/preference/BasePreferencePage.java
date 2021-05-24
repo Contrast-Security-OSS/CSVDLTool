@@ -172,6 +172,11 @@ public class BasePreferencePage extends PreferencePage {
         for (Organization org : orgList) {
             this.addOrgToTable(org);
         }
+        for (Button button : checkBoxList) {
+            if (button.getSelection()) {
+                this.selectedIdx = checkBoxList.indexOf(button);
+            }
+        }
 
         Composite buttonGrp = new Composite(orgTableGrp, SWT.NONE);
         buttonGrp.setLayoutData(new GridData(GridData.FILL_VERTICAL));
@@ -200,6 +205,11 @@ public class BasePreferencePage extends PreferencePage {
                     checkBoxList.get(0).setSelection(true);
                     rtnOrg.setValid(true);
                 }
+                for (Button button : checkBoxList) {
+                    if (button.getSelection()) {
+                        selectedIdx = checkBoxList.indexOf(button);
+                    }
+                }
             }
         });
 
@@ -212,12 +222,25 @@ public class BasePreferencePage extends PreferencePage {
             public void widgetSelected(SelectionEvent e) {
                 int[] indexes = table.getSelectionIndices();
                 for (int i = indexes.length - 1; i >= 0; i--) {
-                    Button button = checkBoxList.remove(i);
-                    button.dispose();
-                    orgList.remove(i);
+                    orgList.remove(indexes[i]);
                 }
-                table.remove(table.getSelectionIndices());
-
+                for (Button button : checkBoxList) {
+                    button.dispose();
+                }
+                checkBoxList.clear();
+                table.removeAll();
+                for (Organization org : orgList) {
+                    addOrgToTable(org);
+                }
+                if (checkBoxList.isEmpty()) {
+                    selectedIdx = -1;
+                } else {
+                    for (Button button : checkBoxList) {
+                        if (button.getSelection()) {
+                            selectedIdx = checkBoxList.indexOf(button);
+                        }
+                    }
+                }
             }
         });
 

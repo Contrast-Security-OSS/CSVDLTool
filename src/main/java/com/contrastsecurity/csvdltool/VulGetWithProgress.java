@@ -68,6 +68,7 @@ import com.contrastsecurity.csvdltool.api.StoryApi;
 import com.contrastsecurity.csvdltool.api.TraceApi;
 import com.contrastsecurity.csvdltool.api.TraceTagsApi;
 import com.contrastsecurity.csvdltool.api.TracesApi;
+import com.contrastsecurity.csvdltool.exception.ApiException;
 import com.contrastsecurity.csvdltool.json.HowToFixJson;
 import com.contrastsecurity.csvdltool.model.Application;
 import com.contrastsecurity.csvdltool.model.ApplicationInCustomGroup;
@@ -151,23 +152,26 @@ public class VulGetWithProgress implements IRunnableWithProgress {
             }
             // アプリケーショングループの情報を取得
             Api groupsApi = new GroupsApi(preferenceStore, organization);
-            List<CustomGroup> customGroups = (List<CustomGroup>) groupsApi.get();
-            monitor.beginTask("アプリケーショングループの情報を取得", customGroups.size());
-            for (CustomGroup customGroup : customGroups) {
-                List<ApplicationInCustomGroup> apps = customGroup.getApplications();
-                if (apps != null) {
-                    for (ApplicationInCustomGroup app : apps) {
-                        String appName = app.getApplication().getName();
-                        if (appGroupMap.containsKey(appName)) {
-                            appGroupMap.get(appName).add(customGroup.getName());
-                        } else {
-                            appGroupMap.put(appName, new ArrayList<String>(Arrays.asList(customGroup.getName())));
+            try {
+                List<CustomGroup> customGroups = (List<CustomGroup>) groupsApi.get();
+                monitor.beginTask("アプリケーショングループの情報を取得", customGroups.size());
+                for (CustomGroup customGroup : customGroups) {
+                    List<ApplicationInCustomGroup> apps = customGroup.getApplications();
+                    if (apps != null) {
+                        for (ApplicationInCustomGroup app : apps) {
+                            String appName = app.getApplication().getName();
+                            if (appGroupMap.containsKey(appName)) {
+                                appGroupMap.get(appName).add(customGroup.getName());
+                            } else {
+                                appGroupMap.put(appName, new ArrayList<String>(Arrays.asList(customGroup.getName())));
+                            }
                         }
                     }
+                    monitor.worked(1);
                 }
-                monitor.worked(1);
+                Thread.sleep(1000);
+            } catch (ApiException ae) {
             }
-            Thread.sleep(1000);
             // 選択済みアプリの脆弱性情報を取得
             monitor.setTaskName(String.format("脆弱性情報の取得(0/%d)", dstApps.size()));
             int appIdx = 1;

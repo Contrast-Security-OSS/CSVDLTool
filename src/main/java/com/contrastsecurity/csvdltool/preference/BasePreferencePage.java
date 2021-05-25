@@ -33,6 +33,8 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.TableEditor;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -65,6 +67,7 @@ public class BasePreferencePage extends PreferencePage {
     private List<Button> checkBoxList = new ArrayList<Button>();
     private int selectedIdx = -1;
     private Table table;
+    private Button addBtn;
 
     Logger logger = Logger.getLogger("csvdltool");
 
@@ -103,6 +106,19 @@ public class BasePreferencePage extends PreferencePage {
                 contrastUrlTxt.selectAll();
             }
         });
+        contrastUrlTxt.addModifyListener(new ModifyListener() {
+            @Override
+            public void modifyText(ModifyEvent e) {
+                String contrastUrlStr = contrastUrlTxt.getText();
+                String serviceKeyStr = serviceKeyTxt.getText();
+                String userNameStr = userNameTxt.getText();
+                if (contrastUrlStr.isEmpty() || serviceKeyStr.isEmpty() || userNameStr.isEmpty()) {
+                    addBtn.setEnabled(false);
+                } else {
+                    addBtn.setEnabled(true);
+                }
+            }
+        });
 
         new Label(baseGrp, SWT.LEFT).setText("Service Key：");
         new Label(baseGrp, SWT.LEFT).setText("");
@@ -113,6 +129,19 @@ public class BasePreferencePage extends PreferencePage {
         serviceKeyTxt.addListener(SWT.FocusIn, new Listener() {
             public void handleEvent(Event e) {
                 serviceKeyTxt.selectAll();
+            }
+        });
+        serviceKeyTxt.addModifyListener(new ModifyListener() {
+            @Override
+            public void modifyText(ModifyEvent e) {
+                String contrastUrlStr = contrastUrlTxt.getText();
+                String serviceKeyStr = serviceKeyTxt.getText();
+                String userNameStr = userNameTxt.getText();
+                if (contrastUrlStr.isEmpty() || serviceKeyStr.isEmpty() || userNameStr.isEmpty()) {
+                    addBtn.setEnabled(false);
+                } else {
+                    addBtn.setEnabled(true);
+                }
             }
         });
 
@@ -128,6 +157,19 @@ public class BasePreferencePage extends PreferencePage {
         userNameTxt.addListener(SWT.FocusIn, new Listener() {
             public void handleEvent(Event e) {
                 userNameTxt.selectAll();
+            }
+        });
+        userNameTxt.addModifyListener(new ModifyListener() {
+            @Override
+            public void modifyText(ModifyEvent e) {
+                String contrastUrlStr = contrastUrlTxt.getText();
+                String serviceKeyStr = serviceKeyTxt.getText();
+                String userNameStr = userNameTxt.getText();
+                if (contrastUrlStr.isEmpty() || serviceKeyStr.isEmpty() || userNameStr.isEmpty()) {
+                    addBtn.setEnabled(false);
+                } else {
+                    addBtn.setEnabled(true);
+                }
             }
         });
 
@@ -184,9 +226,14 @@ public class BasePreferencePage extends PreferencePage {
         buttonGrp.setLayoutData(new GridData(GridData.FILL_VERTICAL));
         buttonGrp.setLayout(new GridLayout(1, true));
 
-        final Button addBtn = new Button(buttonGrp, SWT.NULL);
+        addBtn = new Button(buttonGrp, SWT.NULL);
         addBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         addBtn.setText("追加");
+        if (contrastUrlTxt.getText().isEmpty() || serviceKeyTxt.getText().isEmpty() || userNameTxt.getText().isEmpty()) {
+            addBtn.setEnabled(false);
+        } else {
+            addBtn.setEnabled(true);
+        }
         addBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {

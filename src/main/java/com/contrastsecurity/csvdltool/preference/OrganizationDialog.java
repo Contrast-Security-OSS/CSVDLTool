@@ -28,6 +28,8 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -53,7 +55,6 @@ public class OrganizationDialog extends Dialog {
     private Text orgIdTxt;
     private Text apiKeyTxt;
 
-    private String jsonStr;
     private Organization org;
 
     public OrganizationDialog(Shell parentShell, IPreferenceStore preferenceStore, String url, String usr, String svc) {
@@ -71,14 +72,34 @@ public class OrganizationDialog extends Dialog {
         new Label(composite, SWT.LEFT).setText("組織ID：");
         orgIdTxt = new Text(composite, SWT.BORDER);
         orgIdTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        orgIdTxt.addModifyListener(new ModifyListener() {
+            @Override
+            public void modifyText(ModifyEvent e) {
+                String orgStr = orgIdTxt.getText();
+                String apikeyStr = apiKeyTxt.getText();
+                if (orgStr.isBlank() || apikeyStr.isBlank()) {
+                    getButton(IDialogConstants.OK_ID).setEnabled(false);
+                } else {
+                    getButton(IDialogConstants.OK_ID).setEnabled(true);
+                }
+            }
+        });
         new Label(composite, SWT.LEFT).setText("API Key：");
         apiKeyTxt = new Text(composite, SWT.BORDER);
         apiKeyTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        apiKeyTxt.addModifyListener(new ModifyListener() {
+            @Override
+            public void modifyText(ModifyEvent e) {
+                String orgStr = orgIdTxt.getText();
+                String apikeyStr = apiKeyTxt.getText();
+                if (orgStr.isBlank() || apikeyStr.isBlank()) {
+                    getButton(IDialogConstants.OK_ID).setEnabled(false);
+                } else {
+                    getButton(IDialogConstants.OK_ID).setEnabled(true);
+                }
+            }
+        });
         return composite;
-    }
-
-    public String getJsonStr() {
-        return jsonStr;
     }
 
     public Organization getOrg() {
@@ -89,7 +110,7 @@ public class OrganizationDialog extends Dialog {
     protected void createButtonsForButtonBar(Composite parent) {
         createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
         Button okButton = createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL, true);
-        okButton.setEnabled(true);
+        okButton.setEnabled(false);
     }
 
     @Override
@@ -126,6 +147,6 @@ public class OrganizationDialog extends Dialog {
     @Override
     protected void configureShell(Shell newShell) {
         super.configureShell(newShell);
-        newShell.setText("定義基点ディレクトリ");
+        newShell.setText("組織の追加");
     }
 }

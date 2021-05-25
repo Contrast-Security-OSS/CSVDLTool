@@ -77,7 +77,7 @@ public class OrganizationDialog extends Dialog {
             public void modifyText(ModifyEvent e) {
                 String orgStr = orgIdTxt.getText();
                 String apikeyStr = apiKeyTxt.getText();
-                if (orgStr.isBlank() || apikeyStr.isBlank()) {
+                if (orgStr.isEmpty() || apikeyStr.isEmpty()) {
                     getButton(IDialogConstants.OK_ID).setEnabled(false);
                 } else {
                     getButton(IDialogConstants.OK_ID).setEnabled(true);
@@ -92,7 +92,7 @@ public class OrganizationDialog extends Dialog {
             public void modifyText(ModifyEvent e) {
                 String orgStr = orgIdTxt.getText();
                 String apikeyStr = apiKeyTxt.getText();
-                if (orgStr.isBlank() || apikeyStr.isBlank()) {
+                if (orgStr.isEmpty() || apikeyStr.isEmpty()) {
                     getButton(IDialogConstants.OK_ID).setEnabled(false);
                 } else {
                     getButton(IDialogConstants.OK_ID).setEnabled(true);

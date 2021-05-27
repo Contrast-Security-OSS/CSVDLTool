@@ -324,24 +324,20 @@ public class BasePreferencePage extends PreferencePage {
 
     @Override
     public boolean performOk() {
-        String url = contrastUrlTxt.getText();
-        String usr = userNameTxt.getText();
-        String svc = serviceKeyTxt.getText();
-        if (url.isEmpty() || usr.isEmpty() || svc.isEmpty()) {
-            MessageDialog.openError(getShell(), "基本設定", "4つの項目を埋めて、組織情報を取得してください。");
-            return false;
-        }
         IPreferenceStore ps = getPreferenceStore();
         if (ps == null) {
             return true;
         }
-        if (this.contrastUrlTxt != null) {
+        String url = contrastUrlTxt.getText();
+        String svc = serviceKeyTxt.getText();
+        String usr = userNameTxt.getText();
+        if (!url.trim().isEmpty()) {
             ps.setValue(PreferenceConstants.CONTRAST_URL, this.contrastUrlTxt.getText());
         }
-        if (this.serviceKeyTxt != null) {
+        if (!svc.trim().isEmpty()) {
             ps.setValue(PreferenceConstants.SERVICE_KEY, this.serviceKeyTxt.getText());
         }
-        if (this.userNameTxt != null) {
+        if (!usr.trim().isEmpty()) {
             ps.setValue(PreferenceConstants.USERNAME, this.userNameTxt.getText());
         }
         if (selectedIdx > -1) {

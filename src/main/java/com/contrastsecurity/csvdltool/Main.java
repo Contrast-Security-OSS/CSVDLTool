@@ -87,6 +87,7 @@ import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
 import com.contrastsecurity.csvdltool.preference.VulCSVColumnPreferencePage;
 import com.contrastsecurity.csvdltool.preference.VulOtherPreferencePage;
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
 public class Main implements PropertyChangeListener {
@@ -826,12 +827,16 @@ public class Main implements PropertyChangeListener {
     public Organization getValidOrganization() {
         String orgJsonStr = preferenceStore.getString(PreferenceConstants.TARGET_ORGS);
         if (orgJsonStr.trim().length() > 0) {
-            List<Organization> orgList = new Gson().fromJson(orgJsonStr, new TypeToken<List<Organization>>() {
-            }.getType());
-            for (Organization org : orgList) {
-                if (org.isValid()) {
-                    return org;
+            try {
+                List<Organization> orgList = new Gson().fromJson(orgJsonStr, new TypeToken<List<Organization>>() {
+                }.getType());
+                for (Organization org : orgList) {
+                    if (org.isValid()) {
+                        return org;
+                    }
                 }
+            } catch (JsonSyntaxException e) {
+                return null;
             }
         }
         return null;

@@ -56,6 +56,7 @@ import org.eclipse.swt.widgets.Text;
 import com.contrastsecurity.csvdltool.Main;
 import com.contrastsecurity.csvdltool.model.Organization;
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
 public class BasePreferencePage extends PreferencePage {
@@ -185,8 +186,13 @@ public class BasePreferencePage extends PreferencePage {
 
         String orgJsonStr = preferenceStore.getString(PreferenceConstants.TARGET_ORGS);
         if (orgJsonStr.trim().length() > 0) {
-            orgList = new Gson().fromJson(orgJsonStr, new TypeToken<List<Organization>>() {
-            }.getType());
+            try {
+                orgList = new Gson().fromJson(orgJsonStr, new TypeToken<List<Organization>>() {
+                }.getType());
+            } catch (JsonSyntaxException e) {
+                MessageDialog.openError(getShell(), "組織設定の読み込み", String.format("組織設定の内容に問題があります。\r\n%s", orgJsonStr));
+                orgList = new ArrayList<Organization>();
+            }
         } else {
             orgList = new ArrayList<Organization>();
         }

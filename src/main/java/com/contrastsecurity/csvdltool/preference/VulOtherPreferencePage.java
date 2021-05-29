@@ -203,35 +203,23 @@ public class VulOtherPreferencePage extends PreferencePage {
     @Override
     public boolean performOk() {
         IPreferenceStore ps = getPreferenceStore();
-        List<String> errors = new ArrayList<String>();
         if (ps == null) {
             return true;
         }
-        if (this.sleepTxt != null) {
-            if (this.sleepTxt.getText().isEmpty()) {
-                errors.add("・脆弱性取得間隔スリープを指定してください。");
-            } else {
-                if (!StringUtils.isNumeric(this.sleepTxt.getText())) {
-                    errors.add("・脆弱性取得間隔スリープは数値を指定してください。");
-                }
+        List<String> errors = new ArrayList<String>();
+        if (this.sleepTxt.getText().isEmpty()) {
+            errors.add("・脆弱性取得間隔スリープを指定してください。");
+        } else {
+            if (!StringUtils.isNumeric(this.sleepTxt.getText())) {
+                errors.add("・脆弱性取得間隔スリープは数値を指定してください。");
             }
-            ps.setValue(PreferenceConstants.SLEEP_VUL, this.sleepTxt.getText());
         }
-        if (this.csvSepTagTxt != null) {
-            ps.setValue(PreferenceConstants.CSV_SEPARATOR_TAG, this.csvSepTagTxt.getText());
-        }
-        if (this.csvSepBuildNoTxt != null) {
-            ps.setValue(PreferenceConstants.CSV_SEPARATOR_BUILDNO, this.csvSepBuildNoTxt.getText());
-        }
-        if (this.csvSepGroupTxt != null) {
-            ps.setValue(PreferenceConstants.CSV_SEPARATOR_GROUP, this.csvSepGroupTxt.getText());
-        }
-        if (this.csvSepServerTxt != null) {
-            ps.setValue(PreferenceConstants.CSV_SEPARATOR_SERVER, this.csvSepServerTxt.getText());
-        }
-        if (this.csvFileForamtTxt != null) {
-            ps.setValue(PreferenceConstants.CSV_FILE_FORMAT_VUL, this.csvFileForamtTxt.getText());
-        }
+        ps.setValue(PreferenceConstants.SLEEP_VUL, this.sleepTxt.getText());
+        ps.setValue(PreferenceConstants.CSV_SEPARATOR_TAG, this.csvSepTagTxt.getText());
+        ps.setValue(PreferenceConstants.CSV_SEPARATOR_BUILDNO, this.csvSepBuildNoTxt.getText());
+        ps.setValue(PreferenceConstants.CSV_SEPARATOR_GROUP, this.csvSepGroupTxt.getText());
+        ps.setValue(PreferenceConstants.CSV_SEPARATOR_SERVER, this.csvSepServerTxt.getText());
+        ps.setValue(PreferenceConstants.CSV_FILE_FORMAT_VUL, this.csvFileForamtTxt.getText());
         if (!errors.isEmpty()) {
             MessageDialog.openError(getShell(), "その他設定", String.join("\r\n", errors));
             return false;

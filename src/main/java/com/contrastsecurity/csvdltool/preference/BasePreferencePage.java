@@ -334,18 +334,9 @@ public class BasePreferencePage extends PreferencePage {
         if (ps == null) {
             return true;
         }
-        String url = contrastUrlTxt.getText();
-        String svc = serviceKeyTxt.getText();
-        String usr = userNameTxt.getText();
-        if (!url.trim().isEmpty()) {
-            ps.setValue(PreferenceConstants.CONTRAST_URL, this.contrastUrlTxt.getText());
-        }
-        if (!svc.trim().isEmpty()) {
-            ps.setValue(PreferenceConstants.SERVICE_KEY, this.serviceKeyTxt.getText());
-        }
-        if (!usr.trim().isEmpty()) {
-            ps.setValue(PreferenceConstants.USERNAME, this.userNameTxt.getText());
-        }
+        ps.setValue(PreferenceConstants.CONTRAST_URL, this.contrastUrlTxt.getText());
+        ps.setValue(PreferenceConstants.SERVICE_KEY, this.serviceKeyTxt.getText());
+        ps.setValue(PreferenceConstants.USERNAME, this.userNameTxt.getText());
         if (selectedIdx > -1) {
             TableItem selectedItem = table.getItem(selectedIdx);
             for (Organization org : this.orgList) {

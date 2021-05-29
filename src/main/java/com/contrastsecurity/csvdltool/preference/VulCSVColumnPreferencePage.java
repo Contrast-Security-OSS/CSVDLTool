@@ -216,10 +216,10 @@ public class VulCSVColumnPreferencePage extends PreferencePage {
     @Override
     public boolean performOk() {
         IPreferenceStore ps = getPreferenceStore();
-        List<String> errors = new ArrayList<String>();
         if (ps == null) {
             return true;
         }
+        List<String> errors = new ArrayList<String>();
         Object[] elements = viewer.getCheckedElements();
         List<String> checkedList = new ArrayList<String>();
         for (Object element : elements) {

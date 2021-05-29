@@ -203,35 +203,23 @@ public class LibOtherPreferencePage extends PreferencePage {
     @Override
     public boolean performOk() {
         IPreferenceStore ps = getPreferenceStore();
-        List<String> errors = new ArrayList<String>();
         if (ps == null) {
             return true;
         }
-        if (this.sleepTxt != null) {
-            if (this.sleepTxt.getText().isEmpty()) {
-                errors.add("・ライブラリ取得間隔スリープを指定してください。");
-            } else {
-                if (!StringUtils.isNumeric(this.sleepTxt.getText())) {
-                    errors.add("・ライブラリ取得間隔スリープは数値を指定してください。");
-                }
+        List<String> errors = new ArrayList<String>();
+        if (this.sleepTxt.getText().isEmpty()) {
+            errors.add("・ライブラリ取得間隔スリープを指定してください。");
+        } else {
+            if (!StringUtils.isNumeric(this.sleepTxt.getText())) {
+                errors.add("・ライブラリ取得間隔スリープは数値を指定してください。");
             }
-            ps.setValue(PreferenceConstants.SLEEP_LIB, this.sleepTxt.getText());
         }
-        if (this.csvSepLicenseTxt != null) {
-            ps.setValue(PreferenceConstants.CSV_SEPARATOR_LICENSE, this.csvSepLicenseTxt.getText());
-        }
-        if (this.csvSepRelatedApplicationTxt != null) {
-            ps.setValue(PreferenceConstants.CSV_SEPARATOR_RELATED_APPLICATION, this.csvSepRelatedApplicationTxt.getText());
-        }
-        if (this.csvSepRelatedServerTxt != null) {
-            ps.setValue(PreferenceConstants.CSV_SEPARATOR_RELATED_SERVER, this.csvSepRelatedServerTxt.getText());
-        }
-        if (this.csvSepCVETxt != null) {
-            ps.setValue(PreferenceConstants.CSV_SEPARATOR_CVE, this.csvSepCVETxt.getText());
-        }
-        if (this.csvFileForamtTxt != null) {
-            ps.setValue(PreferenceConstants.CSV_FILE_FORMAT_LIB, this.csvFileForamtTxt.getText());
-        }
+        ps.setValue(PreferenceConstants.SLEEP_LIB, this.sleepTxt.getText());
+        ps.setValue(PreferenceConstants.CSV_SEPARATOR_LICENSE, this.csvSepLicenseTxt.getText());
+        ps.setValue(PreferenceConstants.CSV_SEPARATOR_RELATED_APPLICATION, this.csvSepRelatedApplicationTxt.getText());
+        ps.setValue(PreferenceConstants.CSV_SEPARATOR_RELATED_SERVER, this.csvSepRelatedServerTxt.getText());
+        ps.setValue(PreferenceConstants.CSV_SEPARATOR_CVE, this.csvSepCVETxt.getText());
+        ps.setValue(PreferenceConstants.CSV_FILE_FORMAT_LIB, this.csvFileForamtTxt.getText());
         if (!errors.isEmpty()) {
             MessageDialog.openError(getShell(), "その他設定", String.join("\r\n", errors));
             return false;

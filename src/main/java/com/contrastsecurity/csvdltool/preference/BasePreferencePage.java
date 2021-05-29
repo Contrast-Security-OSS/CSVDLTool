@@ -334,6 +334,18 @@ public class BasePreferencePage extends PreferencePage {
         if (ps == null) {
             return true;
         }
+        String url = this.contrastUrlTxt.getText();
+        String svc = this.serviceKeyTxt.getText();
+        String usr = this.userNameTxt.getText();
+        if (url.isEmpty() || svc.isEmpty() || usr.isEmpty()) {
+            if (!this.orgList.isEmpty()) {
+                MessageDialog.openError(getShell(), "基本設定", "組織一覧に設定が残っている場合、Contrast URL, Service Key, Usernameはブランクにできません。\r\nこれらをブランクにする場合は組織一覧の設定をすべて削除してください。");
+                contrastUrlTxt.setText(ps.getString(PreferenceConstants.CONTRAST_URL));
+                serviceKeyTxt.setText(ps.getString(PreferenceConstants.SERVICE_KEY));
+                userNameTxt.setText(ps.getString(PreferenceConstants.USERNAME));
+                return false;
+            }
+        }
         ps.setValue(PreferenceConstants.CONTRAST_URL, this.contrastUrlTxt.getText());
         ps.setValue(PreferenceConstants.SERVICE_KEY, this.serviceKeyTxt.getText());
         ps.setValue(PreferenceConstants.USERNAME, this.userNameTxt.getText());

@@ -196,6 +196,19 @@ public class BasePreferencePage extends PreferencePage {
         } else {
             orgList = new ArrayList<Organization>();
         }
+        // Clean up ここから
+        List<Integer> irregularIndexes = new ArrayList<Integer>();
+        for (int i = 0; i < orgList.size(); i++) {
+            Object obj = orgList.get(i);
+            if (!(obj instanceof Organization)) {
+                irregularIndexes.add(i);
+            }
+        }
+        int[] irregularArray = irregularIndexes.stream().mapToInt(i -> i).toArray();
+        for (int i = irregularArray.length - 1; i >= 0; i--) {
+            orgList.remove(i);
+        }
+        // Clean up ここまで
 
         table = new Table(orgTableGrp, SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION);
         GridData tableGrDt = new GridData(GridData.FILL_BOTH);
@@ -249,6 +262,9 @@ public class BasePreferencePage extends PreferencePage {
                     return;
                 }
                 Organization rtnOrg = pathDialog.getOrg();
+                if (rtnOrg == null) {
+                    return;
+                }
                 // String path = pathDialog.getDirPath();
                 if (orgList.contains(rtnOrg)) {
                     MessageDialog.openError(composite.getShell(), "組織", "すでに設定されている組織です。");
@@ -364,6 +380,9 @@ public class BasePreferencePage extends PreferencePage {
     }
 
     private void addOrgToTable(Organization org) {
+        if (org == null) {
+            return;
+        }
         TableEditor editor = new TableEditor(table);
         Button button = new Button(table, SWT.CHECK);
         if (org.isValid()) {

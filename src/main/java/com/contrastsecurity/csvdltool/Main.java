@@ -831,7 +831,7 @@ public class Main implements PropertyChangeListener {
                 List<Organization> orgList = new Gson().fromJson(orgJsonStr, new TypeToken<List<Organization>>() {
                 }.getType());
                 for (Organization org : orgList) {
-                    if (org.isValid()) {
+                    if (org != null && org.isValid()) {
                         return org;
                     }
                 }

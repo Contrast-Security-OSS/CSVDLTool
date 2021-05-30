@@ -326,6 +326,12 @@ public class BasePreferencePage extends PreferencePage {
                 }
             }
         });
+
+        Label csvFileFormatHint = new Label(orgTableGrp, SWT.LEFT);
+        GridData csvFileFormatHintGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        csvFileFormatHint.setLayoutData(csvFileFormatHintGrDt);
+        csvFileFormatHint.setText("※ プロキシ経由など接続に関する設定が必要な場合は「接続設定」で事前に設定を済ませておいてください。");
+
         Button applyBtn = new Button(composite, SWT.NULL);
         GridData applyBtnGrDt = new GridData(SWT.RIGHT, SWT.BOTTOM, true, true, 1, 1);
         applyBtnGrDt.widthHint = 90;

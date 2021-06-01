@@ -418,6 +418,5 @@ public class BasePreferencePage extends PreferencePage {
         item.setText(2, org.getName());
         item.setText(3, org.getOrganization_uuid());
         item.setText(4, org.getApikey());
-
     }
 }

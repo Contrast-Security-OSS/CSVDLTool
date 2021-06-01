@@ -85,6 +85,7 @@ import com.contrastsecurity.csvdltool.preference.LibOtherPreferencePage;
 import com.contrastsecurity.csvdltool.preference.MyPreferenceDialog;
 import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
 import com.contrastsecurity.csvdltool.preference.VulCSVColumnPreferencePage;
+import com.contrastsecurity.csvdltool.preference.VulCSVColumnPreferencePage2;
 import com.contrastsecurity.csvdltool.preference.VulOtherPreferencePage;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -764,6 +765,7 @@ public class Main implements PropertyChangeListener {
                 PreferenceNode baseNode = new PreferenceNode("base", new BasePreferencePage());
                 PreferenceNode connectionNode = new PreferenceNode("connection", new ConnectionPreferencePage());
                 PreferenceNode vulCsvColumnNode = new PreferenceNode("vulcsvcolumn", new VulCSVColumnPreferencePage());
+                PreferenceNode vulCsvColumnNode2 = new PreferenceNode("vulcsvcolumn2", new VulCSVColumnPreferencePage2());
                 PreferenceNode vulOtherNode = new PreferenceNode("vulother", new VulOtherPreferencePage());
                 PreferenceNode libCsvColumnNode = new PreferenceNode("libcsvcolumn", new LibCSVColumnPreferencePage());
                 PreferenceNode libOtherNode = new PreferenceNode("libother", new LibOtherPreferencePage());
@@ -773,6 +775,7 @@ public class Main implements PropertyChangeListener {
                 mgr.addTo(vulCsvColumnNode.getId(), vulOtherNode);
                 mgr.addToRoot(libCsvColumnNode);
                 mgr.addTo(libCsvColumnNode.getId(), libOtherNode);
+                mgr.addToRoot(vulCsvColumnNode2);
                 PreferenceNode aboutNode = new PreferenceNode("about", new AboutPage());
                 mgr.addToRoot(aboutNode);
                 PreferenceDialog dialog = new MyPreferenceDialog(shell, mgr);

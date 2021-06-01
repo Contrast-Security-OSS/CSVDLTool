@@ -64,6 +64,10 @@ public enum VulCSVColmunEnum {
         return culumn;
     }
 
+    public boolean isDefault() {
+        return isDefault;
+    }
+
     public static VulCSVColmunEnum[] defaultValues() {
         List<VulCSVColmunEnum> list = new ArrayList<VulCSVColmunEnum>();
         for (VulCSVColmunEnum e : VulCSVColmunEnum.sortedValues()) {

@@ -81,6 +81,7 @@ import com.contrastsecurity.csvdltool.preference.AboutPage;
 import com.contrastsecurity.csvdltool.preference.BasePreferencePage;
 import com.contrastsecurity.csvdltool.preference.ConnectionPreferencePage;
 import com.contrastsecurity.csvdltool.preference.LibCSVColumnPreferencePage;
+import com.contrastsecurity.csvdltool.preference.LibCSVColumnPreferencePage2;
 import com.contrastsecurity.csvdltool.preference.LibOtherPreferencePage;
 import com.contrastsecurity.csvdltool.preference.MyPreferenceDialog;
 import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
@@ -162,7 +163,7 @@ public class Main implements PropertyChangeListener {
             this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_SERVER, ",");
             this.preferenceStore.setDefault(PreferenceConstants.CSV_FILE_FORMAT_VUL, "'vul'_yyyy-MM-dd_HHmmss");
 
-            this.preferenceStore.setDefault(PreferenceConstants.CSV_COLUMN_LIB, LibCSVColmunEnum.defaultValuesStr());
+            this.preferenceStore.setDefault(PreferenceConstants.CSV_COLUMN_LIB, LibCSVColmunEnum.defaultValuesStr2());
             this.preferenceStore.setDefault(PreferenceConstants.SLEEP_LIB, 300);
             this.preferenceStore.setDefault(PreferenceConstants.CSV_OUT_HEADER_LIB, true);
             this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_LICENSE, ",");
@@ -769,6 +770,7 @@ public class Main implements PropertyChangeListener {
                 PreferenceNode vulOtherNode = new PreferenceNode("vulother", new VulOtherPreferencePage());
                 PreferenceNode libCsvColumnNode = new PreferenceNode("libcsvcolumn", new LibCSVColumnPreferencePage());
                 PreferenceNode libOtherNode = new PreferenceNode("libother", new LibOtherPreferencePage());
+                PreferenceNode libCsvColumnNode2 = new PreferenceNode("libcsvcolumn2", new LibCSVColumnPreferencePage2());
                 mgr.addToRoot(baseNode);
                 mgr.addToRoot(connectionNode);
                 mgr.addToRoot(vulCsvColumnNode);
@@ -776,6 +778,7 @@ public class Main implements PropertyChangeListener {
                 mgr.addToRoot(libCsvColumnNode);
                 mgr.addTo(libCsvColumnNode.getId(), libOtherNode);
                 mgr.addToRoot(vulCsvColumnNode2);
+                mgr.addToRoot(libCsvColumnNode2);
                 PreferenceNode aboutNode = new PreferenceNode("about", new AboutPage());
                 mgr.addToRoot(aboutNode);
                 PreferenceDialog dialog = new MyPreferenceDialog(shell, mgr);

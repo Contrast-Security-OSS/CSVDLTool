@@ -51,6 +51,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -69,9 +70,11 @@ public class VulCSVColumnPreferencePage2 extends PreferencePage {
     private List<Button> checkBoxList = new ArrayList<Button>();
     private List<Text> separateTextList = new ArrayList<Text>();
     private Table table;
+    private Text csvFileForamtTxt;
+    private Text sleepTxt;
 
     public VulCSVColumnPreferencePage2() {
-        super("脆弱性情報の出力設定");
+        super("脆弱性情報の出力設定（新）");
     }
 
     @Override
@@ -96,7 +99,16 @@ public class VulCSVColumnPreferencePage2 extends PreferencePage {
         GridData csvGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
         // csvGrpGrDt.horizontalSpan = 2;
         csvColumnGrp.setLayoutData(csvGrpGrDt);
-        csvColumnGrp.setText("CSV出力");
+        csvColumnGrp.setText("CSV出力内容の設定");
+
+        outCsvHeaderFlg = new Button(csvColumnGrp, SWT.CHECK);
+        GridData outCsvHeaderFlgGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        outCsvHeaderFlgGrDt.horizontalSpan = 3;
+        outCsvHeaderFlg.setLayoutData(outCsvHeaderFlgGrDt);
+        outCsvHeaderFlg.setText("カラムヘッダ（項目名）を出力");
+        if (preferenceStore.getBoolean(PreferenceConstants.CSV_OUT_HEADER_VUL)) {
+            outCsvHeaderFlg.setSelection(true);
+        }
 
         String columnJsonStr = preferenceStore.getString(PreferenceConstants.CSV_COLUMN_VUL);
         if (columnJsonStr.trim().length() > 0) {
@@ -138,7 +150,7 @@ public class VulCSVColumnPreferencePage2 extends PreferencePage {
         column0.setResizable(false);
         TableColumn column1 = new TableColumn(table, SWT.CENTER);
         column1.setWidth(50);
-        column1.setText("有効");
+        column1.setText("出力");
         TableColumn column2 = new TableColumn(table, SWT.LEFT);
         column2.setWidth(200);
         column2.setText("項目名");
@@ -259,14 +271,47 @@ public class VulCSVColumnPreferencePage2 extends PreferencePage {
             }
         });
 
-        outCsvHeaderFlg = new Button(csvColumnGrp, SWT.CHECK);
-        GridData outCsvHeaderFlgGrDt = new GridData(GridData.FILL_HORIZONTAL);
-        outCsvHeaderFlgGrDt.horizontalSpan = 2;
-        outCsvHeaderFlg.setLayoutData(outCsvHeaderFlgGrDt);
-        outCsvHeaderFlg.setText("カラムヘッダを出力");
-        if (preferenceStore.getBoolean(PreferenceConstants.CSV_OUT_HEADER_VUL)) {
-            outCsvHeaderFlg.setSelection(true);
-        }
+        Label descLabel = new Label(csvColumnGrp, SWT.LEFT);
+        descLabel.setText("・ ドラッグアンドドロップで項目の並び替えが可能です。\r\n・ 複数の値が出力される項目については、区切り文字が変更可能です。改行させる場合は\\r\\nをご指定してください。");
+        GridData descLabelGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        descLabelGrDt.horizontalSpan = 3;
+        descLabel.setLayoutData(descLabelGrDt);
+
+        Group csvFileFormatGrp = new Group(composite, SWT.NONE);
+        GridLayout csvFileFormatGrpLt = new GridLayout(1, false);
+        csvFileFormatGrpLt.marginWidth = 10;
+        csvFileFormatGrpLt.marginHeight = 10;
+        csvFileFormatGrpLt.horizontalSpacing = 10;
+        csvFileFormatGrp.setLayout(csvFileFormatGrpLt);
+        GridData csvFileFormatGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        // csvFileFormatGrpGrDt.horizontalSpan = 2;
+        csvFileFormatGrp.setLayoutData(csvFileFormatGrpGrDt);
+        csvFileFormatGrp.setText("CSV出力ファイルフォーマット（またはフォルダ名）");
+
+        csvFileForamtTxt = new Text(csvFileFormatGrp, SWT.BORDER);
+        csvFileForamtTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        csvFileForamtTxt.setText(preferenceStore.getString(PreferenceConstants.CSV_FILE_FORMAT_VUL));
+        csvFileForamtTxt.setMessage(preferenceStore.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT_VUL));
+        Label csvFileFormatHint = new Label(csvFileFormatGrp, SWT.LEFT);
+        GridData csvFileFormatHintGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        csvFileFormatHint.setLayoutData(csvFileFormatHintGrDt);
+        csvFileFormatHint.setText("※ java.text.SimpleDateFormatの書式としてください。\r\n例) 'vul_'yyyy-MM-dd_HHmmss");
+
+        Group ctrlGrp = new Group(composite, SWT.NONE);
+        GridLayout proxyGrpLt = new GridLayout(4, false);
+        proxyGrpLt.marginWidth = 15;
+        proxyGrpLt.horizontalSpacing = 10;
+        ctrlGrp.setLayout(proxyGrpLt);
+        GridData proxyGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        // proxyGrpGrDt.horizontalSpan = 4;
+        ctrlGrp.setLayoutData(proxyGrpGrDt);
+        ctrlGrp.setText("制御");
+
+        // ========== 脆弱性取得ごとスリープ ========== //
+        new Label(ctrlGrp, SWT.LEFT).setText("脆弱性取得間隔スリープ（ミリ秒）：");
+        sleepTxt = new Text(ctrlGrp, SWT.BORDER);
+        sleepTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        sleepTxt.setText(preferenceStore.getString(PreferenceConstants.SLEEP_VUL));
 
         Composite buttonGrp = new Composite(parent, SWT.NONE);
         GridLayout buttonGrpLt = new GridLayout(2, false);
@@ -306,6 +351,8 @@ public class VulCSVColumnPreferencePage2 extends PreferencePage {
                 for (VulCSVColumn col : columnList) {
                     addColToTable(col, -1);
                 }
+                csvFileForamtTxt.setText(preferenceStore.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT_VUL));
+                sleepTxt.setText(preferenceStore.getDefaultString(PreferenceConstants.SLEEP_VUL));
             }
         });
 
@@ -334,26 +381,13 @@ public class VulCSVColumnPreferencePage2 extends PreferencePage {
             return true;
         }
         List<String> errors = new ArrayList<String>();
-        // Object[] elements = viewer.getCheckedElements();
-        // List<String> checkedList = new ArrayList<String>();
-        // for (Object element : elements) {
-        // checkedList.add(element.toString());
-        // }
-        //
-        // List<String> list = new ArrayList<String>();
-        // for (String colName : checkedList) {
-        // list.add(VulCSVColmunEnum.getByName(colName).name());
-        // }
-        // if (list.isEmpty()) {
-        // errors.add("CSV出力項目を１つ以上選択してください。");
-        // } else {
-        // ps.setValue(PreferenceConstants.CSV_COLUMN_VUL, String.join(",", list));
-        // }
+        ps.setValue(PreferenceConstants.SLEEP_VUL, this.sleepTxt.getText());
+        ps.setValue(PreferenceConstants.CSV_FILE_FORMAT_VUL, this.csvFileForamtTxt.getText());
+        ps.setValue(PreferenceConstants.CSV_COLUMN_VUL, new Gson().toJson(this.columnList));
         if (!errors.isEmpty()) {
-            MessageDialog.openError(getShell(), "出力項目設定", String.join("\r\n", errors));
+            MessageDialog.openError(getShell(), "脆弱性情報の出力設定", String.join("\r\n", errors));
             return false;
         }
-        ps.setValue(PreferenceConstants.CSV_COLUMN_VUL, new Gson().toJson(this.columnList));
         return true;
     }
 

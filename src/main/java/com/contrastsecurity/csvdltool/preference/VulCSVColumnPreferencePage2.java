@@ -40,6 +40,8 @@ import org.eclipse.swt.dnd.DropTargetAdapter;
 import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -65,6 +67,7 @@ public class VulCSVColumnPreferencePage2 extends PreferencePage {
     private Button outCsvHeaderFlg;
     private List<VulCSVColumn> columnList;
     private List<Button> checkBoxList = new ArrayList<Button>();
+    private List<Text> separateTextList = new ArrayList<Text>();
     private Table table;
 
     public VulCSVColumnPreferencePage2() {
@@ -210,6 +213,10 @@ public class VulCSVColumnPreferencePage2 extends PreferencePage {
                         button.dispose();
                     }
                     checkBoxList.clear();
+                    for (Text text : separateTextList) {
+                        text.dispose();
+                    }
+                    separateTextList.clear();
                     table.removeAll();
                     for (VulCSVColumn col : columnList) {
                         addColToTable(col, -1);
@@ -288,6 +295,10 @@ public class VulCSVColumnPreferencePage2 extends PreferencePage {
                     button.dispose();
                 }
                 checkBoxList.clear();
+                for (Text text : separateTextList) {
+                    text.dispose();
+                }
+                separateTextList.clear();
                 table.removeAll();
                 for (VulCSVColmunEnum colEnum : VulCSVColmunEnum.sortedValues()) {
                     columnList.add(new VulCSVColumn(colEnum));
@@ -387,12 +398,24 @@ public class VulCSVColumnPreferencePage2 extends PreferencePage {
             text.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             text.setTextLimit(5);
             text.setText(col.getSeparateStr());
+            text.addModifyListener(new ModifyListener() {
+                @Override
+                public void modifyText(ModifyEvent e) {
+                    Text modifyText = (Text) e.getSource();
+                    int modifyIndex = separateTextList.indexOf(modifyText);
+                    String text = modifyText.getText();
+                    VulCSVColumn targetColumn = columnList.get(modifyIndex);
+                    targetColumn.setSeparateStr(text);
+                }
+            });
             text.pack();
             editor2.grabHorizontal = true;
             editor2.horizontalAlignment = SWT.LEFT;
             editor2.setEditor(text, item, 3);
+            separateTextList.add(text);
         } else {
             item.setText(3, "");
+            separateTextList.add(new Text(table, SWT.NONE));
         }
         item.setText(4, col.getColumn().getRemarks());
     }

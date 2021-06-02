@@ -233,7 +233,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                             case VUL_04:
                                 Api applicationTagsApi = new ApplicationTagsApi(preferenceStore, organization, appId);
                                 List<String> applicationTags = (List<String>) applicationTagsApi.get();
-                                csvLineList.add(String.join(csvSepTag, applicationTags));
+                                csvLineList.add(String.join(csvColumn.getSeparateStr().replace("\\r", "\r").replace("\\n", "\n"), applicationTags));
                                 break;
                             case VUL_05:
                                 csvLineList.add(trace.getCategory_label());
@@ -280,7 +280,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                                 break;
                             case VUL_11:
                                 if (appGroupMap.containsKey(appName)) {
-                                    csvLineList.add(String.join(csvSepGroup, appGroupMap.get(appName)));
+                                    csvLineList.add(String.join(csvColumn.getSeparateStr().replace("\\r", "\r").replace("\\n", "\n"), appGroupMap.get(appName)));
                                 } else {
                                     csvLineList.add("");
                                 }
@@ -295,11 +295,11 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                                 csvLineList.add(trace.getLast_time_seen());
                                 break;
                             case VUL_15:
-                                csvLineList.add(String.join(csvSepBuildNo, trace.getApp_version_tags()));
+                                csvLineList.add(String.join(csvColumn.getSeparateStr().replace("\\r", "\r").replace("\\n", "\n"), trace.getApp_version_tags()));
                                 break;
                             case VUL_16:
                                 List<String> serverNameList = trace.getServers().stream().map(Server::getName).collect(Collectors.toList());
-                                csvLineList.add(String.join(csvSepServer, serverNameList));
+                                csvLineList.add(String.join(csvColumn.getSeparateStr().replace("\\r", "\r").replace("\\n", "\n"), serverNameList));
                                 break;
                             case VUL_17:
                                 Application app = trace.getApplication();
@@ -309,7 +309,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                             case VUL_18:
                                 Api traceTagsApi = new TraceTagsApi(preferenceStore, organization, trace_id);
                                 List<String> traceTags = (List<String>) traceTagsApi.get();
-                                csvLineList.add(String.join(csvSepTag, traceTags));
+                                csvLineList.add(String.join(csvColumn.getSeparateStr().replace("\\r", "\r").replace("\\n", "\n"), traceTags));
                                 break;
                             case VUL_19:
                                 csvLineList.add(trace.getPending_status());

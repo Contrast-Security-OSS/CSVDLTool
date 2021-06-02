@@ -32,6 +32,15 @@ import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.TableEditor;
+import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.DragSource;
+import org.eclipse.swt.dnd.DragSourceAdapter;
+import org.eclipse.swt.dnd.DragSourceEvent;
+import org.eclipse.swt.dnd.DropTarget;
+import org.eclipse.swt.dnd.DropTargetAdapter;
+import org.eclipse.swt.dnd.DropTargetEvent;
+import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -44,6 +53,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.swt.widgets.Text;
 
 import com.contrastsecurity.csvdltool.VulCSVColmunEnum;
 import com.contrastsecurity.csvdltool.model.VulCSVColumn;
@@ -116,7 +126,7 @@ public class VulCSVColumnPreferencePage2 extends PreferencePage {
         }
         // Clean up ここまで
 
-        table = new Table(csvColumnGrp, SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION);
+        table = new Table(csvColumnGrp, SWT.BORDER | SWT.FULL_SELECTION);
         GridData tableGrDt = new GridData(GridData.FILL_BOTH);
         // tableGrDt.horizontalSpan = 2;
         table.setLayoutData(tableGrDt);
@@ -129,15 +139,83 @@ public class VulCSVColumnPreferencePage2 extends PreferencePage {
         column1.setWidth(50);
         column1.setText("有効");
         TableColumn column2 = new TableColumn(table, SWT.LEFT);
-        column2.setWidth(150);
+        column2.setWidth(200);
         column2.setText("項目名");
         TableColumn column3 = new TableColumn(table, SWT.CENTER);
-        column3.setWidth(250);
+        column3.setWidth(100);
         column3.setText("区切り文字");
+        TableColumn column4 = new TableColumn(table, SWT.CENTER);
+        column4.setWidth(300);
+        column4.setText("備考");
 
         for (VulCSVColumn col : columnList) {
-            this.addColToTable(col);
+            this.addColToTable(col, -1);
         }
+
+        Transfer[] types = new Transfer[] { TextTransfer.getInstance() };
+        DragSource source = new DragSource(table, DND.DROP_MOVE);
+        source.setTransfer(types);
+        source.addDragListener(new DragSourceAdapter() {
+            public void dragSetData(DragSourceEvent event) {
+                DragSource ds = (DragSource) event.widget;
+                Table table = (Table) ds.getControl();
+                TableItem[] selection = table.getSelection();
+                event.data = selection[0].getText(2);
+                int sourceIndex = table.indexOf(selection[0]);
+                event.data = String.valueOf(sourceIndex);
+            }
+        });
+
+        DropTarget target = new DropTarget(table, DND.DROP_MOVE);
+        target.setTransfer(types);
+        target.addDropListener(new DropTargetAdapter() {
+            public void dragEnter(DropTargetEvent event) {
+                System.out.println("dragEnter");
+                // Allow dropping text only
+//                for (int i = 0, n = event.dataTypes.length; i < n; i++) {
+//                    if (TextTransfer.getInstance().isSupportedType(event.dataTypes[i])) {
+//                        event.currentDataType = event.dataTypes[i];
+//                    }
+//                }
+            }
+
+            public void dragOver(DropTargetEvent event) {
+//                System.out.println("dragOver");
+                event.feedback = DND.FEEDBACK_SELECT | DND.FEEDBACK_SCROLL;
+            }
+
+            public void drop(DropTargetEvent event) {
+                System.out.println("drop");
+                if (TextTransfer.getInstance().isSupportedType(event.currentDataType)) {
+                    // Get the dropped data
+                    DropTarget target = (DropTarget) event.widget;
+                    Table table = (Table) target.getControl();
+                    TableItem item = (TableItem) event.item;
+                    System.out.println(item.getText(2));
+                    String sourceIndexStr = (String) event.data;
+                    int sourceIndex = Integer.valueOf(sourceIndexStr);
+                    int targetIndex = table.indexOf(item);
+                    System.out.println(sourceIndex);
+                    System.out.println(targetIndex);
+                    if (sourceIndex == targetIndex) {
+                        return;
+                    }
+                    if (sourceIndex < targetIndex) {
+                        VulCSVColumn targetColumn = columnList.get(sourceIndex);
+                        columnList.add(targetIndex, targetColumn);
+                        columnList.remove(sourceIndex);
+                    } else if (sourceIndex > targetIndex) {
+                        VulCSVColumn targetColumn = columnList.remove(sourceIndex);
+                        columnList.add(targetIndex, targetColumn);
+                    }
+                    checkBoxList.clear();
+                    table.removeAll();
+                    for (VulCSVColumn col : columnList) {
+                        addColToTable(col, -1);
+                    }
+                }
+            }
+        });
 
         Composite chkButtonGrp = new Composite(csvColumnGrp, SWT.NONE);
         chkButtonGrp.setLayoutData(new GridData(GridData.FILL_VERTICAL));
@@ -231,29 +309,30 @@ public class VulCSVColumnPreferencePage2 extends PreferencePage {
             return true;
         }
         List<String> errors = new ArrayList<String>();
-        Object[] elements = viewer.getCheckedElements();
-        List<String> checkedList = new ArrayList<String>();
-        for (Object element : elements) {
-            checkedList.add(element.toString());
-        }
-
-        List<String> list = new ArrayList<String>();
-        for (String colName : checkedList) {
-            list.add(VulCSVColmunEnum.getByName(colName).name());
-        }
-        if (list.isEmpty()) {
-            errors.add("CSV出力項目を１つ以上選択してください。");
-        } else {
-            ps.setValue(PreferenceConstants.CSV_COLUMN_VUL, String.join(",", list));
-        }
+//        Object[] elements = viewer.getCheckedElements();
+//        List<String> checkedList = new ArrayList<String>();
+//        for (Object element : elements) {
+//            checkedList.add(element.toString());
+//        }
+//
+//        List<String> list = new ArrayList<String>();
+//        for (String colName : checkedList) {
+//            list.add(VulCSVColmunEnum.getByName(colName).name());
+//        }
+//        if (list.isEmpty()) {
+//            errors.add("CSV出力項目を１つ以上選択してください。");
+//        } else {
+//            ps.setValue(PreferenceConstants.CSV_COLUMN_VUL, String.join(",", list));
+//        }
         if (!errors.isEmpty()) {
             MessageDialog.openError(getShell(), "出力項目設定", String.join("\r\n", errors));
             return false;
         }
+        ps.setValue(PreferenceConstants.CSV_COLUMN_VUL, new Gson().toJson(this.columnList));
         return true;
     }
 
-    private void addColToTable(VulCSVColumn col) {
+    private void addColToTable(VulCSVColumn col, int index) {
         if (col == null) {
             return;
         }
@@ -266,10 +345,10 @@ public class VulCSVColumnPreferencePage2 extends PreferencePage {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 Button triggerBtn = (Button) e.getSource();
-                for (Button button : checkBoxList) {
-                    button.setSelection(false);
-                }
-                triggerBtn.setSelection(true);
+                int clickIndex = checkBoxList.indexOf(triggerBtn);
+                boolean selected = triggerBtn.getSelection();
+                VulCSVColumn targetColumn = columnList.get(clickIndex);
+                targetColumn.setValid(selected);
             }
 
             @Override
@@ -277,12 +356,29 @@ public class VulCSVColumnPreferencePage2 extends PreferencePage {
             }
         });
         button.pack();
-        TableItem item = new TableItem(table, SWT.CENTER);
+        TableItem item = null;
+        if (index > 0) {
+            item = new TableItem(table, SWT.CENTER, index);
+        } else {
+            item = new TableItem(table, SWT.CENTER);
+        }
         editor.minimumWidth = button.getSize().x;
         editor.horizontalAlignment = SWT.CENTER;
         editor.setEditor(button, item, 1);
         checkBoxList.add(button);
         item.setText(2, col.getColumn().getCulumn());
-        item.setText(3, col.getSeparate());
+        if (col.isSeparate()) {
+            TableEditor editor2 = new TableEditor(table);
+            Text text = new Text(table, SWT.NONE);
+            text.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+            text.setTextLimit(3);
+            text.setText(col.getSeparateStr());
+            text.pack();
+            editor2.minimumWidth = 90;
+            editor2.horizontalAlignment = SWT.LEFT;
+            editor2.setEditor(text, item, 3);
+        } else {
+            item.setText(3, "");
+        }
     }
 }

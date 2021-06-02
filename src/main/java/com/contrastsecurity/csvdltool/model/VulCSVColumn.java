@@ -27,12 +27,14 @@ import com.contrastsecurity.csvdltool.VulCSVColmunEnum;
 
 public class VulCSVColumn {
     private VulCSVColmunEnum column;
-    private String separate;
+    private String separateStr;
+    private boolean separate;
     private boolean valid;
 
     public VulCSVColumn(VulCSVColmunEnum column) {
         this.column = column;
-        this.separate = "";
+        this.separateStr = column.getSeparate();
+        this.separate = column.isSeparate();
         this.valid = column.isDefault();
     }
 
@@ -44,11 +46,19 @@ public class VulCSVColumn {
         this.column = column;
     }
 
-    public String getSeparate() {
+    public String getSeparateStr() {
+        return separateStr;
+    }
+
+    public void setSeparateStr(String separateStr) {
+        this.separateStr = separateStr;
+    }
+
+    public boolean isSeparate() {
         return separate;
     }
 
-    public void setSeparate(String separate) {
+    public void setSeparate(boolean separate) {
         this.separate = separate;
     }
 

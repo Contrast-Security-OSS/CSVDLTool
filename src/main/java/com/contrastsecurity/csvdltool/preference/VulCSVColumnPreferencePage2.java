@@ -228,6 +228,12 @@ public class VulCSVColumnPreferencePage2 extends PreferencePage {
         allOnBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
+                for (VulCSVColumn col : columnList) {
+                    col.setValid(true);
+                }
+                for (Button button : checkBoxList) {
+                    button.setSelection(true);
+                }
             }
         });
 
@@ -237,6 +243,12 @@ public class VulCSVColumnPreferencePage2 extends PreferencePage {
         allOffBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
+                for (Button button : checkBoxList) {
+                    button.setSelection(false);
+                }
+                for (VulCSVColumn col : columnList) {
+                    col.setValid(false);
+                }
             }
         });
 

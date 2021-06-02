@@ -29,7 +29,6 @@ import java.util.List;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
-import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.TableEditor;
 import org.eclipse.swt.dnd.DND;
@@ -64,7 +63,6 @@ import com.google.gson.reflect.TypeToken;
 public class VulCSVColumnPreferencePage2 extends PreferencePage {
 
     private Button outCsvHeaderFlg;
-    private CheckboxTableViewer viewer;
     private List<VulCSVColumn> columnList;
     private List<Button> checkBoxList = new ArrayList<Button>();
     private Table table;
@@ -142,10 +140,10 @@ public class VulCSVColumnPreferencePage2 extends PreferencePage {
         column2.setWidth(200);
         column2.setText("項目名");
         TableColumn column3 = new TableColumn(table, SWT.CENTER);
-        column3.setWidth(100);
+        column3.setWidth(75);
         column3.setText("区切り文字");
-        TableColumn column4 = new TableColumn(table, SWT.CENTER);
-        column4.setWidth(300);
+        TableColumn column4 = new TableColumn(table, SWT.LEFT);
+        column4.setWidth(350);
         column4.setText("備考");
 
         for (VulCSVColumn col : columnList) {
@@ -172,15 +170,15 @@ public class VulCSVColumnPreferencePage2 extends PreferencePage {
             public void dragEnter(DropTargetEvent event) {
                 System.out.println("dragEnter");
                 // Allow dropping text only
-//                for (int i = 0, n = event.dataTypes.length; i < n; i++) {
-//                    if (TextTransfer.getInstance().isSupportedType(event.dataTypes[i])) {
-//                        event.currentDataType = event.dataTypes[i];
-//                    }
-//                }
+                // for (int i = 0, n = event.dataTypes.length; i < n; i++) {
+                // if (TextTransfer.getInstance().isSupportedType(event.dataTypes[i])) {
+                // event.currentDataType = event.dataTypes[i];
+                // }
+                // }
             }
 
             public void dragOver(DropTargetEvent event) {
-//                System.out.println("dragOver");
+                // System.out.println("dragOver");
                 event.feedback = DND.FEEDBACK_SELECT | DND.FEEDBACK_SCROLL;
             }
 
@@ -227,7 +225,6 @@ public class VulCSVColumnPreferencePage2 extends PreferencePage {
         allOnBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                viewer.setAllChecked(true);
             }
         });
 
@@ -237,7 +234,6 @@ public class VulCSVColumnPreferencePage2 extends PreferencePage {
         allOffBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                viewer.setAllChecked(false);
             }
         });
 
@@ -272,15 +268,15 @@ public class VulCSVColumnPreferencePage2 extends PreferencePage {
 
             public void widgetSelected(SelectionEvent e) {
                 outCsvHeaderFlg.setSelection(preferenceStore.getDefaultBoolean(PreferenceConstants.CSV_OUT_HEADER_VUL));
-                String defaultColumns = preferenceStore.getDefaultString(PreferenceConstants.CSV_COLUMN_VUL);
-                List<String> validColumnList = new ArrayList<String>();
-                if (defaultColumns.trim().length() > 0) {
-                    for (String defaultColumn : defaultColumns.split(",")) {
-                        validColumnList.add(VulCSVColmunEnum.valueOf(defaultColumn.trim()).getCulumn());
-                    }
+                columnList = new ArrayList<VulCSVColumn>();
+                for (VulCSVColmunEnum colEnum : VulCSVColmunEnum.sortedValues()) {
+                    columnList.add(new VulCSVColumn(colEnum));
                 }
-                viewer.setCheckedElements(validColumnList.toArray());
-                viewer.refresh();
+                checkBoxList.clear();
+                table.removeAll();
+                for (VulCSVColumn col : columnList) {
+                    addColToTable(col, -1);
+                }
             }
         });
 
@@ -309,21 +305,21 @@ public class VulCSVColumnPreferencePage2 extends PreferencePage {
             return true;
         }
         List<String> errors = new ArrayList<String>();
-//        Object[] elements = viewer.getCheckedElements();
-//        List<String> checkedList = new ArrayList<String>();
-//        for (Object element : elements) {
-//            checkedList.add(element.toString());
-//        }
-//
-//        List<String> list = new ArrayList<String>();
-//        for (String colName : checkedList) {
-//            list.add(VulCSVColmunEnum.getByName(colName).name());
-//        }
-//        if (list.isEmpty()) {
-//            errors.add("CSV出力項目を１つ以上選択してください。");
-//        } else {
-//            ps.setValue(PreferenceConstants.CSV_COLUMN_VUL, String.join(",", list));
-//        }
+        // Object[] elements = viewer.getCheckedElements();
+        // List<String> checkedList = new ArrayList<String>();
+        // for (Object element : elements) {
+        // checkedList.add(element.toString());
+        // }
+        //
+        // List<String> list = new ArrayList<String>();
+        // for (String colName : checkedList) {
+        // list.add(VulCSVColmunEnum.getByName(colName).name());
+        // }
+        // if (list.isEmpty()) {
+        // errors.add("CSV出力項目を１つ以上選択してください。");
+        // } else {
+        // ps.setValue(PreferenceConstants.CSV_COLUMN_VUL, String.join(",", list));
+        // }
         if (!errors.isEmpty()) {
             MessageDialog.openError(getShell(), "出力項目設定", String.join("\r\n", errors));
             return false;
@@ -371,14 +367,15 @@ public class VulCSVColumnPreferencePage2 extends PreferencePage {
             TableEditor editor2 = new TableEditor(table);
             Text text = new Text(table, SWT.NONE);
             text.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-            text.setTextLimit(3);
+            text.setTextLimit(5);
             text.setText(col.getSeparateStr());
             text.pack();
-            editor2.minimumWidth = 90;
+            editor2.grabHorizontal = true;
             editor2.horizontalAlignment = SWT.LEFT;
             editor2.setEditor(text, item, 3);
         } else {
             item.setText(3, "");
         }
+        item.setText(4, col.getColumn().getRemarks());
     }
 }

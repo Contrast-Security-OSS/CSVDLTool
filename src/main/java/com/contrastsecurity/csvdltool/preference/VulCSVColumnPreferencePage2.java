@@ -206,6 +206,9 @@ public class VulCSVColumnPreferencePage2 extends PreferencePage {
                         VulCSVColumn targetColumn = columnList.remove(sourceIndex);
                         columnList.add(targetIndex, targetColumn);
                     }
+                    for (Button button : checkBoxList) {
+                        button.dispose();
+                    }
                     checkBoxList.clear();
                     table.removeAll();
                     for (VulCSVColumn col : columnList) {
@@ -268,12 +271,15 @@ public class VulCSVColumnPreferencePage2 extends PreferencePage {
 
             public void widgetSelected(SelectionEvent e) {
                 outCsvHeaderFlg.setSelection(preferenceStore.getDefaultBoolean(PreferenceConstants.CSV_OUT_HEADER_VUL));
-                columnList = new ArrayList<VulCSVColumn>();
-                for (VulCSVColmunEnum colEnum : VulCSVColmunEnum.sortedValues()) {
-                    columnList.add(new VulCSVColumn(colEnum));
+                columnList.clear();
+                for (Button button : checkBoxList) {
+                    button.dispose();
                 }
                 checkBoxList.clear();
                 table.removeAll();
+                for (VulCSVColmunEnum colEnum : VulCSVColmunEnum.sortedValues()) {
+                    columnList.add(new VulCSVColumn(colEnum));
+                }
                 for (VulCSVColumn col : columnList) {
                     addColToTable(col, -1);
                 }

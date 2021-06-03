@@ -157,10 +157,6 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                 columnList.add(new VulCSVColumn(colEnum));
             }
         }
-        String csvSepTag = preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_TAG).replace("\\r", "\r").replace("\\n", "\n");
-        String csvSepBuildNo = preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_BUILDNO).replace("\\r", "\r").replace("\\n", "\n");
-        String csvSepGroup = preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_GROUP).replace("\\r", "\r").replace("\\n", "\n");
-        String csvSepServer = preferenceStore.getString(PreferenceConstants.CSV_SEPARATOR_SERVER).replace("\\r", "\r").replace("\\n", "\n");
         Map<String, List<String>> appGroupMap = new HashMap<String, List<String>>();
         List<List<String>> csvList = new ArrayList<List<String>>();
         try {
@@ -222,29 +218,37 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                         }
                         switch (csvColumn.getColumn()) {
                             case VUL_01:
+                                // ==================== 01. アプリケーション名 ====================
                                 csvLineList.add(appName);
                                 break;
                             case VUL_02:
+                                // ==================== 02. マージしたときの、各アプリ名称（可能であれば） ====================
                                 csvLineList.add(realApp.getName());
                                 break;
                             case VUL_03:
+                                // ==================== 03. アプリケーションID ====================
                                 csvLineList.add(realApp.getApp_id());
                                 break;
                             case VUL_04:
+                                // ==================== 04. アプリケーションタグ ====================
                                 Api applicationTagsApi = new ApplicationTagsApi(preferenceStore, organization, appId);
                                 List<String> applicationTags = (List<String>) applicationTagsApi.get();
                                 csvLineList.add(String.join(csvColumn.getSeparateStr().replace("\\r", "\r").replace("\\n", "\n"), applicationTags));
                                 break;
                             case VUL_05:
+                                // ==================== 05. （脆弱性の）カテゴリ ====================
                                 csvLineList.add(trace.getCategory_label());
                                 break;
                             case VUL_06:
+                                // ==================== 06. （脆弱性の）ルール ====================
                                 csvLineList.add(trace.getRule_title());
                                 break;
                             case VUL_07:
+                                // ==================== 07. 深刻度 ====================
                                 csvLineList.add(trace.getSeverity_label());
                                 break;
                             case VUL_08:
+                                // ==================== 08. CWE ====================
                                 Api howToFixApi = new HowToFixApi(preferenceStore, organization, trace_id);
                                 try {
                                     howToFixJson = (HowToFixJson) howToFixApi.get();
@@ -273,12 +277,15 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                                 }
                                 break;
                             case VUL_09:
+                                // ==================== 09. ステータス ====================
                                 csvLineList.add(trace.getStatus());
                                 break;
                             case VUL_10:
+                                // ==================== 10. 言語（Javaなど） ====================
                                 csvLineList.add(trace.getLanguage());
                                 break;
                             case VUL_11:
+                                // ==================== 11. グループ（アプリケーションのグループ） ====================
                                 if (appGroupMap.containsKey(appName)) {
                                     csvLineList.add(String.join(csvColumn.getSeparateStr().replace("\\r", "\r").replace("\\n", "\n"), appGroupMap.get(appName)));
                                 } else {
@@ -286,32 +293,40 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                                 }
                                 break;
                             case VUL_12:
+                                // ==================== 12. 脆弱性のタイトル（例：SQLインジェクション：「/api/v1/approvers/」ページのリクエストボディ ） ====================
                                 csvLineList.add(trace.getTitle());
                                 break;
                             case VUL_13:
+                                // ==================== 13. 最初の検出 ====================
                                 csvLineList.add(trace.getFirst_time_seen());
                                 break;
                             case VUL_14:
+                                // ==================== 14. 最後の検出 ====================
                                 csvLineList.add(trace.getLast_time_seen());
                                 break;
                             case VUL_15:
+                                // ==================== 15. ビルド番号 ====================
                                 csvLineList.add(String.join(csvColumn.getSeparateStr().replace("\\r", "\r").replace("\\n", "\n"), trace.getApp_version_tags()));
                                 break;
                             case VUL_16:
+                                // ==================== 16. 次のサーバにより報告 ====================
                                 List<String> serverNameList = trace.getServers().stream().map(Server::getName).collect(Collectors.toList());
                                 csvLineList.add(String.join(csvColumn.getSeparateStr().replace("\\r", "\r").replace("\\n", "\n"), serverNameList));
                                 break;
                             case VUL_17:
+                                // ==================== 17. モジュール ====================
                                 Application app = trace.getApplication();
                                 String module = String.format("%s (%s) - %s", app.getName(), app.getContext_path(), app.getLanguage());
                                 csvLineList.add(module);
                                 break;
                             case VUL_18:
+                                // ==================== 18. 脆弱性タグ ====================
                                 Api traceTagsApi = new TraceTagsApi(preferenceStore, organization, trace_id);
                                 List<String> traceTags = (List<String>) traceTagsApi.get();
                                 csvLineList.add(String.join(csvColumn.getSeparateStr().replace("\\r", "\r").replace("\\n", "\n"), traceTags));
                                 break;
                             case VUL_19:
+                                // ==================== 19. 保留中ステータス ====================
                                 csvLineList.add(trace.getPending_status());
                                 break;
                             default:

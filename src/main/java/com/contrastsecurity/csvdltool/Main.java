@@ -154,19 +154,11 @@ public class Main implements PropertyChangeListener {
             this.preferenceStore.setDefault(PreferenceConstants.CSV_COLUMN_VUL, VulCSVColmunEnum.defaultValuesStr());
             this.preferenceStore.setDefault(PreferenceConstants.SLEEP_VUL, 300);
             this.preferenceStore.setDefault(PreferenceConstants.CSV_OUT_HEADER_VUL, true);
-            this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_TAG, ",");
-            this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_BUILDNO, ",");
-            this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_GROUP, ",");
-            this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_SERVER, ",");
             this.preferenceStore.setDefault(PreferenceConstants.CSV_FILE_FORMAT_VUL, "'vul'_yyyy-MM-dd_HHmmss");
 
             this.preferenceStore.setDefault(PreferenceConstants.CSV_COLUMN_LIB, LibCSVColmunEnum.defaultValuesStr());
             this.preferenceStore.setDefault(PreferenceConstants.SLEEP_LIB, 300);
             this.preferenceStore.setDefault(PreferenceConstants.CSV_OUT_HEADER_LIB, true);
-            this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_LICENSE, ",");
-            this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_RELATED_APPLICATION, ",");
-            this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_RELATED_SERVER, ",");
-            this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_CVE, ",");
             this.preferenceStore.setDefault(PreferenceConstants.CSV_FILE_FORMAT_LIB, "'lib'_yyyy-MM-dd_HHmmss");
             this.preferenceStore.setDefault(PreferenceConstants.OPENED_TAB_IDX, 0);
 

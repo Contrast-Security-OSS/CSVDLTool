@@ -99,6 +99,9 @@ public abstract class Api {
         logger.trace(url);
         HttpGet httpGet = new HttpGet(url);
         List<Header> headers = this.getHeaders();
+        for (Header header : headers) {
+            httpGet.addHeader(header.getName(), header.getValue());
+        }
         CloseableHttpClient httpClient = null;
         try {
             int connectTimeout = Integer.parseInt(this.preferenceStore.getString(PreferenceConstants.CONNECTION_TIMEOUT));

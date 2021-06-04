@@ -388,7 +388,7 @@ public class VulCSVColumnPreferencePage extends PreferencePage {
             TableEditor editor2 = new TableEditor(table);
             Text text = new Text(table, SWT.NONE);
             text.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-            text.setTextLimit(5);
+            text.setTextLimit(4);
             text.setText(col.getSeparateStr());
             text.addModifyListener(new ModifyListener() {
                 @Override

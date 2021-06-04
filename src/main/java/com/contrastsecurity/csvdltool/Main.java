@@ -119,6 +119,8 @@ public class Main implements PropertyChangeListener {
     private List<String> srcApps = new ArrayList<String>();
     private List<String> dstApps = new ArrayList<String>();
 
+    private Organization currentOrg;
+
     private PreferenceStore preferenceStore;
 
     private PropertyChangeSupport support = new PropertyChangeSupport(this);
@@ -224,10 +226,16 @@ public class Main implements PropertyChangeListener {
                     appLoadBtn.setEnabled(false);
                     vulExecuteBtn.setEnabled(false);
                     settingBtn.setText("このボタンから基本設定を行ってください。");
+                    currentOrg = null;
+                    uiReset();
                 } else {
                     appLoadBtn.setEnabled(true);
                     vulExecuteBtn.setEnabled(true);
                     settingBtn.setText("設定");
+                    if (currentOrg != null && !currentOrg.equals(org)) {
+                        uiReset();
+                    }
+                    currentOrg = org;
                 }
                 setWindowTitle();
             }
@@ -266,18 +274,7 @@ public class Main implements PropertyChangeListener {
         appLoadBtn.addSelectionListener(new SelectionListener() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                // src
-                srcListFilter.setText("");
-                srcList.removeAll();
-                srcApps.clear();
-                // dst
-                dstListFilter.setText("");
-                dstList.removeAll();
-                dstApps.clear();
-                // full
-                if (fullAppMap != null) {
-                    fullAppMap.clear();
-                }
+                uiReset();
 
                 AppsGetWithProgress progress = new AppsGetWithProgress(preferenceStore, getValidOrganization());
                 ProgressMonitorDialog progDialog = new ProgressMonitorDialog(shell);
@@ -804,6 +801,21 @@ public class Main implements PropertyChangeListener {
             logger.error(trace);
         }
         display.dispose();
+    }
+
+    private void uiReset() {
+        // src
+        srcListFilter.setText("");
+        srcList.removeAll();
+        srcApps.clear();
+        // dst
+        dstListFilter.setText("");
+        dstList.removeAll();
+        dstApps.clear();
+        // full
+        if (fullAppMap != null) {
+            fullAppMap.clear();
+        }
     }
 
     private void uiUpdate() {

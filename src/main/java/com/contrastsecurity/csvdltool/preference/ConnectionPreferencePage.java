@@ -104,12 +104,25 @@ public class ConnectionPreferencePage extends PreferencePage {
         hostTxt = new Text(proxyHostGrp, SWT.BORDER);
         hostTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         hostTxt.setText(preferenceStore.getString(PreferenceConstants.PROXY_HOST));
+        hostTxt.addListener(SWT.FocusIn, new Listener() {
+            public void handleEvent(Event e) {
+                hostTxt.selectAll();
+            }
+        });
 
         // ========== ポート ========== //
         new Label(proxyHostGrp, SWT.LEFT).setText("ポート：");
         portTxt = new Text(proxyHostGrp, SWT.BORDER);
-        portTxt.setLayoutData(new GridData());
+        GridData portTxtGrDt = new GridData();
+        portTxtGrDt.widthHint = 100;
+        portTxt.setLayoutData(portTxtGrDt);
         portTxt.setText(preferenceStore.getString(PreferenceConstants.PROXY_PORT));
+        portTxt.setTextLimit(5);
+        portTxt.addListener(SWT.FocusIn, new Listener() {
+            public void handleEvent(Event e) {
+                portTxt.selectAll();
+            }
+        });
 
         Group dirGrp = new Group(proxyGrp, SWT.NONE);
         GridLayout dirGrpLt = new GridLayout(2, false);
@@ -126,6 +139,11 @@ public class ConnectionPreferencePage extends PreferencePage {
         userTxt = new Text(dirGrp, SWT.BORDER);
         userTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         userTxt.setText(preferenceStore.getString(PreferenceConstants.PROXY_USER));
+        userTxt.addListener(SWT.FocusIn, new Listener() {
+            public void handleEvent(Event e) {
+                userTxt.selectAll();
+            }
+        });
 
         // ========== パスワード ========== //
         new Label(dirGrp, SWT.LEFT).setText("パスワード：");
@@ -133,6 +151,11 @@ public class ConnectionPreferencePage extends PreferencePage {
         passTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         passTxt.setEchoChar('*');
         passTxt.setText(preferenceStore.getString(PreferenceConstants.PROXY_PASS));
+        passTxt.addListener(SWT.FocusIn, new Listener() {
+            public void handleEvent(Event e) {
+                passTxt.selectAll();
+            }
+        });
 
         Group sslCertGrp = new Group(composite, SWT.NONE);
         GridLayout sslCertGrpLt = new GridLayout(1, false);

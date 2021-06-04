@@ -94,16 +94,6 @@ public enum LibCSVColmunEnum {
     }
 
     public static String defaultValuesStr() {
-        List<String> list = new ArrayList<String>();
-        for (LibCSVColmunEnum e : LibCSVColmunEnum.sortedValues()) {
-            if (e.isDefault) {
-                list.add(e.name());
-            }
-        }
-        return String.join(",", list);
-    }
-
-    public static String defaultValuesStr2() {
         List<LibCSVColumn> list = new ArrayList<LibCSVColumn>();
         for (LibCSVColmunEnum e : LibCSVColmunEnum.sortedValues()) {
             list.add(new LibCSVColumn(e));

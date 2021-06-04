@@ -151,7 +151,7 @@ public class Main implements PropertyChangeListener {
             this.preferenceStore.setDefault(PreferenceConstants.CONNECTION_TIMEOUT, 3000);
             this.preferenceStore.setDefault(PreferenceConstants.SOCKET_TIMEOUT, 3000);
 
-            this.preferenceStore.setDefault(PreferenceConstants.CSV_COLUMN_VUL, VulCSVColmunEnum.defaultValuesStr2());
+            this.preferenceStore.setDefault(PreferenceConstants.CSV_COLUMN_VUL, VulCSVColmunEnum.defaultValuesStr());
             this.preferenceStore.setDefault(PreferenceConstants.SLEEP_VUL, 300);
             this.preferenceStore.setDefault(PreferenceConstants.CSV_OUT_HEADER_VUL, true);
             this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_TAG, ",");
@@ -160,7 +160,7 @@ public class Main implements PropertyChangeListener {
             this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_SERVER, ",");
             this.preferenceStore.setDefault(PreferenceConstants.CSV_FILE_FORMAT_VUL, "'vul'_yyyy-MM-dd_HHmmss");
 
-            this.preferenceStore.setDefault(PreferenceConstants.CSV_COLUMN_LIB, LibCSVColmunEnum.defaultValuesStr2());
+            this.preferenceStore.setDefault(PreferenceConstants.CSV_COLUMN_LIB, LibCSVColmunEnum.defaultValuesStr());
             this.preferenceStore.setDefault(PreferenceConstants.SLEEP_LIB, 300);
             this.preferenceStore.setDefault(PreferenceConstants.CSV_OUT_HEADER_LIB, true);
             this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_LICENSE, ",");

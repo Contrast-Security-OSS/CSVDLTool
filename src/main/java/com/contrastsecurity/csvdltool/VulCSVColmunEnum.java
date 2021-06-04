@@ -100,16 +100,6 @@ public enum VulCSVColmunEnum {
     }
 
     public static String defaultValuesStr() {
-        List<String> list = new ArrayList<String>();
-        for (VulCSVColmunEnum e : VulCSVColmunEnum.sortedValues()) {
-            if (e.isDefault) {
-                list.add(e.name());
-            }
-        }
-        return String.join(",", list);
-    }
-
-    public static String defaultValuesStr2() {
         List<VulCSVColumn> list = new ArrayList<VulCSVColumn>();
         for (VulCSVColmunEnum e : VulCSVColmunEnum.sortedValues()) {
             list.add(new VulCSVColumn(e));

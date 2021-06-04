@@ -181,33 +181,25 @@ public class VulCSVColumnPreferencePage extends PreferencePage {
         target.setTransfer(types);
         target.addDropListener(new DropTargetAdapter() {
             public void dragEnter(DropTargetEvent event) {
-                System.out.println("dragEnter");
-                // Allow dropping text only
-                // for (int i = 0, n = event.dataTypes.length; i < n; i++) {
-                // if (TextTransfer.getInstance().isSupportedType(event.dataTypes[i])) {
-                // event.currentDataType = event.dataTypes[i];
-                // }
-                // }
             }
 
             public void dragOver(DropTargetEvent event) {
-                // System.out.println("dragOver");
                 event.feedback = DND.FEEDBACK_SELECT | DND.FEEDBACK_SCROLL;
             }
 
             public void drop(DropTargetEvent event) {
-                System.out.println("drop");
                 if (TextTransfer.getInstance().isSupportedType(event.currentDataType)) {
-                    // Get the dropped data
                     DropTarget target = (DropTarget) event.widget;
                     Table table = (Table) target.getControl();
-                    TableItem item = (TableItem) event.item;
-                    System.out.println(item.getText(2));
                     String sourceIndexStr = (String) event.data;
                     int sourceIndex = Integer.valueOf(sourceIndexStr);
-                    int targetIndex = table.indexOf(item);
-                    System.out.println(sourceIndex);
-                    System.out.println(targetIndex);
+                    TableItem item = (TableItem) event.item;
+                    int targetIndex = -1;
+                    if (item != null) {
+                        targetIndex = table.indexOf(item);
+                    } else {
+                        targetIndex = columnList.size();
+                    }
                     if (sourceIndex == targetIndex) {
                         return;
                     }
@@ -270,7 +262,7 @@ public class VulCSVColumnPreferencePage extends PreferencePage {
         });
 
         Label descLabel = new Label(csvColumnGrp, SWT.LEFT);
-        descLabel.setText("・ ドラッグアンドドロップで項目の並び替えが可能です。\r\n・ 複数の値が出力される項目については、区切り文字が変更可能です。改行させる場合は\\r\\nをご指定してください。");
+        descLabel.setText("・ ドラッグアンドドロップで項目の並び替えが可能です。\r\n・ 複数の値が出力される項目については、区切り文字の変更が可能です。改行させる場合は\\r\\nをご指定してください。");
         GridData descLabelGrDt = new GridData(GridData.FILL_HORIZONTAL);
         descLabelGrDt.horizontalSpan = 3;
         descLabel.setLayoutData(descLabelGrDt);

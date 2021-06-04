@@ -136,6 +136,11 @@ public class VulCSVColumnPreferencePage extends PreferencePage {
             columnList.remove(i);
         }
         // Clean up ここまで
+        if (columnList.isEmpty()) {
+            for (VulCSVColmunEnum colEnum : VulCSVColmunEnum.sortedValues()) {
+                columnList.add(new VulCSVColumn(colEnum));
+            }
+        }
 
         table = new Table(csvColumnGrp, SWT.BORDER | SWT.FULL_SELECTION);
         GridData tableGrDt = new GridData(GridData.FILL_BOTH);

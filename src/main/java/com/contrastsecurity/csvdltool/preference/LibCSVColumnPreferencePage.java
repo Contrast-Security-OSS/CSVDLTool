@@ -136,6 +136,11 @@ public class LibCSVColumnPreferencePage extends PreferencePage {
             columnList.remove(i);
         }
         // Clean up ここまで
+        if (columnList.isEmpty()) {
+            for (LibCSVColmunEnum colEnum : LibCSVColmunEnum.sortedValues()) {
+                columnList.add(new LibCSVColumn(colEnum));
+            }
+        }
 
         table = new Table(csvColumnGrp, SWT.BORDER | SWT.FULL_SELECTION);
         GridData tableGrDt = new GridData(GridData.FILL_BOTH);

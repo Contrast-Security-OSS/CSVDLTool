@@ -92,10 +92,6 @@ public class CSVPreferencePage extends PreferencePage {
         vulCSVFileForamtTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         vulCSVFileForamtTxt.setText(preferenceStore.getString(PreferenceConstants.CSV_FILE_FORMAT_VUL));
         vulCSVFileForamtTxt.setMessage(preferenceStore.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT_VUL));
-        Label vulCSVFileFormatHint = new Label(vulCSVFileFormatGrp, SWT.LEFT);
-        GridData vulCSVFileFormatHintGrDt = new GridData(GridData.FILL_HORIZONTAL);
-        vulCSVFileFormatHint.setLayoutData(vulCSVFileFormatHintGrDt);
-        vulCSVFileFormatHint.setText("※ java.text.SimpleDateFormatの書式としてください。\r\n例) 'vul_'yyyy-MM-dd_HHmmss");
 
         Group libCSVFileFormatGrp = new Group(csvFileFormatGrp, SWT.NONE);
         GridLayout libCSVFileFormatGrpLt = new GridLayout(1, false);
@@ -112,10 +108,11 @@ public class CSVPreferencePage extends PreferencePage {
         libCSVFileForamtTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         libCSVFileForamtTxt.setText(preferenceStore.getString(PreferenceConstants.CSV_FILE_FORMAT_LIB));
         libCSVFileForamtTxt.setMessage(preferenceStore.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT_LIB));
-        Label libCSVFileFormatHint = new Label(libCSVFileFormatGrp, SWT.LEFT);
-        GridData libCSVFileFormatHintGrDt = new GridData(GridData.FILL_HORIZONTAL);
-        libCSVFileFormatHint.setLayoutData(libCSVFileFormatHintGrDt);
-        libCSVFileFormatHint.setText("※ java.text.SimpleDateFormatの書式としてください。\r\n例) 'lib_'yyyy-MM-dd_HHmmss");
+
+        Label csvFileFormatHint = new Label(csvFileFormatGrp, SWT.LEFT);
+        GridData csvFileFormatHintGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        csvFileFormatHint.setLayoutData(csvFileFormatHintGrDt);
+        csvFileFormatHint.setText("※ java.text.SimpleDateFormatの書式としてください。\r\n例) 'vul_'yyyy-MM-dd_HHmmss、'lib_'yyyy-MM-dd_HHmmss");
 
         Group ctrlGrp = new Group(composite, SWT.NONE);
         GridLayout proxyGrpLt = new GridLayout(2, false);

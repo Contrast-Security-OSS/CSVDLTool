@@ -76,19 +76,22 @@ import org.yaml.snakeyaml.Yaml;
 import com.contrastsecurity.csvdltool.exception.ApiException;
 import com.contrastsecurity.csvdltool.exception.NonApiException;
 import com.contrastsecurity.csvdltool.model.ContrastSecurityYaml;
+import com.contrastsecurity.csvdltool.model.Organization;
 import com.contrastsecurity.csvdltool.preference.AboutPage;
 import com.contrastsecurity.csvdltool.preference.BasePreferencePage;
+import com.contrastsecurity.csvdltool.preference.CSVPreferencePage;
 import com.contrastsecurity.csvdltool.preference.ConnectionPreferencePage;
 import com.contrastsecurity.csvdltool.preference.LibCSVColumnPreferencePage;
-import com.contrastsecurity.csvdltool.preference.LibOtherPreferencePage;
 import com.contrastsecurity.csvdltool.preference.MyPreferenceDialog;
 import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
 import com.contrastsecurity.csvdltool.preference.VulCSVColumnPreferencePage;
-import com.contrastsecurity.csvdltool.preference.VulOtherPreferencePage;
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
 
 public class Main implements PropertyChangeListener {
 
-    public static final String WINDOW_TITLE = "CSVDLTool";
+    public static final String WINDOW_TITLE = "CSVDLTool - %s";
 
     private CSVDLToolShell shell;
 
@@ -115,6 +118,8 @@ public class Main implements PropertyChangeListener {
     private Map<String, AppInfo> fullAppMap;
     private List<String> srcApps = new ArrayList<String>();
     private List<String> dstApps = new ArrayList<String>();
+
+    private Organization currentOrg;
 
     private PreferenceStore preferenceStore;
 
@@ -151,19 +156,11 @@ public class Main implements PropertyChangeListener {
             this.preferenceStore.setDefault(PreferenceConstants.CSV_COLUMN_VUL, VulCSVColmunEnum.defaultValuesStr());
             this.preferenceStore.setDefault(PreferenceConstants.SLEEP_VUL, 300);
             this.preferenceStore.setDefault(PreferenceConstants.CSV_OUT_HEADER_VUL, true);
-            this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_TAG, ",");
-            this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_BUILDNO, ",");
-            this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_GROUP, ",");
-            this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_SERVER, ",");
             this.preferenceStore.setDefault(PreferenceConstants.CSV_FILE_FORMAT_VUL, "'vul'_yyyy-MM-dd_HHmmss");
 
             this.preferenceStore.setDefault(PreferenceConstants.CSV_COLUMN_LIB, LibCSVColmunEnum.defaultValuesStr());
             this.preferenceStore.setDefault(PreferenceConstants.SLEEP_LIB, 300);
             this.preferenceStore.setDefault(PreferenceConstants.CSV_OUT_HEADER_LIB, true);
-            this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_LICENSE, ",");
-            this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_RELATED_APPLICATION, ",");
-            this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_RELATED_SERVER, ",");
-            this.preferenceStore.setDefault(PreferenceConstants.CSV_SEPARATOR_CVE, ",");
             this.preferenceStore.setDefault(PreferenceConstants.CSV_FILE_FORMAT_LIB, "'lib'_yyyy-MM-dd_HHmmss");
             this.preferenceStore.setDefault(PreferenceConstants.OPENED_TAB_IDX, 0);
 
@@ -190,7 +187,7 @@ public class Main implements PropertyChangeListener {
         imageArray[3] = new Image(display, Main.class.getClassLoader().getResourceAsStream("icon48.png"));
         imageArray[4] = new Image(display, Main.class.getClassLoader().getResourceAsStream("icon128.png"));
         shell.setImages(imageArray);
-        shell.setText(String.format(WINDOW_TITLE));
+        setWindowTitle();
         shell.addShellListener(new ShellListener() {
             @Override
             public void shellIconified(ShellEvent event) {
@@ -224,17 +221,23 @@ public class Main implements PropertyChangeListener {
 
             @Override
             public void shellActivated(ShellEvent event) {
-                String orgName = preferenceStore.getString(PreferenceConstants.ORG_NAME);
-                String orgId = preferenceStore.getString(PreferenceConstants.ORG_ID);
-                if (orgName == null || orgName.isEmpty() || orgId == null || orgId.isEmpty()) {
+                Organization org = getValidOrganization();
+                if (org == null) {
                     appLoadBtn.setEnabled(false);
                     vulExecuteBtn.setEnabled(false);
                     settingBtn.setText("このボタンから基本設定を行ってください。");
+                    currentOrg = null;
+                    uiReset();
                 } else {
                     appLoadBtn.setEnabled(true);
                     vulExecuteBtn.setEnabled(true);
                     settingBtn.setText("設定");
+                    if (currentOrg != null && !currentOrg.equals(org)) {
+                        uiReset();
+                    }
+                    currentOrg = org;
                 }
+                setWindowTitle();
             }
         });
 
@@ -271,20 +274,9 @@ public class Main implements PropertyChangeListener {
         appLoadBtn.addSelectionListener(new SelectionListener() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                // src
-                srcListFilter.setText("");
-                srcList.removeAll();
-                srcApps.clear();
-                // dst
-                dstListFilter.setText("");
-                dstList.removeAll();
-                dstApps.clear();
-                // full
-                if (fullAppMap != null) {
-                    fullAppMap.clear();
-                }
+                uiReset();
 
-                AppsGetWithProgress progress = new AppsGetWithProgress(preferenceStore);
+                AppsGetWithProgress progress = new AppsGetWithProgress(preferenceStore, getValidOrganization());
                 ProgressMonitorDialog progDialog = new ProgressMonitorDialog(shell);
                 try {
                     progDialog.run(true, true, progress);
@@ -602,8 +594,8 @@ public class Main implements PropertyChangeListener {
                     MessageDialog.openInformation(shell, "脆弱性情報取得", "取得対象のアプリケーションを選択してください。");
                     return;
                 }
-                VulGetWithProgress progress = new VulGetWithProgress(shell, preferenceStore, dstApps, fullAppMap, vulOnlyParentAppChk.getSelection(), includeDescChk.getSelection(),
-                        includeStackTraceChk.getSelection());
+                VulGetWithProgress progress = new VulGetWithProgress(shell, preferenceStore, getValidOrganization(), dstApps, fullAppMap, vulOnlyParentAppChk.getSelection(),
+                        includeDescChk.getSelection(), includeStackTraceChk.getSelection());
                 ProgressMonitorDialog progDialog = new ProgressMonitorDialog(shell);
                 try {
                     progDialog.run(true, true, progress);
@@ -701,7 +693,8 @@ public class Main implements PropertyChangeListener {
                     MessageDialog.openInformation(shell, "ライブラリ情報取得", "取得対象のアプリケーションを選択してください。");
                     return;
                 }
-                LibGetWithProgress progress = new LibGetWithProgress(shell, preferenceStore, dstApps, fullAppMap, onlyHasCVEChk.getSelection(), includeCVEDetailChk.getSelection());
+                LibGetWithProgress progress = new LibGetWithProgress(shell, preferenceStore, getValidOrganization(), dstApps, fullAppMap, onlyHasCVEChk.getSelection(),
+                        includeCVEDetailChk.getSelection());
                 ProgressMonitorDialog progDialog = new ProgressMonitorDialog(shell);
                 try {
                     progDialog.run(true, true, progress);
@@ -758,16 +751,14 @@ public class Main implements PropertyChangeListener {
                 PreferenceManager mgr = new PreferenceManager();
                 PreferenceNode baseNode = new PreferenceNode("base", new BasePreferencePage());
                 PreferenceNode connectionNode = new PreferenceNode("connection", new ConnectionPreferencePage());
+                PreferenceNode csvNode = new PreferenceNode("csv", new CSVPreferencePage());
                 PreferenceNode vulCsvColumnNode = new PreferenceNode("vulcsvcolumn", new VulCSVColumnPreferencePage());
-                PreferenceNode vulOtherNode = new PreferenceNode("vulother", new VulOtherPreferencePage());
                 PreferenceNode libCsvColumnNode = new PreferenceNode("libcsvcolumn", new LibCSVColumnPreferencePage());
-                PreferenceNode libOtherNode = new PreferenceNode("libother", new LibOtherPreferencePage());
                 mgr.addToRoot(baseNode);
                 mgr.addToRoot(connectionNode);
-                mgr.addToRoot(vulCsvColumnNode);
-                mgr.addTo(vulCsvColumnNode.getId(), vulOtherNode);
-                mgr.addToRoot(libCsvColumnNode);
-                mgr.addTo(libCsvColumnNode.getId(), libOtherNode);
+                mgr.addToRoot(csvNode);
+                mgr.addTo(csvNode.getId(), vulCsvColumnNode);
+                mgr.addTo(csvNode.getId(), libCsvColumnNode);
                 PreferenceNode aboutNode = new PreferenceNode("about", new AboutPage());
                 mgr.addToRoot(aboutNode);
                 PreferenceDialog dialog = new MyPreferenceDialog(shell, mgr);
@@ -812,11 +803,57 @@ public class Main implements PropertyChangeListener {
         display.dispose();
     }
 
+    private void uiReset() {
+        // src
+        srcListFilter.setText("");
+        srcList.removeAll();
+        srcApps.clear();
+        // dst
+        dstListFilter.setText("");
+        dstList.removeAll();
+        dstApps.clear();
+        // full
+        if (fullAppMap != null) {
+            fullAppMap.clear();
+        }
+    }
+
     private void uiUpdate() {
     }
 
     public PreferenceStore getPreferenceStore() {
         return preferenceStore;
+    }
+
+    public Organization getValidOrganization() {
+        String orgJsonStr = preferenceStore.getString(PreferenceConstants.TARGET_ORGS);
+        if (orgJsonStr.trim().length() > 0) {
+            try {
+                List<Organization> orgList = new Gson().fromJson(orgJsonStr, new TypeToken<List<Organization>>() {
+                }.getType());
+                for (Organization org : orgList) {
+                    if (org != null && org.isValid()) {
+                        return org;
+                    }
+                }
+            } catch (JsonSyntaxException e) {
+                return null;
+            }
+        }
+        return null;
+    }
+
+    public void setWindowTitle() {
+        String text = null;
+        Organization validOrg = getValidOrganization();
+        if (validOrg != null) {
+            text = validOrg.getName();
+        }
+        if (text == null || text.isEmpty()) {
+            this.shell.setText(String.format(WINDOW_TITLE, "組織未設定"));
+        } else {
+            this.shell.setText(String.format(WINDOW_TITLE, text));
+        }
     }
 
     @Override

@@ -21,41 +21,22 @@
  * 
  */
 
-package com.contrastsecurity.csvdltool.api;
+package com.contrastsecurity.csvdltool.json;
 
-import java.lang.reflect.Type;
+public class ApiKeyJson extends ContrastJson {
+    private String api_key;
 
-import org.eclipse.jface.preference.IPreferenceStore;
+    public String getApi_key() {
+        return api_key;
+    }
 
-import com.contrastsecurity.csvdltool.json.StoryJson;
-import com.contrastsecurity.csvdltool.model.Organization;
-import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-public class StoryApi extends Api {
-
-    private String trace_id;
-
-    public StoryApi(IPreferenceStore preferenceStore, Organization organization, String trace_id) {
-        super(preferenceStore, organization);
-        this.trace_id = trace_id;
+    public void setApi_key(String api_key) {
+        this.api_key = api_key;
     }
 
     @Override
-    protected String getUrl() {
-        String contrastUrl = preferenceStore.getString(PreferenceConstants.CONTRAST_URL);
-        String orgId = this.organization.getOrganization_uuid();
-        return String.format("%s/api/ng/%s/traces/%s/story", contrastUrl, orgId, this.trace_id);
-    }
-
-    @Override
-    protected Object convert(String response) {
-        Gson gson = new Gson();
-        Type storyType = new TypeToken<StoryJson>() {
-        }.getType();
-        StoryJson storyJson = gson.fromJson(response, storyType);
-        return storyJson.getStory();
+    public String toString() {
+        return this.api_key;
     }
 
 }

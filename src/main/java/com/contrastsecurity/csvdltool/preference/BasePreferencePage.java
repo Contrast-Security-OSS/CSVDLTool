@@ -23,11 +23,19 @@
 
 package com.contrastsecurity.csvdltool.preference;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.TableEditor;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
@@ -37,25 +45,30 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
 import com.contrastsecurity.csvdltool.Main;
-import com.contrastsecurity.csvdltool.api.Api;
-import com.contrastsecurity.csvdltool.api.OrganizationApi;
-import com.contrastsecurity.csvdltool.exception.ApiException;
-import com.contrastsecurity.csvdltool.exception.NonApiException;
 import com.contrastsecurity.csvdltool.model.Organization;
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
 
 public class BasePreferencePage extends PreferencePage {
 
     private Text contrastUrlTxt;
-    private Text apiKeyTxt;
     private Text serviceKeyTxt;
     private Text userNameTxt;
-    private Text orgNameTxt;
-    private Text orgIdTxt;
+    private List<Organization> orgList;
+    private List<Button> checkBoxList = new ArrayList<Button>();
+    private int selectedIdx = -1;
+    private Table table;
+    private Button addBtn;
 
     Logger logger = Logger.getLogger("csvdltool");
 
@@ -88,22 +101,23 @@ public class BasePreferencePage extends PreferencePage {
         contrastUrlTxt = new Text(baseGrp, SWT.BORDER);
         contrastUrlTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         contrastUrlTxt.setText(preferenceStore.getString(PreferenceConstants.CONTRAST_URL));
-        contrastUrlTxt.setMessage("4つの項目をすべて埋めててください。");
+        contrastUrlTxt.setMessage("http://xxx.xxx.xxx.xxx/Contrast");
         contrastUrlTxt.addListener(SWT.FocusIn, new Listener() {
             public void handleEvent(Event e) {
                 contrastUrlTxt.selectAll();
             }
         });
-
-        new Label(baseGrp, SWT.LEFT).setText("API Key：");
-        new Label(baseGrp, SWT.LEFT).setText("");
-        apiKeyTxt = new Text(baseGrp, SWT.BORDER);
-        apiKeyTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        apiKeyTxt.setText(preferenceStore.getString(PreferenceConstants.API_KEY));
-        apiKeyTxt.setMessage("これらの情報はすべてTeamServerの");
-        apiKeyTxt.addListener(SWT.FocusIn, new Listener() {
-            public void handleEvent(Event e) {
-                apiKeyTxt.selectAll();
+        contrastUrlTxt.addModifyListener(new ModifyListener() {
+            @Override
+            public void modifyText(ModifyEvent e) {
+                String contrastUrlStr = contrastUrlTxt.getText();
+                String serviceKeyStr = serviceKeyTxt.getText();
+                String userNameStr = userNameTxt.getText();
+                if (contrastUrlStr.isEmpty() || serviceKeyStr.isEmpty() || userNameStr.isEmpty()) {
+                    addBtn.setEnabled(false);
+                } else {
+                    addBtn.setEnabled(true);
+                }
             }
         });
 
@@ -112,10 +126,23 @@ public class BasePreferencePage extends PreferencePage {
         serviceKeyTxt = new Text(baseGrp, SWT.BORDER);
         serviceKeyTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         serviceKeyTxt.setText(preferenceStore.getString(PreferenceConstants.SERVICE_KEY));
-        serviceKeyTxt.setMessage("「あなたのアカウント」で確認できます。");
+        serviceKeyTxt.setMessage("個人のサービスキー");
         serviceKeyTxt.addListener(SWT.FocusIn, new Listener() {
             public void handleEvent(Event e) {
                 serviceKeyTxt.selectAll();
+            }
+        });
+        serviceKeyTxt.addModifyListener(new ModifyListener() {
+            @Override
+            public void modifyText(ModifyEvent e) {
+                String contrastUrlStr = contrastUrlTxt.getText();
+                String serviceKeyStr = serviceKeyTxt.getText();
+                String userNameStr = userNameTxt.getText();
+                if (contrastUrlStr.isEmpty() || serviceKeyStr.isEmpty() || userNameStr.isEmpty()) {
+                    addBtn.setEnabled(false);
+                } else {
+                    addBtn.setEnabled(true);
+                }
             }
         });
 
@@ -123,73 +150,187 @@ public class BasePreferencePage extends PreferencePage {
         Label icon = new Label(baseGrp, SWT.NONE);
         Image iconImg = new Image(parent.getDisplay(), Main.class.getClassLoader().getResourceAsStream("help.png"));
         icon.setImage(iconImg);
-        icon.setToolTipText("設定するユーザーの権限について\r\n・組織ロールはAdmin権限が必要です。\r\n・アプリケーションアクセスグループはView権限以上が必要です。");
+        icon.setToolTipText("設定するユーザーの権限について\r\n・組織ロールはView権限以上が必要です。\r\n・Admin権限を持つユーザーの場合、アプリケーショングループの情報も取得できます。\r\n・アプリケーションアクセスグループはView権限以上が必要です。");
         userNameTxt = new Text(baseGrp, SWT.BORDER);
         userNameTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         userNameTxt.setText(preferenceStore.getString(PreferenceConstants.USERNAME));
-        userNameTxt.setMessage("すべて埋めたら、下のボタンで組織情報を取得します。");
+        userNameTxt.setMessage("メールアドレス");
         userNameTxt.addListener(SWT.FocusIn, new Listener() {
             public void handleEvent(Event e) {
                 userNameTxt.selectAll();
             }
         });
-
-        Button getOrgBtn = new Button(baseGrp, SWT.NULL);
-        GridData getOrgBtnGrDt = new GridData();
-        getOrgBtnGrDt.horizontalSpan = 3;
-        getOrgBtnGrDt.heightHint = 30;
-        getOrgBtnGrDt.widthHint = 150;
-        getOrgBtnGrDt.horizontalAlignment = SWT.RIGHT;
-        getOrgBtn.setLayoutData(getOrgBtnGrDt);
-        getOrgBtn.setText("組織情報を取得");
-        getOrgBtn.addSelectionListener(new SelectionListener() {
-            public void widgetDefaultSelected(SelectionEvent event) {
-            }
-
-            public void widgetSelected(SelectionEvent event) {
-                String url = contrastUrlTxt.getText();
-                String usr = userNameTxt.getText();
-                String svc = serviceKeyTxt.getText();
-                String api = apiKeyTxt.getText();
-                if (url.isEmpty() || usr.isEmpty() || svc.isEmpty() || api.isEmpty()) {
-                    MessageDialog.openInformation(composite.getShell(), "組織情報の取得", "4つの項目を埋めてください。");
-                    return;
-                }
-                Api orgApi = new OrganizationApi(preferenceStore, url, usr, svc, api);
-                try {
-                    Organization organization = (Organization) orgApi.get();
-                    orgNameTxt.setText(organization.getName());
-                    orgIdTxt.setText(organization.getOrganization_uuid());
-                    MessageDialog.openInformation(composite.getShell(), "組織情報の取得", "組織情報を取得しました。");
-                } catch (ApiException e) {
-                    MessageDialog.openWarning(composite.getShell(), "組織情報の取得", String.format("TeamServerからエラーが返されました。\r\n%s", e.getMessage()));
-                } catch (NonApiException e) {
-                    MessageDialog.openError(composite.getShell(), "組織情報の取得", String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", e.getMessage()));
-                } catch (Exception e) {
-                    MessageDialog.openError(composite.getShell(), "組織情報の取得", String.format("不明なエラーです。ログファイルをご確認ください。\r\n%s", e.getMessage()));
+        userNameTxt.addModifyListener(new ModifyListener() {
+            @Override
+            public void modifyText(ModifyEvent e) {
+                String contrastUrlStr = contrastUrlTxt.getText();
+                String serviceKeyStr = serviceKeyTxt.getText();
+                String userNameStr = userNameTxt.getText();
+                if (contrastUrlStr.isEmpty() || serviceKeyStr.isEmpty() || userNameStr.isEmpty()) {
+                    addBtn.setEnabled(false);
+                } else {
+                    addBtn.setEnabled(true);
                 }
             }
         });
 
-        Composite orgGrp = new Composite(composite, SWT.NONE);
-        GridLayout orgGrpLt = new GridLayout(2, false);
-        orgGrpLt.marginWidth = 15;
-        orgGrpLt.horizontalSpacing = 10;
-        orgGrp.setLayout(orgGrpLt);
-        GridData orgGrpLtGrDt = new GridData(GridData.FILL_HORIZONTAL);
-        orgGrp.setLayoutData(orgGrpLtGrDt);
+        // ========== 組織テーブル ========== //
+        Group orgTableGrp = new Group(composite, SWT.NONE);
+        GridLayout orgTableGrpLt = new GridLayout(2, false);
+        orgTableGrpLt.marginWidth = 15;
+        orgTableGrpLt.horizontalSpacing = 10;
+        orgTableGrp.setLayout(orgTableGrpLt);
+        GridData orgTableGrpGrDt = new GridData(GridData.FILL_BOTH);
+        orgTableGrp.setLayoutData(orgTableGrpGrDt);
+        orgTableGrp.setText("組織一覧");
 
-        new Label(orgGrp, SWT.LEFT).setText("組織名：");
-        orgNameTxt = new Text(orgGrp, SWT.BORDER);
-        orgNameTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        orgNameTxt.setText(preferenceStore.getString(PreferenceConstants.ORG_NAME));
-        orgNameTxt.setEditable(false);
+        String orgJsonStr = preferenceStore.getString(PreferenceConstants.TARGET_ORGS);
+        if (orgJsonStr.trim().length() > 0) {
+            try {
+                orgList = new Gson().fromJson(orgJsonStr, new TypeToken<List<Organization>>() {
+                }.getType());
+            } catch (JsonSyntaxException e) {
+                MessageDialog.openError(getShell(), "組織設定の読み込み", String.format("組織設定の内容に問題があります。\r\n%s", orgJsonStr));
+                orgList = new ArrayList<Organization>();
+            }
+        } else {
+            orgList = new ArrayList<Organization>();
+        }
+        // Clean up ここから
+        List<Integer> irregularIndexes = new ArrayList<Integer>();
+        for (int i = 0; i < orgList.size(); i++) {
+            Object obj = orgList.get(i);
+            if (!(obj instanceof Organization)) {
+                irregularIndexes.add(i);
+            }
+        }
+        int[] irregularArray = irregularIndexes.stream().mapToInt(i -> i).toArray();
+        for (int i = irregularArray.length - 1; i >= 0; i--) {
+            orgList.remove(i);
+        }
+        // Clean up ここまで
 
-        new Label(orgGrp, SWT.LEFT).setText("組織ID：");
-        orgIdTxt = new Text(orgGrp, SWT.BORDER);
-        orgIdTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        orgIdTxt.setText(preferenceStore.getString(PreferenceConstants.ORG_ID));
-        orgIdTxt.setEditable(false);
+        table = new Table(orgTableGrp, SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION);
+        GridData tableGrDt = new GridData(GridData.FILL_BOTH);
+        // tableGrDt.horizontalSpan = 2;
+        table.setLayoutData(tableGrDt);
+        table.setLinesVisible(true);
+        table.setHeaderVisible(true);
+        TableColumn column0 = new TableColumn(table, SWT.NONE);
+        column0.setWidth(0);
+        column0.setResizable(false);
+        TableColumn column1 = new TableColumn(table, SWT.CENTER);
+        column1.setWidth(50);
+        column1.setText("有効");
+        TableColumn column2 = new TableColumn(table, SWT.LEFT);
+        column2.setWidth(150);
+        column2.setText("組織名");
+        TableColumn column3 = new TableColumn(table, SWT.CENTER);
+        column3.setWidth(250);
+        column3.setText("組織ID");
+        TableColumn column4 = new TableColumn(table, SWT.CENTER);
+        column4.setWidth(250);
+        column4.setText("API Key");
+
+        for (Organization org : orgList) {
+            this.addOrgToTable(org);
+        }
+        for (Button button : checkBoxList) {
+            if (button.getSelection()) {
+                this.selectedIdx = checkBoxList.indexOf(button);
+            }
+        }
+
+        Composite buttonGrp = new Composite(orgTableGrp, SWT.NONE);
+        buttonGrp.setLayoutData(new GridData(GridData.FILL_VERTICAL));
+        buttonGrp.setLayout(new GridLayout(1, true));
+
+        addBtn = new Button(buttonGrp, SWT.NULL);
+        addBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        addBtn.setText("追加");
+        if (contrastUrlTxt.getText().isEmpty() || serviceKeyTxt.getText().isEmpty() || userNameTxt.getText().isEmpty()) {
+            addBtn.setEnabled(false);
+        } else {
+            addBtn.setEnabled(true);
+        }
+        addBtn.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                OrganizationDialog pathDialog = new OrganizationDialog(getShell(), preferenceStore, contrastUrlTxt.getText(), userNameTxt.getText(), serviceKeyTxt.getText());
+                int result = pathDialog.open();
+                if (IDialogConstants.OK_ID != result) {
+                    return;
+                }
+                Organization rtnOrg = pathDialog.getOrg();
+                if (rtnOrg == null) {
+                    return;
+                }
+                // String path = pathDialog.getDirPath();
+                if (orgList.contains(rtnOrg)) {
+                    MessageDialog.openError(composite.getShell(), "組織", "すでに設定されている組織です。");
+                    return;
+                }
+                orgList.add(rtnOrg);
+                addOrgToTable(rtnOrg);
+                if (orgList.size() == 1) {
+                    checkBoxList.get(0).setSelection(true);
+                    rtnOrg.setValid(true);
+                }
+                for (Button button : checkBoxList) {
+                    if (button.getSelection()) {
+                        selectedIdx = checkBoxList.indexOf(button);
+                    }
+                }
+            }
+        });
+
+        final Button rmvBtn = new Button(buttonGrp, SWT.NULL);
+        rmvBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        rmvBtn.setText("削除");
+        rmvBtn.setEnabled(false);
+        rmvBtn.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                int[] indexes = table.getSelectionIndices();
+                for (int i = indexes.length - 1; i >= 0; i--) {
+                    orgList.remove(indexes[i]);
+                }
+                for (Button button : checkBoxList) {
+                    button.dispose();
+                }
+                checkBoxList.clear();
+                table.removeAll();
+                for (Organization org : orgList) {
+                    addOrgToTable(org);
+                }
+                if (checkBoxList.isEmpty()) {
+                    selectedIdx = -1;
+                } else {
+                    for (Button button : checkBoxList) {
+                        if (button.getSelection()) {
+                            selectedIdx = checkBoxList.indexOf(button);
+                        }
+                    }
+                }
+            }
+        });
+
+        table.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                int index = table.getSelectionIndex();
+                if (index < 0) {
+                    rmvBtn.setEnabled(false);
+                } else {
+                    rmvBtn.setEnabled(true);
+                }
+            }
+        });
+
+        Label csvFileFormatHint = new Label(orgTableGrp, SWT.LEFT);
+        GridData csvFileFormatHintGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        csvFileFormatHint.setLayoutData(csvFileFormatHintGrDt);
+        csvFileFormatHint.setText("※ プロキシ経由など接続に関する設定が必要な場合は「接続設定」で事前に設定を済ませておいてください。");
 
         Button applyBtn = new Button(composite, SWT.NULL);
         GridData applyBtnGrDt = new GridData(SWT.RIGHT, SWT.BOTTOM, true, true, 1, 1);
@@ -211,36 +352,71 @@ public class BasePreferencePage extends PreferencePage {
 
     @Override
     public boolean performOk() {
-        String url = contrastUrlTxt.getText();
-        String usr = userNameTxt.getText();
-        String svc = serviceKeyTxt.getText();
-        String api = apiKeyTxt.getText();
-        if (url.isEmpty() || usr.isEmpty() || svc.isEmpty() || api.isEmpty()) {
-            MessageDialog.openError(getShell(), "基本設定", "4つの項目を埋めて、組織情報を取得してください。");
-            return false;
-        }
         IPreferenceStore ps = getPreferenceStore();
         if (ps == null) {
             return true;
         }
-        if (this.contrastUrlTxt != null) {
-            ps.setValue(PreferenceConstants.CONTRAST_URL, this.contrastUrlTxt.getText());
+        String url = this.contrastUrlTxt.getText();
+        String svc = this.serviceKeyTxt.getText();
+        String usr = this.userNameTxt.getText();
+        if (url.isEmpty() || svc.isEmpty() || usr.isEmpty()) {
+            if (!this.orgList.isEmpty()) {
+                MessageDialog.openError(getShell(), "基本設定", "組織一覧に設定が残っている場合、Contrast URL, Service Key, Usernameはブランクにできません。\r\nこれらをブランクにする場合は組織一覧の設定をすべて削除してください。");
+                contrastUrlTxt.setText(ps.getString(PreferenceConstants.CONTRAST_URL));
+                serviceKeyTxt.setText(ps.getString(PreferenceConstants.SERVICE_KEY));
+                userNameTxt.setText(ps.getString(PreferenceConstants.USERNAME));
+                return false;
+            }
         }
-        if (this.apiKeyTxt != null) {
-            ps.setValue(PreferenceConstants.API_KEY, this.apiKeyTxt.getText());
+        ps.setValue(PreferenceConstants.CONTRAST_URL, this.contrastUrlTxt.getText());
+        ps.setValue(PreferenceConstants.SERVICE_KEY, this.serviceKeyTxt.getText());
+        ps.setValue(PreferenceConstants.USERNAME, this.userNameTxt.getText());
+        if (selectedIdx > -1) {
+            TableItem selectedItem = table.getItem(selectedIdx);
+            for (Organization org : this.orgList) {
+                if (org.getOrganization_uuid().equals(selectedItem.getText(3))) {
+                    org.setValid(true);
+                } else {
+                    org.setValid(false);
+                }
+            }
         }
-        if (this.serviceKeyTxt != null) {
-            ps.setValue(PreferenceConstants.SERVICE_KEY, this.serviceKeyTxt.getText());
-        }
-        if (this.userNameTxt != null) {
-            ps.setValue(PreferenceConstants.USERNAME, this.userNameTxt.getText());
-        }
-        if (this.orgNameTxt != null) {
-            ps.setValue(PreferenceConstants.ORG_NAME, this.orgNameTxt.getText());
-        }
-        if (this.orgIdTxt != null) {
-            ps.setValue(PreferenceConstants.ORG_ID, this.orgIdTxt.getText());
-        }
+        ps.setValue(PreferenceConstants.TARGET_ORGS, new Gson().toJson(this.orgList));
         return true;
+    }
+
+    private void addOrgToTable(Organization org) {
+        if (org == null) {
+            return;
+        }
+        TableEditor editor = new TableEditor(table);
+        Button button = new Button(table, SWT.CHECK);
+        if (org.isValid()) {
+            button.setSelection(true);
+        }
+        button.addSelectionListener(new SelectionListener() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                Button triggerBtn = (Button) e.getSource();
+                for (Button button : checkBoxList) {
+                    button.setSelection(false);
+                }
+                triggerBtn.setSelection(true);
+                selectedIdx = checkBoxList.indexOf(triggerBtn);
+            }
+
+            @Override
+            public void widgetDefaultSelected(SelectionEvent e) {
+            }
+        });
+        button.pack();
+        TableItem item = new TableItem(table, SWT.CENTER);
+        editor.minimumWidth = button.getSize().x;
+        editor.horizontalAlignment = SWT.CENTER;
+        editor.setEditor(button, item, 1);
+        checkBoxList.add(button);
+        item.setText(2, org.getName());
+        item.setText(3, org.getOrganization_uuid());
+        item.setText(4, org.getApikey());
     }
 }

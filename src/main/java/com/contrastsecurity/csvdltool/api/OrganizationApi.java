@@ -35,6 +35,7 @@ import org.apache.http.message.BasicHeader;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 import com.contrastsecurity.csvdltool.json.OrganizationJson;
+import com.contrastsecurity.csvdltool.model.Organization;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -42,19 +43,18 @@ public class OrganizationApi extends Api {
     private String url;
     private String username;
     private String sevice_key;
-    private String api_key;
 
-    public OrganizationApi(IPreferenceStore preferenceStore, String url, String username, String sevice_key, String api_key) {
-        super(preferenceStore);
+    public OrganizationApi(IPreferenceStore preferenceStore, Organization organization, String url, String username, String sevice_key) {
+        super(preferenceStore, organization);
         this.url = url;
         this.username = username;
         this.sevice_key = sevice_key;
-        this.api_key = api_key;
     }
 
     @Override
     protected String getUrl() {
-        return String.format("%s/api/ng/profile/organizations/default", this.url);
+        String orgId = this.organization.getOrganization_uuid();
+        return String.format("%s/api/ng/profile/organizations/%s?expand=freemium,skip_links", this.url, orgId);
     }
 
     @Override
@@ -64,7 +64,7 @@ public class OrganizationApi extends Api {
         String authHeader = new String(encodedAuth);
         List<Header> headers = new ArrayList<Header>();
         headers.add(new BasicHeader(HttpHeaders.ACCEPT, "application/json"));
-        headers.add(new BasicHeader("API-Key", this.api_key));
+        headers.add(new BasicHeader("API-Key", this.organization.getApikey()));
         headers.add(new BasicHeader(HttpHeaders.AUTHORIZATION, authHeader));
         return headers;
     }

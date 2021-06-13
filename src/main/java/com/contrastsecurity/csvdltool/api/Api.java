@@ -56,6 +56,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 
 import com.contrastsecurity.csvdltool.exception.ApiException;
 import com.contrastsecurity.csvdltool.exception.NonApiException;
+import com.contrastsecurity.csvdltool.model.Organization;
 import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
 
 public abstract class Api {
@@ -63,9 +64,11 @@ public abstract class Api {
     Logger logger = Logger.getLogger("csvdltool");
 
     protected IPreferenceStore preferenceStore;
+    protected Organization organization;
 
-    public Api(IPreferenceStore preferenceStore) {
+    public Api(IPreferenceStore preferenceStore, Organization organization) {
         this.preferenceStore = preferenceStore;
+        this.organization = organization;
     }
 
     public Object get() throws Exception {
@@ -78,7 +81,7 @@ public abstract class Api {
     protected abstract Object convert(String response);
 
     protected List<Header> getHeaders() {
-        String apiKey = preferenceStore.getString(PreferenceConstants.API_KEY);
+        String apiKey = this.organization.getApikey();
         String serviceKey = preferenceStore.getString(PreferenceConstants.SERVICE_KEY);
         String userName = preferenceStore.getString(PreferenceConstants.USERNAME);
         String auth = String.format("%s:%s", userName, serviceKey);
@@ -96,6 +99,9 @@ public abstract class Api {
         logger.trace(url);
         HttpGet httpGet = new HttpGet(url);
         List<Header> headers = this.getHeaders();
+        for (Header header : headers) {
+            httpGet.addHeader(header.getName(), header.getValue());
+        }
         CloseableHttpClient httpClient = null;
         try {
             int connectTimeout = Integer.parseInt(this.preferenceStore.getString(PreferenceConstants.CONNECTION_TIMEOUT));

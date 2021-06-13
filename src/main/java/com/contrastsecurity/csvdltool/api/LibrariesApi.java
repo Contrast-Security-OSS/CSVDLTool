@@ -28,6 +28,7 @@ import java.lang.reflect.Type;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 import com.contrastsecurity.csvdltool.json.LibrariesJson;
+import com.contrastsecurity.csvdltool.model.Organization;
 import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -37,8 +38,8 @@ public class LibrariesApi extends Api {
     private String appId;
     private String filter;
 
-    public LibrariesApi(IPreferenceStore preferenceStore, String appId, String filter) {
-        super(preferenceStore);
+    public LibrariesApi(IPreferenceStore preferenceStore, Organization organization, String appId, String filter) {
+        super(preferenceStore, organization);
         this.appId = appId;
         this.filter = filter;
     }
@@ -46,7 +47,7 @@ public class LibrariesApi extends Api {
     @Override
     protected String getUrl() {
         String contrastUrl = preferenceStore.getString(PreferenceConstants.CONTRAST_URL);
-        String orgId = preferenceStore.getString(PreferenceConstants.ORG_ID);
+        String orgId = this.organization.getOrganization_uuid();
         return String.format("%s/api/ng/%s/applications/%s/libraries?expand=vulns,apps,skip_links&quickFilter=%s&sort=fileName", contrastUrl, orgId, this.appId, this.filter);
     }
 

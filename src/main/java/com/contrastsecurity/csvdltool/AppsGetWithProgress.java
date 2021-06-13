@@ -39,19 +39,23 @@ import org.eclipse.jface.preference.PreferenceStore;
 import com.contrastsecurity.csvdltool.api.Api;
 import com.contrastsecurity.csvdltool.api.ApplicationsApi;
 import com.contrastsecurity.csvdltool.api.GroupsApi;
+import com.contrastsecurity.csvdltool.exception.ApiException;
 import com.contrastsecurity.csvdltool.model.Application;
 import com.contrastsecurity.csvdltool.model.ApplicationInCustomGroup;
 import com.contrastsecurity.csvdltool.model.CustomGroup;
+import com.contrastsecurity.csvdltool.model.Organization;
 
 public class AppsGetWithProgress implements IRunnableWithProgress {
 
     private PreferenceStore preferenceStore;
+    private Organization organization;
     private Map<String, AppInfo> fullAppMap;
 
     Logger logger = Logger.getLogger("csvdltool");
 
-    public AppsGetWithProgress(PreferenceStore preferenceStore) {
+    public AppsGetWithProgress(PreferenceStore preferenceStore, Organization organization) {
         this.preferenceStore = preferenceStore;
+        this.organization = organization;
     }
 
     @SuppressWarnings("unchecked")
@@ -63,25 +67,28 @@ public class AppsGetWithProgress implements IRunnableWithProgress {
             // アプリケーショングループの情報を取得
             monitor.subTask("アプリケーショングループの情報を取得...");
             Map<String, List<String>> appGroupMap = new HashMap<String, List<String>>();
-            Api groupsApi = new GroupsApi(preferenceStore);
-            List<CustomGroup> customGroups = (List<CustomGroup>) groupsApi.get();
-            monitor.worked(1);
-            for (CustomGroup customGroup : customGroups) {
-                List<ApplicationInCustomGroup> apps = customGroup.getApplications();
-                if (apps != null) {
-                    for (ApplicationInCustomGroup app : apps) {
-                        String appName = app.getApplication().getName();
-                        if (appGroupMap.containsKey(appName)) {
-                            appGroupMap.get(appName).add(customGroup.getName());
-                        } else {
-                            appGroupMap.put(appName, new ArrayList<String>(Arrays.asList(customGroup.getName())));
+            Api groupsApi = new GroupsApi(preferenceStore, organization);
+            try {
+                List<CustomGroup> customGroups = (List<CustomGroup>) groupsApi.get();
+                monitor.worked(1);
+                for (CustomGroup customGroup : customGroups) {
+                    List<ApplicationInCustomGroup> apps = customGroup.getApplications();
+                    if (apps != null) {
+                        for (ApplicationInCustomGroup app : apps) {
+                            String appName = app.getApplication().getName();
+                            if (appGroupMap.containsKey(appName)) {
+                                appGroupMap.get(appName).add(customGroup.getName());
+                            } else {
+                                appGroupMap.put(appName, new ArrayList<String>(Arrays.asList(customGroup.getName())));
+                            }
                         }
                     }
                 }
+            } catch (ApiException ae) {
             }
             // アプリケーション一覧を取得
             monitor.subTask("アプリケーション一覧の情報を取得...");
-            Api applicationsApi = new ApplicationsApi(preferenceStore);
+            Api applicationsApi = new ApplicationsApi(preferenceStore, organization);
             List<Application> applications = (List<Application>) applicationsApi.get();
             monitor.worked(1);
             for (Application app : applications) {

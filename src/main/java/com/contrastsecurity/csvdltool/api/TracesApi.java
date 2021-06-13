@@ -28,6 +28,7 @@ import java.lang.reflect.Type;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 import com.contrastsecurity.csvdltool.json.TracesJson;
+import com.contrastsecurity.csvdltool.model.Organization;
 import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -36,15 +37,15 @@ public class TracesApi extends Api {
 
     private String appId;
 
-    public TracesApi(IPreferenceStore preferenceStore, String appId) {
-        super(preferenceStore);
+    public TracesApi(IPreferenceStore preferenceStore, Organization organization, String appId) {
+        super(preferenceStore, organization);
         this.appId = appId;
     }
 
     @Override
     protected String getUrl() {
         String contrastUrl = preferenceStore.getString(PreferenceConstants.CONTRAST_URL);
-        String orgId = preferenceStore.getString(PreferenceConstants.ORG_ID);
+        String orgId = this.organization.getOrganization_uuid();
         return String.format("%s/api/ng/%s/traces/%s/ids", contrastUrl, orgId, this.appId);
     }
 

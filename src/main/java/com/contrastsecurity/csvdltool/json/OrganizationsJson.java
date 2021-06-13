@@ -21,41 +21,21 @@
  * 
  */
 
-package com.contrastsecurity.csvdltool.api;
+package com.contrastsecurity.csvdltool.json;
 
-import java.lang.reflect.Type;
+import java.util.List;
 
-import org.eclipse.jface.preference.IPreferenceStore;
-
-import com.contrastsecurity.csvdltool.json.HowToFixJson;
 import com.contrastsecurity.csvdltool.model.Organization;
-import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
-public class HowToFixApi extends Api {
+public class OrganizationsJson extends ContrastJson {
+    private List<Organization> organizations;
 
-    private String trace_id;
-
-    public HowToFixApi(IPreferenceStore preferenceStore, Organization organization, String trace_id) {
-        super(preferenceStore, organization);
-        this.trace_id = trace_id;
+    public List<Organization> getOrganizations() {
+        return organizations;
     }
 
-    @Override
-    protected String getUrl() {
-        String contrastUrl = preferenceStore.getString(PreferenceConstants.CONTRAST_URL);
-        String orgId = this.organization.getOrganization_uuid();
-        return String.format("%s/api/ng/%s/traces/%s/recommendation", contrastUrl, orgId, this.trace_id);
-    }
-
-    @Override
-    protected Object convert(String response) {
-        Gson gson = new Gson();
-        Type howToFixType = new TypeToken<HowToFixJson>() {
-        }.getType();
-        HowToFixJson howToFixJson = gson.fromJson(response, howToFixType);
-        return howToFixJson;
+    public void setOrganizations(List<Organization> organizations) {
+        this.organizations = organizations;
     }
 
 }

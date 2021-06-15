@@ -26,6 +26,7 @@ package com.contrastsecurity.csvdltool.preference;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.contrastsecurity.csvdltool.CSVDLEncryptor;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -275,7 +276,7 @@ public class ConnectionPreferencePage extends PreferencePage {
         }
         ps.setValue(PreferenceConstants.PROXY_PORT, this.portTxt.getText());
         ps.setValue(PreferenceConstants.PROXY_USER, this.userTxt.getText());
-        ps.setValue(PreferenceConstants.PROXY_PASS, this.passTxt.getText());
+        ps.setValue(PreferenceConstants.PROXY_PASS, CSVDLEncryptor.encrypt(this.passTxt.getText()));
         ps.setValue(PreferenceConstants.IGNORE_SSLCERT_CHECK, this.ignoreSSLCertCheckFlg.getSelection());
         if (this.connectionTimeoutTxt.getText().isEmpty()) {
             errors.add("・ConnetionTimeoutを指定してください。");

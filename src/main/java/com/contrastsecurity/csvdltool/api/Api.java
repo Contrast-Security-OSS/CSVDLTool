@@ -32,6 +32,7 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.contrastsecurity.csvdltool.CSVDLEncryptor;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.Header;
 import org.apache.http.HttpHeaders;
@@ -111,7 +112,8 @@ public abstract class Api {
                         Integer.parseInt(this.preferenceStore.getString(PreferenceConstants.PROXY_PORT)));
                 httpGet.setConfig(RequestConfig.custom().setSocketTimeout(sockettTimeout).setConnectTimeout(connectTimeout).setProxy(proxy).build());
                 String proxy_user = this.preferenceStore.getString(PreferenceConstants.PROXY_USER);
-                String proxy_pass = this.preferenceStore.getString(PreferenceConstants.PROXY_PASS);
+                String encrypted_proxy_pass = this.preferenceStore.getString(PreferenceConstants.PROXY_PASS);
+                String proxy_pass = CSVDLEncryptor.decrypt(encrypted_proxy_pass);
                 if (proxy_user.isEmpty() || proxy_pass.isEmpty()) {
                     if (preferenceStore.getBoolean(PreferenceConstants.IGNORE_SSLCERT_CHECK)) {
                         httpClient = HttpClients.custom().setDefaultHeaders(headers).setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
@@ -188,5 +190,4 @@ public abstract class Api {
             }
         }
     }
-
 }

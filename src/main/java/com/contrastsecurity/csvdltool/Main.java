@@ -92,6 +92,9 @@ import com.google.gson.reflect.TypeToken;
 public class Main implements PropertyChangeListener {
 
     public static final String WINDOW_TITLE = "CSVDLTool - %s";
+    // 以下のMASTER_PASSWORDはプロキシパスワードを保存する際に暗号化で使用するパスワードです。
+    // 本ツールをリリース用にコンパイルする際はchangemeを別の文字列に置き換えてください。
+    public static final String MASTER_PASSWORD = "changeme!";
 
     private CSVDLToolShell shell;
 
@@ -150,6 +153,7 @@ public class Main implements PropertyChangeListener {
             e.printStackTrace();
         }
         try {
+            this.preferenceStore.setDefault(PreferenceConstants.PROXY_AUTH, "none");
             this.preferenceStore.setDefault(PreferenceConstants.CONNECTION_TIMEOUT, 3000);
             this.preferenceStore.setDefault(PreferenceConstants.SOCKET_TIMEOUT, 3000);
 

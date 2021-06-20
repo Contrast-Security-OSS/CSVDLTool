@@ -383,11 +383,15 @@ public class ConnectionPreferencePage extends PreferencePage {
                 BasicTextEncryptor encryptor = new BasicTextEncryptor();
                 encryptor.setPassword(Main.MASTER_PASSWORD);
                 ps.setValue(PreferenceConstants.PROXY_PASS, encryptor.encrypt(this.passTxt.getText()));
+                ps.setValue(PreferenceConstants.PROXY_TMP_USER, "");
+                ps.setValue(PreferenceConstants.PROXY_TMP_PASS, "");
             }
         } else {
             ps.setValue(PreferenceConstants.PROXY_AUTH, "none");
             ps.setValue(PreferenceConstants.PROXY_USER, "");
             ps.setValue(PreferenceConstants.PROXY_PASS, "");
+            ps.setValue(PreferenceConstants.PROXY_TMP_USER, "");
+            ps.setValue(PreferenceConstants.PROXY_TMP_PASS, "");
         }
         ps.setValue(PreferenceConstants.IGNORE_SSLCERT_CHECK, this.ignoreSSLCertCheckFlg.getSelection());
         if (this.connectionTimeoutTxt.getText().isEmpty()) {

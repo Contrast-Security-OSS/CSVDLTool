@@ -53,7 +53,9 @@ import org.apache.http.ssl.TrustStrategy;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.jasypt.util.text.BasicTextEncryptor;
 
+import com.contrastsecurity.csvdltool.Main;
 import com.contrastsecurity.csvdltool.exception.ApiException;
 import com.contrastsecurity.csvdltool.exception.NonApiException;
 import com.contrastsecurity.csvdltool.model.Organization;
@@ -110,9 +112,8 @@ public abstract class Api {
                 HttpHost proxy = new HttpHost(this.preferenceStore.getString(PreferenceConstants.PROXY_HOST),
                         Integer.parseInt(this.preferenceStore.getString(PreferenceConstants.PROXY_PORT)));
                 httpGet.setConfig(RequestConfig.custom().setSocketTimeout(sockettTimeout).setConnectTimeout(connectTimeout).setProxy(proxy).build());
-                String proxy_user = this.preferenceStore.getString(PreferenceConstants.PROXY_USER);
-                String proxy_pass = this.preferenceStore.getString(PreferenceConstants.PROXY_PASS);
-                if (proxy_user.isEmpty() || proxy_pass.isEmpty()) {
+                if (this.preferenceStore.getString(PreferenceConstants.PROXY_AUTH).equals("none")) {
+                    // プロキシ認証なし
                     if (preferenceStore.getBoolean(PreferenceConstants.IGNORE_SSLCERT_CHECK)) {
                         httpClient = HttpClients.custom().setDefaultHeaders(headers).setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
                                 .setSSLContext(new SSLContextBuilder().loadTrustMaterial(null, new TrustStrategy() {
@@ -124,6 +125,22 @@ public abstract class Api {
                         httpClient = HttpClients.custom().setDefaultHeaders(headers).build();
                     }
                 } else {
+                    // プロキシ認証あり
+                    String proxy_user = null;
+                    String proxy_pass = null;
+                    if (this.preferenceStore.getString(PreferenceConstants.PROXY_AUTH).equals("input")) {
+                        proxy_user = this.preferenceStore.getString(PreferenceConstants.PROXY_TMP_USER);
+                        proxy_pass = this.preferenceStore.getString(PreferenceConstants.PROXY_TMP_PASS);
+                    } else {
+                        proxy_user = this.preferenceStore.getString(PreferenceConstants.PROXY_USER);
+                        BasicTextEncryptor encryptor = new BasicTextEncryptor();
+                        encryptor.setPassword(Main.MASTER_PASSWORD);
+                        try {
+                            proxy_pass = encryptor.decrypt(preferenceStore.getString(PreferenceConstants.PROXY_PASS));
+                        } catch (Exception e) {
+                            throw new ApiException("プロキシパスワードの復号化に失敗しました。\\r\\nパスワードの設定をやり直してください。");
+                        }
+                    }
                     CredentialsProvider credsProvider = new BasicCredentialsProvider();
                     credsProvider.setCredentials(new AuthScope(proxy), new UsernamePasswordCredentials(proxy_user, proxy_pass));
                     if (preferenceStore.getBoolean(PreferenceConstants.IGNORE_SSLCERT_CHECK)) {

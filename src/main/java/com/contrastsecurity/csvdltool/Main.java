@@ -42,6 +42,7 @@ import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.preference.PreferenceDialog;
@@ -177,7 +178,7 @@ public class Main implements PropertyChangeListener {
             this.preferenceStore.setDefault(PreferenceConstants.SERVICE_KEY, contrastSecurityYaml.getServiceKey());
             this.preferenceStore.setDefault(PreferenceConstants.USERNAME, contrastSecurityYaml.getUserName());
         } catch (Exception e) {
-            e.printStackTrace();
+            // e.printStackTrace();
         }
     }
 
@@ -216,6 +217,8 @@ public class Main implements PropertyChangeListener {
                 preferenceStore.setValue(PreferenceConstants.INCLUDE_STACKTRACE, includeStackTraceChk.getSelection());
                 preferenceStore.setValue(PreferenceConstants.ONLY_HAS_CVE, onlyHasCVEChk.getSelection());
                 preferenceStore.setValue(PreferenceConstants.INCLUDE_CVE_DETAIL, includeCVEDetailChk.getSelection());
+                preferenceStore.setValue(PreferenceConstants.PROXY_TMP_USER, "");
+                preferenceStore.setValue(PreferenceConstants.PROXY_TMP_PASS, "");
                 try {
                     preferenceStore.save();
                 } catch (IOException ioe) {
@@ -242,6 +245,20 @@ public class Main implements PropertyChangeListener {
                     currentOrg = org;
                 }
                 setWindowTitle();
+                if (preferenceStore.getString(PreferenceConstants.PROXY_AUTH).equals("input")) {
+                    String usr = preferenceStore.getString(PreferenceConstants.PROXY_TMP_USER);
+                    String pwd = preferenceStore.getString(PreferenceConstants.PROXY_TMP_PASS);
+                    if (usr == null || usr.isEmpty() || pwd == null || pwd.isEmpty()) {
+                        ProxyAuthDialog proxyAuthDialog = new ProxyAuthDialog(shell);
+                        int result = proxyAuthDialog.open();
+                        if (IDialogConstants.CANCEL_ID == result) {
+                            preferenceStore.setValue(PreferenceConstants.PROXY_AUTH, "none");
+                        } else {
+                            preferenceStore.setValue(PreferenceConstants.PROXY_TMP_USER, proxyAuthDialog.getUsername());
+                            preferenceStore.setValue(PreferenceConstants.PROXY_TMP_PASS, proxyAuthDialog.getPassword());
+                        }
+                    }
+                }
             }
         });
 
@@ -309,6 +326,7 @@ public class Main implements PropertyChangeListener {
                     sj.add("・下記ユーザーのアプリケーションアクセスグループにView権限が設定されていない。");
                     sj.add(String.format("　%s", userName));
                     sj.add("・Assessライセンスが付与されているアプリケーションがない。");
+                    sj.add("・接続設定が正しくない。プロキシの設定がされていない。など");
                     MessageDialog.openInformation(shell, "アプリケーション一覧の取得", sj.toString());
                 }
                 for (String appLabel : fullAppMap.keySet()) {

@@ -30,6 +30,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -69,6 +71,24 @@ public class ConnectionPreferencePage extends PreferencePage {
     @Override
     protected Control createContents(Composite parent) {
         IPreferenceStore preferenceStore = getPreferenceStore();
+        preferenceStore.addPropertyChangeListener(new IPropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent event) {
+                if (event.getProperty().equals(PreferenceConstants.PROXY_AUTH)) {
+                    if (event.getNewValue().equals("none")) {
+                        if (!authNone.isDisposed()) {
+                            authNone.setSelection(true);
+                            authInput.setSelection(false);
+                            authSave.setSelection(false);
+                            userTxt.setText("");
+                            userTxt.setEnabled(false);
+                            passTxt.setText("");
+                            passTxt.setEnabled(false);
+                        }
+                    }
+                }
+            }
+        });
 
         final Composite composite = new Composite(parent, SWT.NONE);
         GridLayout compositeLt = new GridLayout(1, false);

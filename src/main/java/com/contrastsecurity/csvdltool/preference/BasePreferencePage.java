@@ -54,6 +54,7 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
 import com.contrastsecurity.csvdltool.Main;
+import com.contrastsecurity.csvdltool.ProxyAuthDialog;
 import com.contrastsecurity.csvdltool.model.Organization;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -256,6 +257,20 @@ public class BasePreferencePage extends PreferencePage {
         addBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
+                if (preferenceStore.getBoolean(PreferenceConstants.PROXY_YUKO) && preferenceStore.getString(PreferenceConstants.PROXY_AUTH).equals("input")) {
+                    String usr = preferenceStore.getString(PreferenceConstants.PROXY_TMP_USER);
+                    String pwd = preferenceStore.getString(PreferenceConstants.PROXY_TMP_PASS);
+                    if (usr == null || usr.isEmpty() || pwd == null || pwd.isEmpty()) {
+                        ProxyAuthDialog proxyAuthDialog = new ProxyAuthDialog(getShell());
+                        int result = proxyAuthDialog.open();
+                        if (IDialogConstants.CANCEL_ID == result) {
+                            preferenceStore.setValue(PreferenceConstants.PROXY_AUTH, "none");
+                        } else {
+                            preferenceStore.setValue(PreferenceConstants.PROXY_TMP_USER, proxyAuthDialog.getUsername());
+                            preferenceStore.setValue(PreferenceConstants.PROXY_TMP_PASS, proxyAuthDialog.getPassword());
+                        }
+                    }
+                }
                 OrganizationDialog pathDialog = new OrganizationDialog(getShell(), preferenceStore, contrastUrlTxt.getText(), userNameTxt.getText(), serviceKeyTxt.getText());
                 int result = pathDialog.open();
                 if (IDialogConstants.OK_ID != result) {

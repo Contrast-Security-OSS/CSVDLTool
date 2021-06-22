@@ -245,7 +245,7 @@ public class Main implements PropertyChangeListener {
                     currentOrg = org;
                 }
                 setWindowTitle();
-                if (preferenceStore.getString(PreferenceConstants.PROXY_AUTH).equals("input")) {
+                if (preferenceStore.getBoolean(PreferenceConstants.PROXY_YUKO) && preferenceStore.getString(PreferenceConstants.PROXY_AUTH).equals("input")) {
                     String usr = preferenceStore.getString(PreferenceConstants.PROXY_TMP_USER);
                     String pwd = preferenceStore.getString(PreferenceConstants.PROXY_TMP_PASS);
                     if (usr == null || usr.isEmpty() || pwd == null || pwd.isEmpty()) {

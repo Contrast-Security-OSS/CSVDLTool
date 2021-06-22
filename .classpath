@@ -54,6 +54,11 @@
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry sourcepath="C:/Users/turbou/.gradle/caches/modules-2/files-2.1/org.jasypt/jasypt/1.9.3/9fe5c909addd00e1f3c27af8b64e22ee98922dcc/jasypt-1.9.3-sources.jar" kind="lib" path="C:/Users/turbou/.gradle/caches/modules-2/files-2.1/org.jasypt/jasypt/1.9.3/d99ef9540f51c617f2a293b460f025d2ee563dd/jasypt-1.9.3.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="lib" path="C:/Users/turbou/.gradle/caches/modules-2/files-2.1/org.eclipse.core/commands/3.3.0-I20070605-0010/f602b5987689e09820fe1a3e67b25c423a1214ae/commands-3.3.0-I20070605-0010.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>

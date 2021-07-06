@@ -1,19 +1,19 @@
-## 概要
+### 概要
 TeamServerに登録されている脆弱性情報、ライブラリ情報をCSV形式でレポートを取得できるツールです。  
 TeamServerから直接、csvレポートを出力することもできますが、本ツールではより多くの情報を取得、また  
 出力する情報をカスタマイズすることができます。  
 使用方法の詳細については [Release](https://github.com/Contrast-Security-OSS/CSVDLTool/releases) からダウンロードできるzipファイルに同梱のマニュアルpdfをご確認ください。
 
 
-## 動作環境
+### 動作環境
 Windows8.1、Windows10  
 Java1.8.0_202
 
-## ソースからビルドする場合
+### ソースからビルドする場合
 
 ビルドからではなく、すぐにお使いいただく場合は[リリースについて](#リリースについて)を参照ください。
 
-### コマンドプロンプトでビルドする場合
+#### コマンドプロンプトでビルドする場合
 
 ```
 gradle clean jar
@@ -21,7 +21,7 @@ gradle clean jar
 
 build\libsの下にjarが作成されます。
 
-### Eclipseでビルド、実行できるようにする場合
+#### Eclipseでビルド、実行できるようにする場合
 
 ```
 gradle cleanEclipse eclipse
@@ -31,7 +31,7 @@ Eclipseでプロジェクトをリフレッシュすると、あとは実行でc
 
 
 
-### 32bit版でjarを生成する場合はbuild.gradleの以下箇所を弄ってください。
+#### 32bit版でjarを生成する場合はbuild.gradleの以下箇所を弄ってください。
 
 - 64bitの場合（java 64bitでEclipseなど動かしている場合はこのままで良いです）
 
@@ -48,7 +48,7 @@ Eclipseでプロジェクトをリフレッシュすると、あとは実行でc
 
 
 
-### exe化について
+#### exe化について
 
 - launch4jを使っています。
 - launch4j.xmlを読み込むと、ある程度設定が入っていて、あとはjar（ビルドによって作成された）やexeのパスを修正するぐらいです。
@@ -58,7 +58,7 @@ Eclipseでプロジェクトをリフレッシュすると、あとは実行でc
 
 
 
-## 起動後の使い方について
+### 起動後の使い方について
 
 - contrast_security.yamlをエージェントのDLウィザードからDLしてexeと同じ場所に配置してください。（任意）
   任意というのは、yamlから読み込まなくても、あとで全て手入力でも可能だからです。
@@ -72,7 +72,7 @@ Eclipseでプロジェクトをリフレッシュすると、あとは実行でc
 
 使用方法の詳細については [Release](https://github.com/Contrast-Security-OSS/CSVDLTool/releases) からダウンロードできるzipファイルに同梱のマニュアルpdfをご確認ください。
 
-## リリースについて
+### リリースについて
 [Release](https://github.com/Contrast-Security-OSS/CSVDLTool/releases) で以下２種類のバイナリを提供しています。ビルド不要でダウンロード後すぐにお使いいただけます。
 - CSVDLTool_X.X.X.zip  
   初回ダウンロードの場合はこちらをダウンロードして解凍して、お使いください。  

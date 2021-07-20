@@ -15,7 +15,7 @@ Java1.8.0_202
 #### コマンドプロンプトでビルドする場合
 
 ```
-gradle clean jar
+gradlew clean jar
 ```
 
 build\libsの下にjarが作成されます。
@@ -23,7 +23,7 @@ build\libsの下にjarが作成されます。
 #### Eclipseでビルド、実行できるようにする場合
 
 ```
-gradle cleanEclipse eclipse
+gradlew cleanEclipse eclipse
 ```
 
 Eclipseでプロジェクトをリフレッシュすると、あとは実行でcom.contrastsecurity.csvdltool.Mainで、ツールが起動します。

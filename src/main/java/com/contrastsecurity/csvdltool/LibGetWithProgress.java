@@ -57,7 +57,6 @@ import com.contrastsecurity.csvdltool.model.LibCSVColumn;
 import com.contrastsecurity.csvdltool.model.Library;
 import com.contrastsecurity.csvdltool.model.Organization;
 import com.contrastsecurity.csvdltool.model.Server;
-import com.contrastsecurity.csvdltool.model.VulCSVColumn;
 import com.contrastsecurity.csvdltool.model.Vuln;
 import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
 import com.google.gson.Gson;
@@ -104,7 +103,6 @@ public class LibGetWithProgress implements IRunnableWithProgress {
         }
         String timestamp = new SimpleDateFormat(csvFileFormat).format(new Date());
         int sleepTrace = preferenceStore.getInt(PreferenceConstants.SLEEP_LIB);
-        String csvColumns = preferenceStore.getString(PreferenceConstants.CSV_COLUMN_LIB);
         String columnJsonStr = preferenceStore.getString(PreferenceConstants.CSV_COLUMN_LIB);
         List<LibCSVColumn> columnList = null;
         if (columnJsonStr.trim().length() > 0) {
@@ -225,74 +223,6 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                                 continue;
                         }
                     }
-                    // // ==================== 01. ライブラリ名 ====================
-                    // if (csvColumns.contains(LibCSVColmunEnum.LIB_01.name())) {
-                    // csvLineList.add(library.getFile_name());
-                    // }
-                    // // ==================== 02. 言語 ====================
-                    // if (csvColumns.contains(LibCSVColmunEnum.LIB_02.name())) {
-                    // csvLineList.add(library.getApp_language());
-                    // }
-                    // // ==================== 03. 現在バージョン ====================
-                    // if (csvColumns.contains(LibCSVColmunEnum.LIB_03.name())) {
-                    // csvLineList.add(library.getVersion());
-                    // }
-                    // // ==================== 04. リリース日 ====================
-                    // if (csvColumns.contains(LibCSVColmunEnum.LIB_04.name())) {
-                    // csvLineList.add(library.getRelease_date());
-                    // }
-                    // // ==================== 05. 最新バージョン ====================
-                    // if (csvColumns.contains(LibCSVColmunEnum.LIB_05.name())) {
-                    // csvLineList.add(library.getLatest_version());
-                    // }
-                    // // ==================== 06. リリース日 ====================
-                    // if (csvColumns.contains(LibCSVColmunEnum.LIB_06.name())) {
-                    // csvLineList.add(library.getLatest_release_date());
-                    // }
-                    // // ==================== 07. スコア ====================
-                    // if (csvColumns.contains(LibCSVColmunEnum.LIB_07.name())) {
-                    // csvLineList.add(library.getGrade());
-                    // }
-                    // // ==================== 08. 使用クラス数 ====================
-                    // if (csvColumns.contains(LibCSVColmunEnum.LIB_08.name())) {
-                    // csvLineList.add(String.valueOf(library.getClasses_used()));
-                    // }
-                    // // ==================== 09. 全体クラス数 ====================
-                    // if (csvColumns.contains(LibCSVColmunEnum.LIB_09.name())) {
-                    // csvLineList.add(String.valueOf(library.getClass_count()));
-                    // }
-                    // // ==================== 10. ライセンス ====================
-                    // if (csvColumns.contains(LibCSVColmunEnum.LIB_10.name())) {
-                    // StringJoiner sj = new StringJoiner(csvSepLicense);
-                    // for (String license : library.getLicenses()) {
-                    // sj.add(license);
-                    // }
-                    // csvLineList.add(sj.toString());
-                    // }
-                    // // ==================== 11. 関連アプリケーション ====================
-                    // if (csvColumns.contains(LibCSVColmunEnum.LIB_11.name())) {
-                    // StringJoiner sj = new StringJoiner(csvSepApplication);
-                    // for (Application app : library.getApps()) {
-                    // sj.add(app.getName());
-                    // }
-                    // csvLineList.add(sj.toString());
-                    // }
-                    // // ==================== 12. 関連サーバ ====================
-                    // if (csvColumns.contains(LibCSVColmunEnum.LIB_12.name())) {
-                    // StringJoiner sj = new StringJoiner(csvSepServer);
-                    // for (Server server : library.getServers()) {
-                    // sj.add(server.getName());
-                    // }
-                    // csvLineList.add(sj.toString());
-                    // }
-                    // // ==================== 13. CVE ====================
-                    // if (csvColumns.contains(LibCSVColmunEnum.LIB_13.name())) {
-                    // StringJoiner sj = new StringJoiner(csvSepCVE);
-                    // for (Vuln vuln : library.getVulns()) {
-                    // sj.add(vuln.getName());
-                    // }
-                    // csvLineList.add(sj.toString());
-                    // }
                     if (isIncludeCVEDetail && !library.getVulns().isEmpty()) {
                         // ==================== 14. 詳細 ====================
                         csvLineList.add(String.format("=HYPERLINK(\".\\%s.txt\",\"%s\")", library.getHash(), library.getHash()));

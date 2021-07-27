@@ -48,7 +48,8 @@ public class LibrariesApi extends Api {
     protected String getUrl() {
         String contrastUrl = preferenceStore.getString(PreferenceConstants.CONTRAST_URL);
         String orgId = this.organization.getOrganization_uuid();
-        return String.format("%s/api/ng/%s/applications/%s/libraries?expand=servers,vulns,apps,skip_links&quickFilter=%s&sort=fileName", contrastUrl, orgId, this.appId, this.filter);
+        return String.format("%s/api/ng/%s/applications/%s/libraries?expand=servers,vulns,apps,skip_links&quickFilter=%s&sort=fileName", contrastUrl, orgId, this.appId,
+                this.filter);
     }
 
     @Override

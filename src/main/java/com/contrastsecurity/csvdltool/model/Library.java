@@ -45,6 +45,7 @@ public class Library {
     private List<String> licenses;
     private List<Application> apps;
     private List<Server> servers;
+    private List<String> tags;
 
     public String getHash() {
         return hash;
@@ -168,6 +169,14 @@ public class Library {
 
     public void setServers(List<Server> servers) {
         this.servers = servers;
+    }
+
+    public List<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<String> tags) {
+        this.tags = tags;
     }
 
 }

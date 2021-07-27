@@ -219,6 +219,17 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                                 csvLineList.add(sj.toString());
                                 break;
                             }
+                            case LIB_14: {
+                                // ==================== 14. ライブラリタグ ====================
+                                StringJoiner sj = new StringJoiner(csvColumn.getSeparateStr().replace("\\r", "\r").replace("\\n", "\n"));
+                                if (library.getTags() != null) {
+                                    for (String tag : library.getTags()) {
+                                        sj.add(tag);
+                                    }
+                                }
+                                csvLineList.add(sj.toString());
+                                break;
+                            }
                             default:
                                 continue;
                         }

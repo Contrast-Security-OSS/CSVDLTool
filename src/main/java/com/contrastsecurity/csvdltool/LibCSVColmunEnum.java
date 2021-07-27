@@ -45,7 +45,8 @@ public enum LibCSVColmunEnum {
     LIB_10("ライセンス", 10, true, ",", true, ""),
     LIB_11("関連アプリケーション", 11, true, ",", true, ""),
     LIB_12("関連サーバ", 12, true, ",", true, ""),
-    LIB_13("CVE", 13, true, ",", true, "");
+    LIB_13("CVE", 14, true, ",", true, ""),
+    LIB_14("ライブラリタグ", 13, true, ",", true, "");
 
     private String culumn;
     private int order;

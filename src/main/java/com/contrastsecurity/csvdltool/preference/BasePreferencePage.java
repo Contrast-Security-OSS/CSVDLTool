@@ -67,7 +67,7 @@ public class BasePreferencePage extends PreferencePage {
     private Text userNameTxt;
     private List<Organization> orgList;
     private List<Button> checkBoxList = new ArrayList<Button>();
-    private int selectedIdx = -1;
+    private List<Integer> selectedIdxes = new ArrayList<Integer>();
     private Table table;
     private Button addBtn;
 
@@ -238,7 +238,7 @@ public class BasePreferencePage extends PreferencePage {
         }
         for (Button button : checkBoxList) {
             if (button.getSelection()) {
-                this.selectedIdx = checkBoxList.indexOf(button);
+                this.selectedIdxes.add(checkBoxList.indexOf(button));
             }
         }
 
@@ -293,7 +293,7 @@ public class BasePreferencePage extends PreferencePage {
                 }
                 for (Button button : checkBoxList) {
                     if (button.getSelection()) {
-                        selectedIdx = checkBoxList.indexOf(button);
+                        selectedIdxes.add(checkBoxList.indexOf(button));
                     }
                 }
             }
@@ -319,11 +319,11 @@ public class BasePreferencePage extends PreferencePage {
                     addOrgToTable(org);
                 }
                 if (checkBoxList.isEmpty()) {
-                    selectedIdx = -1;
+                    selectedIdxes.clear();
                 } else {
                     for (Button button : checkBoxList) {
                         if (button.getSelection()) {
-                            selectedIdx = checkBoxList.indexOf(button);
+                            selectedIdxes.add(checkBoxList.indexOf(button));
                         }
                     }
                 }
@@ -386,13 +386,12 @@ public class BasePreferencePage extends PreferencePage {
         ps.setValue(PreferenceConstants.CONTRAST_URL, this.contrastUrlTxt.getText());
         ps.setValue(PreferenceConstants.SERVICE_KEY, this.serviceKeyTxt.getText());
         ps.setValue(PreferenceConstants.USERNAME, this.userNameTxt.getText());
-        if (selectedIdx > -1) {
-            TableItem selectedItem = table.getItem(selectedIdx);
-            for (Organization org : this.orgList) {
+        for (Organization org : this.orgList) {
+            org.setValid(false);
+            for (Integer selectedIdx : selectedIdxes) {
+                TableItem selectedItem = table.getItem(selectedIdx);
                 if (org.getOrganization_uuid().equals(selectedItem.getText(3))) {
                     org.setValid(true);
-                } else {
-                    org.setValid(false);
                 }
             }
         }
@@ -413,11 +412,11 @@ public class BasePreferencePage extends PreferencePage {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 Button triggerBtn = (Button) e.getSource();
-                for (Button button : checkBoxList) {
-                    button.setSelection(false);
+                if (triggerBtn.getSelection()) {
+                    selectedIdxes.add(checkBoxList.indexOf(triggerBtn));
+                } else {
+                    selectedIdxes.remove(checkBoxList.indexOf(triggerBtn));
                 }
-                triggerBtn.setSelection(true);
-                selectedIdx = checkBoxList.indexOf(triggerBtn);
             }
 
             @Override

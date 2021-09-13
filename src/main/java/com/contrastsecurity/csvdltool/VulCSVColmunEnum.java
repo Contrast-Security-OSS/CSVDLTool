@@ -51,7 +51,9 @@ public enum VulCSVColmunEnum {
     VUL_16("次のサーバにより報告", 17, true, ",", true, ""),
     VUL_17("モジュール", 18, false, null, true, ""),
     VUL_18("脆弱性タグ", 19, true, ",", true, ""),
-    VUL_19("保留中ステータス", 10, false, null, false, "");
+    VUL_19("保留中ステータス", 10, false, null, false, ""),
+    VUL_20("組織名", 20, false, null, false, ""),
+    VUL_21("組織ID", 21, false, null, false, "");
 
     private String culumn;
     private int order;

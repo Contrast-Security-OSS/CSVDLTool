@@ -123,13 +123,13 @@ public class Main implements PropertyChangeListener {
     private List<String> srcApps = new ArrayList<String>();
     private List<String> dstApps = new ArrayList<String>();
 
-    private Organization currentOrg;
-
     private PreferenceStore preferenceStore;
 
     private PropertyChangeSupport support = new PropertyChangeSupport(this);
 
     Logger logger = Logger.getLogger("csvdltool");
+
+    String currentTitle;
 
     /**
      * @param args
@@ -228,21 +228,23 @@ public class Main implements PropertyChangeListener {
 
             @Override
             public void shellActivated(ShellEvent event) {
-                Organization org = getValidOrganization();
-                if (org == null) {
+                List<Organization> orgs = getValidOrganizations();
+                if (orgs.isEmpty()) {
                     appLoadBtn.setEnabled(false);
                     vulExecuteBtn.setEnabled(false);
                     settingBtn.setText("このボタンから基本設定を行ってください。");
-                    currentOrg = null;
+                    currentTitle = "";
                     uiReset();
                 } else {
                     appLoadBtn.setEnabled(true);
                     vulExecuteBtn.setEnabled(true);
                     settingBtn.setText("設定");
-                    if (currentOrg != null && !currentOrg.equals(org)) {
+                    List<String> orgNameList = new ArrayList<String>();
+                    String title = String.join(", ", orgNameList);
+                    if (currentTitle != null && !currentTitle.equals(title)) {
                         uiReset();
+                        currentTitle = title;
                     }
-                    currentOrg = org;
                 }
                 setWindowTitle();
                 if (preferenceStore.getBoolean(PreferenceConstants.PROXY_YUKO) && preferenceStore.getString(PreferenceConstants.PROXY_AUTH).equals("input")) {
@@ -297,7 +299,7 @@ public class Main implements PropertyChangeListener {
             public void widgetSelected(SelectionEvent event) {
                 uiReset();
 
-                AppsGetWithProgress progress = new AppsGetWithProgress(preferenceStore, getValidOrganization());
+                AppsGetWithProgress progress = new AppsGetWithProgress(preferenceStore, getValidOrganizations());
                 ProgressMonitorDialog progDialog = new ProgressMonitorDialog(shell);
                 try {
                     progDialog.run(true, true, progress);
@@ -616,7 +618,7 @@ public class Main implements PropertyChangeListener {
                     MessageDialog.openInformation(shell, "脆弱性情報取得", "取得対象のアプリケーションを選択してください。");
                     return;
                 }
-                VulGetWithProgress progress = new VulGetWithProgress(shell, preferenceStore, getValidOrganization(), dstApps, fullAppMap, vulOnlyParentAppChk.getSelection(),
+                VulGetWithProgress progress = new VulGetWithProgress(shell, preferenceStore, getValidOrganizations(), dstApps, fullAppMap, vulOnlyParentAppChk.getSelection(),
                         includeDescChk.getSelection(), includeStackTraceChk.getSelection());
                 ProgressMonitorDialog progDialog = new ProgressMonitorDialog(shell);
                 try {
@@ -715,8 +717,7 @@ public class Main implements PropertyChangeListener {
                     MessageDialog.openInformation(shell, "ライブラリ情報取得", "取得対象のアプリケーションを選択してください。");
                     return;
                 }
-                LibGetWithProgress progress = new LibGetWithProgress(shell, preferenceStore, getValidOrganization(), dstApps, fullAppMap, onlyHasCVEChk.getSelection(),
-                        includeCVEDetailChk.getSelection());
+                LibGetWithProgress progress = new LibGetWithProgress(shell, preferenceStore, dstApps, fullAppMap, onlyHasCVEChk.getSelection(), includeCVEDetailChk.getSelection());
                 ProgressMonitorDialog progDialog = new ProgressMonitorDialog(shell);
                 try {
                     progDialog.run(true, true, progress);
@@ -865,11 +866,34 @@ public class Main implements PropertyChangeListener {
         return null;
     }
 
+    public List<Organization> getValidOrganizations() {
+        List<Organization> orgs = new ArrayList<Organization>();
+        String orgJsonStr = preferenceStore.getString(PreferenceConstants.TARGET_ORGS);
+        if (orgJsonStr.trim().length() > 0) {
+            try {
+                List<Organization> orgList = new Gson().fromJson(orgJsonStr, new TypeToken<List<Organization>>() {
+                }.getType());
+                for (Organization org : orgList) {
+                    if (org != null && org.isValid()) {
+                        orgs.add(org);
+                    }
+                }
+            } catch (JsonSyntaxException e) {
+                return orgs;
+            }
+        }
+        return orgs;
+    }
+
     public void setWindowTitle() {
         String text = null;
-        Organization validOrg = getValidOrganization();
-        if (validOrg != null) {
-            text = validOrg.getName();
+        List<Organization> validOrgs = getValidOrganizations();
+        if (!validOrgs.isEmpty()) {
+            List<String> orgNameList = new ArrayList<String>();
+            for (Organization validOrg : validOrgs) {
+                orgNameList.add(validOrg.getName());
+            }
+            text = String.join(", ", orgNameList);
         }
         if (text == null || text.isEmpty()) {
             this.shell.setText(String.format(WINDOW_TITLE, "組織未設定"));

@@ -23,13 +23,25 @@
 
 package com.contrastsecurity.csvdltool;
 
+import com.contrastsecurity.csvdltool.model.Organization;
+
 public class AppInfo {
+    private Organization organization;
     private String appName;
     private String appId;
 
-    public AppInfo(String appName, String appId) {
+    public AppInfo(Organization organization, String appName, String appId) {
+        this.organization = organization;
         this.appName = appName;
         this.appId = appId;
+    }
+
+    public Organization getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
     }
 
     public String getAppName() {

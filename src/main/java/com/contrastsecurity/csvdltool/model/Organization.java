@@ -69,6 +69,7 @@ public class Organization {
         List<String> strList = new ArrayList<String>();
         strList.add("name: " + this.name);
         strList.add("organization_uuid: " + this.organization_uuid);
+        strList.add("valid: " + this.valid);
         return String.join(", ", strList);
     }
 

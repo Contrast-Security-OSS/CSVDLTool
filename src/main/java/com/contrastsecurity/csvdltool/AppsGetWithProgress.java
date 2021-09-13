@@ -48,65 +48,82 @@ import com.contrastsecurity.csvdltool.model.Organization;
 public class AppsGetWithProgress implements IRunnableWithProgress {
 
     private PreferenceStore preferenceStore;
-    private Organization organization;
+    private List<Organization> organizations;
     private Map<String, AppInfo> fullAppMap;
 
     Logger logger = Logger.getLogger("csvdltool");
 
-    public AppsGetWithProgress(PreferenceStore preferenceStore, Organization organization) {
+    public AppsGetWithProgress(PreferenceStore preferenceStore, List<Organization> organizations) {
         this.preferenceStore = preferenceStore;
-        this.organization = organization;
+        this.organizations = organizations;
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
         fullAppMap = new TreeMap<String, AppInfo>();
-        monitor.beginTask("アプリケーション一覧の読み込み", 2);
-        try {
-            // アプリケーショングループの情報を取得
-            monitor.subTask("アプリケーショングループの情報を取得...");
-            Map<String, List<String>> appGroupMap = new HashMap<String, List<String>>();
-            Api groupsApi = new GroupsApi(preferenceStore, organization);
+        boolean prefix_org_flg = false;
+        if (this.organizations.size() > 1) {
+            prefix_org_flg = true;
+        }
+        monitor.beginTask("アプリケーション一覧の読み込み", 2 * this.organizations.size());
+        Thread.sleep(300);
+        for (Organization org : this.organizations) {
             try {
-                List<CustomGroup> customGroups = (List<CustomGroup>) groupsApi.get();
-                monitor.worked(1);
-                for (CustomGroup customGroup : customGroups) {
-                    List<ApplicationInCustomGroup> apps = customGroup.getApplications();
-                    if (apps != null) {
-                        for (ApplicationInCustomGroup app : apps) {
-                            String appName = app.getApplication().getName();
-                            if (appGroupMap.containsKey(appName)) {
-                                appGroupMap.get(appName).add(customGroup.getName());
-                            } else {
-                                appGroupMap.put(appName, new ArrayList<String>(Arrays.asList(customGroup.getName())));
+                monitor.setTaskName(org.getName());
+                // アプリケーショングループの情報を取得
+                monitor.subTask("アプリケーショングループの情報を取得...");
+                Map<String, List<String>> appGroupMap = new HashMap<String, List<String>>();
+                Api groupsApi = new GroupsApi(preferenceStore, org);
+                try {
+                    List<CustomGroup> customGroups = (List<CustomGroup>) groupsApi.get();
+                    monitor.worked(1);
+                    for (CustomGroup customGroup : customGroups) {
+                        List<ApplicationInCustomGroup> apps = customGroup.getApplications();
+                        if (apps != null) {
+                            for (ApplicationInCustomGroup app : apps) {
+                                String appName = app.getApplication().getName();
+                                if (appGroupMap.containsKey(appName)) {
+                                    appGroupMap.get(appName).add(customGroup.getName());
+                                } else {
+                                    appGroupMap.put(appName, new ArrayList<String>(Arrays.asList(customGroup.getName())));
+                                }
                             }
                         }
                     }
+                } catch (ApiException ae) {
                 }
-            } catch (ApiException ae) {
+                // アプリケーション一覧を取得
+                monitor.subTask("アプリケーション一覧の情報を取得...");
+                Api applicationsApi = new ApplicationsApi(preferenceStore, org);
+                List<Application> applications = (List<Application>) applicationsApi.get();
+                monitor.worked(1);
+                for (Application app : applications) {
+                    if (app.getLicense().getLevel().equals("Unlicensed")) {
+                        continue;
+                    }
+                    if (appGroupMap.containsKey(app.getName())) {
+                        if (prefix_org_flg) {
+                            fullAppMap.put(String.format("[%s] %s - %s", org.getName(), app.getName(), String.join(", ", appGroupMap.get(app.getName()))),
+                                    new AppInfo(org, app.getName(), app.getApp_id()));
+                        } else {
+                            fullAppMap.put(String.format("%s - %s", app.getName(), String.join(", ", appGroupMap.get(app.getName()))),
+                                    new AppInfo(org, app.getName(), app.getApp_id()));
+                        }
+                    } else {
+                        if (prefix_org_flg) {
+                            fullAppMap.put(String.format("[%s] %s", org.getName(), app.getName()), new AppInfo(org, app.getName(), app.getApp_id()));
+                        } else {
+                            fullAppMap.put(String.format("%s", app.getName()), new AppInfo(org, app.getName(), app.getApp_id()));
+                        }
+                    }
+                }
+                Thread.sleep(500);
+            } catch (Exception e) {
+                throw new InvocationTargetException(e);
             }
-            // アプリケーション一覧を取得
-            monitor.subTask("アプリケーション一覧の情報を取得...");
-            Api applicationsApi = new ApplicationsApi(preferenceStore, organization);
-            List<Application> applications = (List<Application>) applicationsApi.get();
-            monitor.worked(1);
-            for (Application app : applications) {
-                if (app.getLicense().getLevel().equals("Unlicensed")) {
-                    continue;
-                }
-                if (appGroupMap.containsKey(app.getName())) {
-                    String appLabel = String.format("%s - %s", app.getName(), String.join(", ", appGroupMap.get(app.getName())));
-                    fullAppMap.put(appLabel, new AppInfo(app.getName(), app.getApp_id()));
-                } else {
-                    fullAppMap.put(app.getName(), new AppInfo(app.getName(), app.getApp_id()));
-                }
-            }
-            Thread.sleep(500); // ただの演出
-            monitor.done();
-        } catch (Exception e) {
-            throw new InvocationTargetException(e);
         }
+        monitor.done();
     }
 
     public Map<String, AppInfo> getFullAppMap() {

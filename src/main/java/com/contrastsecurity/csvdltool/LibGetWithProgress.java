@@ -70,7 +70,6 @@ public class LibGetWithProgress implements IRunnableWithProgress {
 
     private Shell shell;
     private PreferenceStore preferenceStore;
-    private Organization organization;
     private List<String> dstApps;
     private Map<String, AppInfo> fullAppMap;
     private boolean isOnlyHasCVE;
@@ -78,11 +77,10 @@ public class LibGetWithProgress implements IRunnableWithProgress {
 
     Logger logger = Logger.getLogger("csvdltool");
 
-    public LibGetWithProgress(Shell shell, PreferenceStore preferenceStore, Organization organization, List<String> dstApps, Map<String, AppInfo> fullAppMap, boolean isOnlyHasCVE,
+    public LibGetWithProgress(Shell shell, PreferenceStore preferenceStore, List<String> dstApps, Map<String, AppInfo> fullAppMap, boolean isOnlyHasCVE,
             boolean isIncludeCVEDetail) {
         this.shell = shell;
         this.preferenceStore = preferenceStore;
-        this.organization = organization;
         this.dstApps = dstApps;
         this.fullAppMap = fullAppMap;
         this.isOnlyHasCVE = isOnlyHasCVE;
@@ -130,6 +128,7 @@ public class LibGetWithProgress implements IRunnableWithProgress {
             monitor.setTaskName(String.format("脆弱性情報の取得(0/%d)", dstApps.size()));
             int appIdx = 1;
             for (String appLabel : dstApps) {
+                Organization organization = fullAppMap.get(appLabel).getOrganization();
                 String appName = fullAppMap.get(appLabel).getAppName();
                 String appId = fullAppMap.get(appLabel).getAppId();
                 Api librariesApi = new LibrariesApi(preferenceStore, organization, appId, filter);
@@ -230,6 +229,14 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                                 csvLineList.add(sj.toString());
                                 break;
                             }
+                            case LIB_15:
+                                // ==================== 20. 組織名 ====================
+                                csvLineList.add(organization.getName());
+                                break;
+                            case LIB_16:
+                                // ==================== 21. 組織ID ====================
+                                csvLineList.add(organization.getOrganization_uuid());
+                                break;
                             default:
                                 continue;
                         }

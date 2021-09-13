@@ -108,7 +108,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
 
     private Shell shell;
     private PreferenceStore preferenceStore;
-    private Organization organization;
+    private List<Organization> organizations;
     private List<String> dstApps;
     private Map<String, AppInfo> fullAppMap;
     private boolean isOnlyParentApp;
@@ -117,11 +117,11 @@ public class VulGetWithProgress implements IRunnableWithProgress {
 
     Logger logger = Logger.getLogger("csvdltool");
 
-    public VulGetWithProgress(Shell shell, PreferenceStore preferenceStore, Organization organization, List<String> dstApps, Map<String, AppInfo> fullAppMap,
+    public VulGetWithProgress(Shell shell, PreferenceStore preferenceStore, List<Organization> organizations, List<String> dstApps, Map<String, AppInfo> fullAppMap,
             boolean isOnlyParentApp, boolean isIncludeDesc, boolean isIncludeStackTrace) {
         this.shell = shell;
         this.preferenceStore = preferenceStore;
-        this.organization = organization;
+        this.organizations = organizations;
         this.dstApps = dstApps;
         this.fullAppMap = fullAppMap;
         this.isOnlyParentApp = isOnlyParentApp;
@@ -165,32 +165,36 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                 Path dir = Paths.get(timestamp);
                 Files.createDirectory(dir);
             }
+            monitor.beginTask("アプリケーショングループの情報を取得", this.organizations.size());
             // アプリケーショングループの情報を取得
-            Api groupsApi = new GroupsApi(preferenceStore, organization);
-            try {
-                List<CustomGroup> customGroups = (List<CustomGroup>) groupsApi.get();
-                monitor.beginTask("アプリケーショングループの情報を取得", customGroups.size());
-                for (CustomGroup customGroup : customGroups) {
-                    List<ApplicationInCustomGroup> apps = customGroup.getApplications();
-                    if (apps != null) {
-                        for (ApplicationInCustomGroup app : apps) {
-                            String appName = app.getApplication().getName();
-                            if (appGroupMap.containsKey(appName)) {
-                                appGroupMap.get(appName).add(customGroup.getName());
-                            } else {
-                                appGroupMap.put(appName, new ArrayList<String>(Arrays.asList(customGroup.getName())));
+            for (Organization organization : this.organizations) {
+                Api groupsApi = new GroupsApi(preferenceStore, organization);
+                try {
+                    List<CustomGroup> customGroups = (List<CustomGroup>) groupsApi.get();
+                    monitor.subTask("アプリケーショングループの情報を取得...");
+                    for (CustomGroup customGroup : customGroups) {
+                        List<ApplicationInCustomGroup> apps = customGroup.getApplications();
+                        if (apps != null) {
+                            for (ApplicationInCustomGroup app : apps) {
+                                String appName = app.getApplication().getName();
+                                if (appGroupMap.containsKey(appName)) {
+                                    appGroupMap.get(appName).add(customGroup.getName());
+                                } else {
+                                    appGroupMap.put(appName, new ArrayList<String>(Arrays.asList(customGroup.getName())));
+                                }
                             }
                         }
+                        monitor.worked(1);
                     }
-                    monitor.worked(1);
+                    Thread.sleep(1000);
+                } catch (ApiException ae) {
                 }
-                Thread.sleep(1000);
-            } catch (ApiException ae) {
             }
             // 選択済みアプリの脆弱性情報を取得
             monitor.setTaskName(String.format("脆弱性情報の取得(0/%d)", dstApps.size()));
             int appIdx = 1;
             for (String appLabel : dstApps) {
+                Organization organization = fullAppMap.get(appLabel).getOrganization();
                 String appName = fullAppMap.get(appLabel).getAppName();
                 String appId = fullAppMap.get(appLabel).getAppId();
                 Api tracesApi = new TracesApi(preferenceStore, organization, appId);
@@ -328,6 +332,14 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                             case VUL_19:
                                 // ==================== 19. 保留中ステータス ====================
                                 csvLineList.add(trace.getPending_status());
+                                break;
+                            case VUL_20:
+                                // ==================== 20. 組織名 ====================
+                                csvLineList.add(organization.getName());
+                                break;
+                            case VUL_21:
+                                // ==================== 21. 組織ID ====================
+                                csvLineList.add(organization.getOrganization_uuid());
                                 break;
                             default:
                                 continue;

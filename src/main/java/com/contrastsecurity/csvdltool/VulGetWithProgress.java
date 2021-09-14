@@ -40,8 +40,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -51,6 +53,7 @@ import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.PreferenceStore;
@@ -108,7 +111,6 @@ public class VulGetWithProgress implements IRunnableWithProgress {
 
     private Shell shell;
     private PreferenceStore preferenceStore;
-    private List<Organization> organizations;
     private List<String> dstApps;
     private Map<String, AppInfo> fullAppMap;
     private boolean isOnlyParentApp;
@@ -117,11 +119,10 @@ public class VulGetWithProgress implements IRunnableWithProgress {
 
     Logger logger = Logger.getLogger("csvdltool");
 
-    public VulGetWithProgress(Shell shell, PreferenceStore preferenceStore, List<Organization> organizations, List<String> dstApps, Map<String, AppInfo> fullAppMap,
-            boolean isOnlyParentApp, boolean isIncludeDesc, boolean isIncludeStackTrace) {
+    public VulGetWithProgress(Shell shell, PreferenceStore preferenceStore, List<String> dstApps, Map<String, AppInfo> fullAppMap, boolean isOnlyParentApp, boolean isIncludeDesc,
+            boolean isIncludeStackTrace) {
         this.shell = shell;
         this.preferenceStore = preferenceStore;
-        this.organizations = organizations;
         this.dstApps = dstApps;
         this.fullAppMap = fullAppMap;
         this.isOnlyParentApp = isOnlyParentApp;
@@ -133,6 +134,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
     @Override
     public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
         monitor.setTaskName("脆弱性情報の取得を開始しています...");
+        monitor.beginTask("脆弱性情報の取得を開始しています...", 100);
         String csvFileFormat = preferenceStore.getString(PreferenceConstants.CSV_FILE_FORMAT_VUL);
         if (csvFileFormat == null || csvFileFormat.isEmpty()) {
             csvFileFormat = preferenceStore.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT_VUL);
@@ -165,14 +167,24 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                 Path dir = Paths.get(timestamp);
                 Files.createDirectory(dir);
             }
-            monitor.beginTask("アプリケーショングループの情報を取得", this.organizations.size());
+            Set<Organization> organizations = new HashSet<Organization>();
+            for (String appLabel : dstApps) {
+                Organization organization = fullAppMap.get(appLabel).getOrganization();
+                organizations.add(organization);
+            }
+            SubProgressMonitor sub1Monitor = new SubProgressMonitor(monitor, 10);
+            sub1Monitor.beginTask("", organizations.size());
             // アプリケーショングループの情報を取得
-            for (Organization organization : this.organizations) {
+            for (Organization organization : organizations) {
+                monitor.setTaskName(organization.getName());
+                monitor.subTask("アプリケーショングループの情報を取得...");
                 Api groupsApi = new GroupsApi(preferenceStore, organization);
                 try {
                     List<CustomGroup> customGroups = (List<CustomGroup>) groupsApi.get();
-                    monitor.subTask("アプリケーショングループの情報を取得...");
+                    SubProgressMonitor sub1_1Monitor = new SubProgressMonitor(sub1Monitor, 1);
+                    sub1_1Monitor.beginTask("", customGroups.size());
                     for (CustomGroup customGroup : customGroups) {
+                        monitor.subTask(String.format("アプリケーショングループの情報を取得...%s", customGroup.getName()));
                         List<ApplicationInCustomGroup> apps = customGroup.getApplications();
                         if (apps != null) {
                             for (ApplicationInCustomGroup app : apps) {
@@ -184,22 +196,29 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                                 }
                             }
                         }
-                        monitor.worked(1);
+                        sub1_1Monitor.worked(1);
                     }
+                    sub1_1Monitor.done();
                     Thread.sleep(1000);
                 } catch (ApiException ae) {
                 }
             }
+            monitor.subTask("");
+            sub1Monitor.done();
+
             // 選択済みアプリの脆弱性情報を取得
-            monitor.setTaskName(String.format("脆弱性情報の取得(0/%d)", dstApps.size()));
+            SubProgressMonitor sub2Monitor = new SubProgressMonitor(monitor, 70);
+            sub2Monitor.beginTask("", dstApps.size());
             int appIdx = 1;
             for (String appLabel : dstApps) {
                 Organization organization = fullAppMap.get(appLabel).getOrganization();
                 String appName = fullAppMap.get(appLabel).getAppName();
                 String appId = fullAppMap.get(appLabel).getAppId();
+                monitor.setTaskName(String.format("[%s] %s (%d/%d)", organization.getName(), appName, appIdx, dstApps.size()));
                 Api tracesApi = new TracesApi(preferenceStore, organization, appId);
                 List<String> traces = (List<String>) tracesApi.get();
-                monitor.beginTask(String.format("脆弱性情報の取得(%d/%d)", appIdx, dstApps.size()), traces.size());
+                SubProgressMonitor sub2_1Monitor = new SubProgressMonitor(sub2Monitor, 1);
+                sub2_1Monitor.beginTask("", traces.size());
                 for (String trace_id : traces) {
                     if (monitor.isCanceled()) {
                         throw new InterruptedException("キャンセルされました。");
@@ -207,11 +226,11 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                     List<String> csvLineList = new ArrayList<String>();
                     Api traceApi = new TraceApi(preferenceStore, organization, appId, trace_id);
                     Trace trace = (Trace) traceApi.get();
-                    monitor.subTask(String.format("%s - %s", appName, trace.getTitle()));
+                    monitor.subTask(trace.getTitle());
                     Application realApp = trace.getApplication();
                     if (isOnlyParentApp) {
                         if (!appName.equals(realApp.getName())) {
-                            monitor.worked(1);
+                            sub2_1Monitor.worked(1);
                             continue;
                         }
                     }
@@ -492,17 +511,22 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                     }
 
                     csvList.add(csvLineList);
-                    monitor.worked(1);
+                    sub2_1Monitor.worked(1);
                     Thread.sleep(sleepTrace);
                 }
                 appIdx++;
             }
+            monitor.subTask("");
+            sub2Monitor.done();
         } catch (Exception e) {
             throw new InvocationTargetException(e);
         }
 
         // ========== CSV出力 ==========
-        monitor.beginTask("CSV出力", csvList.size());
+        monitor.setTaskName("CSV出力");
+        Thread.sleep(500);
+        SubProgressMonitor sub3Monitor = new SubProgressMonitor(monitor, 20);
+        sub3Monitor.beginTask("", csvList.size());
         String filePath = timestamp + ".csv";
         if (isIncludeDesc) {
             filePath = timestamp + "\\" + timestamp + ".csv";
@@ -523,8 +547,10 @@ public class VulGetWithProgress implements IRunnableWithProgress {
             }
             for (List<String> csvLine : csvList) {
                 printer.printRecord(csvLine);
-                monitor.worked(1);
+                sub3Monitor.worked(1);
+                Thread.sleep(10);
             }
+            sub3Monitor.done();
         } catch (IOException e) {
             e.printStackTrace();
         }

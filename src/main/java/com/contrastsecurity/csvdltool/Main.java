@@ -618,8 +618,8 @@ public class Main implements PropertyChangeListener {
                     MessageDialog.openInformation(shell, "脆弱性情報取得", "取得対象のアプリケーションを選択してください。");
                     return;
                 }
-                VulGetWithProgress progress = new VulGetWithProgress(shell, preferenceStore, getValidOrganizations(), dstApps, fullAppMap, vulOnlyParentAppChk.getSelection(),
-                        includeDescChk.getSelection(), includeStackTraceChk.getSelection());
+                VulGetWithProgress progress = new VulGetWithProgress(shell, preferenceStore, dstApps, fullAppMap, vulOnlyParentAppChk.getSelection(), includeDescChk.getSelection(),
+                        includeStackTraceChk.getSelection());
                 ProgressMonitorDialog progDialog = new VulGetProgressMonitorDialog(shell);
                 try {
                     progDialog.run(true, true, progress);

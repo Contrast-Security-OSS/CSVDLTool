@@ -300,7 +300,7 @@ public class Main implements PropertyChangeListener {
                 uiReset();
 
                 AppsGetWithProgress progress = new AppsGetWithProgress(preferenceStore, getValidOrganizations());
-                ProgressMonitorDialog progDialog = new ProgressMonitorDialog(shell);
+                ProgressMonitorDialog progDialog = new AppGetProgressMonitorDialog(shell);
                 try {
                     progDialog.run(true, true, progress);
                 } catch (InvocationTargetException e) {

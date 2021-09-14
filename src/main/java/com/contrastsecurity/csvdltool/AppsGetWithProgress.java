@@ -33,6 +33,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.PreferenceStore;
 
@@ -66,7 +67,7 @@ public class AppsGetWithProgress implements IRunnableWithProgress {
         if (this.organizations.size() > 1) {
             prefix_org_flg = true;
         }
-        monitor.beginTask("アプリケーション一覧の読み込み", 2 * this.organizations.size());
+        monitor.beginTask("アプリケーション一覧の読み込み...", 2 * this.organizations.size());
         Thread.sleep(300);
         for (Organization org : this.organizations) {
             try {
@@ -77,8 +78,11 @@ public class AppsGetWithProgress implements IRunnableWithProgress {
                 Api groupsApi = new GroupsApi(preferenceStore, org);
                 try {
                     List<CustomGroup> customGroups = (List<CustomGroup>) groupsApi.get();
-                    monitor.worked(1);
+                    SubProgressMonitor sub1Monitor = new SubProgressMonitor(monitor, 1);
+                    sub1Monitor.beginTask("", customGroups.size());
+                    // monitor.worked(1);
                     for (CustomGroup customGroup : customGroups) {
+                        monitor.subTask(String.format("アプリケーショングループの情報を取得...%s", customGroup.getName()));
                         List<ApplicationInCustomGroup> apps = customGroup.getApplications();
                         if (apps != null) {
                             for (ApplicationInCustomGroup app : apps) {
@@ -90,16 +94,22 @@ public class AppsGetWithProgress implements IRunnableWithProgress {
                                 }
                             }
                         }
+                        sub1Monitor.worked(1);
                     }
+                    sub1Monitor.done();
                 } catch (ApiException ae) {
                 }
                 // アプリケーション一覧を取得
                 monitor.subTask("アプリケーション一覧の情報を取得...");
                 Api applicationsApi = new ApplicationsApi(preferenceStore, org);
                 List<Application> applications = (List<Application>) applicationsApi.get();
-                monitor.worked(1);
+                // monitor.worked(1);
+                SubProgressMonitor sub2Monitor = new SubProgressMonitor(monitor, 1);
+                sub2Monitor.beginTask("", applications.size());
                 for (Application app : applications) {
+                    monitor.subTask(String.format("アプリケーション一覧の情報を取得...%s", app.getName()));
                     if (app.getLicense().getLevel().equals("Unlicensed")) {
+                        sub2Monitor.worked(1);
                         continue;
                     }
                     if (appGroupMap.containsKey(app.getName())) {
@@ -117,7 +127,9 @@ public class AppsGetWithProgress implements IRunnableWithProgress {
                             fullAppMap.put(String.format("%s", app.getName()), new AppInfo(org, app.getName(), app.getApp_id()));
                         }
                     }
+                    sub2Monitor.worked(1);
                 }
+                sub2Monitor.done();
                 Thread.sleep(500);
             } catch (Exception e) {
                 throw new InvocationTargetException(e);

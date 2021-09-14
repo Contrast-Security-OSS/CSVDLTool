@@ -127,7 +127,6 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                 Files.createDirectory(dir);
             }
             // 選択済みアプリの脆弱性情報を取得
-            // monitor.setTaskName(String.format("脆弱性情報の取得(0/%d)", dstApps.size()));
             SubProgressMonitor sub1Monitor = new SubProgressMonitor(monitor, 80);
             sub1Monitor.beginTask("", dstApps.size());
             int appIdx = 1;
@@ -138,7 +137,6 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                 monitor.setTaskName(String.format("[%s] %s (%d/%d)", organization.getName(), appName, appIdx, dstApps.size()));
                 Api librariesApi = new LibrariesApi(preferenceStore, organization, appId, filter);
                 List<Library> libraries = (List<Library>) librariesApi.get();
-                // monitor.beginTask(String.format("ライブラリ情報の取得(%d/%d)", appIdx, dstApps.size()), libraries.size());
                 SubProgressMonitor sub1_1Monitor = new SubProgressMonitor(sub1Monitor, 1);
                 sub1_1Monitor.beginTask("", libraries.size());
                 for (Library library : libraries) {
@@ -146,7 +144,6 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                         throw new InterruptedException("キャンセルされました。");
                     }
                     List<String> csvLineList = new ArrayList<String>();
-                    // monitor.subTask(String.format("%s - %s", appName, library.getFile_name()));
                     monitor.subTask(library.getFile_name());
                     for (LibCSVColumn csvColumn : columnList) {
                         if (!csvColumn.isValid()) {
@@ -278,7 +275,6 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                     }
 
                     csvList.add(csvLineList);
-                    // monitor.worked(1);
                     sub1_1Monitor.worked(1);
                     Thread.sleep(sleepTrace);
                 }
@@ -292,7 +288,6 @@ public class LibGetWithProgress implements IRunnableWithProgress {
         }
 
         // ========== CSV出力 ==========
-        // monitor.beginTask("CSV出力", csvList.size());
         monitor.setTaskName("CSV出力");
         Thread.sleep(500);
         SubProgressMonitor sub2Monitor = new SubProgressMonitor(monitor, 20);

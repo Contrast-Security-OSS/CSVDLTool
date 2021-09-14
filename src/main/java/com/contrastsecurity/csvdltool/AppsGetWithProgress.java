@@ -80,7 +80,6 @@ public class AppsGetWithProgress implements IRunnableWithProgress {
                     List<CustomGroup> customGroups = (List<CustomGroup>) groupsApi.get();
                     SubProgressMonitor sub1Monitor = new SubProgressMonitor(monitor, 10);
                     sub1Monitor.beginTask("", customGroups.size());
-                    // monitor.worked(1);
                     for (CustomGroup customGroup : customGroups) {
                         monitor.subTask(String.format("アプリケーショングループの情報を取得...%s", customGroup.getName()));
                         List<ApplicationInCustomGroup> apps = customGroup.getApplications();
@@ -103,7 +102,6 @@ public class AppsGetWithProgress implements IRunnableWithProgress {
                 monitor.subTask("アプリケーション一覧の情報を取得...");
                 Api applicationsApi = new ApplicationsApi(preferenceStore, org);
                 List<Application> applications = (List<Application>) applicationsApi.get();
-                // monitor.worked(1);
                 SubProgressMonitor sub2Monitor = new SubProgressMonitor(monitor, 90);
                 sub2Monitor.beginTask("", applications.size());
                 for (Application app : applications) {

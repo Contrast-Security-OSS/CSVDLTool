@@ -620,7 +620,7 @@ public class Main implements PropertyChangeListener {
                 }
                 VulGetWithProgress progress = new VulGetWithProgress(shell, preferenceStore, getValidOrganizations(), dstApps, fullAppMap, vulOnlyParentAppChk.getSelection(),
                         includeDescChk.getSelection(), includeStackTraceChk.getSelection());
-                ProgressMonitorDialog progDialog = new ProgressMonitorDialog(shell);
+                ProgressMonitorDialog progDialog = new VulGetProgressMonitorDialog(shell);
                 try {
                     progDialog.run(true, true, progress);
                 } catch (InvocationTargetException e) {
@@ -718,7 +718,7 @@ public class Main implements PropertyChangeListener {
                     return;
                 }
                 LibGetWithProgress progress = new LibGetWithProgress(shell, preferenceStore, dstApps, fullAppMap, onlyHasCVEChk.getSelection(), includeCVEDetailChk.getSelection());
-                ProgressMonitorDialog progDialog = new ProgressMonitorDialog(shell);
+                ProgressMonitorDialog progDialog = new LibGetProgressMonitorDialog(shell);
                 try {
                     progDialog.run(true, true, progress);
                 } catch (InvocationTargetException e) {

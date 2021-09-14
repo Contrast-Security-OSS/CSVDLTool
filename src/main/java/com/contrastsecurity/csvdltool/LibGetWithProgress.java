@@ -45,6 +45,7 @@ import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.PreferenceStore;
@@ -91,6 +92,7 @@ public class LibGetWithProgress implements IRunnableWithProgress {
     @Override
     public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
         monitor.setTaskName("ライブラリ情報の取得を開始しています...");
+        monitor.beginTask("ライブラリ情報の取得を開始しています...", 100);
         String filter = "ALL";
         if (isOnlyHasCVE) {
             filter = "VULNERABLE";
@@ -125,21 +127,27 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                 Files.createDirectory(dir);
             }
             // 選択済みアプリの脆弱性情報を取得
-            monitor.setTaskName(String.format("脆弱性情報の取得(0/%d)", dstApps.size()));
+            // monitor.setTaskName(String.format("脆弱性情報の取得(0/%d)", dstApps.size()));
+            SubProgressMonitor sub1Monitor = new SubProgressMonitor(monitor, 80);
+            sub1Monitor.beginTask("", dstApps.size());
             int appIdx = 1;
             for (String appLabel : dstApps) {
                 Organization organization = fullAppMap.get(appLabel).getOrganization();
                 String appName = fullAppMap.get(appLabel).getAppName();
                 String appId = fullAppMap.get(appLabel).getAppId();
+                monitor.setTaskName(String.format("[%s] %s (%d/%d)", organization.getName(), appName, appIdx, dstApps.size()));
                 Api librariesApi = new LibrariesApi(preferenceStore, organization, appId, filter);
                 List<Library> libraries = (List<Library>) librariesApi.get();
-                monitor.beginTask(String.format("ライブラリ情報の取得(%d/%d)", appIdx, dstApps.size()), libraries.size());
+                // monitor.beginTask(String.format("ライブラリ情報の取得(%d/%d)", appIdx, dstApps.size()), libraries.size());
+                SubProgressMonitor sub1_1Monitor = new SubProgressMonitor(sub1Monitor, 1);
+                sub1_1Monitor.beginTask("", libraries.size());
                 for (Library library : libraries) {
                     if (monitor.isCanceled()) {
                         throw new InterruptedException("キャンセルされました。");
                     }
                     List<String> csvLineList = new ArrayList<String>();
-                    monitor.subTask(String.format("%s - %s", appName, library.getFile_name()));
+                    // monitor.subTask(String.format("%s - %s", appName, library.getFile_name()));
+                    monitor.subTask(library.getFile_name());
                     for (LibCSVColumn csvColumn : columnList) {
                         if (!csvColumn.isValid()) {
                             continue;
@@ -270,17 +278,25 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                     }
 
                     csvList.add(csvLineList);
-                    monitor.worked(1);
+                    // monitor.worked(1);
+                    sub1_1Monitor.worked(1);
                     Thread.sleep(sleepTrace);
                 }
+                sub1_1Monitor.done();
                 appIdx++;
             }
+            monitor.subTask("");
+            sub1Monitor.done();
         } catch (Exception e) {
             throw new InvocationTargetException(e);
         }
 
         // ========== CSV出力 ==========
-        monitor.beginTask("CSV出力", csvList.size());
+        // monitor.beginTask("CSV出力", csvList.size());
+        monitor.setTaskName("CSV出力");
+        Thread.sleep(500);
+        SubProgressMonitor sub2Monitor = new SubProgressMonitor(monitor, 20);
+        sub2Monitor.beginTask("", csvList.size());
         String filePath = timestamp + ".csv";
         if (isIncludeCVEDetail) {
             filePath = timestamp + "\\" + timestamp + ".csv";
@@ -301,8 +317,10 @@ public class LibGetWithProgress implements IRunnableWithProgress {
             }
             for (List<String> csvLine : csvList) {
                 printer.printRecord(csvLine);
-                monitor.worked(1);
+                sub2Monitor.worked(1);
+                Thread.sleep(10);
             }
+            sub2Monitor.done();
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -411,11 +411,11 @@ public class BasePreferencePage extends PreferencePage {
         button.addSelectionListener(new SelectionListener() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                Button triggerBtn = (Button) e.getSource();
-                if (triggerBtn.getSelection()) {
-                    selectedIdxes.add(checkBoxList.indexOf(triggerBtn));
-                } else {
-                    selectedIdxes.remove(checkBoxList.indexOf(triggerBtn));
+                selectedIdxes.clear();
+                for (Button button : checkBoxList) {
+                    if (button.getSelection()) {
+                        selectedIdxes.add(checkBoxList.indexOf(button));
+                    }
                 }
             }
 

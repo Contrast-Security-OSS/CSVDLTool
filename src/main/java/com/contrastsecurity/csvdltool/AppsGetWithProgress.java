@@ -67,7 +67,7 @@ public class AppsGetWithProgress implements IRunnableWithProgress {
         if (this.organizations.size() > 1) {
             prefix_org_flg = true;
         }
-        monitor.beginTask("アプリケーション一覧の読み込み...", 2 * this.organizations.size());
+        monitor.beginTask("アプリケーション一覧の読み込み...", 100 * this.organizations.size());
         Thread.sleep(300);
         for (Organization org : this.organizations) {
             try {
@@ -78,7 +78,7 @@ public class AppsGetWithProgress implements IRunnableWithProgress {
                 Api groupsApi = new GroupsApi(preferenceStore, org);
                 try {
                     List<CustomGroup> customGroups = (List<CustomGroup>) groupsApi.get();
-                    SubProgressMonitor sub1Monitor = new SubProgressMonitor(monitor, 1);
+                    SubProgressMonitor sub1Monitor = new SubProgressMonitor(monitor, 10);
                     sub1Monitor.beginTask("", customGroups.size());
                     // monitor.worked(1);
                     for (CustomGroup customGroup : customGroups) {
@@ -104,7 +104,7 @@ public class AppsGetWithProgress implements IRunnableWithProgress {
                 Api applicationsApi = new ApplicationsApi(preferenceStore, org);
                 List<Application> applications = (List<Application>) applicationsApi.get();
                 // monitor.worked(1);
-                SubProgressMonitor sub2Monitor = new SubProgressMonitor(monitor, 1);
+                SubProgressMonitor sub2Monitor = new SubProgressMonitor(monitor, 90);
                 sub2Monitor.beginTask("", applications.size());
                 for (Application app : applications) {
                     monitor.subTask(String.format("アプリケーション一覧の情報を取得...%s", app.getName()));

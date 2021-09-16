@@ -113,6 +113,17 @@ public class LibCSVColumnPreferencePage extends PreferencePage {
             try {
                 columnList = new Gson().fromJson(columnJsonStr, new TypeToken<List<LibCSVColumn>>() {
                 }.getType());
+                List<LibCSVColumn> defaultList = new ArrayList<LibCSVColumn>();
+                for (LibCSVColmunEnum colEnum : LibCSVColmunEnum.sortedValues()) {
+                    defaultList.add(new LibCSVColumn(colEnum));
+                }
+                if (columnList.size() != defaultList.size()) {
+                    defaultList.stream().filter(p -> {
+                        return (!columnList.contains(p));
+                    }).forEach(p -> {
+                        columnList.add(p);
+                    });
+                }
             } catch (JsonSyntaxException e) {
                 MessageDialog.openError(getShell(), "ライブラリ出力項目の読み込み", String.format("ライブラリ出力項目の内容に問題があります。\r\n%s", columnJsonStr));
                 columnList = new ArrayList<LibCSVColumn>();

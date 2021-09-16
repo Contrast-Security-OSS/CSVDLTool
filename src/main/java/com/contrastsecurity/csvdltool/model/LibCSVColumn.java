@@ -70,4 +70,12 @@ public class LibCSVColumn {
         this.valid = valid;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof LibCSVColumn) {
+            LibCSVColumn other = (LibCSVColumn) obj;
+            return other.column == this.column;
+        }
+        return false;
+    }
 }

@@ -360,6 +360,20 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                                 // ==================== 21. 組織ID ====================
                                 csvLineList.add(organization.getOrganization_uuid());
                                 break;
+                            case VUL_22: {
+                                // ==================== 22. 脆弱性へのリンク ====================
+                                String link = String.format("%s/static/ng/index.html#/%s/applications/%s/vulns/%s", preferenceStore.getString(PreferenceConstants.CONTRAST_URL),
+                                        organization.getOrganization_uuid(), trace.getApplication().getApp_id(), trace.getUuid());
+                                csvLineList.add(link);
+                                break;
+                            }
+                            case VUL_23: {
+                                // ==================== 23. 脆弱性へのリンク（ハイパーリンク） ====================
+                                String link = String.format("%s/static/ng/index.html#/%s/applications/%s/vulns/%s", preferenceStore.getString(PreferenceConstants.CONTRAST_URL),
+                                        organization.getOrganization_uuid(), trace.getApplication().getApp_id(), trace.getUuid());
+                                csvLineList.add(String.format("=HYPERLINK(\"%s\",\"TeamServerへ\")", link));
+                                break;
+                            }
                             default:
                                 continue;
                         }

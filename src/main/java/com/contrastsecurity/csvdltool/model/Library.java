@@ -71,6 +71,15 @@ public class Library {
         this.app_language = app_language;
     }
 
+    public String getLanguageCode() {
+        switch (this.app_language) {
+            case "Java":
+                return "java";
+            default:
+                return null;
+        }
+    }
+
     public String getGrade() {
         return grade;
     }

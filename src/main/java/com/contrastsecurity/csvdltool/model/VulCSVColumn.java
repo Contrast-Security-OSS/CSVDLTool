@@ -70,4 +70,12 @@ public class VulCSVColumn {
         this.valid = valid;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof VulCSVColumn) {
+            VulCSVColumn other = (VulCSVColumn) obj;
+            return other.column == this.column;
+        }
+        return false;
+    }
 }

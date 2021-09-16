@@ -113,6 +113,17 @@ public class VulCSVColumnPreferencePage extends PreferencePage {
             try {
                 columnList = new Gson().fromJson(columnJsonStr, new TypeToken<List<VulCSVColumn>>() {
                 }.getType());
+                List<VulCSVColumn> defaultList = new ArrayList<VulCSVColumn>();
+                for (VulCSVColmunEnum colEnum : VulCSVColmunEnum.sortedValues()) {
+                    defaultList.add(new VulCSVColumn(colEnum));
+                }
+                if (columnList.size() != defaultList.size()) {
+                    defaultList.stream().filter(p -> {
+                        return (!columnList.contains(p));
+                    }).forEach(p -> {
+                        columnList.add(p);
+                    });
+                }
             } catch (JsonSyntaxException e) {
                 MessageDialog.openError(getShell(), "脆弱性出力項目の読み込み", String.format("脆弱性出力項目の内容に問題があります。\r\n%s", columnJsonStr));
                 columnList = new ArrayList<VulCSVColumn>();

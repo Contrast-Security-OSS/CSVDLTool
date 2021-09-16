@@ -235,13 +235,37 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                                 break;
                             }
                             case LIB_15:
-                                // ==================== 20. 組織名 ====================
+                                // ==================== 15. 組織名 ====================
                                 csvLineList.add(organization.getName());
                                 break;
                             case LIB_16:
-                                // ==================== 21. 組織ID ====================
+                                // ==================== 16. 組織ID ====================
                                 csvLineList.add(organization.getOrganization_uuid());
                                 break;
+                            case LIB_17: {
+                                // ==================== 17. ライブラリへのリンク ====================
+                                String languageCode = library.getLanguageCode();
+                                if (languageCode != null) {
+                                    String link = String.format("%s/static/ng/index.html#/%s/libraries/%s/%s", preferenceStore.getString(PreferenceConstants.CONTRAST_URL),
+                                            organization.getOrganization_uuid(), languageCode, library.getHash());
+                                    csvLineList.add(link);
+                                } else {
+                                    csvLineList.add("-");
+                                }
+                                break;
+                            }
+                            case LIB_18: {
+                                // ==================== 18. ライブラリへのリンク（ハイパーリンク） ====================
+                                String languageCode = library.getLanguageCode();
+                                if (languageCode != null) {
+                                    String link = String.format("%s/static/ng/index.html#/%s/libraries/%s/%s", preferenceStore.getString(PreferenceConstants.CONTRAST_URL),
+                                            organization.getOrganization_uuid(), languageCode, library.getHash());
+                                    csvLineList.add(String.format("=HYPERLINK(\"%s\",\"TeamServerへ\")", link));
+                                } else {
+                                    csvLineList.add("-");
+                                }
+                                break;
+                            }
                             default:
                                 continue;
                         }

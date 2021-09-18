@@ -27,8 +27,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -39,11 +41,14 @@ import org.eclipse.jface.preference.PreferenceStore;
 
 import com.contrastsecurity.csvdltool.api.Api;
 import com.contrastsecurity.csvdltool.api.ApplicationsApi;
+import com.contrastsecurity.csvdltool.api.FilterSeverityApi;
+import com.contrastsecurity.csvdltool.api.FilterVulnTypeApi;
 import com.contrastsecurity.csvdltool.api.GroupsApi;
 import com.contrastsecurity.csvdltool.exception.ApiException;
 import com.contrastsecurity.csvdltool.model.Application;
 import com.contrastsecurity.csvdltool.model.ApplicationInCustomGroup;
 import com.contrastsecurity.csvdltool.model.CustomGroup;
+import com.contrastsecurity.csvdltool.model.Filter;
 import com.contrastsecurity.csvdltool.model.Organization;
 
 public class AppsGetWithProgress implements IRunnableWithProgress {
@@ -51,6 +56,8 @@ public class AppsGetWithProgress implements IRunnableWithProgress {
     private PreferenceStore preferenceStore;
     private List<Organization> organizations;
     private Map<String, AppInfo> fullAppMap;
+    private Set<Filter> severityFilterSet = new LinkedHashSet<Filter>();
+    private Set<Filter> vulnTypeFilterSet = new LinkedHashSet<Filter>();
 
     Logger logger = Logger.getLogger("csvdltool");
 
@@ -72,14 +79,35 @@ public class AppsGetWithProgress implements IRunnableWithProgress {
         for (Organization org : this.organizations) {
             try {
                 monitor.setTaskName(org.getName());
+                // フィルタの情報を取得
+                monitor.subTask("フィルタの情報を取得...");
+                SubProgressMonitor sub1Monitor = new SubProgressMonitor(monitor, 10);
+                sub1Monitor.beginTask("", 2);
+                Api filterSeverityApi = new FilterSeverityApi(preferenceStore, org);
+                Api filterVulnTypeApi = new FilterVulnTypeApi(preferenceStore, org);
+                try {
+                    List<Filter> filterSeverities = (List<Filter>) filterSeverityApi.get();
+                    for (Filter filter : filterSeverities) {
+                        severityFilterSet.add(filter);
+                    }
+                    sub1Monitor.worked(1);
+                    List<Filter> filterVulnTypes = (List<Filter>) filterVulnTypeApi.get();
+                    for (Filter filter : filterVulnTypes) {
+                        vulnTypeFilterSet.add(filter);
+                    }
+                    sub1Monitor.worked(1);
+                } catch (ApiException ae) {
+                }
+                sub1Monitor.done();
+
                 // アプリケーショングループの情報を取得
                 monitor.subTask("アプリケーショングループの情報を取得...");
                 Map<String, List<String>> appGroupMap = new HashMap<String, List<String>>();
                 Api groupsApi = new GroupsApi(preferenceStore, org);
                 try {
                     List<CustomGroup> customGroups = (List<CustomGroup>) groupsApi.get();
-                    SubProgressMonitor sub1Monitor = new SubProgressMonitor(monitor, 10);
-                    sub1Monitor.beginTask("", customGroups.size());
+                    SubProgressMonitor sub2Monitor = new SubProgressMonitor(monitor, 10);
+                    sub2Monitor.beginTask("", customGroups.size());
                     for (CustomGroup customGroup : customGroups) {
                         monitor.subTask(String.format("アプリケーショングループの情報を取得...%s", customGroup.getName()));
                         List<ApplicationInCustomGroup> apps = customGroup.getApplications();
@@ -93,21 +121,21 @@ public class AppsGetWithProgress implements IRunnableWithProgress {
                                 }
                             }
                         }
-                        sub1Monitor.worked(1);
+                        sub2Monitor.worked(1);
                     }
-                    sub1Monitor.done();
+                    sub2Monitor.done();
                 } catch (ApiException ae) {
                 }
                 // アプリケーション一覧を取得
                 monitor.subTask("アプリケーション一覧の情報を取得...");
                 Api applicationsApi = new ApplicationsApi(preferenceStore, org);
                 List<Application> applications = (List<Application>) applicationsApi.get();
-                SubProgressMonitor sub2Monitor = new SubProgressMonitor(monitor, 90);
-                sub2Monitor.beginTask("", applications.size());
+                SubProgressMonitor sub3Monitor = new SubProgressMonitor(monitor, 80);
+                sub3Monitor.beginTask("", applications.size());
                 for (Application app : applications) {
                     monitor.subTask(String.format("アプリケーション一覧の情報を取得...%s", app.getName()));
                     if (app.getLicense().getLevel().equals("Unlicensed")) {
-                        sub2Monitor.worked(1);
+                        sub3Monitor.worked(1);
                         continue;
                     }
                     if (appGroupMap.containsKey(app.getName())) {
@@ -125,9 +153,9 @@ public class AppsGetWithProgress implements IRunnableWithProgress {
                             fullAppMap.put(String.format("%s", app.getName()), new AppInfo(org, app.getName(), app.getApp_id()));
                         }
                     }
-                    sub2Monitor.worked(1);
+                    sub3Monitor.worked(1);
                 }
-                sub2Monitor.done();
+                sub3Monitor.done();
                 Thread.sleep(500);
             } catch (Exception e) {
                 throw new InvocationTargetException(e);
@@ -138,6 +166,13 @@ public class AppsGetWithProgress implements IRunnableWithProgress {
 
     public Map<String, AppInfo> getFullAppMap() {
         return fullAppMap;
+    }
+
+    public Map<FilterEnum, Set<Filter>> getFilterMap() {
+        Map<FilterEnum, Set<Filter>> filterMap = new HashMap<FilterEnum, Set<Filter>>();
+        filterMap.put(FilterEnum.SEVERITY, severityFilterSet);
+        filterMap.put(FilterEnum.VULNTYPE, vulnTypeFilterSet);
+        return filterMap;
     }
 
 }

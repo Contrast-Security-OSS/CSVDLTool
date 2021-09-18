@@ -38,6 +38,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
@@ -49,6 +50,7 @@ import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.jface.preference.PreferenceManager;
 import org.eclipse.jface.preference.PreferenceNode;
 import org.eclipse.jface.preference.PreferenceStore;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
@@ -77,6 +79,7 @@ import org.yaml.snakeyaml.Yaml;
 import com.contrastsecurity.csvdltool.exception.ApiException;
 import com.contrastsecurity.csvdltool.exception.NonApiException;
 import com.contrastsecurity.csvdltool.model.ContrastSecurityYaml;
+import com.contrastsecurity.csvdltool.model.Filter;
 import com.contrastsecurity.csvdltool.model.Organization;
 import com.contrastsecurity.csvdltool.preference.AboutPage;
 import com.contrastsecurity.csvdltool.preference.BasePreferencePage;
@@ -119,7 +122,12 @@ public class Main implements PropertyChangeListener {
 
     private Button settingBtn;
 
+    private Text vulSeverityFilterTxt;
+    private Text vulVulnTypeFilterTxt;
+    private Text vulLastDetectedFilterTxt;
+
     private Map<String, AppInfo> fullAppMap;
+    private Map<FilterEnum, Set<Filter>> filterMap;
     private List<String> srcApps = new ArrayList<String>();
     private List<String> dstApps = new ArrayList<String>();
 
@@ -185,6 +193,7 @@ public class Main implements PropertyChangeListener {
     private void createPart() {
         Display display = new Display();
         shell = new CSVDLToolShell(display, this);
+        shell.setMinimumSize(640, 580);
         Image[] imageArray = new Image[5];
         imageArray[0] = new Image(display, Main.class.getClassLoader().getResourceAsStream("icon16.png"));
         imageArray[1] = new Image(display, Main.class.getClassLoader().getResourceAsStream("icon24.png"));
@@ -192,6 +201,7 @@ public class Main implements PropertyChangeListener {
         imageArray[3] = new Image(display, Main.class.getClassLoader().getResourceAsStream("icon48.png"));
         imageArray[4] = new Image(display, Main.class.getClassLoader().getResourceAsStream("icon128.png"));
         shell.setImages(imageArray);
+        Window.setDefaultImages(imageArray);
         setWindowTitle();
         shell.addShellListener(new ShellListener() {
             @Override
@@ -285,7 +295,9 @@ public class Main implements PropertyChangeListener {
 
         Group appListGrp = new Group(shell, SWT.NONE);
         appListGrp.setLayout(new GridLayout(3, false));
-        appListGrp.setLayoutData(new GridData(GridData.FILL_BOTH));
+        GridData appListGrpGrDt = new GridData(GridData.FILL_BOTH);
+        appListGrpGrDt.minimumHeight = 200;
+        appListGrp.setLayoutData(appListGrpGrDt);
         // appListGrp.setBackground(display.getSystemColor(SWT.COLOR_RED));
 
         appLoadBtn = new Button(appListGrp, SWT.PUSH);
@@ -336,6 +348,7 @@ public class Main implements PropertyChangeListener {
                     srcApps.add(appLabel); // memory src
                 }
                 srcCount.setText(String.valueOf(srcList.getItemCount()));
+                filterMap = progress.getFilterMap();
             }
 
             @Override
@@ -603,6 +616,67 @@ public class Main implements PropertyChangeListener {
         // buttonGrpGrDt.widthHint = 100;
         vulButtonGrp.setLayoutData(buttonGrpGrDt);
 
+        Group vulFilterGrp = new Group(vulButtonGrp, SWT.NONE);
+        GridLayout vulFilterGrpLt = new GridLayout(2, false);
+        vulFilterGrpLt.marginWidth = 10;
+        vulFilterGrpLt.marginHeight = 10;
+        // vulFilterGrpLt.horizontalSpacing = 10;
+        // vulFilterGrpLt.verticalSpacing = 10;
+        vulFilterGrp.setLayout(vulFilterGrpLt);
+        GridData vulFilterGrpGrDt = new GridData(GridData.FILL_BOTH);
+        vulFilterGrp.setLayoutData(vulFilterGrpGrDt);
+        vulFilterGrp.setText("フィルタ条件");
+
+        new Label(vulFilterGrp, SWT.LEFT).setText("重大度：");
+        vulSeverityFilterTxt = new Text(vulFilterGrp, SWT.BORDER);
+        vulSeverityFilterTxt.setText("すべて");
+        vulSeverityFilterTxt.setEditable(false);
+        vulSeverityFilterTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        vulSeverityFilterTxt.addListener(SWT.MouseUp, new Listener() {
+            public void handleEvent(Event e) {
+                if (filterMap != null && filterMap.containsKey(FilterEnum.SEVERITY)) {
+                    FilterSeverityDialog filterDialog = new FilterSeverityDialog(shell, filterMap.get(FilterEnum.SEVERITY));
+                    int result = filterDialog.open();
+                    if (IDialogConstants.OK_ID != result) {
+                        return;
+                    }
+                    List<String> labels = filterDialog.getLabels();
+                    for (Filter filter : filterMap.get(FilterEnum.SEVERITY)) {
+                        if (labels.contains(filter.getLabel())) {
+                            filter.setValid(true);
+                        } else {
+                            filter.setValid(false);
+                        }
+                    }
+                    if (labels.isEmpty()) {
+                        vulSeverityFilterTxt.setText("すべて");
+                    } else {
+                        vulSeverityFilterTxt.setText(String.join(", ", labels));
+                    }
+                }
+            }
+        });
+
+        new Label(vulFilterGrp, SWT.LEFT).setText("脆弱性タイプ：");
+        vulVulnTypeFilterTxt = new Text(vulFilterGrp, SWT.BORDER);
+        vulVulnTypeFilterTxt.setText("すべて");
+        vulVulnTypeFilterTxt.setEditable(false);
+        vulVulnTypeFilterTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        vulVulnTypeFilterTxt.addListener(SWT.MouseUp, new Listener() {
+            public void handleEvent(Event e) {
+            }
+        });
+
+        new Label(vulFilterGrp, SWT.LEFT).setText("最終検出日：");
+        vulLastDetectedFilterTxt = new Text(vulFilterGrp, SWT.BORDER);
+        vulLastDetectedFilterTxt.setText("すべて");
+        vulLastDetectedFilterTxt.setEditable(false);
+        vulLastDetectedFilterTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        vulVulnTypeFilterTxt.addListener(SWT.MouseUp, new Listener() {
+            public void handleEvent(Event e) {
+            }
+        });
+
         // ========== 取得ボタン ==========
         vulExecuteBtn = new Button(vulButtonGrp, SWT.PUSH);
         GridData executeBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
@@ -618,8 +692,8 @@ public class Main implements PropertyChangeListener {
                     MessageDialog.openInformation(shell, "脆弱性情報取得", "取得対象のアプリケーションを選択してください。");
                     return;
                 }
-                VulGetWithProgress progress = new VulGetWithProgress(shell, preferenceStore, dstApps, fullAppMap, vulOnlyParentAppChk.getSelection(), includeDescChk.getSelection(),
-                        includeStackTraceChk.getSelection());
+                VulGetWithProgress progress = new VulGetWithProgress(shell, preferenceStore, dstApps, fullAppMap, filterMap, vulOnlyParentAppChk.getSelection(),
+                        includeDescChk.getSelection(), includeStackTraceChk.getSelection());
                 ProgressMonitorDialog progDialog = new VulGetProgressMonitorDialog(shell);
                 try {
                     progDialog.run(true, true, progress);

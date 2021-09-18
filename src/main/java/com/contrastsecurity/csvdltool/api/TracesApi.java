@@ -24,10 +24,16 @@
 package com.contrastsecurity.csvdltool.api;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 
+import com.contrastsecurity.csvdltool.FilterEnum;
 import com.contrastsecurity.csvdltool.json.TracesJson;
+import com.contrastsecurity.csvdltool.model.Filter;
 import com.contrastsecurity.csvdltool.model.Organization;
 import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
 import com.google.gson.Gson;
@@ -36,17 +42,56 @@ import com.google.gson.reflect.TypeToken;
 public class TracesApi extends Api {
 
     private String appId;
+    private Map<FilterEnum, Set<Filter>> filterMap;
 
-    public TracesApi(IPreferenceStore preferenceStore, Organization organization, String appId) {
+    public TracesApi(IPreferenceStore preferenceStore, Organization organization, String appId, Map<FilterEnum, Set<Filter>> filterMap) {
         super(preferenceStore, organization);
         this.appId = appId;
+        this.filterMap = filterMap;
     }
 
     @Override
     protected String getUrl() {
         String contrastUrl = preferenceStore.getString(PreferenceConstants.CONTRAST_URL);
         String orgId = this.organization.getOrganization_uuid();
-        return String.format("%s/api/ng/%s/traces/%s/ids", contrastUrl, orgId, this.appId);
+        boolean inValidFoundFlg = false;
+        // 重大度のクエリ文字列
+        List<String> severityFilters = new ArrayList<String>();
+        for (Filter filter : filterMap.get(FilterEnum.SEVERITY)) {
+            if (filter.isValid()) {
+                severityFilters.add(filter.getKeycode());
+            } else {
+                inValidFoundFlg |= true;
+            }
+        }
+        String severityFilterQuery = "";
+        if (inValidFoundFlg && !severityFilters.isEmpty()) {
+            severityFilterQuery = String.format("severities=%s", String.join(",", severityFilters));
+        }
+        // 脆弱性タイプのクエリ文字列
+        List<String> vulnTypeFilters = new ArrayList<String>();
+        inValidFoundFlg = false;
+        for (Filter filter : filterMap.get(FilterEnum.SEVERITY)) {
+            if (filter.isValid()) {
+                vulnTypeFilters.add(filter.getKeycode());
+            } else {
+                inValidFoundFlg |= true;
+            }
+        }
+        String vulnTypeFilterQuery = "";
+        if (inValidFoundFlg && !vulnTypeFilters.isEmpty()) {
+            if (severityFilterQuery.isEmpty()) {
+                vulnTypeFilterQuery = String.format("vulnTypes=%s", String.join(",", vulnTypeFilters));
+            } else {
+                vulnTypeFilterQuery = String.format("&vulnTypes=%s", String.join(",", vulnTypeFilters));
+            }
+        }
+
+        if (severityFilterQuery.isEmpty() && vulnTypeFilterQuery.isEmpty()) {
+            return String.format("%s/api/ng/%s/traces/%s/ids", contrastUrl, orgId, this.appId);
+        } else {
+            return String.format("%s/api/ng/%s/traces/%s/ids?%s", contrastUrl, orgId, this.appId, severityFilterQuery);
+        }
     }
 
     @Override

@@ -80,6 +80,7 @@ import com.contrastsecurity.csvdltool.model.CollapsedEventSummary;
 import com.contrastsecurity.csvdltool.model.CustomGroup;
 import com.contrastsecurity.csvdltool.model.EventDetail;
 import com.contrastsecurity.csvdltool.model.EventSummary;
+import com.contrastsecurity.csvdltool.model.Filter;
 import com.contrastsecurity.csvdltool.model.HttpRequest;
 import com.contrastsecurity.csvdltool.model.Note;
 import com.contrastsecurity.csvdltool.model.Organization;
@@ -113,18 +114,20 @@ public class VulGetWithProgress implements IRunnableWithProgress {
     private PreferenceStore preferenceStore;
     private List<String> dstApps;
     private Map<String, AppInfo> fullAppMap;
+    private Map<FilterEnum, Set<Filter>> filterMap;
     private boolean isOnlyParentApp;
     private boolean isIncludeDesc;
     private boolean isIncludeStackTrace;
 
     Logger logger = Logger.getLogger("csvdltool");
 
-    public VulGetWithProgress(Shell shell, PreferenceStore preferenceStore, List<String> dstApps, Map<String, AppInfo> fullAppMap, boolean isOnlyParentApp, boolean isIncludeDesc,
-            boolean isIncludeStackTrace) {
+    public VulGetWithProgress(Shell shell, PreferenceStore preferenceStore, List<String> dstApps, Map<String, AppInfo> fullAppMap, Map<FilterEnum, Set<Filter>> filterMap,
+            boolean isOnlyParentApp, boolean isIncludeDesc, boolean isIncludeStackTrace) {
         this.shell = shell;
         this.preferenceStore = preferenceStore;
         this.dstApps = dstApps;
         this.fullAppMap = fullAppMap;
+        this.filterMap = filterMap;
         this.isOnlyParentApp = isOnlyParentApp;
         this.isIncludeDesc = isIncludeDesc;
         this.isIncludeStackTrace = isIncludeStackTrace;
@@ -215,7 +218,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                 String appName = fullAppMap.get(appLabel).getAppName();
                 String appId = fullAppMap.get(appLabel).getAppId();
                 monitor.setTaskName(String.format("[%s] %s (%d/%d)", organization.getName(), appName, appIdx, dstApps.size()));
-                Api tracesApi = new TracesApi(preferenceStore, organization, appId);
+                Api tracesApi = new TracesApi(preferenceStore, organization, appId, filterMap);
                 List<String> traces = (List<String>) tracesApi.get();
                 SubProgressMonitor sub2_1Monitor = new SubProgressMonitor(sub2Monitor, 1);
                 sub2_1Monitor.beginTask("", traces.size());

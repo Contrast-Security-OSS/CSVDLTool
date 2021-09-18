@@ -4,6 +4,7 @@ import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.jface.preference.PreferenceManager;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
@@ -11,6 +12,7 @@ public class MyPreferenceDialog extends PreferenceDialog {
 
     public MyPreferenceDialog(Shell parentShell, PreferenceManager manager) {
         super(parentShell, manager);
+        setShellStyle(SWT.CLOSE | SWT.TITLE | SWT.MAX | SWT.RESIZE);
     }
 
     @Override

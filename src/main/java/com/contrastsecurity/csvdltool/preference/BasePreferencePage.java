@@ -271,12 +271,12 @@ public class BasePreferencePage extends PreferencePage {
                         }
                     }
                 }
-                OrganizationDialog pathDialog = new OrganizationDialog(getShell(), preferenceStore, contrastUrlTxt.getText(), userNameTxt.getText(), serviceKeyTxt.getText());
-                int result = pathDialog.open();
+                OrganizationDialog orgDialog = new OrganizationDialog(getShell(), preferenceStore, contrastUrlTxt.getText(), userNameTxt.getText(), serviceKeyTxt.getText());
+                int result = orgDialog.open();
                 if (IDialogConstants.OK_ID != result) {
                     return;
                 }
-                Organization rtnOrg = pathDialog.getOrg();
+                Organization rtnOrg = orgDialog.getOrg();
                 if (rtnOrg == null) {
                     return;
                 }

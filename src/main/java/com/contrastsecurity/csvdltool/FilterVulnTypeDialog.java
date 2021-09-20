@@ -29,7 +29,12 @@ import java.util.Set;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.CheckboxTableViewer;
+import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -37,19 +42,19 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Table;
 
 import com.contrastsecurity.csvdltool.model.Filter;
 
 public class FilterVulnTypeDialog extends Dialog {
 
     private Set<Filter> filters;
-    private List<Button> buttons;
     private List<String> labels;
+    private CheckboxTableViewer viewer;
 
     public FilterVulnTypeDialog(Shell parentShell, Set<Filter> filters) {
         super(parentShell);
         this.filters = filters;
-        this.buttons = new ArrayList<Button>();
         this.labels = new ArrayList<String>();
     }
 
@@ -61,46 +66,69 @@ public class FilterVulnTypeDialog extends Dialog {
         compositeLt.marginHeight = 5;
         compositeLt.horizontalSpacing = 5;
         composite.setLayout(compositeLt);
-        GridData compositeGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        GridData compositeGrDt = new GridData(GridData.FILL_BOTH);
         composite.setLayoutData(compositeGrDt);
-        boolean checkFlg = false;
+
+        final Table table = new Table(composite, SWT.CHECK | SWT.BORDER | SWT.V_SCROLL);
+        GridData tableGrDt = new GridData(GridData.FILL_BOTH);
+        table.setLayoutData(tableGrDt);
+        viewer = new CheckboxTableViewer(table);
+        viewer.setLabelProvider(new ColumnLabelProvider() {
+            @Override
+            public String getText(Object element) {
+                return element.toString();
+            }
+        });
+        List<String> labelList = new ArrayList<String>();
+        List<String> validLabelList = new ArrayList<String>();
         for (Filter filter : this.filters) {
-            Button button = new Button(composite, SWT.CHECK);
-            button.setText(filter.getLabel());
+            labelList.add(filter.getLabel());
             if (filter.isValid()) {
-                button.setSelection(true);
-                checkFlg |= true;
+                validLabelList.add(filter.getLabel());
             } else {
-                button.setSelection(false);
-            }
-            this.buttons.add(button);
-        }
-        if (!checkFlg) {
-            for (Button button : buttons) {
-                button.setSelection(true);
             }
         }
+        if (validLabelList.isEmpty()) {
+            validLabelList.addAll(labelList);
+        }
+        viewer.setContentProvider(new ArrayContentProvider());
+        viewer.setInput(labelList);
+        viewer.setCheckedElements(validLabelList.toArray());
+
+        final Button bulkBtn = new Button(composite, SWT.CHECK);
+        bulkBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        bulkBtn.setText("すべて");
+        bulkBtn.setSelection(true);
+        bulkBtn.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                if (bulkBtn.getSelection()) {
+                    validLabelList.addAll(labelList);
+                    viewer.setCheckedElements(validLabelList.toArray());
+                    viewer.refresh();
+                } else {
+                    viewer.setCheckedElements(new ArrayList<String>().toArray());
+                    viewer.refresh();
+                }
+            }
+        });
         return composite;
     }
 
     @Override
     protected void createButtonsForButtonBar(Composite parent) {
         Button okButton = createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL, true);
-        // okButton.setEnabled(false);
+        okButton.setEnabled(true);
         createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
     }
 
     @Override
     protected void okPressed() {
-        boolean nonCheck = false;
-        for (Button button : buttons) {
-            if (button.getSelection()) {
-                labels.add(button.getText());
-            } else {
-                nonCheck |= true;
-            }
+        Object[] items = viewer.getCheckedElements();
+        for (Object item : items) {
+            labels.add((String) item);
         }
-        if (!nonCheck) {
+        if (labels.size() == this.filters.size()) {
             labels.clear();
         }
         super.okPressed();
@@ -108,7 +136,7 @@ public class FilterVulnTypeDialog extends Dialog {
 
     @Override
     protected Point getInitialSize() {
-        return new Point(360, 600);
+        return new Point(360, 480);
     }
 
     @Override

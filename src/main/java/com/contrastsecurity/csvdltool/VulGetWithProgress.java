@@ -115,6 +115,8 @@ public class VulGetWithProgress implements IRunnableWithProgress {
     private List<String> dstApps;
     private Map<String, AppInfo> fullAppMap;
     private Map<FilterEnum, Set<Filter>> filterMap;
+    private Date frLastDetectedDate;
+    private Date toLastDetectedDate;
     private boolean isOnlyParentApp;
     private boolean isIncludeDesc;
     private boolean isIncludeStackTrace;
@@ -122,12 +124,14 @@ public class VulGetWithProgress implements IRunnableWithProgress {
     Logger logger = Logger.getLogger("csvdltool");
 
     public VulGetWithProgress(Shell shell, PreferenceStore preferenceStore, List<String> dstApps, Map<String, AppInfo> fullAppMap, Map<FilterEnum, Set<Filter>> filterMap,
-            boolean isOnlyParentApp, boolean isIncludeDesc, boolean isIncludeStackTrace) {
+            Date frDate, Date toDate, boolean isOnlyParentApp, boolean isIncludeDesc, boolean isIncludeStackTrace) {
         this.shell = shell;
         this.preferenceStore = preferenceStore;
         this.dstApps = dstApps;
         this.fullAppMap = fullAppMap;
         this.filterMap = filterMap;
+        this.frLastDetectedDate = frDate;
+        this.toLastDetectedDate = toDate;
         this.isOnlyParentApp = isOnlyParentApp;
         this.isIncludeDesc = isIncludeDesc;
         this.isIncludeStackTrace = isIncludeStackTrace;
@@ -218,7 +222,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                 String appName = fullAppMap.get(appLabel).getAppName();
                 String appId = fullAppMap.get(appLabel).getAppId();
                 monitor.setTaskName(String.format("[%s] %s (%d/%d)", organization.getName(), appName, appIdx, dstApps.size()));
-                Api tracesApi = new TracesApi(preferenceStore, organization, appId, filterMap);
+                Api tracesApi = new TracesApi(preferenceStore, organization, appId, filterMap, frLastDetectedDate, toLastDetectedDate);
                 List<String> traces = (List<String>) tracesApi.get();
                 SubProgressMonitor sub2_1Monitor = new SubProgressMonitor(sub2Monitor, 1);
                 sub2_1Monitor.beginTask("", traces.size());

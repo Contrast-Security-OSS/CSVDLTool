@@ -25,6 +25,7 @@ package com.contrastsecurity.csvdltool.api;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -43,11 +44,15 @@ public class TracesApi extends Api {
 
     private String appId;
     private Map<FilterEnum, Set<Filter>> filterMap;
+    private Date frLastDetectedDate;
+    private Date toLastDetectedDate;
 
-    public TracesApi(IPreferenceStore preferenceStore, Organization organization, String appId, Map<FilterEnum, Set<Filter>> filterMap) {
+    public TracesApi(IPreferenceStore preferenceStore, Organization organization, String appId, Map<FilterEnum, Set<Filter>> filterMap, Date frDate, Date toDate) {
         super(preferenceStore, organization);
         this.appId = appId;
         this.filterMap = filterMap;
+        this.frLastDetectedDate = frDate;
+        this.toLastDetectedDate = toDate;
     }
 
     @Override
@@ -86,11 +91,28 @@ public class TracesApi extends Api {
                 vulnTypeFilterQuery = String.format("&vulnTypes=%s", String.join(",", vulnTypeFilters));
             }
         }
+        // 最終検出日のクエリ文字列
+        String lastDetectedFilterQuery = "";
+        if (frLastDetectedDate != null || toLastDetectedDate != null) {
+            String startDate = "";
+            if (frLastDetectedDate != null) {
+                startDate = String.format("&startDate=%s", frLastDetectedDate.getTime());
+            }
+            String endDate = "";
+            if (toLastDetectedDate != null) {
+                endDate = String.format("&endDate=%s", toLastDetectedDate.getTime());
+            }
+            if (severityFilterQuery.isEmpty() && vulnTypeFilterQuery.isEmpty()) {
+                lastDetectedFilterQuery = String.format("timestampFilter=LAST%s%s", startDate, endDate);
+            } else {
+                lastDetectedFilterQuery = String.format("&timestampFilter=LAST%s%s", startDate, endDate);
+            }
+        }
 
-        if (severityFilterQuery.isEmpty() && vulnTypeFilterQuery.isEmpty()) {
+        if (severityFilterQuery.isEmpty() && vulnTypeFilterQuery.isEmpty() && lastDetectedFilterQuery.isEmpty()) {
             return String.format("%s/api/ng/%s/traces/%s/ids", contrastUrl, orgId, this.appId);
         } else {
-            return String.format("%s/api/ng/%s/traces/%s/ids?%s%s", contrastUrl, orgId, this.appId, severityFilterQuery, vulnTypeFilterQuery);
+            return String.format("%s/api/ng/%s/traces/%s/ids?%s%s%s", contrastUrl, orgId, this.appId, severityFilterQuery, vulnTypeFilterQuery, lastDetectedFilterQuery);
         }
     }
 

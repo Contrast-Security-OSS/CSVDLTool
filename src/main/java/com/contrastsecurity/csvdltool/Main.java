@@ -37,6 +37,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -123,6 +124,7 @@ public class Main implements PropertyChangeListener {
 
     private Button settingBtn;
 
+    private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd(E)");
     private Text vulSeverityFilterTxt;
     private Text vulVulnTypeFilterTxt;
     private Text vulLastDetectedFilterTxt;
@@ -131,6 +133,8 @@ public class Main implements PropertyChangeListener {
     private Map<FilterEnum, Set<Filter>> filterMap;
     private List<String> srcApps = new ArrayList<String>();
     private List<String> dstApps = new ArrayList<String>();
+    private Date frLastDetectedDate;
+    private Date toLastDetectedDate;
 
     private PreferenceStore preferenceStore;
 
@@ -350,6 +354,8 @@ public class Main implements PropertyChangeListener {
                 }
                 srcCount.setText(String.valueOf(srcList.getItemCount()));
                 filterMap = progress.getFilterMap();
+                vulSeverityFilterTxt.setText("すべて");
+                vulVulnTypeFilterTxt.setText("すべて");
             }
 
             @Override
@@ -630,7 +636,7 @@ public class Main implements PropertyChangeListener {
 
         new Label(vulFilterGrp, SWT.LEFT).setText("重大度：");
         vulSeverityFilterTxt = new Text(vulFilterGrp, SWT.BORDER);
-        vulSeverityFilterTxt.setText("すべて");
+        vulSeverityFilterTxt.setText("アプリケーション一覧を読み込んでください。");
         vulSeverityFilterTxt.setEditable(false);
         vulSeverityFilterTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         vulSeverityFilterTxt.addListener(SWT.MouseUp, new Listener() {
@@ -639,6 +645,7 @@ public class Main implements PropertyChangeListener {
                     FilterSeverityDialog filterDialog = new FilterSeverityDialog(shell, filterMap.get(FilterEnum.SEVERITY));
                     int result = filterDialog.open();
                     if (IDialogConstants.OK_ID != result) {
+                        vulExecuteBtn.setFocus();
                         return;
                     }
                     List<String> labels = filterDialog.getLabels();
@@ -654,13 +661,14 @@ public class Main implements PropertyChangeListener {
                     } else {
                         vulSeverityFilterTxt.setText(String.join(", ", labels));
                     }
+                    vulExecuteBtn.setFocus();
                 }
             }
         });
 
         new Label(vulFilterGrp, SWT.LEFT).setText("脆弱性タイプ：");
         vulVulnTypeFilterTxt = new Text(vulFilterGrp, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL);
-        vulVulnTypeFilterTxt.setText("すべて");
+        vulVulnTypeFilterTxt.setText("アプリケーション一覧を読み込んでください。");
         vulVulnTypeFilterTxt.setEditable(false);
         GridData vulVulnTypeFilterTxtGrDt = new GridData(GridData.FILL_HORIZONTAL);
         vulVulnTypeFilterTxtGrDt.heightHint = 2 * vulVulnTypeFilterTxt.getLineHeight();
@@ -671,6 +679,7 @@ public class Main implements PropertyChangeListener {
                     FilterVulnTypeDialog filterDialog = new FilterVulnTypeDialog(shell, filterMap.get(FilterEnum.VULNTYPE));
                     int result = filterDialog.open();
                     if (IDialogConstants.OK_ID != result) {
+                        vulExecuteBtn.setFocus();
                         return;
                     }
                     List<String> labels = filterDialog.getLabels();
@@ -686,6 +695,7 @@ public class Main implements PropertyChangeListener {
                     } else {
                         vulVulnTypeFilterTxt.setText(String.join(", ", labels));
                     }
+                    vulExecuteBtn.setFocus();
                 }
             }
         });
@@ -697,13 +707,24 @@ public class Main implements PropertyChangeListener {
         vulLastDetectedFilterTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         vulLastDetectedFilterTxt.addListener(SWT.MouseUp, new Listener() {
             public void handleEvent(Event e) {
-                FilterLastDetectedDialog filterDialog = new FilterLastDetectedDialog(shell);
+                FilterLastDetectedDialog filterDialog = new FilterLastDetectedDialog(shell, frLastDetectedDate, toLastDetectedDate);
                 int result = filterDialog.open();
                 if (IDialogConstants.OK_ID != result) {
+                    vulExecuteBtn.setFocus();
                     return;
                 }
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
-                vulLastDetectedFilterTxt.setText(String.format("%s ～ %s", sdf.format(filterDialog.getFrDate()), sdf.format(filterDialog.getToDate())));
+                frLastDetectedDate = filterDialog.getFrDate();
+                toLastDetectedDate = filterDialog.getToDate();
+                if (frLastDetectedDate != null && toLastDetectedDate != null) {
+                    vulLastDetectedFilterTxt.setText(String.format("%s ～ %s", sdf.format(frLastDetectedDate), sdf.format(toLastDetectedDate)));
+                } else if (frLastDetectedDate != null) {
+                    vulLastDetectedFilterTxt.setText(String.format("%s ～", sdf.format(frLastDetectedDate)));
+                } else if (toLastDetectedDate != null) {
+                    vulLastDetectedFilterTxt.setText(String.format("～ %s", sdf.format(toLastDetectedDate)));
+                } else {
+                    vulLastDetectedFilterTxt.setText("すべて");
+                }
+                vulExecuteBtn.setFocus();
             }
         });
 
@@ -722,8 +743,8 @@ public class Main implements PropertyChangeListener {
                     MessageDialog.openInformation(shell, "脆弱性情報取得", "取得対象のアプリケーションを選択してください。");
                     return;
                 }
-                VulGetWithProgress progress = new VulGetWithProgress(shell, preferenceStore, dstApps, fullAppMap, filterMap, vulOnlyParentAppChk.getSelection(),
-                        includeDescChk.getSelection(), includeStackTraceChk.getSelection());
+                VulGetWithProgress progress = new VulGetWithProgress(shell, preferenceStore, dstApps, fullAppMap, filterMap, frLastDetectedDate, toLastDetectedDate,
+                        vulOnlyParentAppChk.getSelection(), includeDescChk.getSelection(), includeStackTraceChk.getSelection());
                 ProgressMonitorDialog progDialog = new VulGetProgressMonitorDialog(shell);
                 try {
                     progDialog.run(true, true, progress);

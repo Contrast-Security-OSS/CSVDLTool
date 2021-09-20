@@ -130,7 +130,7 @@ public class ProxyAuthDialog extends Dialog {
 
     @Override
     protected void setShellStyle(int newShellStyle) {
-        super.setShellStyle(SWT.CLOSE | SWT.TITLE | SWT.RESIZE);
+        super.setShellStyle(SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
     }
 
     @Override

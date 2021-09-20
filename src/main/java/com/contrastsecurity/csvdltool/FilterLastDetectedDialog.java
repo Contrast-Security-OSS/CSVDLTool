@@ -23,12 +23,15 @@
 
 package com.contrastsecurity.csvdltool;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -36,61 +39,151 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DateTime;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
 
 public class FilterLastDetectedDialog extends Dialog {
 
     private DateTime frCalendar;
     private DateTime toCalendar;
+    private Text frDateText;
+    private Text toDateText;
     private Date frDate;
     private Date toDate;
+    private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd(E)");
+    private Calendar cal = Calendar.getInstance();
 
-    public FilterLastDetectedDialog(Shell parentShell) {
+    public FilterLastDetectedDialog(Shell parentShell, Date frDate, Date toDate) {
         super(parentShell);
+        this.frDate = frDate;
+        this.toDate = toDate;
     }
 
     @Override
     protected Control createDialogArea(Composite parent) {
         Composite composite = (Composite) super.createDialogArea(parent);
-        GridLayout compositeLt = new GridLayout(3, false);
+        GridLayout compositeLt = new GridLayout(5, false);
         compositeLt.marginWidth = 25;
         compositeLt.marginHeight = 10;
-        compositeLt.horizontalSpacing = 10;
+        compositeLt.horizontalSpacing = 15;
         composite.setLayout(compositeLt);
         GridData compositeGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        compositeGrDt.horizontalAlignment = SWT.CENTER;
         composite.setLayoutData(compositeGrDt);
+
         frCalendar = new DateTime(composite, SWT.CALENDAR);
+        GridData frCalendarGrDt = new GridData(SWT.RIGHT, SWT.CENTER, false, false, 2, 1);
+        frCalendar.setLayoutData(frCalendarGrDt);
+        frCalendar.addListener(SWT.MouseUp, new Listener() {
+            @Override
+            public void handleEvent(Event event) {
+                cal.set(frCalendar.getYear(), frCalendar.getMonth(), frCalendar.getDay(), 0, 0, 0);
+                frDateText.setText(sdf.format(cal.getTime()));
+                cal.set(frCalendar.getYear(), frCalendar.getMonth(), frCalendar.getDay(), 0, 0, 0);
+                frDate = cal.getTime();
+            }
+        });
+
         new Label(composite, SWT.NULL).setText("～");
+
         toCalendar = new DateTime(composite, SWT.CALENDAR);
+        GridData toCalendarGrDt = new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1);
+        toCalendar.setLayoutData(toCalendarGrDt);
+        toCalendar.addListener(SWT.MouseUp, new Listener() {
+            @Override
+            public void handleEvent(Event event) {
+                cal.set(toCalendar.getYear(), toCalendar.getMonth(), toCalendar.getDay(), 0, 0, 0);
+                toDateText.setText(sdf.format(cal.getTime()));
+                cal.set(toCalendar.getYear(), toCalendar.getMonth(), toCalendar.getDay(), 23, 59, 59);
+                toDate = cal.getTime();
+            }
+        });
+
+        Button frBtn = new Button(composite, SWT.NULL);
+        GridData frBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        frBtn.setLayoutData(frBtnGrDt);
+        frBtn.setText("From削除");
+        frBtn.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent e) {
+                frDateText.setText("");
+                frDate = null;
+            }
+        });
+        frDateText = new Text(composite, SWT.BORDER);
+        GridData frDateTextGrDt = new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1);
+        frDateTextGrDt.widthHint = 100;
+        frDateText.setLayoutData(frDateTextGrDt);
+        frDateText.setEditable(false);
+        if (frDate != null) {
+            cal.setTime(frDate);
+            frCalendar.setDate(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DATE));
+            frDateText.setText(sdf.format(frDate));
+        } else {
+            cal.set(frCalendar.getYear(), frCalendar.getMonth(), frCalendar.getDay(), 0, 0, 0);
+            // frDateText.setText(sdf.format(cal.getTime()));
+        }
+        new Label(composite, SWT.NULL).setText("～");
+        toDateText = new Text(composite, SWT.BORDER);
+        GridData toDateTextGrDt = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+        toDateTextGrDt.widthHint = 100;
+        toDateText.setLayoutData(toDateTextGrDt);
+        toDateText.setEditable(false);
+        if (toDate != null) {
+            cal.setTime(toDate);
+            toCalendar.setDate(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DATE));
+            toDateText.setText(sdf.format(toDate));
+        } else {
+            cal.set(toCalendar.getYear(), toCalendar.getMonth(), toCalendar.getDay(), 0, 0, 0);
+            // toDateText.setText(sdf.format(cal.getTime()));
+        }
+        Button toBtn = new Button(composite, SWT.NULL);
+        GridData toBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        toBtn.setLayoutData(toBtnGrDt);
+        toBtn.setText("To削除");
+        toBtn.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent e) {
+                toDateText.setText("");
+                toDate = null;
+            }
+        });
         return composite;
     }
 
     @Override
     protected void createButtonsForButtonBar(Composite parent) {
         Button okButton = createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL, true);
-        // okButton.setEnabled(false);
+        Button deSelectButton = createButton(parent, IDialogConstants.DESELECT_ALL_ID, "フィルタ解除", false);
+        okButton.setEnabled(true);
+        deSelectButton.setEnabled(true);
         createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
     }
 
     @Override
     protected void okPressed() {
-        Calendar cal = Calendar.getInstance();
-        cal.set(frCalendar.getYear(), frCalendar.getMonth(), frCalendar.getDay(), 0, 0, 0);
-        this.frDate = cal.getTime();
-        cal.set(toCalendar.getYear(), toCalendar.getMonth(), toCalendar.getDay(), 23, 59, 59);
-        this.toDate = cal.getTime();
         super.okPressed();
     }
 
     @Override
+    protected void buttonPressed(int buttonId) {
+        if (buttonId == IDialogConstants.DESELECT_ALL_ID) {
+            this.frDate = null;
+            this.toDate = null;
+            super.okPressed();
+        }
+        super.buttonPressed(buttonId);
+    }
+
+    @Override
     protected Point getInitialSize() {
-        return new Point(525, 250);
+        return new Point(525, 300);
     }
 
     @Override
     protected void setShellStyle(int newShellStyle) {
-        super.setShellStyle(SWT.CLOSE | SWT.TITLE);
+        super.setShellStyle(SWT.CLOSE | SWT.TITLE | SWT.APPLICATION_MODAL);
     }
 
     @Override

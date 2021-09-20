@@ -12,7 +12,7 @@ public class MyPreferenceDialog extends PreferenceDialog {
 
     public MyPreferenceDialog(Shell parentShell, PreferenceManager manager) {
         super(parentShell, manager);
-        setShellStyle(SWT.CLOSE | SWT.TITLE | SWT.MAX | SWT.RESIZE);
+        setShellStyle(SWT.CLOSE | SWT.TITLE | SWT.MAX | SWT.RESIZE | SWT.APPLICATION_MODAL);
     }
 
     @Override

@@ -113,7 +113,7 @@ public class FilterSeverityDialog extends Dialog {
 
     @Override
     protected void setShellStyle(int newShellStyle) {
-        super.setShellStyle(SWT.CLOSE | SWT.TITLE);
+        super.setShellStyle(SWT.CLOSE | SWT.TITLE | SWT.APPLICATION_MODAL);
     }
 
     @Override

@@ -71,7 +71,7 @@ public class TracesApi extends Api {
         // 脆弱性タイプのクエリ文字列
         List<String> vulnTypeFilters = new ArrayList<String>();
         inValidFoundFlg = false;
-        for (Filter filter : filterMap.get(FilterEnum.SEVERITY)) {
+        for (Filter filter : filterMap.get(FilterEnum.VULNTYPE)) {
             if (filter.isValid()) {
                 vulnTypeFilters.add(filter.getKeycode());
             } else {
@@ -90,7 +90,7 @@ public class TracesApi extends Api {
         if (severityFilterQuery.isEmpty() && vulnTypeFilterQuery.isEmpty()) {
             return String.format("%s/api/ng/%s/traces/%s/ids", contrastUrl, orgId, this.appId);
         } else {
-            return String.format("%s/api/ng/%s/traces/%s/ids?%s", contrastUrl, orgId, this.appId, severityFilterQuery);
+            return String.format("%s/api/ng/%s/traces/%s/ids?%s%s", contrastUrl, orgId, this.appId, severityFilterQuery, vulnTypeFilterQuery);
         }
     }
 

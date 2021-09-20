@@ -33,6 +33,7 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -193,7 +194,7 @@ public class Main implements PropertyChangeListener {
     private void createPart() {
         Display display = new Display();
         shell = new CSVDLToolShell(display, this);
-        shell.setMinimumSize(640, 580);
+        shell.setMinimumSize(640, 600);
         Image[] imageArray = new Image[5];
         imageArray[0] = new Image(display, Main.class.getClassLoader().getResourceAsStream("icon16.png"));
         imageArray[1] = new Image(display, Main.class.getClassLoader().getResourceAsStream("icon24.png"));
@@ -658,12 +659,34 @@ public class Main implements PropertyChangeListener {
         });
 
         new Label(vulFilterGrp, SWT.LEFT).setText("脆弱性タイプ：");
-        vulVulnTypeFilterTxt = new Text(vulFilterGrp, SWT.BORDER);
+        vulVulnTypeFilterTxt = new Text(vulFilterGrp, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL);
         vulVulnTypeFilterTxt.setText("すべて");
         vulVulnTypeFilterTxt.setEditable(false);
-        vulVulnTypeFilterTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        GridData vulVulnTypeFilterTxtGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        vulVulnTypeFilterTxtGrDt.heightHint = 2 * vulVulnTypeFilterTxt.getLineHeight();
+        vulVulnTypeFilterTxt.setLayoutData(vulVulnTypeFilterTxtGrDt);
         vulVulnTypeFilterTxt.addListener(SWT.MouseUp, new Listener() {
             public void handleEvent(Event e) {
+                if (filterMap != null && filterMap.containsKey(FilterEnum.VULNTYPE)) {
+                    FilterVulnTypeDialog filterDialog = new FilterVulnTypeDialog(shell, filterMap.get(FilterEnum.VULNTYPE));
+                    int result = filterDialog.open();
+                    if (IDialogConstants.OK_ID != result) {
+                        return;
+                    }
+                    List<String> labels = filterDialog.getLabels();
+                    for (Filter filter : filterMap.get(FilterEnum.VULNTYPE)) {
+                        if (labels.contains(filter.getLabel())) {
+                            filter.setValid(true);
+                        } else {
+                            filter.setValid(false);
+                        }
+                    }
+                    if (labels.isEmpty()) {
+                        vulVulnTypeFilterTxt.setText("すべて");
+                    } else {
+                        vulVulnTypeFilterTxt.setText(String.join(", ", labels));
+                    }
+                }
             }
         });
 
@@ -672,8 +695,15 @@ public class Main implements PropertyChangeListener {
         vulLastDetectedFilterTxt.setText("すべて");
         vulLastDetectedFilterTxt.setEditable(false);
         vulLastDetectedFilterTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        vulVulnTypeFilterTxt.addListener(SWT.MouseUp, new Listener() {
+        vulLastDetectedFilterTxt.addListener(SWT.MouseUp, new Listener() {
             public void handleEvent(Event e) {
+                FilterLastDetectedDialog filterDialog = new FilterLastDetectedDialog(shell);
+                int result = filterDialog.open();
+                if (IDialogConstants.OK_ID != result) {
+                    return;
+                }
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+                vulLastDetectedFilterTxt.setText(String.format("%s ～ %s", sdf.format(filterDialog.getFrDate()), sdf.format(filterDialog.getToDate())));
             }
         });
 

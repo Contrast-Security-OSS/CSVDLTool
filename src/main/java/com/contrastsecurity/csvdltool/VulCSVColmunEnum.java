@@ -55,7 +55,8 @@ public enum VulCSVColmunEnum {
     VUL_20("組織名", 20, false, null, false, ""),
     VUL_21("組織ID", 21, false, null, false, ""),
     VUL_22("リンク", 22, false, null, false, "TeamServerへのリンクです。"),
-    VUL_23("リンク(ハイパーリンク)", 23, false, null, false, "TeamServerへのリンク（ハイパーリンク）です。");
+    VUL_23("リンク(ハイパーリンク)", 23, false, null, false, "TeamServerへのリンク（ハイパーリンク）です。"),
+    VUL_24("ルートURL", 24, true, ",", false, "ルートカバレッジのURLです。");
 
     private String culumn;
     private int order;

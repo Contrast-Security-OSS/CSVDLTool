@@ -83,6 +83,7 @@ import com.contrastsecurity.csvdltool.model.EventSummary;
 import com.contrastsecurity.csvdltool.model.Filter;
 import com.contrastsecurity.csvdltool.model.HttpRequest;
 import com.contrastsecurity.csvdltool.model.Note;
+import com.contrastsecurity.csvdltool.model.Observation;
 import com.contrastsecurity.csvdltool.model.Organization;
 import com.contrastsecurity.csvdltool.model.Property;
 import com.contrastsecurity.csvdltool.model.Recommendation;
@@ -242,6 +243,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                         }
                     }
                     HowToFixJson howToFixJson = null;
+                    List<Route> routes = null;
                     for (VulCSVColumn csvColumn : columnList) {
                         if (!csvColumn.isValid()) {
                             continue;
@@ -381,6 +383,16 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                                 csvLineList.add(String.format("=HYPERLINK(\"%s\",\"TeamServerへ\")", link));
                                 break;
                             }
+                            case VUL_24:
+                                // ==================== 18. 脆弱性タグ ====================
+                                Api routesApi = new RoutesApi(preferenceStore, organization, appId, trace_id);
+                                routes = (List<Route>) routesApi.get();
+                                List<String> urlList = new ArrayList<String>();
+                                for (Route route : routes) {
+                                    urlList.addAll(route.getObservations().stream().map(Observation::getUrl).collect(Collectors.toList()));
+                                }
+                                csvLineList.add(String.join(csvColumn.getSeparateStr().replace("\\r", "\r").replace("\\n", "\n"), urlList));
+                                break;
                             default:
                                 continue;
                         }
@@ -392,11 +404,22 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                         File file = new File(textFileName);
 
                         // ==================== 19-1. ルート ====================
-                        Api routesApi = new RoutesApi(preferenceStore, organization, appId, trace_id);
-                        List<Route> routes = (List<Route>) routesApi.get();
-                        List<String> signatureList = routes.stream().map(Route::getSignature).collect(Collectors.toList());
-                        signatureList.add(0, ROUTE);
-                        FileUtils.writeLines(file, FILE_ENCODING, signatureList, true);
+                        if (routes == null) {
+                            Api routesApi = new RoutesApi(preferenceStore, organization, appId, trace_id);
+                            routes = (List<Route>) routesApi.get();
+                        }
+                        List<String> signatureUrlList = new ArrayList<String>();
+                        for (Route route : routes) {
+                            signatureUrlList.add(route.getSignature());
+                            for (String url : route.getObservations().stream().map(Observation::getUrl).collect(Collectors.toList())) {
+                                signatureUrlList.add(String.format("- %s", url));
+                            }
+                        }
+                        if (signatureUrlList.isEmpty()) {
+                            signatureUrlList.add("なし");
+                        }
+                        signatureUrlList.add(0, ROUTE);
+                        FileUtils.writeLines(file, FILE_ENCODING, signatureUrlList, true);
 
                         // ==================== 19-2. HTTP情報 ====================
                         Api httpRequestApi = new HttpRequestApi(preferenceStore, organization, trace_id);

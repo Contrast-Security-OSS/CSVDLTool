@@ -26,31 +26,25 @@ package com.contrastsecurity.csvdltool.api;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.nio.charset.StandardCharsets;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.Header;
 import org.apache.http.HttpHeaders;
-import org.apache.http.HttpHost;
-import org.apache.http.HttpStatus;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHeader;
-import org.apache.http.ssl.SSLContextBuilder;
-import org.apache.http.ssl.TrustStrategy;
-import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.jasypt.util.text.BasicTextEncryptor;
@@ -60,6 +54,13 @@ import com.contrastsecurity.csvdltool.exception.ApiException;
 import com.contrastsecurity.csvdltool.exception.NonApiException;
 import com.contrastsecurity.csvdltool.model.Organization;
 import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
+
+import okhttp3.Authenticator;
+import okhttp3.Credentials;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.Route;
 
 public abstract class Api {
 
@@ -99,88 +100,84 @@ public abstract class Api {
     protected String getResponse() throws Exception {
         String url = this.getUrl();
         logger.trace(url);
-        HttpGet httpGet = new HttpGet(url);
+        OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();
+        Request.Builder requestBuilder = new Request.Builder().url(url).get();
         List<Header> headers = this.getHeaders();
         for (Header header : headers) {
-            httpGet.addHeader(header.getName(), header.getValue());
+            requestBuilder.addHeader(header.getName(), header.getValue());
         }
-        CloseableHttpClient httpClient = null;
+        OkHttpClient httpClient = null;
+        Request httpGet = requestBuilder.build();
+        Response response = null;
         try {
             int connectTimeout = Integer.parseInt(this.preferenceStore.getString(PreferenceConstants.CONNECTION_TIMEOUT));
             int sockettTimeout = Integer.parseInt(this.preferenceStore.getString(PreferenceConstants.SOCKET_TIMEOUT));
-            if (this.preferenceStore.getBoolean(PreferenceConstants.PROXY_YUKO)) {
-                HttpHost proxy = new HttpHost(this.preferenceStore.getString(PreferenceConstants.PROXY_HOST),
-                        Integer.parseInt(this.preferenceStore.getString(PreferenceConstants.PROXY_PORT)));
-                httpGet.setConfig(RequestConfig.custom().setSocketTimeout(sockettTimeout).setConnectTimeout(connectTimeout).setProxy(proxy).build());
-                if (this.preferenceStore.getString(PreferenceConstants.PROXY_AUTH).equals("none")) {
-                    // プロキシ認証なし
-                    if (preferenceStore.getBoolean(PreferenceConstants.IGNORE_SSLCERT_CHECK)) {
-                        httpClient = HttpClients.custom().setDefaultHeaders(headers).setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
-                                .setSSLContext(new SSLContextBuilder().loadTrustMaterial(null, new TrustStrategy() {
-                                    public boolean isTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
-                                        return true;
-                                    }
-                                }).build()).build();
-                    } else {
-                        httpClient = HttpClients.custom().setDefaultHeaders(headers).build();
+            clientBuilder.readTimeout(sockettTimeout, TimeUnit.MILLISECONDS).connectTimeout(connectTimeout, TimeUnit.MILLISECONDS);
+
+            if (preferenceStore.getBoolean(PreferenceConstants.IGNORE_SSLCERT_CHECK)) {
+                SSLContext sslContext = SSLContext.getInstance("SSL");
+                TrustManager[] trustAllCerts = getTrustManager();
+                sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
+                SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
+                clientBuilder.sslSocketFactory(sslSocketFactory, (X509TrustManager) trustAllCerts[0]);
+                clientBuilder.hostnameVerifier(new HostnameVerifier() {
+                    @Override
+                    public boolean verify(String hostname, SSLSession session) {
+                        return true;
                     }
-                } else {
+                });
+            }
+
+            if (this.preferenceStore.getBoolean(PreferenceConstants.PROXY_YUKO)) {
+                clientBuilder.proxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress(this.preferenceStore.getString(PreferenceConstants.PROXY_HOST),
+                        Integer.parseInt(this.preferenceStore.getString(PreferenceConstants.PROXY_PORT)))));
+                if (!this.preferenceStore.getString(PreferenceConstants.PROXY_AUTH).equals("none")) {
+                    Authenticator proxyAuthenticator = null;
                     // プロキシ認証あり
-                    String proxy_user = null;
-                    String proxy_pass = null;
                     if (this.preferenceStore.getString(PreferenceConstants.PROXY_AUTH).equals("input")) {
-                        proxy_user = this.preferenceStore.getString(PreferenceConstants.PROXY_TMP_USER);
-                        proxy_pass = this.preferenceStore.getString(PreferenceConstants.PROXY_TMP_PASS);
+                        proxyAuthenticator = new Authenticator() {
+                            @Override
+                            public Request authenticate(Route route, Response response) throws IOException {
+                                String credential = Credentials.basic(preferenceStore.getString(PreferenceConstants.PROXY_TMP_USER),
+                                        preferenceStore.getString(PreferenceConstants.PROXY_TMP_PASS));
+                                return response.request().newBuilder().header("Proxy-Authorization", credential).build();
+                            }
+                        };
                     } else {
-                        proxy_user = this.preferenceStore.getString(PreferenceConstants.PROXY_USER);
                         BasicTextEncryptor encryptor = new BasicTextEncryptor();
                         encryptor.setPassword(Main.MASTER_PASSWORD);
                         try {
-                            proxy_pass = encryptor.decrypt(preferenceStore.getString(PreferenceConstants.PROXY_PASS));
+                            String proxy_pass = encryptor.decrypt(preferenceStore.getString(PreferenceConstants.PROXY_PASS));
+                            proxyAuthenticator = new Authenticator() {
+                                @Override
+                                public Request authenticate(Route route, Response response) throws IOException {
+                                    String credential = Credentials.basic(preferenceStore.getString(PreferenceConstants.PROXY_USER), proxy_pass);
+                                    return response.request().newBuilder().header("Proxy-Authorization", credential).build();
+                                }
+                            };
                         } catch (Exception e) {
                             throw new ApiException("プロキシパスワードの復号化に失敗しました。\\r\\nパスワードの設定をやり直してください。");
                         }
                     }
-                    CredentialsProvider credsProvider = new BasicCredentialsProvider();
-                    credsProvider.setCredentials(new AuthScope(proxy), new UsernamePasswordCredentials(proxy_user, proxy_pass));
-                    if (preferenceStore.getBoolean(PreferenceConstants.IGNORE_SSLCERT_CHECK)) {
-                        httpClient = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).setDefaultHeaders(headers)
-                                .setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE).setSSLContext(new SSLContextBuilder().loadTrustMaterial(null, new TrustStrategy() {
-                                    public boolean isTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
-                                        return true;
-                                    }
-                                }).build()).build();
-                    } else {
-                        httpClient = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).setDefaultHeaders(headers).build();
-                    }
-                }
-            } else {
-                httpGet.setConfig(RequestConfig.custom().setSocketTimeout(sockettTimeout).setConnectTimeout(connectTimeout).build());
-                if (preferenceStore.getBoolean(PreferenceConstants.IGNORE_SSLCERT_CHECK)) {
-                    httpClient = HttpClients.custom().setDefaultHeaders(headers).setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
-                            .setSSLContext(new SSLContextBuilder().loadTrustMaterial(null, new TrustStrategy() {
-                                public boolean isTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
-                                    return true;
-                                }
-                            }).build()).build();
-                } else {
-                    httpClient = HttpClients.custom().setDefaultHeaders(headers).build();
+                    clientBuilder.proxyAuthenticator(proxyAuthenticator);
                 }
             }
-            try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet);) {
-                if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                    return EntityUtils.toString(httpResponse.getEntity());
-                } else if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
-                    throw new ApiException(EntityUtils.toString(httpResponse.getEntity()));
-                } else if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_FORBIDDEN) {
-                    throw new ApiException(EntityUtils.toString(httpResponse.getEntity()));
+            httpClient = clientBuilder.build();
+            try {
+                response = httpClient.newCall(httpGet).execute();
+                if (response.code() == 200) {
+                    return response.body().string();
+                } else if (response.code() == 401) {
+                    throw new ApiException(response.body().string());
+                } else if (response.code() == 403) {
+                    throw new ApiException(response.body().string());
                 } else {
-                    logger.warn(httpResponse.getStatusLine().getStatusCode());
-                    logger.warn(EntityUtils.toString(httpResponse.getEntity()));
-                    throw new NonApiException(String.valueOf(httpResponse.getStatusLine().getStatusCode()));
+                    logger.warn(response.code());
+                    logger.warn(response.body().string());
+                    throw new NonApiException(String.valueOf(response.code()));
                 }
-            } catch (Exception e) {
-                throw e;
+            } catch (IOException ioe) {
+                throw ioe;
             }
         } catch (Exception e) {
             StringWriter stringWriter = new StringWriter();
@@ -192,18 +189,36 @@ public abstract class Api {
             throw e;
         } finally {
             try {
-                if (httpClient != null) {
-                    httpClient.close();
+                if (response != null) {
+                    response.body().close();
                 }
-            } catch (IOException ioe) {
+            } catch (Exception e) {
                 StringWriter stringWriter = new StringWriter();
                 PrintWriter printWriter = new PrintWriter(stringWriter);
-                ioe.printStackTrace(printWriter);
+                e.printStackTrace(printWriter);
                 String trace = stringWriter.toString();
                 logger.error(trace);
-                throw ioe;
+                throw e;
             }
         }
+    }
+
+    private static TrustManager[] getTrustManager() {
+        TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
+            @Override
+            public void checkClientTrusted(X509Certificate[] chain, String authType) {
+            }
+
+            @Override
+            public void checkServerTrusted(X509Certificate[] chain, String authType) {
+            }
+
+            @Override
+            public X509Certificate[] getAcceptedIssuers() {
+                return new X509Certificate[] {};
+            }
+        } };
+        return trustAllCerts;
     }
 
 }

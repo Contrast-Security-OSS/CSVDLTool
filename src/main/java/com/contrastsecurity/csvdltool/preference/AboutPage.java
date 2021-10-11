@@ -62,7 +62,7 @@ public class AboutPage extends PreferencePage {
         Label versionValueLbl = new Label(appGrp, SWT.NONE);
         GridData versionValueLblGrDt = new GridData();
         versionValueLbl.setLayoutData(versionValueLblGrDt);
-        versionValueLbl.setText("1.4.0");
+        versionValueLbl.setText("1.4.1");
 
         Label copyrightLbl = new Label(appGrp, SWT.NONE);
         GridData copyrightLblGrDt = new GridData();
@@ -97,6 +97,7 @@ public class AboutPage extends PreferencePage {
         new Link(licenseGrp, SWT.NONE).setText("- gson 2.8.6");
         new Link(licenseGrp, SWT.NONE).setText("- httpclient 4.5.13");
         new Link(licenseGrp, SWT.NONE).setText("- httpcore 4.4.13");
+        new Link(licenseGrp, SWT.NONE).setText("- okhttp 4.9.2");
         new Link(licenseGrp, SWT.NONE).setText("- log4j 1.2.17");
         new Link(licenseGrp, SWT.NONE).setText("- snakeyaml 1.16");
 

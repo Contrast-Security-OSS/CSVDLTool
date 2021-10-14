@@ -28,6 +28,7 @@ import java.util.List;
 public abstract class ContrastJson {
     private String success;
     private List<String> messages;
+    private int count;
 
     public String getSuccess() {
         return success;
@@ -43,6 +44,14 @@ public abstract class ContrastJson {
 
     public void setMessages(List<String> messages) {
         this.messages = messages;
+    }
+
+    public int getCount() {
+        return count;
+    }
+
+    public void setCount(int count) {
+        this.count = count;
     }
 
     @Override

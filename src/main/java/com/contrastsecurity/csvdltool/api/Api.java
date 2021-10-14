@@ -68,6 +68,7 @@ public abstract class Api {
 
     protected IPreferenceStore preferenceStore;
     protected Organization organization;
+    protected int totalCount;
 
     public Api(IPreferenceStore preferenceStore, Organization organization) {
         this.preferenceStore = preferenceStore;
@@ -77,6 +78,10 @@ public abstract class Api {
     public Object get() throws Exception {
         String response = this.getResponse();
         return this.convert(response);
+    }
+
+    public int getTotalCount() {
+        return totalCount;
     }
 
     protected abstract String getUrl();

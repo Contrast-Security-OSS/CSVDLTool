@@ -35,15 +35,20 @@ import com.google.gson.reflect.TypeToken;
 
 public class AttackEventsApi extends Api {
 
-    public AttackEventsApi(IPreferenceStore preferenceStore, Organization organization) {
+    private final static int LIMIT = 1000;
+    private int offset;
+
+    public AttackEventsApi(IPreferenceStore preferenceStore, Organization organization, int offset) {
         super(preferenceStore, organization);
+        this.offset = offset;
     }
 
     @Override
     protected String getUrl() {
         String contrastUrl = preferenceStore.getString(PreferenceConstants.CONTRAST_URL);
         String orgId = this.organization.getOrganization_uuid();
-        return String.format("%s/api/ng/%s/rasp/events/new?expand=drilldownDetails,application_roles,skip_links&limit=15&offset=0&sort=-timestamp", contrastUrl, orgId);
+        return String.format("%s/api/ng/%s/rasp/events/new?expand=drilldownDetails,application_roles,skip_links&limit=%d&offset=%d&sort=timestamp", contrastUrl, orgId, LIMIT,
+                this.offset);
     }
 
     @Override
@@ -52,7 +57,8 @@ public class AttackEventsApi extends Api {
         Type contType = new TypeToken<AttackEventsJson>() {
         }.getType();
         AttackEventsJson attackEventsJson = gson.fromJson(response, contType);
-        return attackEventsJson.getAttackEvents();
+        this.totalCount = attackEventsJson.getCount();
+        return attackEventsJson.getEvents();
     }
 
 }

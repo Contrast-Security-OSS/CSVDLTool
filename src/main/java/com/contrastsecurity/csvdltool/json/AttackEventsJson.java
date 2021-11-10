@@ -29,21 +29,21 @@ import java.util.StringJoiner;
 import com.contrastsecurity.csvdltool.model.AttackEvent;
 
 public class AttackEventsJson extends ContrastJson {
-    private List<AttackEvent> attackEvents;
+    private List<AttackEvent> events;
 
-    public List<AttackEvent> getAttackEvents() {
-        return attackEvents;
+    public List<AttackEvent> getEvents() {
+        return events;
     }
 
-    public void setAttackEvents(List<AttackEvent> attackEvents) {
-        this.attackEvents = attackEvents;
+    public void setAttackEvents(List<AttackEvent> events) {
+        this.events = events;
     }
 
     @Override
     public String toString() {
         StringJoiner sj = new StringJoiner("\r\n");
-        for (AttackEvent events : this.attackEvents) {
-            sj.add(events.toString());
+        for (AttackEvent event : this.events) {
+            sj.add(event.toString());
         }
         return sj.toString();
     }

@@ -56,7 +56,6 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
-import org.eclipse.swt.custom.TableEditor;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -84,10 +83,10 @@ import org.yaml.snakeyaml.Yaml;
 
 import com.contrastsecurity.csvdltool.exception.ApiException;
 import com.contrastsecurity.csvdltool.exception.NonApiException;
+import com.contrastsecurity.csvdltool.model.AttackEvent;
 import com.contrastsecurity.csvdltool.model.ContrastSecurityYaml;
 import com.contrastsecurity.csvdltool.model.Filter;
 import com.contrastsecurity.csvdltool.model.Organization;
-import com.contrastsecurity.csvdltool.model.VulCSVColumn;
 import com.contrastsecurity.csvdltool.preference.AboutPage;
 import com.contrastsecurity.csvdltool.preference.BasePreferencePage;
 import com.contrastsecurity.csvdltool.preference.CSVPreferencePage;
@@ -139,7 +138,8 @@ public class Main implements PropertyChangeListener {
     private Text vulLastDetectedFilterTxt;
 
     private Map<String, AppInfo> fullAppMap;
-    private Map<FilterEnum, Set<Filter>> filterMap;
+    private Map<FilterEnum, Set<Filter>> assessFilterMap;
+    private Map<FilterEnum, Set<Filter>> protectFilterMap;
     private List<String> srcApps = new ArrayList<String>();
     private List<String> dstApps = new ArrayList<String>();
     private Date frLastDetectedDate;
@@ -381,7 +381,7 @@ public class Main implements PropertyChangeListener {
                     srcApps.add(appLabel); // memory src
                 }
                 srcCount.setText(String.valueOf(srcList.getItemCount()));
-                filterMap = progress.getFilterMap();
+                assessFilterMap = progress.getFilterMap();
                 vulSeverityFilterTxt.setText("すべて");
                 vulVulnTypeFilterTxt.setText("すべて");
             }
@@ -671,15 +671,15 @@ public class Main implements PropertyChangeListener {
         vulSeverityFilterTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         vulSeverityFilterTxt.addListener(SWT.MouseUp, new Listener() {
             public void handleEvent(Event e) {
-                if (filterMap != null && filterMap.containsKey(FilterEnum.SEVERITY)) {
-                    FilterSeverityDialog filterDialog = new FilterSeverityDialog(shell, filterMap.get(FilterEnum.SEVERITY));
+                if (assessFilterMap != null && assessFilterMap.containsKey(FilterEnum.SEVERITY)) {
+                    FilterSeverityDialog filterDialog = new FilterSeverityDialog(shell, assessFilterMap.get(FilterEnum.SEVERITY));
                     int result = filterDialog.open();
                     if (IDialogConstants.OK_ID != result) {
                         vulExecuteBtn.setFocus();
                         return;
                     }
                     List<String> labels = filterDialog.getLabels();
-                    for (Filter filter : filterMap.get(FilterEnum.SEVERITY)) {
+                    for (Filter filter : assessFilterMap.get(FilterEnum.SEVERITY)) {
                         if (labels.contains(filter.getLabel())) {
                             filter.setValid(true);
                         } else {
@@ -705,15 +705,15 @@ public class Main implements PropertyChangeListener {
         vulVulnTypeFilterTxt.setLayoutData(vulVulnTypeFilterTxtGrDt);
         vulVulnTypeFilterTxt.addListener(SWT.MouseUp, new Listener() {
             public void handleEvent(Event e) {
-                if (filterMap != null && filterMap.containsKey(FilterEnum.VULNTYPE)) {
-                    FilterVulnTypeDialog filterDialog = new FilterVulnTypeDialog(shell, filterMap.get(FilterEnum.VULNTYPE));
+                if (assessFilterMap != null && assessFilterMap.containsKey(FilterEnum.VULNTYPE)) {
+                    FilterVulnTypeDialog filterDialog = new FilterVulnTypeDialog(shell, assessFilterMap.get(FilterEnum.VULNTYPE));
                     int result = filterDialog.open();
                     if (IDialogConstants.OK_ID != result) {
                         vulExecuteBtn.setFocus();
                         return;
                     }
                     List<String> labels = filterDialog.getLabels();
-                    for (Filter filter : filterMap.get(FilterEnum.VULNTYPE)) {
+                    for (Filter filter : assessFilterMap.get(FilterEnum.VULNTYPE)) {
                         if (labels.contains(filter.getLabel())) {
                             filter.setValid(true);
                         } else {
@@ -773,7 +773,7 @@ public class Main implements PropertyChangeListener {
                     MessageDialog.openInformation(shell, "脆弱性情報取得", "取得対象のアプリケーションを選択してください。");
                     return;
                 }
-                VulGetWithProgress progress = new VulGetWithProgress(shell, preferenceStore, dstApps, fullAppMap, filterMap, frLastDetectedDate, toLastDetectedDate,
+                VulGetWithProgress progress = new VulGetWithProgress(shell, preferenceStore, dstApps, fullAppMap, assessFilterMap, frLastDetectedDate, toLastDetectedDate,
                         vulOnlyParentAppChk.getSelection(), includeDescChk.getSelection(), includeStackTraceChk.getSelection());
                 ProgressMonitorDialog progDialog = new VulGetProgressMonitorDialog(shell);
                 try {
@@ -943,11 +943,17 @@ public class Main implements PropertyChangeListener {
             @Override
             public void widgetSelected(SelectionEvent event) {
                 uiReset();
-
+                attackTable.removeAll();
                 AttackEventsGetWithProgress progress = new AttackEventsGetWithProgress(preferenceStore, getValidOrganizations());
                 ProgressMonitorDialog progDialog = new AttackGetProgressMonitorDialog(shell);
                 try {
                     progDialog.run(true, true, progress);
+                    List<AttackEvent> attackEvents = progress.getAttackEvents();
+                    Collections.reverse(attackEvents);
+                    for (AttackEvent attackEvent : attackEvents) {
+                        addColToTable(attackEvent, -1);
+                    }
+                    protectFilterMap = progress.getFilterMap();
                 } catch (InvocationTargetException e) {
                     StringWriter stringWriter = new StringWriter();
                     PrintWriter printWriter = new PrintWriter(stringWriter);
@@ -972,7 +978,7 @@ public class Main implements PropertyChangeListener {
             }
         });
 
-        attackTable = new Table(attackListGrp, SWT.BORDER | SWT.FULL_SELECTION);
+        attackTable = new Table(attackListGrp, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
         GridData tableGrDt = new GridData(GridData.FILL_BOTH);
         // tableGrDt.horizontalSpan = 2;
         attackTable.setLayoutData(tableGrDt);
@@ -981,18 +987,41 @@ public class Main implements PropertyChangeListener {
         TableColumn column0 = new TableColumn(attackTable, SWT.NONE);
         column0.setWidth(0);
         column0.setResizable(false);
-        TableColumn column1 = new TableColumn(attackTable, SWT.CENTER);
-        column1.setWidth(50);
-        column1.setText("選択");
         TableColumn column2 = new TableColumn(attackTable, SWT.LEFT);
         column2.setWidth(120);
         column2.setText("ソースIP");
+        column2.setToolTipText("oyoyo");
+        column2.addSelectionListener(new SelectionListener() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                FilterSourceIpDialog filterDialog = new FilterSourceIpDialog(shell, protectFilterMap.get(FilterEnum.SOURCEIP));
+                int result = filterDialog.open();
+                if (IDialogConstants.OK_ID != result) {
+                    return;
+                }
+                List<String> labels = filterDialog.getLabels();
+            }
+
+            @Override
+            public void widgetDefaultSelected(SelectionEvent e) {
+            }
+        });
         TableColumn column3 = new TableColumn(attackTable, SWT.CENTER);
-        column3.setWidth(75);
+        column3.setWidth(100);
         column3.setText("結果");
         TableColumn column4 = new TableColumn(attackTable, SWT.LEFT);
         column4.setWidth(250);
         column4.setText("アプリケーション");
+        column4.addSelectionListener(new SelectionListener() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                System.out.println("oyoyo");
+            }
+
+            @Override
+            public void widgetDefaultSelected(SelectionEvent e) {
+            }
+        });
         TableColumn column5 = new TableColumn(attackTable, SWT.LEFT);
         column5.setWidth(200);
         column5.setText("サーバ");
@@ -1000,14 +1029,14 @@ public class Main implements PropertyChangeListener {
         column6.setWidth(200);
         column6.setText("ルール");
         TableColumn column7 = new TableColumn(attackTable, SWT.LEFT);
-        column7.setWidth(120);
+        column7.setWidth(150);
         column7.setText("時間");
         TableColumn column8 = new TableColumn(attackTable, SWT.LEFT);
         column8.setWidth(150);
         column8.setText("URL");
 
         protectTabItem.setControl(protectShell);
-        
+
         int main_idx = this.preferenceStore.getInt(PreferenceConstants.OPENED_MAIN_TAB_IDX);
         mainTabFolder.setSelection(main_idx);
 
@@ -1074,69 +1103,25 @@ public class Main implements PropertyChangeListener {
         display.dispose();
     }
 
-//    private void addColToTable(VulCSVColumn col, int index) {
-//        if (col == null) {
-//            return;
-//        }
-//        TableEditor editor = new TableEditor(table);
-//        Button button = new Button(table, SWT.CHECK);
-//        if (col.isValid()) {
-//            button.setSelection(true);
-//        }
-//        button.addSelectionListener(new SelectionListener() {
-//            @Override
-//            public void widgetSelected(SelectionEvent e) {
-//                Button triggerBtn = (Button) e.getSource();
-//                int clickIndex = checkBoxList.indexOf(triggerBtn);
-//                boolean selected = triggerBtn.getSelection();
-//                VulCSVColumn targetColumn = columnList.get(clickIndex);
-//                targetColumn.setValid(selected);
-//            }
-//
-//            @Override
-//            public void widgetDefaultSelected(SelectionEvent e) {
-//            }
-//        });
-//        button.pack();
-//        TableItem item = null;
-//        if (index > 0) {
-//            item = new TableItem(table, SWT.CENTER, index);
-//        } else {
-//            item = new TableItem(table, SWT.CENTER);
-//        }
-//        editor.minimumWidth = button.getSize().x;
-//        editor.horizontalAlignment = SWT.CENTER;
-//        editor.setEditor(button, item, 1);
-//        checkBoxList.add(button);
-//        item.setText(2, col.getColumn().getCulumn());
-//        if (col.isSeparate()) {
-//            TableEditor editor2 = new TableEditor(table);
-//            Text text = new Text(table, SWT.NONE);
-//            text.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-//            text.setTextLimit(4);
-//            text.setText(col.getSeparateStr());
-//            text.addModifyListener(new ModifyListener() {
-//                @Override
-//                public void modifyText(ModifyEvent e) {
-//                    Text modifyText = (Text) e.getSource();
-//                    int modifyIndex = separateTextList.indexOf(modifyText);
-//                    String text = modifyText.getText();
-//                    VulCSVColumn targetColumn = columnList.get(modifyIndex);
-//                    targetColumn.setSeparateStr(text);
-//                }
-//            });
-//            text.pack();
-//            editor2.grabHorizontal = true;
-//            editor2.horizontalAlignment = SWT.LEFT;
-//            editor2.setEditor(text, item, 3);
-//            separateTextList.add(text);
-//        } else {
-//            item.setText(3, "");
-//            separateTextList.add(new Text(table, SWT.NONE));
-//        }
-//        item.setText(4, col.getColumn().getRemarks());
-//    }
-    
+    private void addColToTable(AttackEvent attackEvent, int index) {
+        if (attackEvent == null) {
+            return;
+        }
+        TableItem item = null;
+        if (index > 0) {
+            item = new TableItem(attackTable, SWT.CENTER, index);
+        } else {
+            item = new TableItem(attackTable, SWT.CENTER);
+        }
+        item.setText(1, attackEvent.getSource());
+        item.setText(2, attackEvent.getResult());
+        item.setText(3, attackEvent.getApplication().getName());
+        item.setText(4, attackEvent.getServer().getName());
+        item.setText(5, attackEvent.getRule());
+        item.setText(6, attackEvent.getReceived());
+        item.setText(7, attackEvent.getUrl());
+    }
+
     private void uiReset() {
         // src
         srcListFilter.setText("");

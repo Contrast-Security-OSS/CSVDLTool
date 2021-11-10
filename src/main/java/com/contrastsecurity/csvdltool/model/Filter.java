@@ -30,6 +30,14 @@ public class Filter {
     private boolean new_group;
     private boolean isValid;
 
+    public Filter() {
+    }
+
+    public Filter(String label) {
+        this.label = label;
+        this.keycode = label;
+    }
+
     public String getKeycode() {
         return keycode;
     }

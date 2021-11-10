@@ -39,7 +39,7 @@ import org.eclipse.swt.widgets.Link;
 public class AboutPage extends PreferencePage {
 
     public AboutPage() {
-        super("CSVDLToolについて");
+        super("ContrastToolについて");
     }
 
     @Override
@@ -62,7 +62,7 @@ public class AboutPage extends PreferencePage {
         Label versionValueLbl = new Label(appGrp, SWT.NONE);
         GridData versionValueLblGrDt = new GridData();
         versionValueLbl.setLayoutData(versionValueLblGrDt);
-        versionValueLbl.setText("1.4.2");
+        versionValueLbl.setText("2.0.0");
 
         Label copyrightLbl = new Label(appGrp, SWT.NONE);
         GridData copyrightLblGrDt = new GridData();

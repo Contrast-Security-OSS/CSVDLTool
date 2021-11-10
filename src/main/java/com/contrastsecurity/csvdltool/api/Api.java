@@ -57,8 +57,11 @@ import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
 
 import okhttp3.Authenticator;
 import okhttp3.Credentials;
+import okhttp3.FormBody;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.Route;
 
@@ -76,7 +79,12 @@ public abstract class Api {
     }
 
     public Object get() throws Exception {
-        String response = this.getResponse();
+        String response = this.getResponse(false);
+        return this.convert(response);
+    }
+
+    public Object post() throws Exception {
+        String response = this.getResponse(true);
         return this.convert(response);
     }
 
@@ -102,17 +110,25 @@ public abstract class Api {
         return headers;
     }
 
-    protected String getResponse() throws Exception {
+    protected String getResponse(boolean isPost) throws Exception {
         String url = this.getUrl();
         logger.trace(url);
         OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();
-        Request.Builder requestBuilder = new Request.Builder().url(url).get();
+        Request.Builder requestBuilder = null;
+        if (isPost) {
+            MediaType mediaTypeJson = MediaType.parse("application/json; charset=UTF-8");
+            String json = "{\"quickFilter\":\"EFFECTIVE\",\"keyword\":\"\",\"includeSuppressed\":false,\"includeBotBlockers\":false,\"includeIpBlacklist\":false,\"startDate\":1635950789318,\"endDate\":1636037160000,\"tags\":[],\"severities\":[],\"results\":[\"BLOCKED\"],\"rules\":[],\"applications\":[],\"servers\":[],\"environments\":[],\"attackers\":[]}";
+            RequestBody body = RequestBody.create(json, mediaTypeJson);
+            requestBuilder = new Request.Builder().url(url).post(body);
+        } else {
+            requestBuilder = new Request.Builder().url(url).get();
+        }
         List<Header> headers = this.getHeaders();
         for (Header header : headers) {
             requestBuilder.addHeader(header.getName(), header.getValue());
         }
         OkHttpClient httpClient = null;
-        Request httpGet = requestBuilder.build();
+        Request request = requestBuilder.build();
         Response response = null;
         try {
             int connectTimeout = Integer.parseInt(this.preferenceStore.getString(PreferenceConstants.CONNECTION_TIMEOUT));
@@ -169,7 +185,7 @@ public abstract class Api {
             }
             httpClient = clientBuilder.build();
             try {
-                response = httpClient.newCall(httpGet).execute();
+                response = httpClient.newCall(request).execute();
                 if (response.code() == 200) {
                     return response.body().string();
                 } else if (response.code() == 401) {

@@ -75,6 +75,8 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -147,6 +149,7 @@ public class Main implements PropertyChangeListener {
 
     // PROTECT
     private Table attackTable;
+    List<AttackEvent> attackEvents;
 
     private PreferenceStore preferenceStore;
 
@@ -936,9 +939,11 @@ public class Main implements PropertyChangeListener {
         attackLoadBtn = new Button(attackListGrp, SWT.PUSH);
         GridData attackLoadBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
         attackLoadBtnGrDt.horizontalSpan = 3;
+        attackLoadBtnGrDt.heightHint = 50;
         attackLoadBtn.setLayoutData(attackLoadBtnGrDt);
-        attackLoadBtn.setText("攻撃イベント一覧の読み込み");
+        attackLoadBtn.setText("取得");
         attackLoadBtn.setToolTipText("攻撃イベント一覧を読み込みます。");
+        attackLoadBtn.setFont(new Font(display, "ＭＳ ゴシック", 20, SWT.NORMAL));
         attackLoadBtn.addSelectionListener(new SelectionListener() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -948,7 +953,7 @@ public class Main implements PropertyChangeListener {
                 ProgressMonitorDialog progDialog = new AttackGetProgressMonitorDialog(shell);
                 try {
                     progDialog.run(true, true, progress);
-                    List<AttackEvent> attackEvents = progress.getAttackEvents();
+                    attackEvents = progress.getAttackEvents();
                     Collections.reverse(attackEvents);
                     for (AttackEvent attackEvent : attackEvents) {
                         addColToTable(attackEvent, -1);
@@ -980,48 +985,39 @@ public class Main implements PropertyChangeListener {
 
         attackTable = new Table(attackListGrp, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
         GridData tableGrDt = new GridData(GridData.FILL_BOTH);
-        // tableGrDt.horizontalSpan = 2;
+        tableGrDt.horizontalSpan = 3;
         attackTable.setLayoutData(tableGrDt);
         attackTable.setLinesVisible(true);
         attackTable.setHeaderVisible(true);
+        Menu menuTable = new Menu(attackTable);
+        attackTable.setMenu(menuTable);
+
+        MenuItem miTag = new MenuItem(menuTable, SWT.NONE);
+        miTag.setText("タグ付け");
+        MenuItem miExp = new MenuItem(menuTable, SWT.NONE);
+        miExp.setText("エクスポート");
+
+        attackTable.addListener(SWT.MenuDetect, new Listener() {
+            @Override
+            public void handleEvent(Event event) {
+                if (attackTable.getSelectionCount() <= 0) {
+                    event.doit = false;
+                }
+            }
+        });
+
         TableColumn column0 = new TableColumn(attackTable, SWT.NONE);
         column0.setWidth(0);
         column0.setResizable(false);
         TableColumn column2 = new TableColumn(attackTable, SWT.LEFT);
         column2.setWidth(120);
         column2.setText("ソースIP");
-        column2.setToolTipText("oyoyo");
-        column2.addSelectionListener(new SelectionListener() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                FilterSourceIpDialog filterDialog = new FilterSourceIpDialog(shell, protectFilterMap.get(FilterEnum.SOURCEIP));
-                int result = filterDialog.open();
-                if (IDialogConstants.OK_ID != result) {
-                    return;
-                }
-                List<String> labels = filterDialog.getLabels();
-            }
-
-            @Override
-            public void widgetDefaultSelected(SelectionEvent e) {
-            }
-        });
         TableColumn column3 = new TableColumn(attackTable, SWT.CENTER);
         column3.setWidth(100);
         column3.setText("結果");
         TableColumn column4 = new TableColumn(attackTable, SWT.LEFT);
         column4.setWidth(250);
         column4.setText("アプリケーション");
-        column4.addSelectionListener(new SelectionListener() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                System.out.println("oyoyo");
-            }
-
-            @Override
-            public void widgetDefaultSelected(SelectionEvent e) {
-            }
-        });
         TableColumn column5 = new TableColumn(attackTable, SWT.LEFT);
         column5.setWidth(200);
         column5.setText("サーバ");
@@ -1034,6 +1030,28 @@ public class Main implements PropertyChangeListener {
         TableColumn column8 = new TableColumn(attackTable, SWT.LEFT);
         column8.setWidth(150);
         column8.setText("URL");
+
+        Button attackEventFilterBtn = new Button(attackListGrp, SWT.PUSH);
+        GridData attackEventFilterBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        attackEventFilterBtnGrDt.horizontalSpan = 3;
+        attackEventFilterBtn.setLayoutData(attackEventFilterBtnGrDt);
+        attackEventFilterBtn.setText("フィルター");
+        attackEventFilterBtn.setToolTipText("攻撃イベント一覧を読み込みます。");
+        attackEventFilterBtn.addSelectionListener(new SelectionListener() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                AttackEventFilterDialog filterDialog = new AttackEventFilterDialog(shell, protectFilterMap);
+                filterDialog.addPropertyChangeListener(shell.getMain());
+                int result = filterDialog.open();
+                if (IDialogConstants.OK_ID != result) {
+                    return;
+                }
+            }
+
+            @Override
+            public void widgetDefaultSelected(SelectionEvent e) {
+            }
+        });
 
         protectTabItem.setControl(protectShell);
 
@@ -1198,15 +1216,40 @@ public class Main implements PropertyChangeListener {
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void propertyChange(PropertyChangeEvent event) {
-        // if ("authInput".equals(event.getPropertyName())) {
-        // Boolean enableFlg = (Boolean) event.getNewValue();
-        // this.executeBtn.setEnabled(enableFlg.booleanValue());
-        // } else if ("optionInputs".equals(event.getPropertyName())) {
-        // String oldValue = (String) event.getOldValue();
-        // System.out.println(oldValue);
-        // }
+        if ("attackEventFilter".equals(event.getPropertyName())) {
+            Map<FilterEnum, Set<Filter>> filterMap = (Map<FilterEnum, Set<Filter>>) event.getNewValue();
+            attackTable.removeAll();
+            for (AttackEvent attackEvent : attackEvents) {
+                boolean lostFlg = false;
+                for (Filter filter : filterMap.get(FilterEnum.SOURCEIP)) {
+                    if (attackEvent.getSource().equals(filter.getLabel())) {
+                        if (!filter.isValid()) {
+                            lostFlg |= true;
+                        }
+                    }
+                }
+                for (Filter filter : filterMap.get(FilterEnum.APPLICATION)) {
+                    if (attackEvent.getApplication().getName().equals(filter.getLabel())) {
+                        if (!filter.isValid()) {
+                            lostFlg |= true;
+                        }
+                    }
+                }
+                for (Filter filter : filterMap.get(FilterEnum.RULE)) {
+                    if (attackEvent.getRule().equals(filter.getLabel())) {
+                        if (!filter.isValid()) {
+                            lostFlg |= true;
+                        }
+                    }
+                }
+                if (!lostFlg) {
+                    addColToTable(attackEvent, -1);
+                }
+            }
+        }
     }
 
     /**

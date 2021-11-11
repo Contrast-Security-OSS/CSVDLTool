@@ -36,6 +36,7 @@ public class Filter {
     public Filter(String label) {
         this.label = label;
         this.keycode = label;
+        this.isValid = true;
     }
 
     public String getKeycode() {

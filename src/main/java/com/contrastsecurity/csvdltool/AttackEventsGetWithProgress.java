@@ -63,7 +63,6 @@ public class AttackEventsGetWithProgress implements IRunnableWithProgress {
     @Override
     public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
         monitor.beginTask("攻撃イベント一覧の読み込み...", 100 * this.organizations.size());
-        Thread.sleep(300);
         for (Organization org : this.organizations) {
             try {
                 monitor.setTaskName(org.getName());
@@ -76,6 +75,8 @@ public class AttackEventsGetWithProgress implements IRunnableWithProgress {
                 int totalCount = attacksApi.getTotalCount();
                 SubProgressMonitor sub1Monitor = new SubProgressMonitor(monitor, 100);
                 sub1Monitor.beginTask("", totalCount);
+                monitor.subTask(String.format("攻撃イベント一覧の情報を取得...(%d/%d)", allAttackEvents.size(), totalCount));
+                sub1Monitor.worked(attackEvents.size());
                 boolean incompleteFlg = false;
                 incompleteFlg = totalCount > allAttackEvents.size();
                 while (incompleteFlg) {
@@ -84,6 +85,7 @@ public class AttackEventsGetWithProgress implements IRunnableWithProgress {
                     }
                     attacksApi = new AttackEventsApi(preferenceStore, org, allAttackEvents.size());
                     List<AttackEvent> attackEvents = (List<AttackEvent>) attacksApi.get();
+                    monitor.subTask(String.format("攻撃イベント一覧の情報を取得...(%d/%d)", allAttackEvents.size(), totalCount));
                     sub1Monitor.worked(attackEvents.size());
                     allAttackEvents.addAll(attackEvents);
                     incompleteFlg = totalCount > allAttackEvents.size();

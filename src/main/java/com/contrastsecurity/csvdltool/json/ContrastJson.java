@@ -25,7 +25,7 @@ package com.contrastsecurity.csvdltool.json;
 
 import java.util.List;
 
-public abstract class ContrastJson {
+public class ContrastJson {
     private String success;
     private List<String> messages;
     private int count;

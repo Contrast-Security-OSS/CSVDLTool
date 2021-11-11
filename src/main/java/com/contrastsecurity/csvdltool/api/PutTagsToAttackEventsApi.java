@@ -25,46 +25,52 @@ package com.contrastsecurity.csvdltool.api;
 
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 
-import com.contrastsecurity.csvdltool.json.AttackEventsJson;
-import com.contrastsecurity.csvdltool.model.AttackEvent;
+import com.contrastsecurity.csvdltool.json.ContrastJson;
 import com.contrastsecurity.csvdltool.model.Organization;
 import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-public class AttackEventsApi extends Api {
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
 
-    private final static int LIMIT = 1000;
-    private int offset;
+public class PutTagsToAttackEventsApi extends Api {
 
-    public AttackEventsApi(IPreferenceStore preferenceStore, Organization organization, int offset) {
+    private List<String> uuids;
+    private String tag;
+
+    public PutTagsToAttackEventsApi(IPreferenceStore preferenceStore, Organization organization, List<String> uuids, String tag) {
         super(preferenceStore, organization);
-        this.offset = offset;
+        this.uuids = uuids;
+        this.tag = tag;
     }
 
     @Override
     protected String getUrl() {
         String contrastUrl = preferenceStore.getString(PreferenceConstants.CONTRAST_URL);
         String orgId = this.organization.getOrganization_uuid();
-        return String.format("%s/api/ng/%s/rasp/events/new?expand=drilldownDetails,application_roles,skip_links&limit=%d&offset=%d&sort=timestamp", contrastUrl, orgId, LIMIT,
-                this.offset);
+        return String.format("%s/api/ng/%s/tags/attack/events/bulk?expand=skip_links", contrastUrl, orgId);
+    }
+
+    @Override
+    protected RequestBody getBody() {
+        MediaType mediaTypeJson = MediaType.parse("application/json; charset=UTF-8");
+        String json = String.format("{\"attack_events_uuid\":[%s],\"tags\":[\"%s\"],\"tags_remove\":[]}", this.uuids.stream().collect(Collectors.joining("\",\"", "\"", "\"")),
+                this.tag);
+        return RequestBody.create(json, mediaTypeJson);
     }
 
     @Override
     protected Object convert(String response) {
         Gson gson = new Gson();
-        Type contType = new TypeToken<AttackEventsJson>() {
+        Type contType = new TypeToken<ContrastJson>() {
         }.getType();
-        AttackEventsJson attackEventsJson = gson.fromJson(response, contType);
-        this.totalCount = attackEventsJson.getCount();
-        List<AttackEvent> attackEvents = attackEventsJson.getEvents();
-        for (AttackEvent attackEvent : attackEvents) {
-            attackEvent.setOrganization(this.organization);
-        }
-        return attackEvents;
+        ContrastJson contrastJson = gson.fromJson(response, contType);
+        return contrastJson.getSuccess();
     }
 
 }

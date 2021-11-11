@@ -41,6 +41,7 @@ public class AttackEvent {
     private Server server;
     private HttpRequest httpRequest;
     private String event_uuid;
+    private Organization organization;
 
     public String getReceived() {
         LocalDateTime ldt = LocalDateTime.ofInstant(Instant.ofEpochMilli(Long.parseLong(this.received)), ZoneId.systemDefault());
@@ -129,6 +130,14 @@ public class AttackEvent {
 
     public void setEvent_uuid(String event_uuid) {
         this.event_uuid = event_uuid;
+    }
+
+    public Organization getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
     }
 
     @Override

@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -56,6 +57,8 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -83,6 +86,8 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.yaml.snakeyaml.Yaml;
 
+import com.contrastsecurity.csvdltool.api.Api;
+import com.contrastsecurity.csvdltool.api.PutTagsToAttackEventsApi;
 import com.contrastsecurity.csvdltool.exception.ApiException;
 import com.contrastsecurity.csvdltool.exception.NonApiException;
 import com.contrastsecurity.csvdltool.model.AttackEvent;
@@ -149,7 +154,8 @@ public class Main implements PropertyChangeListener {
 
     // PROTECT
     private Table attackTable;
-    List<AttackEvent> attackEvents;
+    private List<AttackEvent> attackEvents;
+    private List<AttackEvent> filteredAttackEvents = new ArrayList<AttackEvent>();
 
     private PreferenceStore preferenceStore;
 
@@ -955,6 +961,7 @@ public class Main implements PropertyChangeListener {
                     progDialog.run(true, true, progress);
                     attackEvents = progress.getAttackEvents();
                     Collections.reverse(attackEvents);
+                    filteredAttackEvents.addAll(attackEvents);
                     for (AttackEvent attackEvent : attackEvents) {
                         addColToTable(attackEvent, -1);
                     }
@@ -994,6 +1001,46 @@ public class Main implements PropertyChangeListener {
 
         MenuItem miTag = new MenuItem(menuTable, SWT.NONE);
         miTag.setText("タグ付け");
+        miTag.addSelectionListener(new SelectionListener() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                int[] selectIndexes = attackTable.getSelectionIndices();
+                TagInputDialog tagInputDialog = new TagInputDialog(shell);
+                int result = tagInputDialog.open();
+                if (IDialogConstants.OK_ID != result) {
+                    return;
+                }
+                String tag = tagInputDialog.getTag();
+                if (tag == null) {
+                    return;
+                }
+                Map<Organization, List<String>> orgMap = new HashMap<Organization, List<String>>();
+                for (int idx : selectIndexes) {
+                    AttackEvent attackEvent = filteredAttackEvents.get(idx);
+                    if (orgMap.containsKey(attackEvent.getOrganization())) {
+                        orgMap.get(attackEvent.getOrganization()).add(attackEvent.getEvent_uuid());
+                    } else {
+                        orgMap.put(attackEvent.getOrganization(), new ArrayList<String>(Arrays.asList(attackEvent.getEvent_uuid())));
+                    }
+                }
+                try {
+                    for (Organization org : orgMap.keySet()) {
+                        Api putApi = new PutTagsToAttackEventsApi(preferenceStore, org, orgMap.get(org), tag);
+                        String msg = (String) putApi.put();
+                        System.out.println(msg);
+                        if (Boolean.valueOf(msg)) {
+                            MessageDialog.openInformation(shell, "攻撃イベントへのタグ追加", "選択されている攻撃イベントにタグを追加しました。");
+                        }
+                    }
+                } catch (Exception e2) {
+                    e2.printStackTrace();
+                }
+            }
+
+            @Override
+            public void widgetDefaultSelected(SelectionEvent e) {
+            }
+        });
         MenuItem miExp = new MenuItem(menuTable, SWT.NONE);
         miExp.setText("エクスポート");
 
@@ -1005,10 +1052,22 @@ public class Main implements PropertyChangeListener {
                 }
             }
         });
+        attackTable.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.stateMask == SWT.CTRL && e.keyCode == 'a') {
+                    attackTable.selectAll();
+                    e.doit = false;
+                }
+            }
+        });
 
         TableColumn column0 = new TableColumn(attackTable, SWT.NONE);
         column0.setWidth(0);
         column0.setResizable(false);
+        TableColumn column1 = new TableColumn(attackTable, SWT.LEFT);
+        column1.setWidth(150);
+        column1.setText("組織");
         TableColumn column2 = new TableColumn(attackTable, SWT.LEFT);
         column2.setWidth(120);
         column2.setText("ソースIP");
@@ -1131,13 +1190,14 @@ public class Main implements PropertyChangeListener {
         } else {
             item = new TableItem(attackTable, SWT.CENTER);
         }
-        item.setText(1, attackEvent.getSource());
-        item.setText(2, attackEvent.getResult());
-        item.setText(3, attackEvent.getApplication().getName());
-        item.setText(4, attackEvent.getServer().getName());
-        item.setText(5, attackEvent.getRule());
-        item.setText(6, attackEvent.getReceived());
-        item.setText(7, attackEvent.getUrl());
+        item.setText(1, attackEvent.getOrganization().getName());
+        item.setText(2, attackEvent.getSource());
+        item.setText(3, attackEvent.getResult());
+        item.setText(4, attackEvent.getApplication().getName());
+        item.setText(5, attackEvent.getServer().getName());
+        item.setText(6, attackEvent.getRule());
+        item.setText(7, attackEvent.getReceived());
+        item.setText(8, attackEvent.getUrl());
     }
 
     private void uiReset() {
@@ -1222,6 +1282,7 @@ public class Main implements PropertyChangeListener {
         if ("attackEventFilter".equals(event.getPropertyName())) {
             Map<FilterEnum, Set<Filter>> filterMap = (Map<FilterEnum, Set<Filter>>) event.getNewValue();
             attackTable.removeAll();
+            filteredAttackEvents.clear();
             for (AttackEvent attackEvent : attackEvents) {
                 boolean lostFlg = false;
                 for (Filter filter : filterMap.get(FilterEnum.SOURCEIP)) {
@@ -1247,6 +1308,7 @@ public class Main implements PropertyChangeListener {
                 }
                 if (!lostFlg) {
                     addColToTable(attackEvent, -1);
+                    filteredAttackEvents.add(attackEvent);
                 }
             }
         }

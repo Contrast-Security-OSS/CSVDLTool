@@ -25,7 +25,10 @@ package com.contrastsecurity.csvdltool;
 
 public enum FilterEnum {
     SEVERITY("重大度"),
-    VULNTYPE("脆弱性タイプ");
+    VULNTYPE("脆弱性タイプ"),
+    SOURCEIP("ソースIP"),
+    APPLICATION("アプリケーション"),
+    RULE("ルール");
 
     private String filterName;
 

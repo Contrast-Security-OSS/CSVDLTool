@@ -18,7 +18,7 @@ public class MyPreferenceDialog extends PreferenceDialog {
     @Override
     protected void configureShell(Shell newShell) {
         super.configureShell(newShell);
-        newShell.setText("CSVDLTool設定");
+        newShell.setText("ContrastTool設定");
     }
 
     @Override

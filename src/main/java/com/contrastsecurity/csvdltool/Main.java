@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -56,6 +57,8 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -75,11 +78,19 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.yaml.snakeyaml.Yaml;
 
+import com.contrastsecurity.csvdltool.api.Api;
+import com.contrastsecurity.csvdltool.api.PutTagsToAttackEventsApi;
 import com.contrastsecurity.csvdltool.exception.ApiException;
 import com.contrastsecurity.csvdltool.exception.NonApiException;
+import com.contrastsecurity.csvdltool.model.AttackEvent;
 import com.contrastsecurity.csvdltool.model.ContrastSecurityYaml;
 import com.contrastsecurity.csvdltool.model.Filter;
 import com.contrastsecurity.csvdltool.model.Organization;
@@ -97,13 +108,14 @@ import com.google.gson.reflect.TypeToken;
 
 public class Main implements PropertyChangeListener {
 
-    public static final String WINDOW_TITLE = "CSVDLTool - %s";
+    public static final String WINDOW_TITLE = "ContrastTool - %s";
     // 以下のMASTER_PASSWORDはプロキシパスワードを保存する際に暗号化で使用するパスワードです。
     // 本ツールをリリース用にコンパイルする際はchangemeを別の文字列に置き換えてください。
     public static final String MASTER_PASSWORD = "changeme!";
 
     private CSVDLToolShell shell;
 
+    // ASSESS
     private Button appLoadBtn;
     private Text srcListFilter;
     private Text dstListFilter;
@@ -111,7 +123,8 @@ public class Main implements PropertyChangeListener {
     private org.eclipse.swt.widgets.List dstList;
     private Label srcCount;
     private Label dstCount;
-    private CTabFolder tabFolder;
+    private CTabFolder mainTabFolder;
+    private CTabFolder subTabFolder;
 
     private Button vulExecuteBtn;
     private Button vulOnlyParentAppChk;
@@ -122,6 +135,8 @@ public class Main implements PropertyChangeListener {
     private Button onlyHasCVEChk;
     private Button includeCVEDetailChk;
 
+    private Button attackLoadBtn;
+
     private Button settingBtn;
 
     private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd(E)");
@@ -130,11 +145,17 @@ public class Main implements PropertyChangeListener {
     private Text vulLastDetectedFilterTxt;
 
     private Map<String, AppInfo> fullAppMap;
-    private Map<FilterEnum, Set<Filter>> filterMap;
+    private Map<FilterEnum, Set<Filter>> assessFilterMap;
+    private Map<FilterEnum, Set<Filter>> protectFilterMap;
     private List<String> srcApps = new ArrayList<String>();
     private List<String> dstApps = new ArrayList<String>();
     private Date frLastDetectedDate;
     private Date toLastDetectedDate;
+
+    // PROTECT
+    private Table attackTable;
+    private List<AttackEvent> attackEvents;
+    private List<AttackEvent> filteredAttackEvents = new ArrayList<AttackEvent>();
 
     private PreferenceStore preferenceStore;
 
@@ -180,7 +201,8 @@ public class Main implements PropertyChangeListener {
             this.preferenceStore.setDefault(PreferenceConstants.SLEEP_LIB, 300);
             this.preferenceStore.setDefault(PreferenceConstants.CSV_OUT_HEADER_LIB, true);
             this.preferenceStore.setDefault(PreferenceConstants.CSV_FILE_FORMAT_LIB, "'lib'_yyyy-MM-dd_HHmmss");
-            this.preferenceStore.setDefault(PreferenceConstants.OPENED_TAB_IDX, 0);
+            this.preferenceStore.setDefault(PreferenceConstants.OPENED_MAIN_TAB_IDX, 0);
+            this.preferenceStore.setDefault(PreferenceConstants.OPENED_SUB_TAB_IDX, 0);
 
             Yaml yaml = new Yaml();
             InputStream is = new FileInputStream("contrast_security.yaml");
@@ -198,7 +220,7 @@ public class Main implements PropertyChangeListener {
     private void createPart() {
         Display display = new Display();
         shell = new CSVDLToolShell(display, this);
-        shell.setMinimumSize(640, 600);
+        shell.setMinimumSize(640, 620);
         Image[] imageArray = new Image[5];
         imageArray[0] = new Image(display, Main.class.getClassLoader().getResourceAsStream("icon16.png"));
         imageArray[1] = new Image(display, Main.class.getClassLoader().getResourceAsStream("icon24.png"));
@@ -223,8 +245,10 @@ public class Main implements PropertyChangeListener {
 
             @Override
             public void shellClosed(ShellEvent event) {
-                int idx = tabFolder.getSelectionIndex();
-                preferenceStore.setValue(PreferenceConstants.OPENED_TAB_IDX, idx);
+                int main_idx = mainTabFolder.getSelectionIndex();
+                int sub_idx = subTabFolder.getSelectionIndex();
+                preferenceStore.setValue(PreferenceConstants.OPENED_MAIN_TAB_IDX, main_idx);
+                preferenceStore.setValue(PreferenceConstants.OPENED_SUB_TAB_IDX, sub_idx);
                 preferenceStore.setValue(PreferenceConstants.MEM_WIDTH, shell.getSize().x);
                 preferenceStore.setValue(PreferenceConstants.MEM_HEIGHT, shell.getSize().y);
                 preferenceStore.setValue(PreferenceConstants.VUL_ONLY_PARENT_APP, vulOnlyParentAppChk.getSelection());
@@ -298,7 +322,20 @@ public class Main implements PropertyChangeListener {
         baseLayout.verticalSpacing = 8;
         shell.setLayout(baseLayout);
 
-        Group appListGrp = new Group(shell, SWT.NONE);
+        mainTabFolder = new CTabFolder(shell, SWT.NONE);
+        GridData mainTabFolderGrDt = new GridData(GridData.FILL_BOTH);
+        mainTabFolder.setLayoutData(mainTabFolderGrDt);
+        mainTabFolder.setSelectionBackground(new Color[] { display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND), display.getSystemColor(SWT.COLOR_WIDGET_LIGHT_SHADOW) },
+                new int[] { 100 }, true);
+
+        // #################### ASSESS #################### //
+        CTabItem assessTabItem = new CTabItem(mainTabFolder, SWT.NONE);
+        assessTabItem.setText("ASSESS");
+
+        Composite assessShell = new Composite(mainTabFolder, SWT.NONE);
+        assessShell.setLayout(new GridLayout(1, false));
+
+        Group appListGrp = new Group(assessShell, SWT.NONE);
         appListGrp.setLayout(new GridLayout(3, false));
         GridData appListGrpGrDt = new GridData(GridData.FILL_BOTH);
         appListGrpGrDt.minimumHeight = 200;
@@ -353,7 +390,7 @@ public class Main implements PropertyChangeListener {
                     srcApps.add(appLabel); // memory src
                 }
                 srcCount.setText(String.valueOf(srcList.getItemCount()));
-                filterMap = progress.getFilterMap();
+                assessFilterMap = progress.getFilterMap();
                 vulSeverityFilterTxt.setText("すべて");
                 vulVulnTypeFilterTxt.setText("すべて");
             }
@@ -424,7 +461,8 @@ public class Main implements PropertyChangeListener {
 
         this.srcCount = new Label(srcGrp, SWT.RIGHT);
         GridData srcCountGrDt = new GridData(GridData.FILL_HORIZONTAL);
-        srcCountGrDt.heightHint = 8;
+        srcCountGrDt.minimumHeight = 18;
+        srcCountGrDt.heightHint = 18;
         this.srcCount.setLayoutData(srcCountGrDt);
         this.srcCount.setFont(new Font(display, "ＭＳ ゴシック", 8, SWT.NORMAL));
         this.srcCount.setText("0");
@@ -598,22 +636,23 @@ public class Main implements PropertyChangeListener {
         this.dstCount = new Label(dstGrp, SWT.RIGHT);
         this.dstCount.setFont(new Font(display, "ＭＳ ゴシック", 8, SWT.NORMAL));
         GridData dstCountGrDt = new GridData(GridData.FILL_HORIZONTAL);
-        dstCountGrDt.heightHint = 8;
+        dstCountGrDt.minimumHeight = 20;
+        dstCountGrDt.heightHint = 20;
         this.dstCount.setLayoutData(dstCountGrDt);
         this.dstCount.setText("0");
 
-        tabFolder = new CTabFolder(shell, SWT.NONE);
+        subTabFolder = new CTabFolder(assessShell, SWT.NONE);
         GridData tabFolderGrDt = new GridData(GridData.FILL_HORIZONTAL);
-        tabFolder.setLayoutData(tabFolderGrDt);
-        tabFolder.setSelectionBackground(new Color[] { display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND), display.getSystemColor(SWT.COLOR_WIDGET_LIGHT_SHADOW) },
+        subTabFolder.setLayoutData(tabFolderGrDt);
+        subTabFolder.setSelectionBackground(new Color[] { display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND), display.getSystemColor(SWT.COLOR_WIDGET_LIGHT_SHADOW) },
                 new int[] { 100 }, true);
 
         // #################### 脆弱性 #################### //
-        CTabItem vulTabItem = new CTabItem(tabFolder, SWT.NONE);
+        CTabItem vulTabItem = new CTabItem(subTabFolder, SWT.NONE);
         vulTabItem.setText("脆弱性");
 
         // ========== グループ ==========
-        Composite vulButtonGrp = new Composite(tabFolder, SWT.NULL);
+        Composite vulButtonGrp = new Composite(subTabFolder, SWT.NULL);
         GridLayout buttonGrpLt = new GridLayout(1, false);
         buttonGrpLt.marginWidth = 10;
         buttonGrpLt.marginHeight = 10;
@@ -641,15 +680,15 @@ public class Main implements PropertyChangeListener {
         vulSeverityFilterTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         vulSeverityFilterTxt.addListener(SWT.MouseUp, new Listener() {
             public void handleEvent(Event e) {
-                if (filterMap != null && filterMap.containsKey(FilterEnum.SEVERITY)) {
-                    FilterSeverityDialog filterDialog = new FilterSeverityDialog(shell, filterMap.get(FilterEnum.SEVERITY));
+                if (assessFilterMap != null && assessFilterMap.containsKey(FilterEnum.SEVERITY)) {
+                    FilterSeverityDialog filterDialog = new FilterSeverityDialog(shell, assessFilterMap.get(FilterEnum.SEVERITY));
                     int result = filterDialog.open();
                     if (IDialogConstants.OK_ID != result) {
                         vulExecuteBtn.setFocus();
                         return;
                     }
                     List<String> labels = filterDialog.getLabels();
-                    for (Filter filter : filterMap.get(FilterEnum.SEVERITY)) {
+                    for (Filter filter : assessFilterMap.get(FilterEnum.SEVERITY)) {
                         if (labels.contains(filter.getLabel())) {
                             filter.setValid(true);
                         } else {
@@ -675,15 +714,15 @@ public class Main implements PropertyChangeListener {
         vulVulnTypeFilterTxt.setLayoutData(vulVulnTypeFilterTxtGrDt);
         vulVulnTypeFilterTxt.addListener(SWT.MouseUp, new Listener() {
             public void handleEvent(Event e) {
-                if (filterMap != null && filterMap.containsKey(FilterEnum.VULNTYPE)) {
-                    FilterVulnTypeDialog filterDialog = new FilterVulnTypeDialog(shell, filterMap.get(FilterEnum.VULNTYPE));
+                if (assessFilterMap != null && assessFilterMap.containsKey(FilterEnum.VULNTYPE)) {
+                    FilterVulnTypeDialog filterDialog = new FilterVulnTypeDialog(shell, assessFilterMap.get(FilterEnum.VULNTYPE));
                     int result = filterDialog.open();
                     if (IDialogConstants.OK_ID != result) {
                         vulExecuteBtn.setFocus();
                         return;
                     }
                     List<String> labels = filterDialog.getLabels();
-                    for (Filter filter : filterMap.get(FilterEnum.VULNTYPE)) {
+                    for (Filter filter : assessFilterMap.get(FilterEnum.VULNTYPE)) {
                         if (labels.contains(filter.getLabel())) {
                             filter.setValid(true);
                         } else {
@@ -743,7 +782,7 @@ public class Main implements PropertyChangeListener {
                     MessageDialog.openInformation(shell, "脆弱性情報取得", "取得対象のアプリケーションを選択してください。");
                     return;
                 }
-                VulGetWithProgress progress = new VulGetWithProgress(shell, preferenceStore, dstApps, fullAppMap, filterMap, frLastDetectedDate, toLastDetectedDate,
+                VulGetWithProgress progress = new VulGetWithProgress(shell, preferenceStore, dstApps, fullAppMap, assessFilterMap, frLastDetectedDate, toLastDetectedDate,
                         vulOnlyParentAppChk.getSelection(), includeDescChk.getSelection(), includeStackTraceChk.getSelection());
                 ProgressMonitorDialog progDialog = new VulGetProgressMonitorDialog(shell);
                 try {
@@ -813,11 +852,11 @@ public class Main implements PropertyChangeListener {
         vulTabItem.setControl(vulButtonGrp);
 
         // #################### ライブラリ #################### //
-        CTabItem libTabItem = new CTabItem(tabFolder, SWT.NONE);
+        CTabItem libTabItem = new CTabItem(subTabFolder, SWT.NONE);
         libTabItem.setText("ライブラリ");
 
         // ========== グループ ==========
-        Composite libButtonGrp = new Composite(tabFolder, SWT.NULL);
+        Composite libButtonGrp = new Composite(subTabFolder, SWT.NULL);
         GridLayout libButtonGrpLt = new GridLayout(1, false);
         libButtonGrpLt.marginWidth = 10;
         libButtonGrpLt.marginHeight = 10;
@@ -885,8 +924,198 @@ public class Main implements PropertyChangeListener {
         }
         libTabItem.setControl(libButtonGrp);
 
-        int idx = this.preferenceStore.getInt(PreferenceConstants.OPENED_TAB_IDX);
-        tabFolder.setSelection(idx);
+        int sub_idx = this.preferenceStore.getInt(PreferenceConstants.OPENED_SUB_TAB_IDX);
+        subTabFolder.setSelection(sub_idx);
+
+        assessTabItem.setControl(assessShell);
+
+        // #################### PROTECT #################### //
+        CTabItem protectTabItem = new CTabItem(mainTabFolder, SWT.NONE);
+        protectTabItem.setText("PROTECT");
+
+        Composite protectShell = new Composite(mainTabFolder, SWT.NONE);
+        protectShell.setLayout(new GridLayout(1, false));
+
+        Group attackListGrp = new Group(protectShell, SWT.NONE);
+        attackListGrp.setLayout(new GridLayout(3, false));
+        GridData attackListGrpGrDt = new GridData(GridData.FILL_BOTH);
+        attackListGrpGrDt.minimumHeight = 200;
+        attackListGrp.setLayoutData(attackListGrpGrDt);
+
+        attackLoadBtn = new Button(attackListGrp, SWT.PUSH);
+        GridData attackLoadBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        attackLoadBtnGrDt.horizontalSpan = 3;
+        attackLoadBtnGrDt.heightHint = 50;
+        attackLoadBtn.setLayoutData(attackLoadBtnGrDt);
+        attackLoadBtn.setText("取得");
+        attackLoadBtn.setToolTipText("攻撃イベント一覧を読み込みます。");
+        attackLoadBtn.setFont(new Font(display, "ＭＳ ゴシック", 20, SWT.NORMAL));
+        attackLoadBtn.addSelectionListener(new SelectionListener() {
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                uiReset();
+                attackTable.removeAll();
+                AttackEventsGetWithProgress progress = new AttackEventsGetWithProgress(preferenceStore, getValidOrganizations());
+                ProgressMonitorDialog progDialog = new AttackGetProgressMonitorDialog(shell);
+                try {
+                    progDialog.run(true, true, progress);
+                    attackEvents = progress.getAttackEvents();
+                    Collections.reverse(attackEvents);
+                    filteredAttackEvents.addAll(attackEvents);
+                    for (AttackEvent attackEvent : attackEvents) {
+                        addColToTable(attackEvent, -1);
+                    }
+                    protectFilterMap = progress.getFilterMap();
+                } catch (InvocationTargetException e) {
+                    StringWriter stringWriter = new StringWriter();
+                    PrintWriter printWriter = new PrintWriter(stringWriter);
+                    e.printStackTrace(printWriter);
+                    String trace = stringWriter.toString();
+                    logger.error(trace);
+                    String errorMsg = e.getTargetException().getMessage();
+                    if (e.getTargetException() instanceof ApiException) {
+                        MessageDialog.openWarning(shell, "攻撃一覧の取得", String.format("TeamServerからエラーが返されました。\r\n%s", errorMsg));
+                    } else if (e.getTargetException() instanceof NonApiException) {
+                        MessageDialog.openError(shell, "攻撃一覧の取得", String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", errorMsg));
+                    } else {
+                        MessageDialog.openError(shell, "攻撃一覧の取得", String.format("不明なエラーです。ログファイルをご確認ください。\r\n%s", errorMsg));
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void widgetDefaultSelected(SelectionEvent event) {
+            }
+        });
+
+        attackTable = new Table(attackListGrp, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
+        GridData tableGrDt = new GridData(GridData.FILL_BOTH);
+        tableGrDt.horizontalSpan = 3;
+        attackTable.setLayoutData(tableGrDt);
+        attackTable.setLinesVisible(true);
+        attackTable.setHeaderVisible(true);
+        Menu menuTable = new Menu(attackTable);
+        attackTable.setMenu(menuTable);
+
+        MenuItem miTag = new MenuItem(menuTable, SWT.NONE);
+        miTag.setText("タグ付け");
+        miTag.addSelectionListener(new SelectionListener() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                int[] selectIndexes = attackTable.getSelectionIndices();
+                TagInputDialog tagInputDialog = new TagInputDialog(shell);
+                int result = tagInputDialog.open();
+                if (IDialogConstants.OK_ID != result) {
+                    return;
+                }
+                String tag = tagInputDialog.getTag();
+                if (tag == null) {
+                    return;
+                }
+                Map<Organization, List<String>> orgMap = new HashMap<Organization, List<String>>();
+                for (int idx : selectIndexes) {
+                    AttackEvent attackEvent = filteredAttackEvents.get(idx);
+                    if (orgMap.containsKey(attackEvent.getOrganization())) {
+                        orgMap.get(attackEvent.getOrganization()).add(attackEvent.getEvent_uuid());
+                    } else {
+                        orgMap.put(attackEvent.getOrganization(), new ArrayList<String>(Arrays.asList(attackEvent.getEvent_uuid())));
+                    }
+                }
+                try {
+                    for (Organization org : orgMap.keySet()) {
+                        Api putApi = new PutTagsToAttackEventsApi(preferenceStore, org, orgMap.get(org), tag);
+                        String msg = (String) putApi.put();
+                        System.out.println(msg);
+                        if (Boolean.valueOf(msg)) {
+                            MessageDialog.openInformation(shell, "攻撃イベントへのタグ追加", "選択されている攻撃イベントにタグを追加しました。");
+                        }
+                    }
+                } catch (Exception e2) {
+                    e2.printStackTrace();
+                }
+            }
+
+            @Override
+            public void widgetDefaultSelected(SelectionEvent e) {
+            }
+        });
+        MenuItem miExp = new MenuItem(menuTable, SWT.NONE);
+        miExp.setText("エクスポート");
+
+        attackTable.addListener(SWT.MenuDetect, new Listener() {
+            @Override
+            public void handleEvent(Event event) {
+                if (attackTable.getSelectionCount() <= 0) {
+                    event.doit = false;
+                }
+            }
+        });
+        attackTable.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.stateMask == SWT.CTRL && e.keyCode == 'a') {
+                    attackTable.selectAll();
+                    e.doit = false;
+                }
+            }
+        });
+
+        TableColumn column0 = new TableColumn(attackTable, SWT.NONE);
+        column0.setWidth(0);
+        column0.setResizable(false);
+        TableColumn column1 = new TableColumn(attackTable, SWT.LEFT);
+        column1.setWidth(150);
+        column1.setText("組織");
+        TableColumn column2 = new TableColumn(attackTable, SWT.LEFT);
+        column2.setWidth(120);
+        column2.setText("ソースIP");
+        TableColumn column3 = new TableColumn(attackTable, SWT.CENTER);
+        column3.setWidth(100);
+        column3.setText("結果");
+        TableColumn column4 = new TableColumn(attackTable, SWT.LEFT);
+        column4.setWidth(250);
+        column4.setText("アプリケーション");
+        TableColumn column5 = new TableColumn(attackTable, SWT.LEFT);
+        column5.setWidth(200);
+        column5.setText("サーバ");
+        TableColumn column6 = new TableColumn(attackTable, SWT.LEFT);
+        column6.setWidth(200);
+        column6.setText("ルール");
+        TableColumn column7 = new TableColumn(attackTable, SWT.LEFT);
+        column7.setWidth(150);
+        column7.setText("時間");
+        TableColumn column8 = new TableColumn(attackTable, SWT.LEFT);
+        column8.setWidth(150);
+        column8.setText("URL");
+
+        Button attackEventFilterBtn = new Button(attackListGrp, SWT.PUSH);
+        GridData attackEventFilterBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        attackEventFilterBtnGrDt.horizontalSpan = 3;
+        attackEventFilterBtn.setLayoutData(attackEventFilterBtnGrDt);
+        attackEventFilterBtn.setText("フィルター");
+        attackEventFilterBtn.setToolTipText("攻撃イベント一覧を読み込みます。");
+        attackEventFilterBtn.addSelectionListener(new SelectionListener() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                AttackEventFilterDialog filterDialog = new AttackEventFilterDialog(shell, protectFilterMap);
+                filterDialog.addPropertyChangeListener(shell.getMain());
+                int result = filterDialog.open();
+                if (IDialogConstants.OK_ID != result) {
+                    return;
+                }
+            }
+
+            @Override
+            public void widgetDefaultSelected(SelectionEvent e) {
+            }
+        });
+
+        protectTabItem.setControl(protectShell);
+
+        int main_idx = this.preferenceStore.getInt(PreferenceConstants.OPENED_MAIN_TAB_IDX);
+        mainTabFolder.setSelection(main_idx);
 
         // ========== 設定ボタン ==========
         settingBtn = new Button(shell, SWT.PUSH);
@@ -949,6 +1178,26 @@ public class Main implements PropertyChangeListener {
             logger.error(trace);
         }
         display.dispose();
+    }
+
+    private void addColToTable(AttackEvent attackEvent, int index) {
+        if (attackEvent == null) {
+            return;
+        }
+        TableItem item = null;
+        if (index > 0) {
+            item = new TableItem(attackTable, SWT.CENTER, index);
+        } else {
+            item = new TableItem(attackTable, SWT.CENTER);
+        }
+        item.setText(1, attackEvent.getOrganization().getName());
+        item.setText(2, attackEvent.getSource());
+        item.setText(3, attackEvent.getResult());
+        item.setText(4, attackEvent.getApplication().getName());
+        item.setText(5, attackEvent.getServer().getName());
+        item.setText(6, attackEvent.getRule());
+        item.setText(7, attackEvent.getReceived());
+        item.setText(8, attackEvent.getUrl());
     }
 
     private void uiReset() {
@@ -1027,15 +1276,42 @@ public class Main implements PropertyChangeListener {
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void propertyChange(PropertyChangeEvent event) {
-        // if ("authInput".equals(event.getPropertyName())) {
-        // Boolean enableFlg = (Boolean) event.getNewValue();
-        // this.executeBtn.setEnabled(enableFlg.booleanValue());
-        // } else if ("optionInputs".equals(event.getPropertyName())) {
-        // String oldValue = (String) event.getOldValue();
-        // System.out.println(oldValue);
-        // }
+        if ("attackEventFilter".equals(event.getPropertyName())) {
+            Map<FilterEnum, Set<Filter>> filterMap = (Map<FilterEnum, Set<Filter>>) event.getNewValue();
+            attackTable.removeAll();
+            filteredAttackEvents.clear();
+            for (AttackEvent attackEvent : attackEvents) {
+                boolean lostFlg = false;
+                for (Filter filter : filterMap.get(FilterEnum.SOURCEIP)) {
+                    if (attackEvent.getSource().equals(filter.getLabel())) {
+                        if (!filter.isValid()) {
+                            lostFlg |= true;
+                        }
+                    }
+                }
+                for (Filter filter : filterMap.get(FilterEnum.APPLICATION)) {
+                    if (attackEvent.getApplication().getName().equals(filter.getLabel())) {
+                        if (!filter.isValid()) {
+                            lostFlg |= true;
+                        }
+                    }
+                }
+                for (Filter filter : filterMap.get(FilterEnum.RULE)) {
+                    if (attackEvent.getRule().equals(filter.getLabel())) {
+                        if (!filter.isValid()) {
+                            lostFlg |= true;
+                        }
+                    }
+                }
+                if (!lostFlg) {
+                    addColToTable(attackEvent, -1);
+                    filteredAttackEvents.add(attackEvent);
+                }
+            }
+        }
     }
 
     /**

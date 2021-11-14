@@ -24,39 +24,28 @@
 package com.contrastsecurity.csvdltool.json;
 
 import java.util.List;
+import java.util.StringJoiner;
 
-public class ContrastJson {
-    private String success;
-    private List<String> messages;
-    private int count;
+import com.contrastsecurity.csvdltool.model.AttackEvent;
 
-    public String getSuccess() {
-        return success;
+public class AttackEventsJson extends ContrastJson {
+    private List<AttackEvent> events;
+
+    public List<AttackEvent> getEvents() {
+        return events;
     }
 
-    public void setSuccess(String success) {
-        this.success = success;
-    }
-
-    public List<String> getMessages() {
-        return messages;
-    }
-
-    public void setMessages(List<String> messages) {
-        this.messages = messages;
-    }
-
-    public int getCount() {
-        return count;
-    }
-
-    public void setCount(int count) {
-        this.count = count;
+    public void setAttackEvents(List<AttackEvent> events) {
+        this.events = events;
     }
 
     @Override
     public String toString() {
-        return String.format("%s - %s", this.success, this.messages);
+        StringJoiner sj = new StringJoiner("\r\n");
+        for (AttackEvent event : this.events) {
+            sj.add(event.toString());
+        }
+        return sj.toString();
     }
 
 }

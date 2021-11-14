@@ -21,42 +21,58 @@
  * 
  */
 
-package com.contrastsecurity.csvdltool.json;
+package com.contrastsecurity.csvdltool.model;
 
-import java.util.List;
+public class AttackColumn {
 
-public class ContrastJson {
-    private String success;
-    private List<String> messages;
-    private int count;
+    private boolean valid;
+    private String sourceIp;
+    private String application;
+    private String server;
+    private String rule;
 
-    public String getSuccess() {
-        return success;
+    public AttackColumn() {
+        this.valid = false;
     }
 
-    public void setSuccess(String success) {
-        this.success = success;
+    public boolean isValid() {
+        return valid;
     }
 
-    public List<String> getMessages() {
-        return messages;
+    public void setValid(boolean valid) {
+        this.valid = valid;
     }
 
-    public void setMessages(List<String> messages) {
-        this.messages = messages;
+    public String getSourceIp() {
+        return sourceIp;
     }
 
-    public int getCount() {
-        return count;
+    public void setSourceIp(String sourceIp) {
+        this.sourceIp = sourceIp;
     }
 
-    public void setCount(int count) {
-        this.count = count;
+    public String getApplication() {
+        return application;
     }
 
-    @Override
-    public String toString() {
-        return String.format("%s - %s", this.success, this.messages);
+    public void setApplication(String application) {
+        this.application = application;
+    }
+
+    public String getServer() {
+        return server;
+    }
+
+    public void setServer(String server) {
+        this.server = server;
+    }
+
+    public String getRule() {
+        return rule;
+    }
+
+    public void setRule(String rule) {
+        this.rule = rule;
     }
 
 }

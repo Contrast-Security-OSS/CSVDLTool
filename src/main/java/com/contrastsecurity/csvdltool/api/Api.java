@@ -59,10 +59,18 @@ import okhttp3.Authenticator;
 import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.Route;
 
 public abstract class Api {
+
+    public enum HttpMethod {
+        GET,
+        POST,
+        PUT,
+        DELETE
+    }
 
     Logger logger = Logger.getLogger("csvdltool");
 
@@ -76,7 +84,17 @@ public abstract class Api {
     }
 
     public Object get() throws Exception {
-        String response = this.getResponse();
+        String response = this.getResponse(HttpMethod.GET);
+        return this.convert(response);
+    }
+
+    public Object post() throws Exception {
+        String response = this.getResponse(HttpMethod.POST);
+        return this.convert(response);
+    }
+
+    public Object put() throws Exception {
+        String response = this.getResponse(HttpMethod.PUT);
         return this.convert(response);
     }
 
@@ -102,17 +120,33 @@ public abstract class Api {
         return headers;
     }
 
-    protected String getResponse() throws Exception {
+    protected RequestBody getBody() {
+        return null;
+    }
+
+    protected String getResponse(HttpMethod httpMethod) throws Exception {
         String url = this.getUrl();
         logger.trace(url);
         OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();
-        Request.Builder requestBuilder = new Request.Builder().url(url).get();
+        Request.Builder requestBuilder = null;
+        switch (httpMethod) {
+            case POST:
+                requestBuilder = new Request.Builder().url(url).post(getBody());
+                break;
+            case PUT:
+                requestBuilder = new Request.Builder().url(url).put(getBody());
+                break;
+            case DELETE:
+                return "";
+            default:
+                requestBuilder = new Request.Builder().url(url).get();
+        }
         List<Header> headers = this.getHeaders();
         for (Header header : headers) {
             requestBuilder.addHeader(header.getName(), header.getValue());
         }
         OkHttpClient httpClient = null;
-        Request httpGet = requestBuilder.build();
+        Request request = requestBuilder.build();
         Response response = null;
         try {
             int connectTimeout = Integer.parseInt(this.preferenceStore.getString(PreferenceConstants.CONNECTION_TIMEOUT));
@@ -169,7 +203,7 @@ public abstract class Api {
             }
             httpClient = clientBuilder.build();
             try {
-                response = httpClient.newCall(httpGet).execute();
+                response = httpClient.newCall(request).execute();
                 if (response.code() == 200) {
                     return response.body().string();
                 } else if (response.code() == 401) {

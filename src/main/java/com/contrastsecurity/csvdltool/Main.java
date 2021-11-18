@@ -23,6 +23,7 @@
 
 package com.contrastsecurity.csvdltool;
 
+import java.awt.Desktop;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -33,6 +34,8 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1006,7 +1009,7 @@ public class Main implements PropertyChangeListener {
 
         MenuItem miTag = new MenuItem(menuTable, SWT.NONE);
         miTag.setText("タグ付け");
-        miTag.addSelectionListener(new SelectionListener() {
+        miTag.addSelectionListener(new SelectionAdapter() {
             @SuppressWarnings("unchecked")
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -1051,13 +1054,33 @@ public class Main implements PropertyChangeListener {
                     e2.printStackTrace();
                 }
             }
-
-            @Override
-            public void widgetDefaultSelected(SelectionEvent e) {
-            }
         });
+
         MenuItem miExp = new MenuItem(menuTable, SWT.NONE);
         miExp.setText("エクスポート");
+
+        MenuItem miJump = new MenuItem(menuTable, SWT.NONE);
+        miJump.setText("TeamServerへ");
+        miJump.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                int[] selectIndexes = attackTable.getSelectionIndices();
+                try {
+                    Desktop desktop = Desktop.getDesktop();
+                    for (int idx : selectIndexes) {
+                        AttackEvent attackEvent = filteredAttackEvents.get(idx);
+                        String contrastUrl = preferenceStore.getString(PreferenceConstants.CONTRAST_URL);
+                        String orgUuid = attackEvent.getOrganization().getOrganization_uuid();
+                        String eventUuid = attackEvent.getEvent_uuid();
+                        desktop.browse(new URI(String.format("%s/static/ng/index.html#/%s/attacks/events/%s", contrastUrl, orgUuid, eventUuid)));
+                    }
+                } catch (IOException ioe) {
+                    ioe.printStackTrace();
+                } catch (URISyntaxException urise) {
+                    urise.printStackTrace();
+                }
+            }
+        });
 
         attackTable.addListener(SWT.MenuDetect, new Listener() {
             @Override

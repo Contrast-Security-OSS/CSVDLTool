@@ -1072,7 +1072,7 @@ public class Main implements PropertyChangeListener {
                         String contrastUrl = preferenceStore.getString(PreferenceConstants.CONTRAST_URL);
                         String orgUuid = attackEvent.getOrganization().getOrganization_uuid();
                         String eventUuid = attackEvent.getEvent_uuid();
-                        desktop.browse(new URI(String.format("%s/static/ng/index.html#/%s/attacks/events/%s", contrastUrl, orgUuid, eventUuid)));
+                        desktop.browse(new URI(String.format("%s/static/ng/index.html#/%s/attacks/events/%s", contrastUrl, orgUuid.trim(), eventUuid)));
                     }
                 } catch (IOException ioe) {
                     ioe.printStackTrace();

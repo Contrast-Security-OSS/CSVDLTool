@@ -42,6 +42,7 @@ public class AttackEvent {
     private HttpRequest httpRequest;
     private String event_uuid;
     private Organization organization;
+    private List<String> tags;
 
     public String getReceived() {
         LocalDateTime ldt = LocalDateTime.ofInstant(Instant.ofEpochMilli(Long.parseLong(this.received)), ZoneId.systemDefault());
@@ -138,6 +139,14 @@ public class AttackEvent {
 
     public void setOrganization(Organization organization) {
         this.organization = organization;
+    }
+
+    public List<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<String> tags) {
+        this.tags = tags;
     }
 
     @Override

@@ -88,6 +88,7 @@ import org.eclipse.swt.widgets.Text;
 import org.yaml.snakeyaml.Yaml;
 
 import com.contrastsecurity.csvdltool.api.Api;
+import com.contrastsecurity.csvdltool.api.AttackEventTagsApi;
 import com.contrastsecurity.csvdltool.api.PutTagsToAttackEventsApi;
 import com.contrastsecurity.csvdltool.exception.ApiException;
 import com.contrastsecurity.csvdltool.exception.NonApiException;
@@ -1006,6 +1007,7 @@ public class Main implements PropertyChangeListener {
         MenuItem miTag = new MenuItem(menuTable, SWT.NONE);
         miTag.setText("タグ付け");
         miTag.addSelectionListener(new SelectionListener() {
+            @SuppressWarnings("unchecked")
             @Override
             public void widgetSelected(SelectionEvent e) {
                 int[] selectIndexes = attackTable.getSelectionIndices();
@@ -1018,21 +1020,30 @@ public class Main implements PropertyChangeListener {
                 if (tag == null) {
                     return;
                 }
-                Map<Organization, List<String>> orgMap = new HashMap<Organization, List<String>>();
+                Map<Organization, List<AttackEvent>> orgMap = new HashMap<Organization, List<AttackEvent>>();
                 for (int idx : selectIndexes) {
                     AttackEvent attackEvent = filteredAttackEvents.get(idx);
                     if (orgMap.containsKey(attackEvent.getOrganization())) {
-                        orgMap.get(attackEvent.getOrganization()).add(attackEvent.getEvent_uuid());
+                        orgMap.get(attackEvent.getOrganization()).add(attackEvent);
                     } else {
-                        orgMap.put(attackEvent.getOrganization(), new ArrayList<String>(Arrays.asList(attackEvent.getEvent_uuid())));
+                        orgMap.put(attackEvent.getOrganization(), new ArrayList<AttackEvent>(Arrays.asList(attackEvent)));
                     }
                 }
                 try {
                     for (Organization org : orgMap.keySet()) {
-                        Api putApi = new PutTagsToAttackEventsApi(preferenceStore, org, orgMap.get(org), tag);
+                        List<AttackEvent> attackEvents = orgMap.get(org);
+                        Api putApi = new PutTagsToAttackEventsApi(preferenceStore, org, attackEvents, tag);
                         String msg = (String) putApi.put();
-                        System.out.println(msg);
                         if (Boolean.valueOf(msg)) {
+                            for (AttackEvent attackEvent : attackEvents) {
+                                Api attackEventTagsApi = new AttackEventTagsApi(preferenceStore, org, attackEvent.getEvent_uuid());
+                                List<String> tags = (List<String>) attackEventTagsApi.get();
+                                attackEvent.setTags(tags);
+                            }
+                            attackTable.removeAll();
+                            for (AttackEvent attackEvent : filteredAttackEvents) {
+                                addColToTable(attackEvent, -1);
+                            }
                             MessageDialog.openInformation(shell, "攻撃イベントへのタグ追加", "選択されている攻撃イベントにタグを追加しました。");
                         }
                     }
@@ -1093,6 +1104,9 @@ public class Main implements PropertyChangeListener {
         TableColumn column8 = new TableColumn(attackTable, SWT.LEFT);
         column8.setWidth(150);
         column8.setText("URL");
+        TableColumn column9 = new TableColumn(attackTable, SWT.LEFT);
+        column9.setWidth(250);
+        column9.setText("タグ");
 
         Button attackEventFilterBtn = new Button(attackListGrp, SWT.PUSH);
         GridData attackEventFilterBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
@@ -1202,6 +1216,11 @@ public class Main implements PropertyChangeListener {
         item.setText(6, attackEvent.getRule());
         item.setText(7, attackEvent.getReceived());
         item.setText(8, attackEvent.getUrl());
+        String tags = "";
+        if (attackEvent.getTags() != null) {
+            tags = String.join(",", attackEvent.getTags());
+        }
+        item.setText(9, tags);
     }
 
     private void uiReset() {

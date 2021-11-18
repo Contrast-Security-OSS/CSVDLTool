@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 import com.contrastsecurity.csvdltool.json.ContrastJson;
+import com.contrastsecurity.csvdltool.model.AttackEvent;
 import com.contrastsecurity.csvdltool.model.Organization;
 import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
 import com.google.gson.Gson;
@@ -40,12 +41,12 @@ import okhttp3.RequestBody;
 
 public class PutTagsToAttackEventsApi extends Api {
 
-    private List<String> uuids;
+    private List<AttackEvent> attackEvents;
     private String tag;
 
-    public PutTagsToAttackEventsApi(IPreferenceStore preferenceStore, Organization organization, List<String> uuids, String tag) {
+    public PutTagsToAttackEventsApi(IPreferenceStore preferenceStore, Organization organization, List<AttackEvent> attackEvents, String tag) {
         super(preferenceStore, organization);
-        this.uuids = uuids;
+        this.attackEvents = attackEvents;
         this.tag = tag;
     }
 
@@ -59,8 +60,8 @@ public class PutTagsToAttackEventsApi extends Api {
     @Override
     protected RequestBody getBody() {
         MediaType mediaTypeJson = MediaType.parse("application/json; charset=UTF-8");
-        String json = String.format("{\"attack_events_uuid\":[%s],\"tags\":[\"%s\"],\"tags_remove\":[]}", this.uuids.stream().collect(Collectors.joining("\",\"", "\"", "\"")),
-                this.tag);
+        String json = String.format("{\"attack_events_uuid\":[%s],\"tags\":[\"%s\"],\"tags_remove\":[]}",
+                this.attackEvents.stream().map(ae -> ae.getEvent_uuid()).collect(Collectors.joining("\",\"", "\"", "\"")), this.tag);
         return RequestBody.create(json, mediaTypeJson);
     }
 

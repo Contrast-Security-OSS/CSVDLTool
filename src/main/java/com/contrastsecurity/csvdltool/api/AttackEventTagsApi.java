@@ -24,47 +24,38 @@
 package com.contrastsecurity.csvdltool.api;
 
 import java.lang.reflect.Type;
-import java.util.List;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 
-import com.contrastsecurity.csvdltool.json.AttackEventsJson;
-import com.contrastsecurity.csvdltool.model.AttackEvent;
+import com.contrastsecurity.csvdltool.json.TagsJson;
 import com.contrastsecurity.csvdltool.model.Organization;
 import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-public class AttackEventsApi extends Api {
+public class AttackEventTagsApi extends Api {
 
-    private final static int LIMIT = 1000;
-    private int offset;
+    private String uuid;
 
-    public AttackEventsApi(IPreferenceStore preferenceStore, Organization organization, int offset) {
+    public AttackEventTagsApi(IPreferenceStore preferenceStore, Organization organization, String uuid) {
         super(preferenceStore, organization);
-        this.offset = offset;
+        this.uuid = uuid;
     }
 
     @Override
     protected String getUrl() {
         String contrastUrl = preferenceStore.getString(PreferenceConstants.CONTRAST_URL);
         String orgId = this.organization.getOrganization_uuid();
-        return String.format("%s/api/ng/%s/rasp/events/new?expand=drilldownDetails,application_roles,tags,skip_links&limit=%d&offset=%d&sort=timestamp", contrastUrl, orgId, LIMIT,
-                this.offset);
+        return String.format("%s/api/ng/%s/tags/attack/event/list/%s?expand=skip_links", contrastUrl, orgId, this.uuid);
     }
 
     @Override
     protected Object convert(String response) {
         Gson gson = new Gson();
-        Type contType = new TypeToken<AttackEventsJson>() {
+        Type tagsType = new TypeToken<TagsJson>() {
         }.getType();
-        AttackEventsJson attackEventsJson = gson.fromJson(response, contType);
-        this.totalCount = attackEventsJson.getCount();
-        List<AttackEvent> attackEvents = attackEventsJson.getEvents();
-        for (AttackEvent attackEvent : attackEvents) {
-            attackEvent.setOrganization(this.organization);
-        }
-        return attackEvents;
+        TagsJson tagsJson = gson.fromJson(response, tagsType);
+        return tagsJson.getTags();
     }
 
 }

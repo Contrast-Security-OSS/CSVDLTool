@@ -45,6 +45,7 @@ import java.util.Set;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
+import org.apache.commons.exec.OS;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -178,6 +179,9 @@ public class Main implements PropertyChangeListener {
         try {
             String homeDir = System.getProperty("user.home");
             this.preferenceStore = new PreferenceStore(homeDir + "\\csvdltool.properties");
+            if (OS.isFamilyMac()) {
+                this.preferenceStore = new PreferenceStore(homeDir + "/csvdltool.properties");
+            }
             try {
                 this.preferenceStore.load();
             } catch (FileNotFoundException fnfe) {

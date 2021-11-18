@@ -50,6 +50,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.exec.OS;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -100,7 +101,8 @@ import com.google.gson.reflect.TypeToken;
 
 public class VulGetWithProgress implements IRunnableWithProgress {
 
-    private static final String CSV_ENCODING = "Shift_JIS";
+    private static final String CSV_WIN_ENCODING = "Shift_JIS";
+    private static final String CSV_MAC_ENCODING = "UTF-8";
     private static final String FILE_ENCODING = "UTF-8";
 
     private static final String ROUTE = "==================== ルート ====================";
@@ -399,8 +401,15 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                     }
                     if (isIncludeDesc) {
                         // ==================== 19. 詳細（長文データ） ====================
-                        csvLineList.add(String.format("=HYPERLINK(\".\\%s.txt\",\"%s\")", trace.getUuid(), trace.getUuid()));
+                        if (OS.isFamilyWindows()) {
+                            csvLineList.add(String.format("=HYPERLINK(\".\\%s.txt\",\"%s\")", trace.getUuid(), trace.getUuid()));
+                        } else {
+                            csvLineList.add(String.format("=HYPERLINK(\"%s.txt\",\"%s\")", trace.getUuid(), trace.getUuid()));
+                        }
                         String textFileName = String.format("%s\\%s.txt", timestamp, trace.getUuid());
+                        if (OS.isFamilyMac()) {
+                            textFileName = String.format("%s/%s.txt", timestamp, trace.getUuid());
+                        }
                         File file = new File(textFileName);
 
                         // ==================== 19-1. ルート ====================
@@ -574,8 +583,15 @@ public class VulGetWithProgress implements IRunnableWithProgress {
         String filePath = timestamp + ".csv";
         if (isIncludeDesc) {
             filePath = timestamp + "\\" + timestamp + ".csv";
+            if (OS.isFamilyMac()) {
+                filePath = timestamp + "/" + timestamp + ".csv";
+            }
         }
-        try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(filePath)), CSV_ENCODING))) {
+        String csv_encoding = CSV_WIN_ENCODING;
+        if (OS.isFamilyMac()) {
+            csv_encoding = CSV_MAC_ENCODING;
+        }
+        try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(filePath)), csv_encoding))) {
             CSVPrinter printer = CSVFormat.EXCEL.print(bw);
             if (preferenceStore.getBoolean(PreferenceConstants.CSV_OUT_HEADER_VUL)) {
                 List<String> csvHeaderList = new ArrayList<String>();

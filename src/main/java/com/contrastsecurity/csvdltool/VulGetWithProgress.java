@@ -101,10 +101,6 @@ import com.google.gson.reflect.TypeToken;
 
 public class VulGetWithProgress implements IRunnableWithProgress {
 
-    private static final String CSV_WIN_ENCODING = "Shift_JIS";
-    private static final String CSV_MAC_ENCODING = "UTF-8";
-    private static final String FILE_ENCODING = "UTF-8";
-
     private static final String ROUTE = "==================== ルート ====================";
     private static final String HTTP_INFO = "==================== HTTP情報 ====================";
     private static final String WHAT_HAPPEN = "==================== 何が起こったか？ ====================";
@@ -428,15 +424,15 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                             signatureUrlList.add("なし");
                         }
                         signatureUrlList.add(0, ROUTE);
-                        FileUtils.writeLines(file, FILE_ENCODING, signatureUrlList, true);
+                        FileUtils.writeLines(file, Main.FILE_ENCODING, signatureUrlList, true);
 
                         // ==================== 19-2. HTTP情報 ====================
                         Api httpRequestApi = new HttpRequestApi(preferenceStore, organization, trace_id);
                         HttpRequest httpRequest = (HttpRequest) httpRequestApi.get();
                         if (httpRequest != null) {
-                            FileUtils.writeLines(file, FILE_ENCODING, Arrays.asList(HTTP_INFO, httpRequest.getText()), true);
+                            FileUtils.writeLines(file, Main.FILE_ENCODING, Arrays.asList(HTTP_INFO, httpRequest.getText()), true);
                         } else {
-                            FileUtils.writeLines(file, FILE_ENCODING, Arrays.asList(HTTP_INFO, "なし"), true);
+                            FileUtils.writeLines(file, Main.FILE_ENCODING, Arrays.asList(HTTP_INFO, "なし"), true);
                         }
 
                         Api storyApi = new StoryApi(preferenceStore, organization, trace_id);
@@ -464,9 +460,9 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                             chapterLines.add(chapter.getIntroText());
                             chapterLines.add(chapter.getBody());
                         }
-                        FileUtils.writeLines(file, FILE_ENCODING, chapterLines, true);
+                        FileUtils.writeLines(file, Main.FILE_ENCODING, chapterLines, true);
                         // ==================== 19-4. どんなリスクであるか？ ====================
-                        FileUtils.writeLines(file, FILE_ENCODING, Arrays.asList(RISK, story.getRisk().getText()), true);
+                        FileUtils.writeLines(file, Main.FILE_ENCODING, Arrays.asList(RISK, story.getRisk().getText()), true);
                         // ==================== 19-5. 修正方法 ====================
                         List<String> howToFixLines = new ArrayList<String>();
                         howToFixLines.add(HOWTOFIX);
@@ -493,7 +489,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                         howToFixLines.add(howToFixJson.getRecommendation().getText());
                         howToFixLines.add(String.format("CWE: %s", howToFixJson.getCwe()));
                         howToFixLines.add(String.format("OWASP: %s", howToFixJson.getOwasp()));
-                        FileUtils.writeLines(file, FILE_ENCODING, howToFixLines, true);
+                        FileUtils.writeLines(file, Main.FILE_ENCODING, howToFixLines, true);
                         // ==================== 19-6. コメント ====================
                         List<String> noteLines = new ArrayList<String>();
                         noteLines.add(COMMENT);
@@ -535,7 +531,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                                 noteLines.add(note.getNote());
                             }
                         }
-                        FileUtils.writeLines(file, FILE_ENCODING, noteLines, true);
+                        FileUtils.writeLines(file, Main.FILE_ENCODING, noteLines, true);
                     }
                     if (isIncludeStackTrace) {
                         String textFileName = String.format("%s\\%s.txt", timestamp, trace.getUuid());
@@ -560,7 +556,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                                 }
                             }
                         }
-                        FileUtils.writeLines(file, FILE_ENCODING, detailLines, true);
+                        FileUtils.writeLines(file, Main.FILE_ENCODING, detailLines, true);
                     }
 
                     csvList.add(csvLineList);
@@ -587,9 +583,9 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                 filePath = timestamp + "/" + timestamp + ".csv";
             }
         }
-        String csv_encoding = CSV_WIN_ENCODING;
+        String csv_encoding = Main.CSV_WIN_ENCODING;
         if (OS.isFamilyMac()) {
-            csv_encoding = CSV_MAC_ENCODING;
+            csv_encoding = Main.CSV_MAC_ENCODING;
         }
         try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(filePath)), csv_encoding))) {
             CSVPrinter printer = CSVFormat.EXCEL.print(bw);

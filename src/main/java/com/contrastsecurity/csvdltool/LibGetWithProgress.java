@@ -67,10 +67,6 @@ import com.google.gson.reflect.TypeToken;
 
 public class LibGetWithProgress implements IRunnableWithProgress {
 
-    private static final String CSV_WIN_ENCODING = "Shift_JIS";
-    private static final String CSV_MAC_ENCODING = "UTF-8";
-    private static final String FILE_ENCODING = "UTF-8";
-
     private Shell shell;
     private PreferenceStore preferenceStore;
     private List<String> dstApps;
@@ -299,24 +295,24 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                         File file = new File(textFileName);
                         for (Vuln vuln : library.getVulns()) {
                             // ==================== 14-1. タイトル ====================
-                            FileUtils.writeLines(file, FILE_ENCODING,
+                            FileUtils.writeLines(file, Main.FILE_ENCODING,
                                     Arrays.asList(
                                             String.format("=============== %s(CVSS %s) %s ===============", vuln.getName(), vuln.getSeverity_value(), vuln.getSeverity_code())),
                                     true);
                             // ==================== 14-2. 説明 ====================
-                            FileUtils.writeLines(file, FILE_ENCODING, Arrays.asList(vuln.getDescription()), true);
+                            FileUtils.writeLines(file, Main.FILE_ENCODING, Arrays.asList(vuln.getDescription()), true);
                             // ==================== 14-3. 機密性への影響 ====================
-                            FileUtils.writeLines(file, FILE_ENCODING, Arrays.asList(String.format("機密性への影響: %s", vuln.getConfidentiality_impact())), true);
+                            FileUtils.writeLines(file, Main.FILE_ENCODING, Arrays.asList(String.format("機密性への影響: %s", vuln.getConfidentiality_impact())), true);
                             // ==================== 14-4. 完全性への影響 ====================
-                            FileUtils.writeLines(file, FILE_ENCODING, Arrays.asList(String.format("完全性への影響: %s", vuln.getIntegrity_impact())), true);
+                            FileUtils.writeLines(file, Main.FILE_ENCODING, Arrays.asList(String.format("完全性への影響: %s", vuln.getIntegrity_impact())), true);
                             // ==================== 14-5. 可用性への影響 ====================
-                            FileUtils.writeLines(file, FILE_ENCODING, Arrays.asList(String.format("可用性への影響: %s", vuln.getAvailability_impact())), true);
+                            FileUtils.writeLines(file, Main.FILE_ENCODING, Arrays.asList(String.format("可用性への影響: %s", vuln.getAvailability_impact())), true);
                             // ==================== 14-6. 攻撃前の認証要否 ====================
-                            FileUtils.writeLines(file, FILE_ENCODING, Arrays.asList(String.format("攻撃前の認証要否: %s", vuln.getAuthentication())), true);
+                            FileUtils.writeLines(file, Main.FILE_ENCODING, Arrays.asList(String.format("攻撃前の認証要否: %s", vuln.getAuthentication())), true);
                             // ==================== 14-7. 攻撃元区分 ====================
-                            FileUtils.writeLines(file, FILE_ENCODING, Arrays.asList(String.format("攻撃元区分: %s", vuln.getAccess_vector())), true);
+                            FileUtils.writeLines(file, Main.FILE_ENCODING, Arrays.asList(String.format("攻撃元区分: %s", vuln.getAccess_vector())), true);
                             // ==================== 14-8. 攻撃条件複雑さ ====================
-                            FileUtils.writeLines(file, FILE_ENCODING, Arrays.asList(String.format("攻撃条件複雑さ: %s", vuln.getAccess_complexity())), true);
+                            FileUtils.writeLines(file, Main.FILE_ENCODING, Arrays.asList(String.format("攻撃条件複雑さ: %s", vuln.getAccess_complexity())), true);
                         }
                     }
 
@@ -345,9 +341,9 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                 filePath = timestamp + "/" + timestamp + ".csv";
             }
         }
-        String csv_encoding = CSV_WIN_ENCODING;
+        String csv_encoding = Main.CSV_WIN_ENCODING;
         if (OS.isFamilyMac()) {
-            csv_encoding = CSV_MAC_ENCODING;
+            csv_encoding = Main.CSV_MAC_ENCODING;
         }
         try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(filePath)), csv_encoding))) {
             CSVPrinter printer = CSVFormat.EXCEL.print(bw);

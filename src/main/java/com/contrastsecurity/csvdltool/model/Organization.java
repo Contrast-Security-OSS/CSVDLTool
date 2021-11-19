@@ -45,7 +45,7 @@ public class Organization {
     }
 
     public void setOrganization_uuid(String organization_uuid) {
-        this.organization_uuid = organization_uuid;
+        this.organization_uuid = organization_uuid.trim();
     }
 
     public String getApikey() {

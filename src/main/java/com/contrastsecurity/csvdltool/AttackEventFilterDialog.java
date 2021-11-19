@@ -129,12 +129,11 @@ public class AttackEventFilterDialog extends Dialog {
                     srcValidLabelList.addAll(srcLabelList);
                     srcIpViewer.setCheckedElements(srcValidLabelList.toArray());
                     srcIpViewer.refresh();
-                    support.firePropertyChange("attackEventFilter", null, "oyoyo");
                 } else {
                     srcIpViewer.setCheckedElements(new ArrayList<String>().toArray());
                     srcIpViewer.refresh();
-                    support.firePropertyChange("attackEventFilter", null, "buhihi");
                 }
+                checkStateUpdate();
             }
         });
 
@@ -191,12 +190,11 @@ public class AttackEventFilterDialog extends Dialog {
                     appValidLabelList.addAll(appLabelList);
                     appViewer.setCheckedElements(appValidLabelList.toArray());
                     appViewer.refresh();
-                    support.firePropertyChange("attackEventFilter", null, "oyoyo");
                 } else {
                     appViewer.setCheckedElements(new ArrayList<String>().toArray());
                     appViewer.refresh();
-                    support.firePropertyChange("attackEventFilter", null, "buhihi");
                 }
+                checkStateUpdate();
             }
         });
 
@@ -253,12 +251,11 @@ public class AttackEventFilterDialog extends Dialog {
                     ruleValidLabelList.addAll(ruleLabelList);
                     ruleViewer.setCheckedElements(ruleValidLabelList.toArray());
                     ruleViewer.refresh();
-                    support.firePropertyChange("attackEventFilter", null, "oyoyo");
                 } else {
                     ruleViewer.setCheckedElements(new ArrayList<String>().toArray());
                     ruleViewer.refresh();
-                    support.firePropertyChange("attackEventFilter", null, "buhihi");
                 }
+                checkStateUpdate();
             }
         });
 

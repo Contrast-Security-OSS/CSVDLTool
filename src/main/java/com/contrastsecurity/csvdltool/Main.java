@@ -107,6 +107,7 @@ import com.contrastsecurity.csvdltool.model.ContrastSecurityYaml;
 import com.contrastsecurity.csvdltool.model.Filter;
 import com.contrastsecurity.csvdltool.model.Organization;
 import com.contrastsecurity.csvdltool.preference.AboutPage;
+import com.contrastsecurity.csvdltool.preference.AttackEventCSVColumnPreferencePage;
 import com.contrastsecurity.csvdltool.preference.BasePreferencePage;
 import com.contrastsecurity.csvdltool.preference.CSVPreferencePage;
 import com.contrastsecurity.csvdltool.preference.ConnectionPreferencePage;
@@ -1148,20 +1149,26 @@ public class Main implements PropertyChangeListener {
                                 break;
                             case ATTACK_EVENT_09:
                                 // ==================== 09. 組織名 ====================
-                                csvLineList.add(attackEvent.getSource());
+                                csvLineList.add(attackEvent.getOrganization().getName());
                                 break;
                             case ATTACK_EVENT_10:
                                 // ==================== 10. 組織ID ====================
-                                csvLineList.add(attackEvent.getSource());
+                                csvLineList.add(attackEvent.getOrganization().getOrganization_uuid());
                                 break;
-                            case ATTACK_EVENT_11:
+                            case ATTACK_EVENT_11: {
                                 // ==================== 11. 攻撃イベントへのリンク ====================
-                                csvLineList.add(attackEvent.getSource());
+                                String link = String.format("%s/static/ng/index.html#/%s/attacks/events/%s", preferenceStore.getString(PreferenceConstants.CONTRAST_URL),
+                                        attackEvent.getOrganization().getOrganization_uuid().trim(), attackEvent.getEvent_uuid());
+                                csvLineList.add(link);
                                 break;
-                            case ATTACK_EVENT_12:
+                            }
+                            case ATTACK_EVENT_12: {
                                 // ==================== 12. 攻撃イベントへのリンク（ハイパーリンク） ====================
-                                csvLineList.add(attackEvent.getSource());
+                                String link = String.format("%s/static/ng/index.html#/%s/attacks/events/%s", preferenceStore.getString(PreferenceConstants.CONTRAST_URL),
+                                        attackEvent.getOrganization().getOrganization_uuid().trim(), attackEvent.getEvent_uuid());
+                                csvLineList.add(String.format("=HYPERLINK(\"%s\",\"TeamServerへ\")", link));
                                 break;
+                            }
                         }
                     }
                     csvList.add(csvLineList);
@@ -1299,11 +1306,13 @@ public class Main implements PropertyChangeListener {
                 PreferenceNode csvNode = new PreferenceNode("csv", new CSVPreferencePage());
                 PreferenceNode vulCsvColumnNode = new PreferenceNode("vulcsvcolumn", new VulCSVColumnPreferencePage());
                 PreferenceNode libCsvColumnNode = new PreferenceNode("libcsvcolumn", new LibCSVColumnPreferencePage());
+                PreferenceNode evtCsvColumnNode = new PreferenceNode("evtcsvcolumn", new AttackEventCSVColumnPreferencePage());
                 mgr.addToRoot(baseNode);
                 mgr.addToRoot(connectionNode);
                 mgr.addToRoot(csvNode);
                 mgr.addTo(csvNode.getId(), vulCsvColumnNode);
                 mgr.addTo(csvNode.getId(), libCsvColumnNode);
+                mgr.addTo(csvNode.getId(), evtCsvColumnNode);
                 PreferenceNode aboutNode = new PreferenceNode("about", new AboutPage());
                 mgr.addToRoot(aboutNode);
                 PreferenceDialog dialog = new MyPreferenceDialog(shell, mgr);

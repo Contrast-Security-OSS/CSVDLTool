@@ -44,8 +44,9 @@ import org.eclipse.swt.widgets.Text;
 
 public class CSVPreferencePage extends PreferencePage {
 
-    private Text vulCSVFileForamtTxt;
-    private Text libCSVFileForamtTxt;
+    private Text vulCSVFileFmtTxt;
+    private Text libCSVFileFmtTxt;
+    private Text evtCSVFileFmtTxt;
     private Text vulSleepTxt;
     private Text libSleepTxt;
 
@@ -65,51 +66,67 @@ public class CSVPreferencePage extends PreferencePage {
         compositeLt.verticalSpacing = 20;
         composite.setLayout(compositeLt);
 
-        Group csvFileFormatGrp = new Group(composite, SWT.NONE);
-        GridLayout csvGrpLt = new GridLayout(1, false);
-        csvGrpLt.marginWidth = 10;
-        csvGrpLt.marginHeight = 10;
-        csvGrpLt.horizontalSpacing = 5;
-        csvGrpLt.verticalSpacing = 10;
-        csvFileFormatGrp.setLayout(csvGrpLt);
-        GridData csvGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
-        // csvGrpGrDt.horizontalSpan = 2;
-        csvFileFormatGrp.setLayoutData(csvGrpGrDt);
-        csvFileFormatGrp.setText("CSV出力ファイルフォーマット（フォルダ名にも適用されます）");
+        Group csvFileFmtGrp = new Group(composite, SWT.NONE);
+        GridLayout csvFileFmtGrpLt = new GridLayout(1, false);
+        csvFileFmtGrpLt.marginWidth = 10;
+        csvFileFmtGrpLt.marginHeight = 10;
+        csvFileFmtGrpLt.horizontalSpacing = 5;
+        csvFileFmtGrpLt.verticalSpacing = 10;
+        csvFileFmtGrp.setLayout(csvFileFmtGrpLt);
+        GridData csvFileFmtGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        // csvFileFmtGrpGrDt.horizontalSpan = 2;
+        csvFileFmtGrp.setLayoutData(csvFileFmtGrpGrDt);
+        csvFileFmtGrp.setText("CSV出力ファイルフォーマット（フォルダ名にも適用されます）");
 
-        Group vulCSVFileFormatGrp = new Group(csvFileFormatGrp, SWT.NONE);
-        GridLayout vulCSVFileFormatGrpLt = new GridLayout(1, false);
-        vulCSVFileFormatGrpLt.marginWidth = 10;
-        vulCSVFileFormatGrpLt.marginHeight = 10;
-        vulCSVFileFormatGrpLt.horizontalSpacing = 10;
-        vulCSVFileFormatGrp.setLayout(vulCSVFileFormatGrpLt);
-        GridData vulCSVFileFormatGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
-        // csvFileFormatGrpGrDt.horizontalSpan = 2;
-        vulCSVFileFormatGrp.setLayoutData(vulCSVFileFormatGrpGrDt);
-        vulCSVFileFormatGrp.setText("脆弱性");
+        Group vulCSVFileFmtGrp = new Group(csvFileFmtGrp, SWT.NONE);
+        GridLayout vulCSVFileFmtGrpLt = new GridLayout(1, false);
+        vulCSVFileFmtGrpLt.marginWidth = 10;
+        vulCSVFileFmtGrpLt.marginHeight = 10;
+        vulCSVFileFmtGrpLt.horizontalSpacing = 10;
+        vulCSVFileFmtGrp.setLayout(vulCSVFileFmtGrpLt);
+        GridData vulCSVFileFmtGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        // vulCSVFileFmtGrpGrDt.horizontalSpan = 2;
+        vulCSVFileFmtGrp.setLayoutData(vulCSVFileFmtGrpGrDt);
+        vulCSVFileFmtGrp.setText("脆弱性");
 
-        vulCSVFileForamtTxt = new Text(vulCSVFileFormatGrp, SWT.BORDER);
-        vulCSVFileForamtTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        vulCSVFileForamtTxt.setText(preferenceStore.getString(PreferenceConstants.CSV_FILE_FORMAT_VUL));
-        vulCSVFileForamtTxt.setMessage(preferenceStore.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT_VUL));
+        vulCSVFileFmtTxt = new Text(vulCSVFileFmtGrp, SWT.BORDER);
+        vulCSVFileFmtTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        vulCSVFileFmtTxt.setText(preferenceStore.getString(PreferenceConstants.CSV_FILE_FORMAT_VUL));
+        vulCSVFileFmtTxt.setMessage(preferenceStore.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT_VUL));
 
-        Group libCSVFileFormatGrp = new Group(csvFileFormatGrp, SWT.NONE);
-        GridLayout libCSVFileFormatGrpLt = new GridLayout(1, false);
-        libCSVFileFormatGrpLt.marginWidth = 10;
-        libCSVFileFormatGrpLt.marginHeight = 10;
-        libCSVFileFormatGrpLt.horizontalSpacing = 10;
-        libCSVFileFormatGrp.setLayout(libCSVFileFormatGrpLt);
-        GridData libCSVFileFormatGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
-        // csvFileFormatGrpGrDt.horizontalSpan = 2;
-        libCSVFileFormatGrp.setLayoutData(libCSVFileFormatGrpGrDt);
-        libCSVFileFormatGrp.setText("ライブラリ");
+        Group libCSVFileFmtGrp = new Group(csvFileFmtGrp, SWT.NONE);
+        GridLayout libCSVFileFmtGrpLt = new GridLayout(1, false);
+        libCSVFileFmtGrpLt.marginWidth = 10;
+        libCSVFileFmtGrpLt.marginHeight = 10;
+        libCSVFileFmtGrpLt.horizontalSpacing = 10;
+        libCSVFileFmtGrp.setLayout(libCSVFileFmtGrpLt);
+        GridData libCSVFileFmtGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        // libCSVFileFmtGrpGrDt.horizontalSpan = 2;
+        libCSVFileFmtGrp.setLayoutData(libCSVFileFmtGrpGrDt);
+        libCSVFileFmtGrp.setText("ライブラリ");
 
-        libCSVFileForamtTxt = new Text(libCSVFileFormatGrp, SWT.BORDER);
-        libCSVFileForamtTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        libCSVFileForamtTxt.setText(preferenceStore.getString(PreferenceConstants.CSV_FILE_FORMAT_LIB));
-        libCSVFileForamtTxt.setMessage(preferenceStore.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT_LIB));
+        libCSVFileFmtTxt = new Text(libCSVFileFmtGrp, SWT.BORDER);
+        libCSVFileFmtTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        libCSVFileFmtTxt.setText(preferenceStore.getString(PreferenceConstants.CSV_FILE_FORMAT_LIB));
+        libCSVFileFmtTxt.setMessage(preferenceStore.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT_LIB));
 
-        Label csvFileFormatHint = new Label(csvFileFormatGrp, SWT.LEFT);
+        Group evtCSVFileFmtGrp = new Group(csvFileFmtGrp, SWT.NONE);
+        GridLayout evtCSVFileFmtGrpLt = new GridLayout(1, false);
+        evtCSVFileFmtGrpLt.marginWidth = 10;
+        evtCSVFileFmtGrpLt.marginHeight = 10;
+        evtCSVFileFmtGrpLt.horizontalSpacing = 10;
+        evtCSVFileFmtGrp.setLayout(evtCSVFileFmtGrpLt);
+        GridData evtCSVFileFmtGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        // evtCSVFileFmtGrpGrDt.horizontalSpan = 2;
+        evtCSVFileFmtGrp.setLayoutData(evtCSVFileFmtGrpGrDt);
+        evtCSVFileFmtGrp.setText("攻撃イベント");
+
+        evtCSVFileFmtTxt = new Text(evtCSVFileFmtGrp, SWT.BORDER);
+        evtCSVFileFmtTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        evtCSVFileFmtTxt.setText(preferenceStore.getString(PreferenceConstants.CSV_FILE_FORMAT_ATTACKEVENT));
+        evtCSVFileFmtTxt.setMessage(preferenceStore.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT_ATTACKEVENT));
+
+        Label csvFileFormatHint = new Label(csvFileFmtGrp, SWT.LEFT);
         GridData csvFileFormatHintGrDt = new GridData(GridData.FILL_HORIZONTAL);
         csvFileFormatHint.setLayoutData(csvFileFormatHintGrDt);
         csvFileFormatHint.setText("※ java.text.SimpleDateFormatの書式としてください。\r\n例) 'vul_'yyyy-MM-dd_HHmmss、'lib_'yyyy-MM-dd_HHmmss");
@@ -157,8 +174,8 @@ public class CSVPreferencePage extends PreferencePage {
             }
 
             public void widgetSelected(SelectionEvent e) {
-                vulCSVFileForamtTxt.setText(preferenceStore.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT_VUL));
-                libCSVFileForamtTxt.setText(preferenceStore.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT_LIB));
+                vulCSVFileFmtTxt.setText(preferenceStore.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT_VUL));
+                libCSVFileFmtTxt.setText(preferenceStore.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT_LIB));
                 vulSleepTxt.setText(preferenceStore.getDefaultString(PreferenceConstants.SLEEP_VUL));
                 libSleepTxt.setText(preferenceStore.getDefaultString(PreferenceConstants.SLEEP_LIB));
             }
@@ -205,8 +222,8 @@ public class CSVPreferencePage extends PreferencePage {
         }
         ps.setValue(PreferenceConstants.SLEEP_VUL, this.vulSleepTxt.getText());
         ps.setValue(PreferenceConstants.SLEEP_LIB, this.libSleepTxt.getText());
-        ps.setValue(PreferenceConstants.CSV_FILE_FORMAT_VUL, this.vulCSVFileForamtTxt.getText());
-        ps.setValue(PreferenceConstants.CSV_FILE_FORMAT_LIB, this.libCSVFileForamtTxt.getText());
+        ps.setValue(PreferenceConstants.CSV_FILE_FORMAT_VUL, this.vulCSVFileFmtTxt.getText());
+        ps.setValue(PreferenceConstants.CSV_FILE_FORMAT_LIB, this.libCSVFileFmtTxt.getText());
         if (!errors.isEmpty()) {
             MessageDialog.openError(getShell(), "その他設定", String.join("\r\n", errors));
             return false;

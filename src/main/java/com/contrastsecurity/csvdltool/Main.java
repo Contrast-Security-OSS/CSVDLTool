@@ -27,10 +27,14 @@ import java.awt.Desktop;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
@@ -48,6 +52,8 @@ import java.util.Set;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.exec.OS;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -96,6 +102,7 @@ import com.contrastsecurity.csvdltool.api.PutTagsToAttackEventsApi;
 import com.contrastsecurity.csvdltool.exception.ApiException;
 import com.contrastsecurity.csvdltool.exception.NonApiException;
 import com.contrastsecurity.csvdltool.model.AttackEvent;
+import com.contrastsecurity.csvdltool.model.AttackEventCSVColumn;
 import com.contrastsecurity.csvdltool.model.ContrastSecurityYaml;
 import com.contrastsecurity.csvdltool.model.Filter;
 import com.contrastsecurity.csvdltool.model.Organization;
@@ -214,6 +221,11 @@ public class Main implements PropertyChangeListener {
             this.preferenceStore.setDefault(PreferenceConstants.SLEEP_LIB, 300);
             this.preferenceStore.setDefault(PreferenceConstants.CSV_OUT_HEADER_LIB, true);
             this.preferenceStore.setDefault(PreferenceConstants.CSV_FILE_FORMAT_LIB, "'lib'_yyyy-MM-dd_HHmmss");
+
+            this.preferenceStore.setDefault(PreferenceConstants.CSV_COLUMN_ATTACKEVENT, AttackEventCSVColmunEnum.defaultValuesStr());
+            this.preferenceStore.setDefault(PreferenceConstants.CSV_OUT_HEADER_ATTACKEVENT, true);
+            this.preferenceStore.setDefault(PreferenceConstants.CSV_FILE_FORMAT_ATTACKEVENT, "'attackevent'_yyyy-MM-dd_HHmmss");
+
             this.preferenceStore.setDefault(PreferenceConstants.OPENED_MAIN_TAB_IDX, 0);
             this.preferenceStore.setDefault(PreferenceConstants.OPENED_SUB_TAB_IDX, 0);
 
@@ -1063,6 +1075,116 @@ public class Main implements PropertyChangeListener {
 
         MenuItem miExp = new MenuItem(menuTable, SWT.NONE);
         miExp.setText("エクスポート");
+        miExp.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                int[] selectIndexes = attackTable.getSelectionIndices();
+                List<List<String>> csvList = new ArrayList<List<String>>();
+                String csvFileFormat = preferenceStore.getString(PreferenceConstants.CSV_FILE_FORMAT_ATTACKEVENT);
+                if (csvFileFormat == null || csvFileFormat.isEmpty()) {
+                    csvFileFormat = preferenceStore.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT_ATTACKEVENT);
+                }
+                String timestamp = new SimpleDateFormat(csvFileFormat).format(new Date());
+                String filePath = timestamp + ".csv";
+                String csv_encoding = Main.CSV_WIN_ENCODING;
+                if (OS.isFamilyMac()) {
+                    csv_encoding = Main.CSV_MAC_ENCODING;
+                }
+                String columnJsonStr = preferenceStore.getString(PreferenceConstants.CSV_COLUMN_ATTACKEVENT);
+                List<AttackEventCSVColumn> columnList = null;
+                if (columnJsonStr.trim().length() > 0) {
+                    try {
+                        columnList = new Gson().fromJson(columnJsonStr, new TypeToken<List<AttackEventCSVColumn>>() {
+                        }.getType());
+                    } catch (JsonSyntaxException jse) {
+                        MessageDialog.openError(shell, "脆弱性出力項目の読み込み", String.format("脆弱性出力項目の内容に問題があります。\r\n%s", columnJsonStr));
+                        columnList = new ArrayList<AttackEventCSVColumn>();
+                    }
+                } else {
+                    columnList = new ArrayList<AttackEventCSVColumn>();
+                    for (AttackEventCSVColmunEnum colEnum : AttackEventCSVColmunEnum.sortedValues()) {
+                        columnList.add(new AttackEventCSVColumn(colEnum));
+                    }
+                }
+                for (int idx : selectIndexes) {
+                    List<String> csvLineList = new ArrayList<String>();
+                    AttackEvent attackEvent = filteredAttackEvents.get(idx);
+                    for (AttackEventCSVColumn csvColumn : columnList) {
+                        if (!csvColumn.isValid()) {
+                            continue;
+                        }
+                        switch (csvColumn.getColumn()) {
+                            case ATTACK_EVENT_01:
+                                // ==================== 01. ソースIP ====================
+                                csvLineList.add(attackEvent.getSource());
+                                break;
+                            case ATTACK_EVENT_02:
+                                // ==================== 02. 結果 ====================
+                                csvLineList.add(attackEvent.getResult());
+                                break;
+                            case ATTACK_EVENT_03:
+                                // ==================== 03. アプリケーション ====================
+                                csvLineList.add(attackEvent.getApplication().getName());
+                                break;
+                            case ATTACK_EVENT_04:
+                                // ==================== 04. サーバ ====================
+                                csvLineList.add(attackEvent.getServer().getName());
+                                break;
+                            case ATTACK_EVENT_05:
+                                // ==================== 05. ルール ====================
+                                csvLineList.add(attackEvent.getRule());
+                                break;
+                            case ATTACK_EVENT_06:
+                                // ==================== 06. 時間 ====================
+                                csvLineList.add(attackEvent.getReceived());
+                                break;
+                            case ATTACK_EVENT_07:
+                                // ==================== 07. URL ====================
+                                csvLineList.add(attackEvent.getUrl());
+                                break;
+                            case ATTACK_EVENT_08:
+                                // ==================== 08. タグ ====================
+                                csvLineList.add(String.join(csvColumn.getSeparateStr().replace("\\r", "\r").replace("\\n", "\n"), attackEvent.getTags()));
+                                break;
+                            case ATTACK_EVENT_09:
+                                // ==================== 09. 組織名 ====================
+                                csvLineList.add(attackEvent.getSource());
+                                break;
+                            case ATTACK_EVENT_10:
+                                // ==================== 10. 組織ID ====================
+                                csvLineList.add(attackEvent.getSource());
+                                break;
+                            case ATTACK_EVENT_11:
+                                // ==================== 11. 攻撃イベントへのリンク ====================
+                                csvLineList.add(attackEvent.getSource());
+                                break;
+                            case ATTACK_EVENT_12:
+                                // ==================== 12. 攻撃イベントへのリンク（ハイパーリンク） ====================
+                                csvLineList.add(attackEvent.getSource());
+                                break;
+                        }
+                    }
+                    csvList.add(csvLineList);
+                }
+                try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(filePath)), csv_encoding))) {
+                    CSVPrinter printer = CSVFormat.EXCEL.print(bw);
+                    if (preferenceStore.getBoolean(PreferenceConstants.CSV_OUT_HEADER_ATTACKEVENT)) {
+                        List<String> csvHeaderList = new ArrayList<String>();
+                        for (AttackEventCSVColumn csvColumn : columnList) {
+                            if (csvColumn.isValid()) {
+                                csvHeaderList.add(csvColumn.getColumn().getCulumn());
+                            }
+                        }
+                        printer.printRecord(csvHeaderList);
+                    }
+                    for (List<String> csvLine : csvList) {
+                        printer.printRecord(csvLine);
+                    }
+                } catch (IOException ioe) {
+                    ioe.printStackTrace();
+                }
+            }
+        });
 
         MenuItem miJump = new MenuItem(menuTable, SWT.NONE);
         miJump.setText("TeamServerへ");
@@ -1105,12 +1227,9 @@ public class Main implements PropertyChangeListener {
             }
         });
 
-        TableColumn column0 = new TableColumn(attackTable, SWT.NONE);
-        column0.setWidth(0);
-        column0.setResizable(false);
-        TableColumn column1 = new TableColumn(attackTable, SWT.LEFT);
-        column1.setWidth(150);
-        column1.setText("組織");
+        TableColumn column1 = new TableColumn(attackTable, SWT.NONE);
+        column1.setWidth(0);
+        column1.setResizable(false);
         TableColumn column2 = new TableColumn(attackTable, SWT.LEFT);
         column2.setWidth(120);
         column2.setText("ソースIP");
@@ -1135,6 +1254,9 @@ public class Main implements PropertyChangeListener {
         TableColumn column9 = new TableColumn(attackTable, SWT.LEFT);
         column9.setWidth(250);
         column9.setText("タグ");
+        TableColumn column10 = new TableColumn(attackTable, SWT.LEFT);
+        column10.setWidth(150);
+        column10.setText("組織名");
 
         Button attackEventFilterBtn = new Button(attackListGrp, SWT.PUSH);
         GridData attackEventFilterBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
@@ -1236,14 +1358,14 @@ public class Main implements PropertyChangeListener {
         } else {
             item = new TableItem(attackTable, SWT.CENTER);
         }
-        item.setText(1, attackEvent.getOrganization().getName());
-        item.setText(2, attackEvent.getSource());
-        item.setText(3, attackEvent.getResult());
-        item.setText(4, attackEvent.getApplication().getName());
-        item.setText(5, attackEvent.getServer().getName());
-        item.setText(6, attackEvent.getRule());
-        item.setText(7, attackEvent.getReceived());
-        item.setText(8, attackEvent.getUrl());
+        item.setText(1, attackEvent.getSource());
+        item.setText(2, attackEvent.getResult());
+        item.setText(3, attackEvent.getApplication().getName());
+        item.setText(4, attackEvent.getServer().getName());
+        item.setText(5, attackEvent.getRule());
+        item.setText(6, attackEvent.getReceived());
+        item.setText(7, attackEvent.getUrl());
+        item.setText(8, attackEvent.getOrganization().getName());
         String tags = "";
         if (attackEvent.getTags() != null) {
             tags = String.join(",", attackEvent.getTags());

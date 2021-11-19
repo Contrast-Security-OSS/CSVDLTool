@@ -297,12 +297,14 @@ public class Main implements PropertyChangeListener {
                 if (orgs.isEmpty()) {
                     appLoadBtn.setEnabled(false);
                     vulExecuteBtn.setEnabled(false);
+                    attackLoadBtn.setEnabled(false);
                     settingBtn.setText("このボタンから基本設定を行ってください。");
                     currentTitle = "";
                     uiReset();
                 } else {
                     appLoadBtn.setEnabled(true);
                     vulExecuteBtn.setEnabled(true);
+                    attackLoadBtn.setEnabled(true);
                     settingBtn.setText("設定");
                     List<String> orgNameList = new ArrayList<String>();
                     String title = String.join(", ", orgNameList);
@@ -1270,10 +1272,14 @@ public class Main implements PropertyChangeListener {
         attackEventFilterBtnGrDt.horizontalSpan = 3;
         attackEventFilterBtn.setLayoutData(attackEventFilterBtnGrDt);
         attackEventFilterBtn.setText("フィルター");
-        attackEventFilterBtn.setToolTipText("攻撃イベント一覧を読み込みます。");
+        attackEventFilterBtn.setToolTipText("攻撃イベントのフィルタリングを行います。");
         attackEventFilterBtn.addSelectionListener(new SelectionListener() {
             @Override
             public void widgetSelected(SelectionEvent e) {
+                if (protectFilterMap == null) {
+                    MessageDialog.openInformation(shell, "攻撃イベントフィルター", "攻撃イベント一覧を読み込んでください。");
+                    return;
+                }
                 AttackEventFilterDialog filterDialog = new AttackEventFilterDialog(shell, protectFilterMap);
                 filterDialog.addPropertyChangeListener(shell.getMain());
                 int result = filterDialog.open();

@@ -62,7 +62,7 @@ public class AboutPage extends PreferencePage {
         Label versionValueLbl = new Label(appGrp, SWT.NONE);
         GridData versionValueLblGrDt = new GridData();
         versionValueLbl.setLayoutData(versionValueLblGrDt);
-        versionValueLbl.setText("2.0.0");
+        versionValueLbl.setText("1.5.0");
 
         Label copyrightLbl = new Label(appGrp, SWT.NONE);
         GridData copyrightLblGrDt = new GridData();
@@ -120,6 +120,21 @@ public class AboutPage extends PreferencePage {
         new Link(licenseGrp, SWT.NONE).setText("- workbench 3.3.0-I20070608-1100");
         new Link(licenseGrp, SWT.NONE).setText("- jface 3.3.0-I20070606-0010");
         new Link(licenseGrp, SWT.NONE).setText("- org.eclipse.swt.win32.win32.x86 4.3");
+
+        Link epl2LicenseLinkLbl = new Link(licenseGrp, SWT.NONE);
+        epl2LicenseLinkLbl.setText("This software includes the work that is distributed in the <a>Eclipse Public License 2.0</a>");
+        epl2LicenseLinkLbl.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
+            public void widgetSelected(org.eclipse.swt.events.SelectionEvent event) {
+                try {
+                    if (Desktop.isDesktopSupported()) {
+                        Desktop.getDesktop().browse(new URI("https://www.eclipse.org/legal/epl-v20.html"));
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        new Link(licenseGrp, SWT.NONE).setText("- org.eclipse.swt.cocoa.macosx.x86_64 3.109.0");
 
         noDefaultAndApplyButton();
         return parent;

@@ -1380,12 +1380,12 @@ public class Main implements PropertyChangeListener {
         item.setText(5, attackEvent.getRule());
         item.setText(6, attackEvent.getReceived());
         item.setText(7, attackEvent.getUrl());
-        item.setText(8, attackEvent.getOrganization().getName());
         String tags = "";
         if (attackEvent.getTags() != null) {
             tags = String.join(",", attackEvent.getTags());
         }
-        item.setText(9, tags);
+        item.setText(8, tags);
+        item.setText(9, attackEvent.getOrganization().getName());
     }
 
     private void uiReset() {

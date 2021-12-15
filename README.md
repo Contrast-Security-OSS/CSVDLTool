@@ -30,7 +30,7 @@ Windows8.1、Windows10, Mac11(Big Sur)
   compile group: 'org.eclipse.swt', name: 'org.eclipse.swt.win32.win32.x86', version: '4.3'
   //compile group: 'org.eclipse.platform', name: 'org.eclipse.swt.cocoa.macosx.x86_64', version: '3.109.0', transitive: false
   ```
-- Mac 64bitの場合
+- Macの場合
 
   ```gradle
   //compile group: 'org.eclipse.swt', name:   'org.eclipse.swt.win32.win32.x86_64', version: '4.3'

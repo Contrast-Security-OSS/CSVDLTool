@@ -111,6 +111,13 @@ Eclipseでプロジェクトをリフレッシュすると、あとは実行でc
     ```bash
     codesign -d --verbose=4 CSVDLTool_1.5.0.app
     ```
+    
+#### 圧縮について補足
+
+- Mac
+  ```bash
+  7z a CSVDLTool_1.5.0.cli7z CSVDLTool_1.5.0.app/
+  ```
 
 ### 起動後の使い方について
 
@@ -135,6 +142,13 @@ Eclipseでプロジェクトをリフレッシュすると、あとは実行でc
   - CSVDLTool_X.X.X.exe  
     既にzipをダウンロード済みの場合はexeのダウンロードと入れ替えのみでツールを使用できます。
 - Mac
-  - CSVDLTool_X.X.dmg
+  - CSVDLTool_X.X.X.cli7z  
+    下記コマンドで解凍してください。  
+    ```bash
+    # p7zipのインストールについては
+    brew install p7zip
+    # 解凍コマンド
+    7z x CSVDLTool_X.X.X.cli7z
+    ```
 
 以上

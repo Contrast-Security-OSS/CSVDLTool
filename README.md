@@ -105,11 +105,11 @@ Eclipseでプロジェクトをリフレッシュすると、あとは実行でc
     読み込めたら、Common Name(通称)をコピー
   - 署名
     ```bash
-    codesign --deep -s "Contrast Security, Inc." -v CSVDLTool-1.5.0.app
+    codesign --deep -s "Contrast Security, Inc." -v CSVDLTool_1.5.0.app
     ```
   - 署名の確認
     ```bash
-    codesign -d --verbose=4 CSVDLTool-1.5.0.app
+    codesign -d --verbose=4 CSVDLTool_1.5.0.app
     ```
 
 ### 起動後の使い方について

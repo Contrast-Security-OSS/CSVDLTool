@@ -46,6 +46,9 @@ public class Library {
     private List<Application> apps;
     private List<Server> servers;
     private List<String> tags;
+    private boolean restricted;
+    private boolean invalid_version;
+    private boolean licenseViolation;
 
     public String getHash() {
         return hash;
@@ -186,6 +189,30 @@ public class Library {
 
     public void setTags(List<String> tags) {
         this.tags = tags;
+    }
+
+    public boolean isRestricted() {
+        return restricted;
+    }
+
+    public void setRestricted(boolean restricted) {
+        this.restricted = restricted;
+    }
+
+    public boolean isInvalid_version() {
+        return invalid_version;
+    }
+
+    public void setInvalid_version(boolean invalid_version) {
+        this.invalid_version = invalid_version;
+    }
+
+    public boolean isLicenseViolation() {
+        return licenseViolation;
+    }
+
+    public void setLicenseViolation(boolean licenseViolation) {
+        this.licenseViolation = licenseViolation;
     }
 
 }

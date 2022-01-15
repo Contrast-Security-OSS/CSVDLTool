@@ -277,6 +277,36 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                                 }
                                 break;
                             }
+                            case LIB_19: {
+                                // ==================== 19. ライブラリ制限に抵触 ====================
+                                boolean restricted = library.isRestricted();
+                                if (restricted) {
+                                    csvLineList.add("Y");
+                                } else {
+                                    csvLineList.add("N");
+                                }
+                                break;
+                            }
+                            case LIB_20: {
+                                // ==================== 20. バージョン要件に抵触 ====================
+                                boolean invalid_version = library.isInvalid_version();
+                                if (invalid_version) {
+                                    csvLineList.add("Y");
+                                } else {
+                                    csvLineList.add("N");
+                                }
+                                break;
+                            }
+                            case LIB_21: {
+                                // ==================== 21. ライセンス制限に抵触 ====================
+                                boolean licenseViolation = library.isLicenseViolation();
+                                if (licenseViolation) {
+                                    csvLineList.add("Y");
+                                } else {
+                                    csvLineList.add("N");
+                                }
+                                break;
+                            }
                             default:
                                 continue;
                         }

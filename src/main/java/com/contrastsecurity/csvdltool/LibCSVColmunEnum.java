@@ -47,10 +47,13 @@ public enum LibCSVColmunEnum {
     LIB_12("関連サーバ", 12, true, ",", true, ""),
     LIB_13("CVE", 14, true, ",", true, ""),
     LIB_14("ライブラリタグ", 13, true, ",", true, ""),
-    LIB_15("組織名", 15, false, null, false, ""),
-    LIB_16("組織ID", 16, false, null, false, ""),
-    LIB_17("リンク", 17, false, null, false, "TeamServerへのリンクです。"),
-    LIB_18("リンク(ハイパーリンク)", 18, false, null, false, "TeamServerへのリンク（ハイパーリンク）です。");
+    LIB_15("組織名", 18, false, null, false, ""),
+    LIB_16("組織ID", 19, false, null, false, ""),
+    LIB_17("リンク", 20, false, null, false, "TeamServerへのリンクです。"),
+    LIB_18("リンク(ハイパーリンク)", 21, false, null, false, "TeamServerへのリンク（ハイパーリンク）です。"),
+    LIB_19("ライブラリ制限に抵触", 15, false, null, false, "ライブラリ・コンプライアンス"),
+    LIB_20("バージョン要件に抵触", 16, false, null, false, "ライブラリ・コンプライアンス"),
+    LIB_21("ライセンス制限に抵触", 17, false, null, false, "ライブラリ・コンプライアンス");
 
     private String culumn;
     private int order;

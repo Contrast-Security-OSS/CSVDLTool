@@ -281,9 +281,9 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                                 // ==================== 19. ライブラリ制限に抵触 ====================
                                 boolean restricted = library.isRestricted();
                                 if (restricted) {
-                                    csvLineList.add("Y");
+                                    csvLineList.add(csvColumn.getTrueStr());
                                 } else {
-                                    csvLineList.add("N");
+                                    csvLineList.add(csvColumn.getFalseStr());
                                 }
                                 break;
                             }
@@ -291,9 +291,9 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                                 // ==================== 20. バージョン要件に抵触 ====================
                                 boolean invalid_version = library.isInvalid_version();
                                 if (invalid_version) {
-                                    csvLineList.add("Y");
+                                    csvLineList.add(csvColumn.getTrueStr());
                                 } else {
-                                    csvLineList.add("N");
+                                    csvLineList.add(csvColumn.getFalseStr());
                                 }
                                 break;
                             }
@@ -301,9 +301,9 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                                 // ==================== 21. ライセンス制限に抵触 ====================
                                 boolean licenseViolation = library.isLicenseViolation();
                                 if (licenseViolation) {
-                                    csvLineList.add("Y");
+                                    csvLineList.add(csvColumn.getTrueStr());
                                 } else {
-                                    csvLineList.add("N");
+                                    csvLineList.add(csvColumn.getFalseStr());
                                 }
                                 break;
                             }

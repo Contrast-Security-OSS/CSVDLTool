@@ -33,40 +33,46 @@ import com.contrastsecurity.csvdltool.model.LibCSVColumn;
 import com.google.gson.Gson;
 
 public enum LibCSVColmunEnum {
-    LIB_01("ライブラリ名", 1, false, null, true, ""),
-    LIB_02("言語", 2, false, null, true, ""),
-    LIB_03("現在バージョン", 3, false, null, true, ""),
-    LIB_04("現在バージョンリリース日", 4, false, null, true, ""),
-    LIB_05("最新バージョン", 5, false, null, true, ""),
-    LIB_06("最新バージョンリリース日", 6, false, null, true, ""),
-    LIB_07("スコア", 7, false, null, true, ""),
-    LIB_08("使用クラス数", 8, false, null, true, ""),
-    LIB_09("全体クラス数", 9, false, null, true, ""),
-    LIB_10("ライセンス", 10, true, ",", true, ""),
-    LIB_11("関連アプリケーション", 11, true, ",", true, ""),
-    LIB_12("関連サーバ", 12, true, ",", true, ""),
-    LIB_13("CVE", 14, true, ",", true, ""),
-    LIB_14("ライブラリタグ", 13, true, ",", true, ""),
-    LIB_15("組織名", 18, false, null, false, ""),
-    LIB_16("組織ID", 19, false, null, false, ""),
-    LIB_17("リンク", 20, false, null, false, "TeamServerへのリンクです。"),
-    LIB_18("リンク(ハイパーリンク)", 21, false, null, false, "TeamServerへのリンク（ハイパーリンク）です。"),
-    LIB_19("ライブラリ制限に抵触", 15, false, null, false, "ライブラリ・コンプライアンス"),
-    LIB_20("バージョン要件に抵触", 16, false, null, false, "ライブラリ・コンプライアンス"),
-    LIB_21("ライセンス制限に抵触", 17, false, null, false, "ライブラリ・コンプライアンス");
+    LIB_01("ライブラリ名", 1, false, null, false, null, null, true, ""),
+    LIB_02("言語", 2, false, null, false, null, null, true, ""),
+    LIB_03("現在バージョン", 3, false, null, false, null, null, true, ""),
+    LIB_04("現在バージョンリリース日", 4, false, null, false, null, null, true, ""),
+    LIB_05("最新バージョン", 5, false, null, false, null, null, true, ""),
+    LIB_06("最新バージョンリリース日", 6, false, null, false, null, null, true, ""),
+    LIB_07("スコア", 7, false, null, false, null, null, true, ""),
+    LIB_08("使用クラス数", 8, false, null, false, null, null, true, ""),
+    LIB_09("全体クラス数", 9, false, null, false, null, null, true, ""),
+    LIB_10("ライセンス", 10, true, ",", false, null, null, true, ""),
+    LIB_11("関連アプリケーション", 11, true, ",", false, null, null, true, ""),
+    LIB_12("関連サーバ", 12, true, ",", false, null, null, true, ""),
+    LIB_13("CVE", 14, true, ",", false, null, null, true, ""),
+    LIB_14("ライブラリタグ", 13, true, ",", false, null, null, true, ""),
+    LIB_15("組織名", 18, false, null, false, null, null, false, ""),
+    LIB_16("組織ID", 19, false, null, false, null, null, false, ""),
+    LIB_17("リンク", 20, false, null, false, null, null, false, "TeamServerへのリンクです。"),
+    LIB_18("リンク(ハイパーリンク)", 21, false, null, false, null, null, false, "TeamServerへのリンク（ハイパーリンク）です。"),
+    LIB_19("ライブラリ制限に抵触", 15, false, null, true, "Yes", "No", false, "ライブラリ・コンプライアンス"),
+    LIB_20("バージョン要件に抵触", 16, false, null, true, "Yes", "No", false, "ライブラリ・コンプライアンス"),
+    LIB_21("ライセンス制限に抵触", 17, false, null, true, "Yes", "No", false, "ライブラリ・コンプライアンス");
 
     private String culumn;
     private int order;
     private boolean isSeparate;
     private String separate;
+    private boolean isBoolean;
+    private String trueStr;
+    private String falseStr;
     private boolean isDefault;
     private String remarks;
 
-    private LibCSVColmunEnum(String culumn, int order, boolean isSeparate, String separate, boolean isDefault, String remarks) {
+    private LibCSVColmunEnum(String culumn, int order, boolean isSeparate, String separate, boolean isBoolean, String trueStr, String falseStr, boolean isDefault, String remarks) {
         this.culumn = culumn;
         this.order = order;
         this.isSeparate = isSeparate;
         this.separate = separate;
+        this.isBoolean = isBoolean;
+        this.trueStr = trueStr;
+        this.falseStr = falseStr;
         this.isDefault = isDefault;
         this.remarks = remarks;
     }
@@ -81,6 +87,18 @@ public enum LibCSVColmunEnum {
 
     public String getSeparate() {
         return separate;
+    }
+
+    public boolean isBoolean() {
+        return isBoolean;
+    }
+
+    public String getTrueStr() {
+        return trueStr;
+    }
+
+    public String getFalseStr() {
+        return falseStr;
     }
 
     public boolean isDefault() {

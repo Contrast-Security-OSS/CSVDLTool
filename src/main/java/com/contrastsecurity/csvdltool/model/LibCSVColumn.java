@@ -29,12 +29,18 @@ public class LibCSVColumn {
     private LibCSVColmunEnum column;
     private String separateStr;
     private boolean separate;
+    private String trueStr;
+    private String falseStr;
+    private boolean isBoolean;
     private boolean valid;
 
     public LibCSVColumn(LibCSVColmunEnum column) {
         this.column = column;
         this.separateStr = column.getSeparate();
         this.separate = column.isSeparate();
+        this.trueStr = column.getTrueStr();
+        this.falseStr = column.getFalseStr();
+        this.isBoolean = column.isBoolean();
         this.valid = column.isDefault();
     }
 
@@ -60,6 +66,30 @@ public class LibCSVColumn {
 
     public void setSeparate(boolean separate) {
         this.separate = separate;
+    }
+
+    public String getTrueStr() {
+        return trueStr;
+    }
+
+    public void setTrueStr(String trueStr) {
+        this.trueStr = trueStr;
+    }
+
+    public String getFalseStr() {
+        return falseStr;
+    }
+
+    public void setFalseStr(String falseStr) {
+        this.falseStr = falseStr;
+    }
+
+    public boolean isBoolean() {
+        return isBoolean;
+    }
+
+    public void setBoolean(boolean isBoolean) {
+        this.isBoolean = isBoolean;
     }
 
     public boolean isValid() {

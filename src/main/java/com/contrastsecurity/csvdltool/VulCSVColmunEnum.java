@@ -33,43 +33,49 @@ import com.contrastsecurity.csvdltool.model.VulCSVColumn;
 import com.google.gson.Gson;
 
 public enum VulCSVColmunEnum {
-    VUL_01("アプリケーション名", 1, false, null, true, ""),
-    VUL_02("マージしたときの各アプリ名称", 2, false, null, true, ""),
-    VUL_03("アプリケーションID", 3, false, null, false, ""),
-    VUL_04("アプリケーションタグ", 4, true, ",", true, ""),
-    VUL_05("カテゴリ", 5, false, null, true, ""),
-    VUL_06("ルール", 6, false, null, true, ""),
-    VUL_07("深刻度", 7, false, null, true, ""),
-    VUL_08("CWE", 8, true, ",", true, ""),
-    VUL_09("ステータス", 9, false, null, true, ""),
-    VUL_10("言語", 11, false, null, true, ""),
-    VUL_11("アプリケーションのグループ", 12, true, ",", true, "Admin権限のユーザーが設定されている場合、取得可能です。"),
-    VUL_12("脆弱性のタイトル", 13, false, null, true, ""),
-    VUL_13("最初の検出", 14, false, null, true, ""),
-    VUL_14("最後の検出", 15, false, null, true, ""),
-    VUL_15("ビルド番号", 16, true, ",", true, ""),
-    VUL_16("次のサーバにより報告", 17, true, ",", true, ""),
-    VUL_17("モジュール", 18, false, null, true, ""),
-    VUL_18("脆弱性タグ", 19, true, ",", true, ""),
-    VUL_19("保留中ステータス", 10, false, null, false, ""),
-    VUL_20("組織名", 20, false, null, false, ""),
-    VUL_21("組織ID", 21, false, null, false, ""),
-    VUL_22("リンク", 22, false, null, false, "TeamServerへのリンクです。"),
-    VUL_23("リンク(ハイパーリンク)", 23, false, null, false, "TeamServerへのリンク（ハイパーリンク）です。"),
-    VUL_24("ルートURL", 24, true, ",", false, "ルートカバレッジのURLです。");
+    VUL_01("アプリケーション名", 1, false, null, false, null, null, true, ""),
+    VUL_02("マージしたときの各アプリ名称", 2, false, null, false, null, null, true, ""),
+    VUL_03("アプリケーションID", 3, false, null, false, null, null, false, ""),
+    VUL_04("アプリケーションタグ", 4, true, ",", false, null, null, true, ""),
+    VUL_05("カテゴリ", 5, false, null, false, null, null, true, ""),
+    VUL_06("ルール", 6, false, null, false, null, null, true, ""),
+    VUL_07("深刻度", 7, false, null, false, null, null, true, ""),
+    VUL_08("CWE", 8, true, ",", false, null, null, true, ""),
+    VUL_09("ステータス", 9, false, null, false, null, null, true, ""),
+    VUL_10("言語", 11, false, null, false, null, null, true, ""),
+    VUL_11("アプリケーションのグループ", 12, true, ",", false, null, null, true, "Admin権限のユーザーが設定されている場合、取得可能です。"),
+    VUL_12("脆弱性のタイトル", 13, false, null, false, null, null, true, ""),
+    VUL_13("最初の検出", 14, false, null, false, null, null, true, ""),
+    VUL_14("最後の検出", 15, false, null, false, null, null, true, ""),
+    VUL_15("ビルド番号", 16, true, ",", false, null, null, true, ""),
+    VUL_16("次のサーバにより報告", 17, true, ",", false, null, null, true, ""),
+    VUL_17("モジュール", 18, false, null, false, null, null, true, ""),
+    VUL_18("脆弱性タグ", 19, true, ",", false, null, null, true, ""),
+    VUL_19("保留中ステータス", 10, false, null, false, null, null, false, ""),
+    VUL_20("組織名", 20, false, null, false, null, null, false, ""),
+    VUL_21("組織ID", 21, false, null, false, null, null, false, ""),
+    VUL_22("リンク", 22, false, null, false, null, null, false, "TeamServerへのリンクです。"),
+    VUL_23("リンク(ハイパーリンク)", 23, false, null, false, null, null, false, "TeamServerへのリンク（ハイパーリンク）です。"),
+    VUL_24("ルートURL", 24, true, ",", false, null, null, false, "ルートカバレッジのURLです。");
 
     private String culumn;
     private int order;
     private boolean isSeparate;
     private String separate;
+    private boolean isBoolean;
+    private String trueStr;
+    private String falseStr;
     private boolean isDefault;
     private String remarks;
 
-    private VulCSVColmunEnum(String culumn, int order, boolean isSeparate, String separate, boolean isDefault, String remarks) {
+    private VulCSVColmunEnum(String culumn, int order, boolean isSeparate, String separate, boolean isBoolean, String trueStr, String falseStr, boolean isDefault, String remarks) {
         this.culumn = culumn;
         this.order = order;
         this.isSeparate = isSeparate;
         this.separate = separate;
+        this.isBoolean = isBoolean;
+        this.trueStr = trueStr;
+        this.falseStr = falseStr;
         this.isDefault = isDefault;
         this.remarks = remarks;
     }
@@ -84,6 +90,18 @@ public enum VulCSVColmunEnum {
 
     public String getSeparate() {
         return separate;
+    }
+
+    public boolean isBoolean() {
+        return isBoolean;
+    }
+
+    public String getTrueStr() {
+        return trueStr;
+    }
+
+    public String getFalseStr() {
+        return falseStr;
     }
 
     public boolean isDefault() {

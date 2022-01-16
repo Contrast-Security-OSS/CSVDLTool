@@ -69,6 +69,8 @@ public class VulCSVColumnPreferencePage extends PreferencePage {
     private List<VulCSVColumn> columnList;
     private List<Button> checkBoxList = new ArrayList<Button>();
     private List<Text> separateTextList = new ArrayList<Text>();
+    private List<Text> trueTextList = new ArrayList<Text>();
+    private List<Text> falseTextList = new ArrayList<Text>();
     private Table table;
 
     public VulCSVColumnPreferencePage() {
@@ -171,9 +173,15 @@ public class VulCSVColumnPreferencePage extends PreferencePage {
         TableColumn column3 = new TableColumn(table, SWT.CENTER);
         column3.setWidth(75);
         column3.setText("区切り文字");
-        TableColumn column4 = new TableColumn(table, SWT.LEFT);
-        column4.setWidth(350);
-        column4.setText("備考");
+        TableColumn column4 = new TableColumn(table, SWT.CENTER);
+        column4.setWidth(75);
+        column4.setText("true");
+        TableColumn column5 = new TableColumn(table, SWT.CENTER);
+        column5.setWidth(75);
+        column5.setText("false");
+        TableColumn column6 = new TableColumn(table, SWT.LEFT);
+        column6.setWidth(350);
+        column6.setText("備考");
 
         for (VulCSVColumn col : columnList) {
             this.addColToTable(col, -1);
@@ -235,6 +243,14 @@ public class VulCSVColumnPreferencePage extends PreferencePage {
                         text.dispose();
                     }
                     separateTextList.clear();
+                    for (Text text : trueTextList) {
+                        text.dispose();
+                    }
+                    trueTextList.clear();
+                    for (Text text : falseTextList) {
+                        text.dispose();
+                    }
+                    falseTextList.clear();
                     table.removeAll();
                     for (VulCSVColumn col : columnList) {
                         addColToTable(col, -1);
@@ -278,7 +294,11 @@ public class VulCSVColumnPreferencePage extends PreferencePage {
         });
 
         Label descLabel = new Label(csvColumnGrp, SWT.LEFT);
-        descLabel.setText("・ ドラッグアンドドロップで項目の並び替えが可能です。\r\n・ 複数の値が出力される項目については、区切り文字の変更が可能です。改行させる場合は\\r\\nをご指定してください。");
+        List<String> descLabelList = new ArrayList<String>();
+        descLabelList.add("・ ドラッグアンドドロップで項目の並び替えが可能です。");
+        descLabelList.add("・ 複数の値が出力される項目については、区切り文字の変更が可能です。改行させる場合は\\r\\nをご指定してください。");
+        descLabelList.add("・ 真偽の値が出力される項目については、Yes/No文字の変更が可能です。例) Y/N、○/");
+        descLabel.setText(String.join("\r\n", descLabelList));
         GridData descLabelGrDt = new GridData(GridData.FILL_HORIZONTAL);
         descLabelGrDt.horizontalSpan = 3;
         descLabel.setLayoutData(descLabelGrDt);
@@ -314,6 +334,14 @@ public class VulCSVColumnPreferencePage extends PreferencePage {
                     text.dispose();
                 }
                 separateTextList.clear();
+                for (Text text : trueTextList) {
+                    text.dispose();
+                }
+                trueTextList.clear();
+                for (Text text : falseTextList) {
+                    text.dispose();
+                }
+                falseTextList.clear();
                 table.removeAll();
                 for (VulCSVColmunEnum colEnum : VulCSVColmunEnum.sortedValues()) {
                     columnList.add(new VulCSVColumn(colEnum));
@@ -418,6 +446,55 @@ public class VulCSVColumnPreferencePage extends PreferencePage {
             item.setText(3, "");
             separateTextList.add(new Text(table, SWT.NONE));
         }
-        item.setText(4, col.getColumn().getRemarks());
+        if (col.isBoolean()) {
+            // TrueStr
+            TableEditor editor3 = new TableEditor(table);
+            Text trueText = new Text(table, SWT.NONE);
+            trueText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+            trueText.setTextLimit(10);
+            trueText.setText(col.getTrueStr());
+            trueText.addModifyListener(new ModifyListener() {
+                @Override
+                public void modifyText(ModifyEvent e) {
+                    Text modifyText = (Text) e.getSource();
+                    int modifyIndex = trueTextList.indexOf(modifyText);
+                    String text = modifyText.getText();
+                    VulCSVColumn targetColumn = columnList.get(modifyIndex);
+                    targetColumn.setTrueStr(text);
+                }
+            });
+            trueText.pack();
+            editor3.grabHorizontal = true;
+            editor3.horizontalAlignment = SWT.CENTER;
+            editor3.setEditor(trueText, item, 4);
+            trueTextList.add(trueText);
+            // FalseStr
+            TableEditor editor4 = new TableEditor(table);
+            Text falseText = new Text(table, SWT.NONE);
+            falseText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+            falseText.setTextLimit(10);
+            falseText.setText(col.getFalseStr());
+            falseText.addModifyListener(new ModifyListener() {
+                @Override
+                public void modifyText(ModifyEvent e) {
+                    Text modifyText = (Text) e.getSource();
+                    int modifyIndex = falseTextList.indexOf(modifyText);
+                    String text = modifyText.getText();
+                    VulCSVColumn targetColumn = columnList.get(modifyIndex);
+                    targetColumn.setFalseStr(text);
+                }
+            });
+            falseText.pack();
+            editor4.grabHorizontal = true;
+            editor4.horizontalAlignment = SWT.CENTER;
+            editor4.setEditor(falseText, item, 5);
+            falseTextList.add(falseText);
+        } else {
+            item.setText(4, "");
+            item.setText(5, "");
+            trueTextList.add(new Text(table, SWT.NONE));
+            falseTextList.add(new Text(table, SWT.NONE));
+        }
+        item.setText(6, col.getColumn().getRemarks());
     }
 }

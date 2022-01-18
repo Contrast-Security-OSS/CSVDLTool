@@ -8,3 +8,5 @@
 /contrast_security.yaml
 /csvdltool.properties
 /csvdltool.log
+.DS_Store
+contrast-code.pfx

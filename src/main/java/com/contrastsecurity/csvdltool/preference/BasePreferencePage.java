@@ -383,9 +383,9 @@ public class BasePreferencePage extends PreferencePage {
                 return false;
             }
         }
-        ps.setValue(PreferenceConstants.CONTRAST_URL, this.contrastUrlTxt.getText());
-        ps.setValue(PreferenceConstants.SERVICE_KEY, this.serviceKeyTxt.getText());
-        ps.setValue(PreferenceConstants.USERNAME, this.userNameTxt.getText());
+        ps.setValue(PreferenceConstants.CONTRAST_URL, url);
+        ps.setValue(PreferenceConstants.SERVICE_KEY, svc);
+        ps.setValue(PreferenceConstants.USERNAME, usr);
         for (Organization org : this.orgList) {
             org.setValid(false);
             for (Integer selectedIdx : selectedIdxes) {

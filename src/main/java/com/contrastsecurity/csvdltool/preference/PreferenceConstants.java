@@ -25,7 +25,6 @@ package com.contrastsecurity.csvdltool.preference;
 
 public class PreferenceConstants {
     public static final String CONTRAST_URL = new String("com.contrastsecurity.csvdltool.contrast_url");
-    public static final String API_KEY = new String("com.contrastsecurity.csvdltool.api_key");
     public static final String SERVICE_KEY = new String("com.contrastsecurity.csvdltool.service_key");
     public static final String USERNAME = new String("com.contrastsecurity.csvdltool.username");
     public static final String TARGET_ORGS = new String("com.contrastsecurity.csvdltool.target_orgs");

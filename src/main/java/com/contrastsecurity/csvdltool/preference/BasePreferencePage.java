@@ -256,7 +256,7 @@ public class BasePreferencePage extends PreferencePage {
         }
         addBtn.addSelectionListener(new SelectionAdapter() {
             @Override
-            public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent event) {
                 if (preferenceStore.getBoolean(PreferenceConstants.PROXY_YUKO) && preferenceStore.getString(PreferenceConstants.PROXY_AUTH).equals("input")) {
                     String usr = preferenceStore.getString(PreferenceConstants.PROXY_TMP_USER);
                     String pwd = preferenceStore.getString(PreferenceConstants.PROXY_TMP_PASS);

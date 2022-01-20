@@ -121,7 +121,7 @@ import com.google.gson.reflect.TypeToken;
 
 public class Main implements PropertyChangeListener {
 
-    public static final String WINDOW_TITLE = "ContrastTool - %s";
+    public static final String WINDOW_TITLE = "CSVDLTool - %s";
     // 以下のMASTER_PASSWORDはプロキシパスワードを保存する際に暗号化で使用するパスワードです。
     // 本ツールをリリース用にコンパイルする際はchangemeを別の文字列に置き換えてください。
     public static final String MASTER_PASSWORD = "changeme!";

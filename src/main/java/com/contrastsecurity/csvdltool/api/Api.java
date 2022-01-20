@@ -76,6 +76,7 @@ public abstract class Api {
 
     protected IPreferenceStore preferenceStore;
     protected Organization organization;
+    protected boolean success;
     protected int totalCount;
 
     public Api(IPreferenceStore preferenceStore, Organization organization) {
@@ -96,6 +97,10 @@ public abstract class Api {
     public Object put() throws Exception {
         String response = this.getResponse(HttpMethod.PUT);
         return this.convert(response);
+    }
+
+    public boolean isSuccess() {
+        return success;
     }
 
     public int getTotalCount() {

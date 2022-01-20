@@ -39,7 +39,7 @@ import org.eclipse.swt.widgets.Link;
 public class AboutPage extends PreferencePage {
 
     public AboutPage() {
-        super("ContrastToolについて");
+        super("CSVDLToolについて");
     }
 
     @Override

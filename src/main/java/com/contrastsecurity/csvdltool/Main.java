@@ -488,8 +488,8 @@ public class Main implements PropertyChangeListener {
 
         this.srcCount = new Label(srcGrp, SWT.RIGHT);
         GridData srcCountGrDt = new GridData(GridData.FILL_HORIZONTAL);
-        srcCountGrDt.minimumHeight = 18;
-        srcCountGrDt.heightHint = 18;
+        srcCountGrDt.minimumHeight = 20;
+        srcCountGrDt.heightHint = 20;
         this.srcCount.setLayoutData(srcCountGrDt);
         this.srcCount.setFont(new Font(display, "ＭＳ ゴシック", 8, SWT.NORMAL));
         this.srcCount.setText("0");
@@ -661,11 +661,11 @@ public class Main implements PropertyChangeListener {
         });
 
         this.dstCount = new Label(dstGrp, SWT.RIGHT);
-        this.dstCount.setFont(new Font(display, "ＭＳ ゴシック", 8, SWT.NORMAL));
         GridData dstCountGrDt = new GridData(GridData.FILL_HORIZONTAL);
         dstCountGrDt.minimumHeight = 20;
         dstCountGrDt.heightHint = 20;
         this.dstCount.setLayoutData(dstCountGrDt);
+        this.dstCount.setFont(new Font(display, "ＭＳ ゴシック", 8, SWT.NORMAL));
         this.dstCount.setText("0");
 
         subTabFolder = new CTabFolder(assessShell, SWT.NONE);

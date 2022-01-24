@@ -93,7 +93,7 @@ public class AttackEventsGetWithProgress implements IRunnableWithProgress {
                     incompleteFlg = totalCount > orgAttackEvents.size();
                 }
                 sub1Monitor.done();
-                allAttackEvents.addAll(orgAttackEvents);
+                this.allAttackEvents.addAll(orgAttackEvents);
                 Thread.sleep(500);
             } catch (Exception e) {
                 throw new InvocationTargetException(e);
@@ -103,11 +103,11 @@ public class AttackEventsGetWithProgress implements IRunnableWithProgress {
     }
 
     public List<AttackEvent> getAllAttackEvents() {
-        return allAttackEvents;
+        return this.allAttackEvents;
     }
 
     public Map<FilterEnum, Set<Filter>> getFilterMap() {
-        for (AttackEvent attackEvent : allAttackEvents) {
+        for (AttackEvent attackEvent : this.allAttackEvents) {
             sourceIpFilterSet.add(new Filter(attackEvent.getSource()));
             applicationFilterSet.add(new Filter(attackEvent.getApplication().getName()));
             ruleFilterSet.add(new Filter(attackEvent.getRule()));

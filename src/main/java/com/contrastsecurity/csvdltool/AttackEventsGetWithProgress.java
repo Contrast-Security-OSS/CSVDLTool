@@ -47,7 +47,7 @@ public class AttackEventsGetWithProgress implements IRunnableWithProgress {
 
     private PreferenceStore preferenceStore;
     private List<Organization> organizations;
-    private List<AttackEvent> attackEvents;
+    private List<AttackEvent> allAttackEvents;
     private Set<Filter> sourceIpFilterSet = new LinkedHashSet<Filter>();
     private Set<Filter> applicationFilterSet = new LinkedHashSet<Filter>();
     private Set<Filter> ruleFilterSet = new LinkedHashSet<Filter>();
@@ -57,6 +57,7 @@ public class AttackEventsGetWithProgress implements IRunnableWithProgress {
     public AttackEventsGetWithProgress(PreferenceStore preferenceStore, List<Organization> organizations) {
         this.preferenceStore = preferenceStore;
         this.organizations = organizations;
+        this.allAttackEvents = new ArrayList<AttackEvent>();
     }
 
     @SuppressWarnings("unchecked")
@@ -65,34 +66,34 @@ public class AttackEventsGetWithProgress implements IRunnableWithProgress {
         monitor.beginTask("攻撃イベント一覧の読み込み...", 100 * this.organizations.size());
         for (Organization org : this.organizations) {
             try {
+                List<AttackEvent> orgAttackEvents = new ArrayList<AttackEvent>();
                 monitor.setTaskName(org.getName());
-                List<AttackEvent> allAttackEvents = new ArrayList<AttackEvent>();
                 // アプリケーション一覧を取得
                 monitor.subTask("攻撃イベント一覧の情報を取得...");
-                Api attacksApi = new AttackEventsApi(preferenceStore, org, allAttackEvents.size());
-                attackEvents = (List<AttackEvent>) attacksApi.get();
-                allAttackEvents.addAll((List<AttackEvent>) attacksApi.get());
+                Api attacksApi = new AttackEventsApi(preferenceStore, org, orgAttackEvents.size());
+                List<AttackEvent> tmpAttackEvents = (List<AttackEvent>) attacksApi.get();
+                orgAttackEvents.addAll(tmpAttackEvents);
                 int totalCount = attacksApi.getTotalCount();
                 SubProgressMonitor sub1Monitor = new SubProgressMonitor(monitor, 100);
                 sub1Monitor.beginTask("", totalCount);
-                monitor.subTask(String.format("攻撃イベント一覧の情報を取得...(%d/%d)", allAttackEvents.size(), totalCount));
-                sub1Monitor.worked(attackEvents.size());
+                monitor.subTask(String.format("攻撃イベント一覧の情報を取得...(%d/%d)", orgAttackEvents.size(), totalCount));
+                sub1Monitor.worked(tmpAttackEvents.size());
                 boolean incompleteFlg = false;
-                incompleteFlg = totalCount > allAttackEvents.size();
+                incompleteFlg = totalCount > orgAttackEvents.size();
                 while (incompleteFlg) {
+                    Thread.sleep(200);
                     if (monitor.isCanceled()) {
                         throw new InterruptedException("キャンセルされました。");
                     }
-                    attacksApi = new AttackEventsApi(preferenceStore, org, allAttackEvents.size());
-                    List<AttackEvent> attackEvents = (List<AttackEvent>) attacksApi.get();
-                    monitor.subTask(String.format("攻撃イベント一覧の情報を取得...(%d/%d)", allAttackEvents.size(), totalCount));
-                    sub1Monitor.worked(attackEvents.size());
-                    allAttackEvents.addAll(attackEvents);
-                    incompleteFlg = totalCount > allAttackEvents.size();
-                    Thread.sleep(200);
+                    attacksApi = new AttackEventsApi(preferenceStore, org, orgAttackEvents.size());
+                    tmpAttackEvents = (List<AttackEvent>) attacksApi.get();
+                    orgAttackEvents.addAll(tmpAttackEvents);
+                    monitor.subTask(String.format("攻撃イベント一覧の情報を取得...(%d/%d)", orgAttackEvents.size(), totalCount));
+                    sub1Monitor.worked(tmpAttackEvents.size());
+                    incompleteFlg = totalCount > orgAttackEvents.size();
                 }
                 sub1Monitor.done();
-                System.out.println(allAttackEvents.size());
+                allAttackEvents.addAll(orgAttackEvents);
                 Thread.sleep(500);
             } catch (Exception e) {
                 throw new InvocationTargetException(e);
@@ -101,12 +102,12 @@ public class AttackEventsGetWithProgress implements IRunnableWithProgress {
         monitor.done();
     }
 
-    public List<AttackEvent> getAttackEvents() {
-        return attackEvents;
+    public List<AttackEvent> getAllAttackEvents() {
+        return allAttackEvents;
     }
 
     public Map<FilterEnum, Set<Filter>> getFilterMap() {
-        for (AttackEvent attackEvent : attackEvents) {
+        for (AttackEvent attackEvent : allAttackEvents) {
             sourceIpFilterSet.add(new Filter(attackEvent.getSource()));
             applicationFilterSet.add(new Filter(attackEvent.getApplication().getName()));
             ruleFilterSet.add(new Filter(attackEvent.getRule()));

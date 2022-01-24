@@ -986,7 +986,7 @@ public class Main implements PropertyChangeListener {
                 ProgressMonitorDialog progDialog = new AttackGetProgressMonitorDialog(shell);
                 try {
                     progDialog.run(true, true, progress);
-                    attackEvents = progress.getAttackEvents();
+                    attackEvents = progress.getAllAttackEvents();
                     Collections.reverse(attackEvents);
                     filteredAttackEvents.addAll(attackEvents);
                     for (AttackEvent attackEvent : attackEvents) {

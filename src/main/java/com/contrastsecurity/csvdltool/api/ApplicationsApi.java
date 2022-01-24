@@ -50,8 +50,8 @@ public class ApplicationsApi extends Api {
         Gson gson = new Gson();
         Type contType = new TypeToken<ApplicationsJson>() {
         }.getType();
-        ApplicationsJson applicationJson = gson.fromJson(response, contType);
-        return applicationJson.getApplications();
+        ApplicationsJson applicationsJson = gson.fromJson(response, contType);
+        return applicationsJson.getApplications();
     }
 
 }

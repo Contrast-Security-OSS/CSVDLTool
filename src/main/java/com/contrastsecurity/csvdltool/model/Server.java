@@ -31,6 +31,8 @@ public class Server {
     private String enabled;
     private String server_id;
     private String agent_version;
+    private String language;
+    private String path;
 
     public String getName() {
         return name;
@@ -90,6 +92,22 @@ public class Server {
 
     public void setAgent_version(String agent_version) {
         this.agent_version = agent_version;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
     }
 
 }

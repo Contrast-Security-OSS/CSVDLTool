@@ -1632,6 +1632,7 @@ public class Main implements PropertyChangeListener {
     public void propertyChange(PropertyChangeEvent event) {
         if ("attackEventFilter".equals(event.getPropertyName())) {
             Map<FilterEnum, Set<Filter>> filterMap = (Map<FilterEnum, Set<Filter>>) event.getNewValue();
+            attackTable.clearAll();
             attackTable.removeAll();
             filteredAttackEvents.clear();
             for (AttackEvent attackEvent : attackEvents) {
@@ -1678,6 +1679,7 @@ public class Main implements PropertyChangeListener {
             }
         } else if ("serverFilter".equals(event.getPropertyName())) {
             Map<FilterEnum, Set<Filter>> filterMap = (Map<FilterEnum, Set<Filter>>) event.getNewValue();
+            serverTable.clearAll();
             serverTable.removeAll();
             filteredServers.clear();
             for (Server server : servers) {

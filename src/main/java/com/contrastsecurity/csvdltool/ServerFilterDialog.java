@@ -52,16 +52,14 @@ import org.eclipse.swt.widgets.Table;
 
 import com.contrastsecurity.csvdltool.model.Filter;
 
-public class AttackEventFilterDialog extends Dialog {
+public class ServerFilterDialog extends Dialog {
 
     private Map<FilterEnum, Set<Filter>> filterMap;
-    private CheckboxTableViewer srcIpViewer;
-    private CheckboxTableViewer appViewer;
-    private CheckboxTableViewer ruleViewer;
-    private CheckboxTableViewer tagViewer;
+    private CheckboxTableViewer languageViewer;
+    private CheckboxTableViewer agentVersionViewer;
     private PropertyChangeSupport support = new PropertyChangeSupport(this);
 
-    public AttackEventFilterDialog(Shell parentShell, Map<FilterEnum, Set<Filter>> filterMap) {
+    public ServerFilterDialog(Shell parentShell, Map<FilterEnum, Set<Filter>> filterMap) {
         super(parentShell);
         this.filterMap = filterMap;
     }
@@ -69,7 +67,7 @@ public class AttackEventFilterDialog extends Dialog {
     @Override
     protected Control createDialogArea(Composite parent) {
         Composite composite = (Composite) super.createDialogArea(parent);
-        GridLayout compositeLt = new GridLayout(4, false);
+        GridLayout compositeLt = new GridLayout(3, false);
         compositeLt.marginWidth = 25;
         compositeLt.marginHeight = 5;
         compositeLt.horizontalSpacing = 5;
@@ -90,8 +88,8 @@ public class AttackEventFilterDialog extends Dialog {
         final Table srcIpTable = new Table(srcIpGrp, SWT.CHECK | SWT.BORDER | SWT.V_SCROLL);
         GridData srcIpTableGrDt = new GridData(GridData.FILL_BOTH);
         srcIpTable.setLayoutData(srcIpTableGrDt);
-        srcIpViewer = new CheckboxTableViewer(srcIpTable);
-        srcIpViewer.setLabelProvider(new ColumnLabelProvider() {
+        languageViewer = new CheckboxTableViewer(srcIpTable);
+        languageViewer.setLabelProvider(new ColumnLabelProvider() {
             @Override
             public String getText(Object element) {
                 return element.toString();
@@ -99,7 +97,7 @@ public class AttackEventFilterDialog extends Dialog {
         });
         List<String> srcLabelList = new ArrayList<String>();
         List<String> srcValidLabelList = new ArrayList<String>();
-        for (Filter filter : filterMap.get(FilterEnum.SOURCEIP)) {
+        for (Filter filter : filterMap.get(FilterEnum.LANGUAGE)) {
             srcLabelList.add(filter.getLabel());
             if (filter.isValid()) {
                 srcValidLabelList.add(filter.getLabel());
@@ -109,10 +107,10 @@ public class AttackEventFilterDialog extends Dialog {
         if (srcValidLabelList.isEmpty()) {
             srcValidLabelList.addAll(srcLabelList);
         }
-        srcIpViewer.setContentProvider(new ArrayContentProvider());
-        srcIpViewer.setInput(srcLabelList);
-        srcIpViewer.setCheckedElements(srcValidLabelList.toArray());
-        srcIpViewer.addCheckStateListener(new ICheckStateListener() {
+        languageViewer.setContentProvider(new ArrayContentProvider());
+        languageViewer.setInput(srcLabelList);
+        languageViewer.setCheckedElements(srcValidLabelList.toArray());
+        languageViewer.addCheckStateListener(new ICheckStateListener() {
             @Override
             public void checkStateChanged(CheckStateChangedEvent event) {
                 checkStateUpdate();
@@ -128,11 +126,11 @@ public class AttackEventFilterDialog extends Dialog {
             public void widgetSelected(SelectionEvent e) {
                 if (srcIpBulkBtn.getSelection()) {
                     srcValidLabelList.addAll(srcLabelList);
-                    srcIpViewer.setCheckedElements(srcValidLabelList.toArray());
-                    srcIpViewer.refresh();
+                    languageViewer.setCheckedElements(srcValidLabelList.toArray());
+                    languageViewer.refresh();
                 } else {
-                    srcIpViewer.setCheckedElements(new ArrayList<String>().toArray());
-                    srcIpViewer.refresh();
+                    languageViewer.setCheckedElements(new ArrayList<String>().toArray());
+                    languageViewer.refresh();
                 }
                 checkStateUpdate();
             }
@@ -151,8 +149,8 @@ public class AttackEventFilterDialog extends Dialog {
         final Table appTable = new Table(appGrp, SWT.CHECK | SWT.BORDER | SWT.V_SCROLL);
         GridData appTableGrDt = new GridData(GridData.FILL_BOTH);
         appTable.setLayoutData(appTableGrDt);
-        appViewer = new CheckboxTableViewer(appTable);
-        appViewer.setLabelProvider(new ColumnLabelProvider() {
+        agentVersionViewer = new CheckboxTableViewer(appTable);
+        agentVersionViewer.setLabelProvider(new ColumnLabelProvider() {
             @Override
             public String getText(Object element) {
                 return element.toString();
@@ -160,7 +158,7 @@ public class AttackEventFilterDialog extends Dialog {
         });
         List<String> appLabelList = new ArrayList<String>();
         List<String> appValidLabelList = new ArrayList<String>();
-        for (Filter filter : filterMap.get(FilterEnum.APPLICATION)) {
+        for (Filter filter : filterMap.get(FilterEnum.AGENT_VERSION)) {
             appLabelList.add(filter.getLabel());
             if (filter.isValid()) {
                 appValidLabelList.add(filter.getLabel());
@@ -170,10 +168,10 @@ public class AttackEventFilterDialog extends Dialog {
         if (appValidLabelList.isEmpty()) {
             appValidLabelList.addAll(appLabelList);
         }
-        appViewer.setContentProvider(new ArrayContentProvider());
-        appViewer.setInput(appLabelList);
-        appViewer.setCheckedElements(appValidLabelList.toArray());
-        appViewer.addCheckStateListener(new ICheckStateListener() {
+        agentVersionViewer.setContentProvider(new ArrayContentProvider());
+        agentVersionViewer.setInput(appLabelList);
+        agentVersionViewer.setCheckedElements(appValidLabelList.toArray());
+        agentVersionViewer.addCheckStateListener(new ICheckStateListener() {
             @Override
             public void checkStateChanged(CheckStateChangedEvent event) {
                 checkStateUpdate();
@@ -189,133 +187,11 @@ public class AttackEventFilterDialog extends Dialog {
             public void widgetSelected(SelectionEvent e) {
                 if (appBulkBtn.getSelection()) {
                     appValidLabelList.addAll(appLabelList);
-                    appViewer.setCheckedElements(appValidLabelList.toArray());
-                    appViewer.refresh();
+                    agentVersionViewer.setCheckedElements(appValidLabelList.toArray());
+                    agentVersionViewer.refresh();
                 } else {
-                    appViewer.setCheckedElements(new ArrayList<String>().toArray());
-                    appViewer.refresh();
-                }
-                checkStateUpdate();
-            }
-        });
-
-        // #################### ルール #################### //
-        Group ruleGrp = new Group(composite, SWT.NONE);
-        GridLayout ruleGrpLt = new GridLayout(1, false);
-        ruleGrpLt.marginWidth = 10;
-        ruleGrpLt.marginHeight = 10;
-        ruleGrp.setLayout(ruleGrpLt);
-        GridData ruleGrpGrDt = new GridData(GridData.FILL_BOTH);
-        ruleGrp.setLayoutData(ruleGrpGrDt);
-        ruleGrp.setText("ルール");
-
-        final Table ruleTable = new Table(ruleGrp, SWT.CHECK | SWT.BORDER | SWT.V_SCROLL);
-        GridData ruleTableGrDt = new GridData(GridData.FILL_BOTH);
-        ruleTable.setLayoutData(ruleTableGrDt);
-        ruleViewer = new CheckboxTableViewer(ruleTable);
-        ruleViewer.setLabelProvider(new ColumnLabelProvider() {
-            @Override
-            public String getText(Object element) {
-                return element.toString();
-            }
-        });
-        List<String> ruleLabelList = new ArrayList<String>();
-        List<String> ruleValidLabelList = new ArrayList<String>();
-        for (Filter filter : filterMap.get(FilterEnum.RULE)) {
-            ruleLabelList.add(filter.getLabel());
-            if (filter.isValid()) {
-                ruleValidLabelList.add(filter.getLabel());
-            } else {
-            }
-        }
-        if (ruleValidLabelList.isEmpty()) {
-            ruleValidLabelList.addAll(ruleLabelList);
-        }
-        ruleViewer.setContentProvider(new ArrayContentProvider());
-        ruleViewer.setInput(ruleLabelList);
-        ruleViewer.setCheckedElements(ruleValidLabelList.toArray());
-        ruleViewer.addCheckStateListener(new ICheckStateListener() {
-            @Override
-            public void checkStateChanged(CheckStateChangedEvent event) {
-                checkStateUpdate();
-            }
-        });
-
-        final Button ruleBulkBtn = new Button(ruleGrp, SWT.CHECK);
-        ruleBulkBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        ruleBulkBtn.setText("すべて");
-        ruleBulkBtn.setSelection(true);
-        ruleBulkBtn.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                if (ruleBulkBtn.getSelection()) {
-                    ruleValidLabelList.addAll(ruleLabelList);
-                    ruleViewer.setCheckedElements(ruleValidLabelList.toArray());
-                    ruleViewer.refresh();
-                } else {
-                    ruleViewer.setCheckedElements(new ArrayList<String>().toArray());
-                    ruleViewer.refresh();
-                }
-                checkStateUpdate();
-            }
-        });
-
-        // #################### タグ #################### //
-        Group tagGrp = new Group(composite, SWT.NONE);
-        GridLayout tagGrpLt = new GridLayout(1, false);
-        tagGrpLt.marginWidth = 10;
-        tagGrpLt.marginHeight = 10;
-        tagGrp.setLayout(tagGrpLt);
-        GridData tagGrpGrDt = new GridData(GridData.FILL_BOTH);
-        tagGrp.setLayoutData(tagGrpGrDt);
-        tagGrp.setText("タグ");
-
-        final Table tagTable = new Table(tagGrp, SWT.CHECK | SWT.BORDER | SWT.V_SCROLL);
-        GridData tagTableGrDt = new GridData(GridData.FILL_BOTH);
-        tagTable.setLayoutData(tagTableGrDt);
-        tagViewer = new CheckboxTableViewer(tagTable);
-        tagViewer.setLabelProvider(new ColumnLabelProvider() {
-            @Override
-            public String getText(Object element) {
-                return element.toString();
-            }
-        });
-        List<String> tagLabelList = new ArrayList<String>();
-        List<String> tagValidLabelList = new ArrayList<String>();
-        for (Filter filter : filterMap.get(FilterEnum.TAG)) {
-            tagLabelList.add(filter.getLabel());
-            if (filter.isValid()) {
-                tagValidLabelList.add(filter.getLabel());
-            } else {
-            }
-        }
-        if (tagValidLabelList.isEmpty()) {
-            tagValidLabelList.addAll(tagLabelList);
-        }
-        tagViewer.setContentProvider(new ArrayContentProvider());
-        tagViewer.setInput(tagLabelList);
-        tagViewer.setCheckedElements(tagValidLabelList.toArray());
-        tagViewer.addCheckStateListener(new ICheckStateListener() {
-            @Override
-            public void checkStateChanged(CheckStateChangedEvent event) {
-                checkStateUpdate();
-            }
-        });
-
-        final Button tagBulkBtn = new Button(tagGrp, SWT.CHECK);
-        tagBulkBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        tagBulkBtn.setText("すべて");
-        tagBulkBtn.setSelection(true);
-        tagBulkBtn.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                if (tagBulkBtn.getSelection()) {
-                    tagValidLabelList.addAll(tagLabelList);
-                    tagViewer.setCheckedElements(tagValidLabelList.toArray());
-                    tagViewer.refresh();
-                } else {
-                    tagViewer.setCheckedElements(new ArrayList<String>().toArray());
-                    tagViewer.refresh();
+                    agentVersionViewer.setCheckedElements(new ArrayList<String>().toArray());
+                    agentVersionViewer.refresh();
                 }
                 checkStateUpdate();
             }
@@ -325,59 +201,31 @@ public class AttackEventFilterDialog extends Dialog {
     }
 
     private void checkStateUpdate() {
-        // ソースIP
-        Object[] srcIpItems = srcIpViewer.getCheckedElements();
+        Object[] srcIpItems = languageViewer.getCheckedElements();
         List<String> strItems = new ArrayList<String>();
         for (Object item : srcIpItems) {
             strItems.add((String) item);
         }
-        for (Filter filter : filterMap.get(FilterEnum.SOURCEIP)) {
+        for (Filter filter : filterMap.get(FilterEnum.LANGUAGE)) {
             if (strItems.contains(filter.getLabel())) {
                 filter.setValid(true);
             } else {
                 filter.setValid(false);
             }
         }
-        // アプリケーション名
-        Object[] appItems = appViewer.getCheckedElements();
+        Object[] appItems = agentVersionViewer.getCheckedElements();
         strItems.clear();
         for (Object item : appItems) {
             strItems.add((String) item);
         }
-        for (Filter filter : filterMap.get(FilterEnum.APPLICATION)) {
+        for (Filter filter : filterMap.get(FilterEnum.AGENT_VERSION)) {
             if (strItems.contains(filter.getLabel())) {
                 filter.setValid(true);
             } else {
                 filter.setValid(false);
             }
         }
-        // 脆弱性ルール
-        Object[] ruleItems = ruleViewer.getCheckedElements();
-        strItems.clear();
-        for (Object item : ruleItems) {
-            strItems.add((String) item);
-        }
-        for (Filter filter : filterMap.get(FilterEnum.RULE)) {
-            if (strItems.contains(filter.getLabel())) {
-                filter.setValid(true);
-            } else {
-                filter.setValid(false);
-            }
-        }
-        // タグ
-        Object[] tagItems = tagViewer.getCheckedElements();
-        strItems.clear();
-        for (Object item : tagItems) {
-            strItems.add((String) item);
-        }
-        for (Filter filter : filterMap.get(FilterEnum.TAG)) {
-            if (strItems.contains(filter.getLabel())) {
-                filter.setValid(true);
-            } else {
-                filter.setValid(false);
-            }
-        }
-        support.firePropertyChange("attackEventFilter", null, filterMap);
+        support.firePropertyChange("serverFilter", null, filterMap);
     }
 
     @Override
@@ -403,7 +251,7 @@ public class AttackEventFilterDialog extends Dialog {
     @Override
     protected void configureShell(Shell newShell) {
         super.configureShell(newShell);
-        newShell.setText("攻撃イベントフィルター");
+        newShell.setText("サーバフィルター");
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {

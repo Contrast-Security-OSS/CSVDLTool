@@ -106,6 +106,7 @@ import com.contrastsecurity.csvdltool.model.AttackEventCSVColumn;
 import com.contrastsecurity.csvdltool.model.ContrastSecurityYaml;
 import com.contrastsecurity.csvdltool.model.Filter;
 import com.contrastsecurity.csvdltool.model.Organization;
+import com.contrastsecurity.csvdltool.model.Server;
 import com.contrastsecurity.csvdltool.preference.AboutPage;
 import com.contrastsecurity.csvdltool.preference.AttackEventCSVColumnPreferencePage;
 import com.contrastsecurity.csvdltool.preference.BasePreferencePage;
@@ -155,6 +156,8 @@ public class Main implements PropertyChangeListener {
 
     private Button attackLoadBtn;
 
+    private Button serverLoadBtn;
+
     private Button settingBtn;
 
     private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd(E)");
@@ -165,6 +168,7 @@ public class Main implements PropertyChangeListener {
     private Map<String, AppInfo> fullAppMap;
     private Map<FilterEnum, Set<Filter>> assessFilterMap;
     private Map<FilterEnum, Set<Filter>> protectFilterMap;
+    private Map<FilterEnum, Set<Filter>> serverFilterMap;
     private List<String> srcApps = new ArrayList<String>();
     private List<String> dstApps = new ArrayList<String>();
     private Date frLastDetectedDate;
@@ -174,6 +178,11 @@ public class Main implements PropertyChangeListener {
     private Table attackTable;
     private List<AttackEvent> attackEvents;
     private List<AttackEvent> filteredAttackEvents = new ArrayList<AttackEvent>();
+
+    // SERVER
+    private Table serverTable;
+    private List<Server> servers;
+    private List<Server> filteredServers = new ArrayList<Server>();
 
     private PreferenceStore preferenceStore;
 
@@ -1294,6 +1303,145 @@ public class Main implements PropertyChangeListener {
 
         protectTabItem.setControl(protectShell);
 
+        // #################### SERVER #################### //
+        CTabItem serverTabItem = new CTabItem(mainTabFolder, SWT.NONE);
+        serverTabItem.setText("SERVER(β版)");
+
+        Composite serverShell = new Composite(mainTabFolder, SWT.NONE);
+        serverShell.setLayout(new GridLayout(1, false));
+
+        Group serverListGrp = new Group(serverShell, SWT.NONE);
+        serverListGrp.setLayout(new GridLayout(3, false));
+        GridData serverListGrpGrDt = new GridData(GridData.FILL_BOTH);
+        serverListGrpGrDt.minimumHeight = 200;
+        serverListGrp.setLayoutData(serverListGrpGrDt);
+
+        serverLoadBtn = new Button(serverListGrp, SWT.PUSH);
+        GridData serverLoadBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        serverLoadBtnGrDt.horizontalSpan = 3;
+        serverLoadBtnGrDt.heightHint = 50;
+        serverLoadBtn.setLayoutData(serverLoadBtnGrDt);
+        serverLoadBtn.setText("取得");
+        serverLoadBtn.setToolTipText("サーバ一覧を読み込みます。");
+        serverLoadBtn.setFont(new Font(display, "ＭＳ ゴシック", 20, SWT.NORMAL));
+        serverLoadBtn.addSelectionListener(new SelectionListener() {
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                uiReset();
+                serverTable.removeAll();
+                ServersWithProgress progress = new ServersWithProgress(preferenceStore, getValidOrganizations());
+                ProgressMonitorDialog progDialog = new AttackGetProgressMonitorDialog(shell);
+                try {
+                    progDialog.run(true, true, progress);
+                    servers = progress.getAllServers();
+                    filteredServers.addAll(servers);
+                    for (Server server : servers) {
+                        addColToServerTable(server, -1);
+                    }
+                    serverFilterMap = progress.getFilterMap();
+                } catch (InvocationTargetException e) {
+                    StringWriter stringWriter = new StringWriter();
+                    PrintWriter printWriter = new PrintWriter(stringWriter);
+                    e.printStackTrace(printWriter);
+                    String trace = stringWriter.toString();
+                    logger.error(trace);
+                    String errorMsg = e.getTargetException().getMessage();
+                    if (e.getTargetException() instanceof ApiException) {
+                        MessageDialog.openWarning(shell, "攻撃一覧の取得", String.format("TeamServerからエラーが返されました。\r\n%s", errorMsg));
+                    } else if (e.getTargetException() instanceof NonApiException) {
+                        MessageDialog.openError(shell, "攻撃一覧の取得", String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", errorMsg));
+                    } else {
+                        MessageDialog.openError(shell, "攻撃一覧の取得", String.format("不明なエラーです。ログファイルをご確認ください。\r\n%s", errorMsg));
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void widgetDefaultSelected(SelectionEvent event) {
+            }
+        });
+
+        serverTable = new Table(serverListGrp, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
+        GridData serverTableGrDt = new GridData(GridData.FILL_BOTH);
+        serverTableGrDt.horizontalSpan = 3;
+        serverTable.setLayoutData(serverTableGrDt);
+        serverTable.setLinesVisible(true);
+        serverTable.setHeaderVisible(true);
+
+        Menu menuServerTable = new Menu(serverTable);
+        serverTable.setMenu(menuServerTable);
+
+        MenuItem miServerExp = new MenuItem(menuServerTable, SWT.NONE);
+        miServerExp.setText("エクスポート");
+        miServerExp.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+            }
+        });
+
+        serverTable.addListener(SWT.MenuDetect, new Listener() {
+            @Override
+            public void handleEvent(Event event) {
+                if (serverTable.getSelectionCount() <= 0) {
+                    event.doit = false;
+                }
+            }
+        });
+        serverTable.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.stateMask == SWT.CTRL && e.keyCode == 'a') {
+                    serverTable.selectAll();
+                    e.doit = false;
+                }
+            }
+        });
+
+        TableColumn serverColumn1 = new TableColumn(serverTable, SWT.NONE);
+        serverColumn1.setWidth(0);
+        serverColumn1.setResizable(false);
+        TableColumn serverColumn2 = new TableColumn(serverTable, SWT.LEFT);
+        serverColumn2.setWidth(150);
+        serverColumn2.setText("サーバ名");
+        TableColumn serverColumn3 = new TableColumn(serverTable, SWT.LEFT);
+        serverColumn3.setWidth(360);
+        serverColumn3.setText("パス");
+        TableColumn serverColumn4 = new TableColumn(serverTable, SWT.LEFT);
+        serverColumn4.setWidth(100);
+        serverColumn4.setText("言語");
+        TableColumn serverColumn5 = new TableColumn(serverTable, SWT.LEFT);
+        serverColumn5.setWidth(200);
+        serverColumn5.setText("エージェントバージョン");
+        serverTabItem.setControl(serverShell);
+
+        Button serverFilterBtn = new Button(serverListGrp, SWT.PUSH);
+        GridData serverFilterBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        serverFilterBtnGrDt.horizontalSpan = 3;
+        serverFilterBtn.setLayoutData(serverFilterBtnGrDt);
+        serverFilterBtn.setText("フィルター");
+        serverFilterBtn.setToolTipText("サーバのフィルタリングを行います。");
+        serverFilterBtn.addSelectionListener(new SelectionListener() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                if (serverFilterMap == null) {
+                    MessageDialog.openInformation(shell, "サーバフィルター", "サーバ一覧を読み込んでください。");
+                    return;
+                }
+                ServerFilterDialog filterDialog = new ServerFilterDialog(shell, serverFilterMap);
+                filterDialog.addPropertyChangeListener(shell.getMain());
+                int result = filterDialog.open();
+                if (IDialogConstants.OK_ID != result) {
+                    return;
+                }
+            }
+
+            @Override
+            public void widgetDefaultSelected(SelectionEvent e) {
+            }
+        });
+
         int main_idx = this.preferenceStore.getInt(PreferenceConstants.OPENED_MAIN_TAB_IDX);
         mainTabFolder.setSelection(main_idx);
 
@@ -1385,6 +1533,22 @@ public class Main implements PropertyChangeListener {
         }
         item.setText(8, tags);
         item.setText(9, attackEvent.getOrganization().getName());
+    }
+
+    private void addColToServerTable(Server server, int index) {
+        if (server == null) {
+            return;
+        }
+        TableItem item = null;
+        if (index > 0) {
+            item = new TableItem(serverTable, SWT.CENTER, index);
+        } else {
+            item = new TableItem(serverTable, SWT.CENTER);
+        }
+        item.setText(1, server.getName());
+        item.setText(2, server.getPath());
+        item.setText(3, server.getLanguage());
+        item.setText(4, server.getAgent_version());
     }
 
     private void uiReset() {
@@ -1493,12 +1657,52 @@ public class Main implements PropertyChangeListener {
                         }
                     }
                 }
+                for (Filter filter : filterMap.get(FilterEnum.TAG)) {
+                    if (filter.getLabel().equals("")) {
+                        if (attackEvent.getTags().isEmpty()) {
+                            if (!filter.isValid()) {
+                                lostFlg |= true;
+                            }
+                        }
+                    }
+                    if (attackEvent.getTags().contains(filter.getLabel())) {
+                        if (!filter.isValid()) {
+                            lostFlg |= true;
+                        }
+                    }
+                }
                 if (!lostFlg) {
                     addColToTable(attackEvent, -1);
                     filteredAttackEvents.add(attackEvent);
                 }
             }
+        } else if ("serverFilter".equals(event.getPropertyName())) {
+            Map<FilterEnum, Set<Filter>> filterMap = (Map<FilterEnum, Set<Filter>>) event.getNewValue();
+            serverTable.removeAll();
+            filteredServers.clear();
+            for (Server server : servers) {
+                boolean lostFlg = false;
+                for (Filter filter : filterMap.get(FilterEnum.LANGUAGE)) {
+                    if (server.getLanguage().equals(filter.getLabel())) {
+                        if (!filter.isValid()) {
+                            lostFlg |= true;
+                        }
+                    }
+                }
+                for (Filter filter : filterMap.get(FilterEnum.AGENT_VERSION)) {
+                    if (server.getAgent_version().equals(filter.getLabel())) {
+                        if (!filter.isValid()) {
+                            lostFlg |= true;
+                        }
+                    }
+                }
+                if (!lostFlg) {
+                    addColToServerTable(server, -1);
+                    filteredServers.add(server);
+                }
+            }
         }
+
     }
 
     /**

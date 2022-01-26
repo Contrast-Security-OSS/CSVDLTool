@@ -21,26 +21,31 @@
  * 
  */
 
-package com.contrastsecurity.csvdltool;
+package com.contrastsecurity.csvdltool.json;
 
-public enum FilterEnum {
-    SEVERITY("重大度"),
-    VULNTYPE("脆弱性タイプ"),
-    SOURCEIP("ソースIP"),
-    APPLICATION("アプリケーション"),
-    RULE("ルール"),
-    LANGUAGE("言語"),
-    AGENT_VERSION("エージェントバージョン"),
-    TAG("タグ");
+import java.util.List;
+import java.util.StringJoiner;
 
-    private String filterName;
+import com.contrastsecurity.csvdltool.model.Server;
 
-    private FilterEnum(String filterName) {
-        this.filterName = filterName;
+public class ServersJson extends ContrastJson {
+    private List<Server> servers;
+
+    public List<Server> getServers() {
+        return servers;
     }
 
-    public String getFilterName() {
-        return filterName;
+    public void setServers(List<Server> servers) {
+        this.servers = servers;
+    }
+
+    @Override
+    public String toString() {
+        StringJoiner sj = new StringJoiner("\r\n");
+        for (Server a : this.servers) {
+            sj.add(a.toString());
+        }
+        return sj.toString();
     }
 
 }

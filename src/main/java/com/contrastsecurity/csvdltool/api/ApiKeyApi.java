@@ -21,26 +21,38 @@
  * 
  */
 
-package com.contrastsecurity.csvdltool;
+package com.contrastsecurity.csvdltool.api;
 
-public enum FilterEnum {
-    SEVERITY("重大度"),
-    VULNTYPE("脆弱性タイプ"),
-    SOURCEIP("ソースIP"),
-    APPLICATION("アプリケーション"),
-    RULE("ルール"),
-    LANGUAGE("言語"),
-    AGENT_VERSION("エージェントバージョン"),
-    TAG("タグ");
+import java.lang.reflect.Type;
 
-    private String filterName;
+import org.eclipse.jface.preference.IPreferenceStore;
 
-    private FilterEnum(String filterName) {
-        this.filterName = filterName;
+import com.contrastsecurity.csvdltool.json.ApiKeyJson;
+import com.contrastsecurity.csvdltool.model.Organization;
+import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+public class ApiKeyApi extends Api {
+
+    public ApiKeyApi(IPreferenceStore preferenceStore, Organization organization) {
+        super(preferenceStore, organization);
     }
 
-    public String getFilterName() {
-        return filterName;
+    @Override
+    protected String getUrl() {
+        String contrastUrl = preferenceStore.getString(PreferenceConstants.CONTRAST_URL);
+        String orgId = this.organization.getOrganization_uuid();
+        return String.format("%s/api/ng/superadmin/users/%s/keys/apikey?expand=skip_links", contrastUrl, orgId);
+    }
+
+    @Override
+    protected Object convert(String response) {
+        Gson gson = new Gson();
+        Type apiKeyType = new TypeToken<ApiKeyJson>() {
+        }.getType();
+        ApiKeyJson apiKeyJson = gson.fromJson(response, apiKeyType);
+        return apiKeyJson.getApi_key();
     }
 
 }

@@ -38,46 +38,44 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.PreferenceStore;
 
 import com.contrastsecurity.csvdltool.api.Api;
-import com.contrastsecurity.csvdltool.api.AttackEventsApi;
-import com.contrastsecurity.csvdltool.model.AttackEvent;
+import com.contrastsecurity.csvdltool.api.ServersApi;
 import com.contrastsecurity.csvdltool.model.Filter;
 import com.contrastsecurity.csvdltool.model.Organization;
+import com.contrastsecurity.csvdltool.model.Server;
 
-public class AttackEventsGetWithProgress implements IRunnableWithProgress {
+public class ServersWithProgress implements IRunnableWithProgress {
 
     private PreferenceStore preferenceStore;
     private List<Organization> organizations;
-    private List<AttackEvent> allAttackEvents;
-    private Set<Filter> sourceIpFilterSet = new LinkedHashSet<Filter>();
-    private Set<Filter> applicationFilterSet = new LinkedHashSet<Filter>();
-    private Set<Filter> ruleFilterSet = new LinkedHashSet<Filter>();
-    private Set<Filter> tagFilterSet = new LinkedHashSet<Filter>();
+    private List<Server> allServers;
+    private Set<Filter> agentVerFilterSet = new LinkedHashSet<Filter>();
+    private Set<Filter> languageFilterSet = new LinkedHashSet<Filter>();
 
     Logger logger = Logger.getLogger("csvdltool");
 
-    public AttackEventsGetWithProgress(PreferenceStore preferenceStore, List<Organization> organizations) {
+    public ServersWithProgress(PreferenceStore preferenceStore, List<Organization> organizations) {
         this.preferenceStore = preferenceStore;
         this.organizations = organizations;
-        this.allAttackEvents = new ArrayList<AttackEvent>();
+        this.allServers = new ArrayList<Server>();
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-        monitor.beginTask("攻撃イベント一覧の読み込み...", 100 * this.organizations.size());
+        monitor.beginTask("サーバ一覧の読み込み...", 100 * this.organizations.size());
         for (Organization org : this.organizations) {
             try {
-                List<AttackEvent> orgAttackEvents = new ArrayList<AttackEvent>();
+                List<Server> orgAttackEvents = new ArrayList<Server>();
                 monitor.setTaskName(org.getName());
                 // アプリケーション一覧を取得
-                monitor.subTask("攻撃イベント一覧の情報を取得...");
-                Api attacksApi = new AttackEventsApi(preferenceStore, org, orgAttackEvents.size());
-                List<AttackEvent> tmpAttackEvents = (List<AttackEvent>) attacksApi.get();
+                monitor.subTask("サーバ一覧の情報を取得...");
+                Api attacksApi = new ServersApi(preferenceStore, org, orgAttackEvents.size());
+                List<Server> tmpAttackEvents = (List<Server>) attacksApi.get();
                 orgAttackEvents.addAll(tmpAttackEvents);
                 int totalCount = attacksApi.getTotalCount();
                 SubProgressMonitor sub1Monitor = new SubProgressMonitor(monitor, 100);
                 sub1Monitor.beginTask("", totalCount);
-                monitor.subTask(String.format("攻撃イベント一覧の情報を取得...(%d/%d)", orgAttackEvents.size(), totalCount));
+                monitor.subTask(String.format("サーバ一覧の情報を取得...(%d/%d)", orgAttackEvents.size(), totalCount));
                 sub1Monitor.worked(tmpAttackEvents.size());
                 boolean incompleteFlg = false;
                 incompleteFlg = totalCount > orgAttackEvents.size();
@@ -86,15 +84,15 @@ public class AttackEventsGetWithProgress implements IRunnableWithProgress {
                     if (monitor.isCanceled()) {
                         throw new InterruptedException("キャンセルされました。");
                     }
-                    attacksApi = new AttackEventsApi(preferenceStore, org, orgAttackEvents.size());
-                    tmpAttackEvents = (List<AttackEvent>) attacksApi.get();
+                    attacksApi = new ServersApi(preferenceStore, org, orgAttackEvents.size());
+                    tmpAttackEvents = (List<Server>) attacksApi.get();
                     orgAttackEvents.addAll(tmpAttackEvents);
-                    monitor.subTask(String.format("攻撃イベント一覧の情報を取得...(%d/%d)", orgAttackEvents.size(), totalCount));
+                    monitor.subTask(String.format("サーバ一覧の情報を取得...(%d/%d)", orgAttackEvents.size(), totalCount));
                     sub1Monitor.worked(tmpAttackEvents.size());
                     incompleteFlg = totalCount > orgAttackEvents.size();
                 }
                 sub1Monitor.done();
-                this.allAttackEvents.addAll(orgAttackEvents);
+                this.allServers.addAll(orgAttackEvents);
                 Thread.sleep(500);
             } catch (Exception e) {
                 throw new InvocationTargetException(e);
@@ -103,29 +101,18 @@ public class AttackEventsGetWithProgress implements IRunnableWithProgress {
         monitor.done();
     }
 
-    public List<AttackEvent> getAllAttackEvents() {
-        return this.allAttackEvents;
+    public List<Server> getAllServers() {
+        return this.allServers;
     }
 
     public Map<FilterEnum, Set<Filter>> getFilterMap() {
-        for (AttackEvent attackEvent : this.allAttackEvents) {
-            sourceIpFilterSet.add(new Filter(attackEvent.getSource()));
-            applicationFilterSet.add(new Filter(attackEvent.getApplication().getName()));
-            ruleFilterSet.add(new Filter(attackEvent.getRule()));
-            if (attackEvent.getTags().isEmpty()) {
-                tagFilterSet.add(new Filter(""));
-            } else {
-                for (String tag : attackEvent.getTags()) {
-                    tagFilterSet.add(new Filter(tag));
-                }
-            }
+        for (Server server : this.allServers) {
+            languageFilterSet.add(new Filter(server.getLanguage()));
+            agentVerFilterSet.add(new Filter(server.getAgent_version()));
         }
         Map<FilterEnum, Set<Filter>> filterMap = new HashMap<FilterEnum, Set<Filter>>();
-        filterMap.put(FilterEnum.SOURCEIP, sourceIpFilterSet);
-        filterMap.put(FilterEnum.APPLICATION, applicationFilterSet);
-        filterMap.put(FilterEnum.RULE, ruleFilterSet);
-        filterMap.put(FilterEnum.TAG, tagFilterSet);
+        filterMap.put(FilterEnum.LANGUAGE, languageFilterSet);
+        filterMap.put(FilterEnum.AGENT_VERSION, agentVerFilterSet);
         return filterMap;
     }
-
 }

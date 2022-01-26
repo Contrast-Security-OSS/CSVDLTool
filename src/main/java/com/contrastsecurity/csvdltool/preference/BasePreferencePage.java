@@ -370,9 +370,9 @@ public class BasePreferencePage extends PreferencePage {
         if (ps == null) {
             return true;
         }
-        String url = this.contrastUrlTxt.getText();
-        String svc = this.serviceKeyTxt.getText();
-        String usr = this.userNameTxt.getText();
+        String url = this.contrastUrlTxt.getText().trim();
+        String svc = this.serviceKeyTxt.getText().trim();
+        String usr = this.userNameTxt.getText().trim();
         if (url.isEmpty() || svc.isEmpty() || usr.isEmpty()) {
             if (!this.orgList.isEmpty()) {
                 MessageDialog.openError(getShell(), "基本設定", "組織一覧に設定が残っている場合、Contrast URL, Service Key, Usernameはブランクにできません。\r\nこれらをブランクにする場合は組織一覧の設定をすべて削除してください。");

@@ -1096,7 +1096,13 @@ public class Main implements PropertyChangeListener {
                     csvFileFormat = preferenceStore.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT_ATTACKEVENT);
                 }
                 String timestamp = new SimpleDateFormat(csvFileFormat).format(new Date());
+                String currentPath = System.getProperty("user.dir");
                 String filePath = timestamp + ".csv";
+                if (OS.isFamilyMac()) {
+                    if (currentPath.contains(".app/Contents/Java")) {
+                        filePath = "../../../" + timestamp + ".csv";
+                    }
+                }
                 String csv_encoding = Main.CSV_WIN_ENCODING;
                 if (OS.isFamilyMac()) {
                     csv_encoding = Main.CSV_MAC_ENCODING;

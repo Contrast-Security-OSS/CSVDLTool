@@ -364,11 +364,20 @@ public class LibGetWithProgress implements IRunnableWithProgress {
         Thread.sleep(500);
         SubProgressMonitor sub2Monitor = new SubProgressMonitor(monitor, 20);
         sub2Monitor.beginTask("", csvList.size());
+        String currentPath = System.getProperty("user.dir");
         String filePath = timestamp + ".csv";
+        if (OS.isFamilyMac()) {
+            if (currentPath.contains(".app/Contents/Java")) {
+                filePath = "../../../" + timestamp + ".csv";
+            }
+        }
         if (isIncludeCVEDetail) {
             filePath = timestamp + "\\" + timestamp + ".csv";
             if (OS.isFamilyMac()) {
                 filePath = timestamp + "/" + timestamp + ".csv";
+                if (currentPath.contains(".app/Contents/Java")) {
+                    filePath = "../../../" + timestamp + "/" + timestamp + ".csv";
+                }
             }
         }
         String csv_encoding = Main.CSV_WIN_ENCODING;

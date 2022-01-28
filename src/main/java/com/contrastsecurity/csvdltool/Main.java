@@ -989,7 +989,6 @@ public class Main implements PropertyChangeListener {
         attackLoadBtn.addSelectionListener(new SelectionListener() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                uiReset();
                 attackTable.removeAll();
                 AttackEventsGetWithProgress progress = new AttackEventsGetWithProgress(preferenceStore, getValidOrganizations());
                 ProgressMonitorDialog progDialog = new AttackGetProgressMonitorDialog(shell);
@@ -1333,7 +1332,6 @@ public class Main implements PropertyChangeListener {
         serverLoadBtn.addSelectionListener(new SelectionListener() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                uiReset();
                 serverTable.removeAll();
                 ServersWithProgress progress = new ServersWithProgress(preferenceStore, getValidOrganizations());
                 ProgressMonitorDialog progDialog = new AttackGetProgressMonitorDialog(shell);

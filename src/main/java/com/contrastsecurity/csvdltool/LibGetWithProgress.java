@@ -121,7 +121,13 @@ public class LibGetWithProgress implements IRunnableWithProgress {
         try {
             // 長文情報（何が起こったか？など）を出力する場合はフォルダに出力
             if (this.isIncludeCVEDetail) {
-                Path dir = Paths.get(timestamp);
+                String dirPath = timestamp;
+                if (OS.isFamilyMac()) {
+                    if (System.getProperty("user.dir").contains(".app/Contents/Java")) {
+                        dirPath = "../../../" + timestamp;
+                    }
+                }
+                Path dir = Paths.get(dirPath);
                 Files.createDirectory(dir);
             }
             // 選択済みアプリの脆弱性情報を取得
@@ -321,6 +327,9 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                         String textFileName = String.format("%s\\%s.txt", timestamp, library.getHash());
                         if (OS.isFamilyMac()) {
                             textFileName = String.format("%s/%s.txt", timestamp, library.getHash());
+                            if (System.getProperty("user.dir").contains(".app/Contents/Java")) {
+                                textFileName = String.format("../../../%s/%s.txt", timestamp, library.getHash());
+                            }
                         }
                         File file = new File(textFileName);
                         for (Vuln vuln : library.getVulns()) {
@@ -364,10 +373,9 @@ public class LibGetWithProgress implements IRunnableWithProgress {
         Thread.sleep(500);
         SubProgressMonitor sub2Monitor = new SubProgressMonitor(monitor, 20);
         sub2Monitor.beginTask("", csvList.size());
-        String currentPath = System.getProperty("user.dir");
         String filePath = timestamp + ".csv";
         if (OS.isFamilyMac()) {
-            if (currentPath.contains(".app/Contents/Java")) {
+            if (System.getProperty("user.dir").contains(".app/Contents/Java")) {
                 filePath = "../../../" + timestamp + ".csv";
             }
         }
@@ -375,7 +383,7 @@ public class LibGetWithProgress implements IRunnableWithProgress {
             filePath = timestamp + "\\" + timestamp + ".csv";
             if (OS.isFamilyMac()) {
                 filePath = timestamp + "/" + timestamp + ".csv";
-                if (currentPath.contains(".app/Contents/Java")) {
+                if (System.getProperty("user.dir").contains(".app/Contents/Java")) {
                     filePath = "../../../" + timestamp + "/" + timestamp + ".csv";
                 }
             }

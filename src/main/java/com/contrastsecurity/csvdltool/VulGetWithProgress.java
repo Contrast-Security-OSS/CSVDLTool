@@ -170,7 +170,13 @@ public class VulGetWithProgress implements IRunnableWithProgress {
         try {
             // 長文情報（何が起こったか？など）を出力する場合はフォルダに出力
             if (this.isIncludeDesc) {
-                Path dir = Paths.get(timestamp);
+                String dirPath = timestamp;
+                if (OS.isFamilyMac()) {
+                    if (System.getProperty("user.dir").contains(".app/Contents/Java")) {
+                        dirPath = "../../../" + timestamp;
+                    }
+                }
+                Path dir = Paths.get(dirPath);
                 Files.createDirectory(dir);
             }
             Set<Organization> organizations = new HashSet<Organization>();
@@ -405,6 +411,9 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                         String textFileName = String.format("%s\\%s.txt", timestamp, trace.getUuid());
                         if (OS.isFamilyMac()) {
                             textFileName = String.format("%s/%s.txt", timestamp, trace.getUuid());
+                            if (System.getProperty("user.dir").contains(".app/Contents/Java")) {
+                                textFileName = String.format("../../../%s/%s.txt", timestamp, trace.getUuid());
+                            }
                         }
                         File file = new File(textFileName);
 
@@ -535,6 +544,12 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                     }
                     if (isIncludeStackTrace) {
                         String textFileName = String.format("%s\\%s.txt", timestamp, trace.getUuid());
+                        if (OS.isFamilyMac()) {
+                            textFileName = String.format("%s/%s.txt", timestamp, trace.getUuid());
+                            if (System.getProperty("user.dir").contains(".app/Contents/Java")) {
+                                textFileName = String.format("../../../%s/%s.txt", timestamp, trace.getUuid());
+                            }
+                        }
                         File file = new File(textFileName);
                         // ==================== 19-7. スタックトレース ====================
                         List<String> detailLines = new ArrayList<String>();
@@ -576,10 +591,9 @@ public class VulGetWithProgress implements IRunnableWithProgress {
         Thread.sleep(500);
         SubProgressMonitor sub3Monitor = new SubProgressMonitor(monitor, 20);
         sub3Monitor.beginTask("", csvList.size());
-        String currentPath = System.getProperty("user.dir");
         String filePath = timestamp + ".csv";
         if (OS.isFamilyMac()) {
-            if (currentPath.contains(".app/Contents/Java")) {
+            if (System.getProperty("user.dir").contains(".app/Contents/Java")) {
                 filePath = "../../../" + timestamp + ".csv";
             }
         }
@@ -587,7 +601,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
             filePath = timestamp + "\\" + timestamp + ".csv";
             if (OS.isFamilyMac()) {
                 filePath = timestamp + "/" + timestamp + ".csv";
-                if (currentPath.contains(".app/Contents/Java")) {
+                if (System.getProperty("user.dir").contains(".app/Contents/Java")) {
                     filePath = "../../../" + timestamp + "/" + timestamp + ".csv";
                 }
             }

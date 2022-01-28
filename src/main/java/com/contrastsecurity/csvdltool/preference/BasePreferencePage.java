@@ -111,9 +111,9 @@ public class BasePreferencePage extends PreferencePage {
         contrastUrlTxt.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent e) {
-                String contrastUrlStr = contrastUrlTxt.getText();
-                String serviceKeyStr = serviceKeyTxt.getText();
-                String userNameStr = userNameTxt.getText();
+                String contrastUrlStr = contrastUrlTxt.getText().trim();
+                String serviceKeyStr = serviceKeyTxt.getText().trim();
+                String userNameStr = userNameTxt.getText().trim();
                 if (contrastUrlStr.isEmpty() || serviceKeyStr.isEmpty() || userNameStr.isEmpty()) {
                     addBtn.setEnabled(false);
                 } else {
@@ -136,9 +136,9 @@ public class BasePreferencePage extends PreferencePage {
         serviceKeyTxt.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent e) {
-                String contrastUrlStr = contrastUrlTxt.getText();
-                String serviceKeyStr = serviceKeyTxt.getText();
-                String userNameStr = userNameTxt.getText();
+                String contrastUrlStr = contrastUrlTxt.getText().trim();
+                String serviceKeyStr = serviceKeyTxt.getText().trim();
+                String userNameStr = userNameTxt.getText().trim();
                 if (contrastUrlStr.isEmpty() || serviceKeyStr.isEmpty() || userNameStr.isEmpty()) {
                     addBtn.setEnabled(false);
                 } else {
@@ -164,9 +164,9 @@ public class BasePreferencePage extends PreferencePage {
         userNameTxt.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent e) {
-                String contrastUrlStr = contrastUrlTxt.getText();
-                String serviceKeyStr = serviceKeyTxt.getText();
-                String userNameStr = userNameTxt.getText();
+                String contrastUrlStr = contrastUrlTxt.getText().trim();
+                String serviceKeyStr = serviceKeyTxt.getText().trim();
+                String userNameStr = userNameTxt.getText().trim();
                 if (contrastUrlStr.isEmpty() || serviceKeyStr.isEmpty() || userNameStr.isEmpty()) {
                     addBtn.setEnabled(false);
                 } else {
@@ -249,7 +249,7 @@ public class BasePreferencePage extends PreferencePage {
         addBtn = new Button(buttonGrp, SWT.NULL);
         addBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         addBtn.setText("追加");
-        if (contrastUrlTxt.getText().isEmpty() || serviceKeyTxt.getText().isEmpty() || userNameTxt.getText().isEmpty()) {
+        if (contrastUrlTxt.getText().trim().isEmpty() || serviceKeyTxt.getText().trim().isEmpty() || userNameTxt.getText().trim().isEmpty()) {
             addBtn.setEnabled(false);
         } else {
             addBtn.setEnabled(true);
@@ -271,7 +271,8 @@ public class BasePreferencePage extends PreferencePage {
                         }
                     }
                 }
-                OrganizationDialog orgDialog = new OrganizationDialog(getShell(), preferenceStore, contrastUrlTxt.getText(), userNameTxt.getText(), serviceKeyTxt.getText());
+                OrganizationDialog orgDialog = new OrganizationDialog(getShell(), preferenceStore, contrastUrlTxt.getText().trim(), userNameTxt.getText().trim(),
+                        serviceKeyTxt.getText().trim());
                 int result = orgDialog.open();
                 if (IDialogConstants.OK_ID != result) {
                     return;

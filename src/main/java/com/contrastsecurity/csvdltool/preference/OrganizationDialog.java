@@ -82,8 +82,8 @@ public class OrganizationDialog extends Dialog {
         orgIdTxt.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent e) {
-                String orgStr = orgIdTxt.getText();
-                String apikeyStr = apiKeyTxt.getText();
+                String orgStr = orgIdTxt.getText().trim();
+                String apikeyStr = apiKeyTxt.getText().trim();
                 if (orgStr.isEmpty() || apikeyStr.isEmpty()) {
                     getButton(IDialogConstants.OK_ID).setEnabled(false);
                 } else {
@@ -103,8 +103,8 @@ public class OrganizationDialog extends Dialog {
         apiKeyTxt.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent e) {
-                String orgStr = orgIdTxt.getText();
-                String apikeyStr = apiKeyTxt.getText();
+                String orgStr = orgIdTxt.getText().trim();
+                String apikeyStr = apiKeyTxt.getText().trim();
                 if (orgStr.isEmpty() || apikeyStr.isEmpty()) {
                     getButton(IDialogConstants.OK_ID).setEnabled(false);
                 } else {
@@ -129,8 +129,8 @@ public class OrganizationDialog extends Dialog {
     @Override
     protected void okPressed() {
         Organization organization = new Organization();
-        organization.setApikey(apiKeyTxt.getText());
-        organization.setOrganization_uuid(orgIdTxt.getText());
+        organization.setApikey(apiKeyTxt.getText().trim());
+        organization.setOrganization_uuid(orgIdTxt.getText().trim());
         organization.setValid(false);
         Api orgApi = new OrganizationApi(preferenceStore, organization, url, usr, svc);
         try {

@@ -989,6 +989,7 @@ public class Main implements PropertyChangeListener {
         attackLoadBtn.addSelectionListener(new SelectionListener() {
             @Override
             public void widgetSelected(SelectionEvent event) {
+                attackTable.clearAll();
                 attackTable.removeAll();
                 AttackEventsGetWithProgress progress = new AttackEventsGetWithProgress(preferenceStore, getValidOrganizations());
                 ProgressMonitorDialog progDialog = new AttackGetProgressMonitorDialog(shell);
@@ -1070,6 +1071,7 @@ public class Main implements PropertyChangeListener {
                                 List<String> tags = (List<String>) attackEventTagsApi.get();
                                 attackEvent.setTags(tags);
                             }
+                            attackTable.clearAll();
                             attackTable.removeAll();
                             for (AttackEvent attackEvent : filteredAttackEvents) {
                                 addColToTable(attackEvent, -1);
@@ -1332,6 +1334,7 @@ public class Main implements PropertyChangeListener {
         serverLoadBtn.addSelectionListener(new SelectionListener() {
             @Override
             public void widgetSelected(SelectionEvent event) {
+                serverTable.clearAll();
                 serverTable.removeAll();
                 ServersWithProgress progress = new ServersWithProgress(preferenceStore, getValidOrganizations());
                 ProgressMonitorDialog progDialog = new AttackGetProgressMonitorDialog(shell);

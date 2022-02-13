@@ -414,22 +414,26 @@ public class ConnectionPreferencePage extends PreferencePage {
             ps.setValue(PreferenceConstants.PROXY_TMP_PASS, "");
         }
         ps.setValue(PreferenceConstants.IGNORE_SSLCERT_CHECK, this.ignoreSSLCertCheckFlg.getSelection());
+
         if (this.connectionTimeoutTxt.getText().isEmpty()) {
             errors.add("・ConnetionTimeoutを指定してください。");
         } else {
             if (!StringUtils.isNumeric(this.connectionTimeoutTxt.getText())) {
                 errors.add("・ConnetionTimeoutは数値を指定してください。");
+            } else {
+                ps.setValue(PreferenceConstants.CONNECTION_TIMEOUT, this.connectionTimeoutTxt.getText());
             }
         }
-        ps.setValue(PreferenceConstants.CONNECTION_TIMEOUT, this.connectionTimeoutTxt.getText());
+
         if (this.socketTimeoutTxt.getText().isEmpty()) {
             errors.add("・SocketTimeoutを指定してください。");
         } else {
             if (!StringUtils.isNumeric(this.socketTimeoutTxt.getText())) {
                 errors.add("・SocketTimeoutは数値を指定してください。");
+            } else {
+                ps.setValue(PreferenceConstants.SOCKET_TIMEOUT, this.socketTimeoutTxt.getText());
             }
         }
-        ps.setValue(PreferenceConstants.SOCKET_TIMEOUT, this.socketTimeoutTxt.getText());
         if (!errors.isEmpty()) {
             MessageDialog.openError(getShell(), "接続設定", String.join("\r\n", errors));
             return false;

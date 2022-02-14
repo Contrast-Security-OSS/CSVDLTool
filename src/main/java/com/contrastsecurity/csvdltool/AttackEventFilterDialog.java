@@ -55,6 +55,7 @@ import com.contrastsecurity.csvdltool.model.Filter;
 public class AttackEventFilterDialog extends Dialog {
 
     private Map<FilterEnum, Set<Filter>> filterMap;
+    private CheckboxTableViewer srcNameViewer;
     private CheckboxTableViewer srcIpViewer;
     private CheckboxTableViewer appViewer;
     private CheckboxTableViewer ruleViewer;
@@ -69,13 +70,75 @@ public class AttackEventFilterDialog extends Dialog {
     @Override
     protected Control createDialogArea(Composite parent) {
         Composite composite = (Composite) super.createDialogArea(parent);
-        GridLayout compositeLt = new GridLayout(4, false);
+        GridLayout compositeLt = new GridLayout(3, false);
         compositeLt.marginWidth = 25;
         compositeLt.marginHeight = 5;
         compositeLt.horizontalSpacing = 5;
         composite.setLayout(compositeLt);
         GridData compositeGrDt = new GridData(GridData.FILL_BOTH);
         composite.setLayoutData(compositeGrDt);
+
+        // #################### ソース名 #################### //
+        Group srcNameGrp = new Group(composite, SWT.NONE);
+        GridLayout srcNameGrpLt = new GridLayout(1, false);
+        srcNameGrpLt.marginWidth = 10;
+        srcNameGrpLt.marginHeight = 10;
+        srcNameGrp.setLayout(srcNameGrpLt);
+        GridData srcNameGrpGrDt = new GridData(GridData.FILL_BOTH);
+        srcNameGrpGrDt.minimumWidth = 200;
+        srcNameGrp.setLayoutData(srcNameGrpGrDt);
+        srcNameGrp.setText("ソース名");
+
+        final Table srcNameTable = new Table(srcNameGrp, SWT.CHECK | SWT.BORDER | SWT.V_SCROLL);
+        GridData srcNameTableGrDt = new GridData(GridData.FILL_BOTH);
+        srcNameTable.setLayoutData(srcNameTableGrDt);
+        srcNameViewer = new CheckboxTableViewer(srcNameTable);
+        srcNameViewer.setLabelProvider(new ColumnLabelProvider() {
+            @Override
+            public String getText(Object element) {
+                return element.toString();
+            }
+        });
+        List<String> srcNameLabelList = new ArrayList<String>();
+        List<String> srcNameValidLabelList = new ArrayList<String>();
+        for (Filter filter : filterMap.get(FilterEnum.SOURCE_NAME)) {
+            srcNameLabelList.add(filter.getLabel());
+            if (filter.isValid()) {
+                srcNameValidLabelList.add(filter.getLabel());
+            } else {
+            }
+        }
+        if (srcNameValidLabelList.isEmpty()) {
+            srcNameValidLabelList.addAll(srcNameLabelList);
+        }
+        srcNameViewer.setContentProvider(new ArrayContentProvider());
+        srcNameViewer.setInput(srcNameLabelList);
+        srcNameViewer.setCheckedElements(srcNameValidLabelList.toArray());
+        srcNameViewer.addCheckStateListener(new ICheckStateListener() {
+            @Override
+            public void checkStateChanged(CheckStateChangedEvent event) {
+                checkStateUpdate();
+            }
+        });
+
+        final Button srcNameBulkBtn = new Button(srcNameGrp, SWT.CHECK);
+        srcNameBulkBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        srcNameBulkBtn.setText("すべて");
+        srcNameBulkBtn.setSelection(true);
+        srcNameBulkBtn.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                if (srcNameBulkBtn.getSelection()) {
+                    srcNameValidLabelList.addAll(srcNameLabelList);
+                    srcNameViewer.setCheckedElements(srcNameValidLabelList.toArray());
+                    srcNameViewer.refresh();
+                } else {
+                    srcNameViewer.setCheckedElements(new ArrayList<String>().toArray());
+                    srcNameViewer.refresh();
+                }
+                checkStateUpdate();
+            }
+        });
 
         // #################### ソースIP #################### //
         Group srcIpGrp = new Group(composite, SWT.NONE);
@@ -84,6 +147,7 @@ public class AttackEventFilterDialog extends Dialog {
         srcIpGrpLt.marginHeight = 10;
         srcIpGrp.setLayout(srcIpGrpLt);
         GridData srcIpGrpGrDt = new GridData(GridData.FILL_BOTH);
+        srcIpGrpGrDt.minimumWidth = 200;
         srcIpGrp.setLayoutData(srcIpGrpGrDt);
         srcIpGrp.setText("ソースIP");
 
@@ -99,7 +163,7 @@ public class AttackEventFilterDialog extends Dialog {
         });
         List<String> srcLabelList = new ArrayList<String>();
         List<String> srcValidLabelList = new ArrayList<String>();
-        for (Filter filter : filterMap.get(FilterEnum.SOURCEIP)) {
+        for (Filter filter : filterMap.get(FilterEnum.SOURCE_IP)) {
             srcLabelList.add(filter.getLabel());
             if (filter.isValid()) {
                 srcValidLabelList.add(filter.getLabel());
@@ -145,6 +209,7 @@ public class AttackEventFilterDialog extends Dialog {
         appGrpLt.marginHeight = 10;
         appGrp.setLayout(appGrpLt);
         GridData appGrpGrDt = new GridData(GridData.FILL_BOTH);
+        appGrpGrDt.minimumWidth = 200;
         appGrp.setLayoutData(appGrpGrDt);
         appGrp.setText("アプリケーション");
 
@@ -206,6 +271,7 @@ public class AttackEventFilterDialog extends Dialog {
         ruleGrpLt.marginHeight = 10;
         ruleGrp.setLayout(ruleGrpLt);
         GridData ruleGrpGrDt = new GridData(GridData.FILL_BOTH);
+        ruleGrpGrDt.minimumWidth = 200;
         ruleGrp.setLayoutData(ruleGrpGrDt);
         ruleGrp.setText("ルール");
 
@@ -267,6 +333,7 @@ public class AttackEventFilterDialog extends Dialog {
         tagGrpLt.marginHeight = 10;
         tagGrp.setLayout(tagGrpLt);
         GridData tagGrpGrDt = new GridData(GridData.FILL_BOTH);
+        tagGrpGrDt.minimumWidth = 200;
         tagGrp.setLayoutData(tagGrpGrDt);
         tagGrp.setText("タグ");
 
@@ -325,13 +392,25 @@ public class AttackEventFilterDialog extends Dialog {
     }
 
     private void checkStateUpdate() {
+        // ソース名
+        Object[] srcNameItems = srcNameViewer.getCheckedElements();
+        List<String> strItems = new ArrayList<String>();
+        for (Object item : srcNameItems) {
+            strItems.add((String) item);
+        }
+        for (Filter filter : filterMap.get(FilterEnum.SOURCE_NAME)) {
+            if (strItems.contains(filter.getLabel())) {
+                filter.setValid(true);
+            } else {
+                filter.setValid(false);
+            }
+        }
         // ソースIP
         Object[] srcIpItems = srcIpViewer.getCheckedElements();
-        List<String> strItems = new ArrayList<String>();
         for (Object item : srcIpItems) {
             strItems.add((String) item);
         }
-        for (Filter filter : filterMap.get(FilterEnum.SOURCEIP)) {
+        for (Filter filter : filterMap.get(FilterEnum.SOURCE_IP)) {
             if (strItems.contains(filter.getLabel())) {
                 filter.setValid(true);
             } else {
@@ -392,7 +471,7 @@ public class AttackEventFilterDialog extends Dialog {
 
     @Override
     protected Point getInitialSize() {
-        return new Point(640, 480);
+        return new Point(720, 480);
     }
 
     @Override

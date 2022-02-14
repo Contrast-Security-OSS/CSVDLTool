@@ -21,27 +21,24 @@
  * 
  */
 
-package com.contrastsecurity.csvdltool;
+package com.contrastsecurity.csvdltool.json;
 
-public enum FilterEnum {
-    SEVERITY("重大度"),
-    VULNTYPE("脆弱性タイプ"),
-    SOURCE_NAME("ソース名"),
-    SOURCE_IP("ソースIP"),
-    APPLICATION("アプリケーション"),
-    RULE("ルール"),
-    LANGUAGE("言語"),
-    AGENT_VERSION("エージェントバージョン"),
-    TAG("タグ");
+import com.contrastsecurity.csvdltool.model.AttackEventSummary;
 
-    private String filterName;
+public class AttackEventSummaryJson extends ContrastJson {
+    private AttackEventSummary summary;
 
-    private FilterEnum(String filterName) {
-        this.filterName = filterName;
+    public AttackEventSummary getSummary() {
+        return summary;
     }
 
-    public String getFilterName() {
-        return filterName;
+    public void setSummary(AttackEventSummary summary) {
+        this.summary = summary;
+    }
+
+    @Override
+    public String toString() {
+        return this.summary.toString();
     }
 
 }

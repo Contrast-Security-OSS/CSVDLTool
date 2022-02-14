@@ -23,25 +23,13 @@
 
 package com.contrastsecurity.csvdltool;
 
-public enum FilterEnum {
-    SEVERITY("重大度"),
-    VULNTYPE("脆弱性タイプ"),
-    SOURCE_NAME("ソース名"),
-    SOURCE_IP("ソースIP"),
-    APPLICATION("アプリケーション"),
-    RULE("ルール"),
-    LANGUAGE("言語"),
-    AGENT_VERSION("エージェントバージョン"),
-    TAG("タグ");
-
-    private String filterName;
-
-    private FilterEnum(String filterName) {
-        this.filterName = filterName;
-    }
-
-    public String getFilterName() {
-        return filterName;
-    }
+public enum AttackEventDetectedDateFilterEnum {
+    BEFORE_30_DAYS,
+    YESTERDAY,
+    TODAY,
+    LAST_WEEK_START,
+    LAST_WEEK_END,
+    THIS_WEEK_START,
+    THIS_WEEK_END;
 
 }

@@ -43,6 +43,9 @@ public class AttackEvent {
     private String event_uuid;
     private Organization organization;
     private List<String> tags;
+    private UserInput user_input;
+    // Jsonにはないフィールド
+    private String source_name;
 
     public String getReceived() {
         LocalDateTime ldt = LocalDateTime.ofInstant(Instant.ofEpochMilli(Long.parseLong(this.received)), ZoneId.systemDefault());
@@ -147,6 +150,25 @@ public class AttackEvent {
 
     public void setTags(List<String> tags) {
         this.tags = tags;
+    }
+
+    public UserInput getUser_input() {
+        return user_input;
+    }
+
+    public void setUser_input(UserInput user_input) {
+        this.user_input = user_input;
+    }
+
+    public String getSource_name() {
+        if (this.source_name == null || this.source_name.isEmpty()) {
+            return "";
+        }
+        return source_name;
+    }
+
+    public void setSource_name(String source_name) {
+        this.source_name = source_name;
     }
 
     @Override

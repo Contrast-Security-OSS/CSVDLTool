@@ -41,8 +41,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -114,6 +120,7 @@ import com.contrastsecurity.csvdltool.preference.CSVPreferencePage;
 import com.contrastsecurity.csvdltool.preference.ConnectionPreferencePage;
 import com.contrastsecurity.csvdltool.preference.LibCSVColumnPreferencePage;
 import com.contrastsecurity.csvdltool.preference.MyPreferenceDialog;
+import com.contrastsecurity.csvdltool.preference.OtherPreferencePage;
 import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
 import com.contrastsecurity.csvdltool.preference.VulCSVColumnPreferencePage;
 import com.google.gson.Gson;
@@ -175,9 +182,20 @@ public class Main implements PropertyChangeListener {
     private Date toLastDetectedDate;
 
     // PROTECT
+    private List<Button> attackTermRadios = new ArrayList<Button>();
+    private Button attackTerm30days;
+    private Button attackTermYesterday;
+    private Button attackTermToday;
+    private Button attackTermLastWeek;
+    private Button attackTermThisWeek;
+    private Button attackTermPeriod;
+    private Text attackDetectedFilterTxt;
+    private Date frDetectedDate;
+    private Date toDetectedDate;
     private Table attackTable;
     private List<AttackEvent> attackEvents;
     private List<AttackEvent> filteredAttackEvents = new ArrayList<AttackEvent>();
+    private Map<AttackEventDetectedDateFilterEnum, LocalDate> attackEventDetectedFilterMap;
 
     // SERVER
     private Table serverTable;
@@ -232,6 +250,8 @@ public class Main implements PropertyChangeListener {
             this.preferenceStore.setDefault(PreferenceConstants.CSV_OUT_HEADER_LIB, true);
             this.preferenceStore.setDefault(PreferenceConstants.CSV_FILE_FORMAT_LIB, "'lib'_yyyy-MM-dd_HHmmss");
 
+            this.preferenceStore.setDefault(PreferenceConstants.ATTACK_START_WEEKDAY, 1); // 月曜日
+            this.preferenceStore.setDefault(PreferenceConstants.ATTACK_DETECTED_DATE_FILTER, 0);
             this.preferenceStore.setDefault(PreferenceConstants.CSV_COLUMN_ATTACKEVENT, AttackEventCSVColmunEnum.defaultValuesStr());
             this.preferenceStore.setDefault(PreferenceConstants.CSV_OUT_HEADER_ATTACKEVENT, true);
             this.preferenceStore.setDefault(PreferenceConstants.CSV_FILE_FORMAT_ATTACKEVENT, "'attackevent'_yyyy-MM-dd_HHmmss");
@@ -292,6 +312,11 @@ public class Main implements PropertyChangeListener {
                 preferenceStore.setValue(PreferenceConstants.INCLUDE_CVE_DETAIL, includeCVEDetailChk.getSelection());
                 preferenceStore.setValue(PreferenceConstants.PROXY_TMP_USER, "");
                 preferenceStore.setValue(PreferenceConstants.PROXY_TMP_PASS, "");
+                for (Button termBtn : attackTermRadios) {
+                    if (termBtn.getSelection()) {
+                        preferenceStore.setValue(PreferenceConstants.ATTACK_DETECTED_DATE_FILTER, attackTermRadios.indexOf(termBtn));
+                    }
+                }
                 try {
                     preferenceStore.save();
                 } catch (IOException ioe) {
@@ -321,6 +346,7 @@ public class Main implements PropertyChangeListener {
                         currentTitle = title;
                     }
                 }
+                updateProtectOption();
                 setWindowTitle();
                 if (preferenceStore.getBoolean(PreferenceConstants.PROXY_YUKO) && preferenceStore.getString(PreferenceConstants.PROXY_AUTH).equals("input")) {
                     String usr = preferenceStore.getString(PreferenceConstants.PROXY_TMP_USER);
@@ -363,6 +389,14 @@ public class Main implements PropertyChangeListener {
         mainTabFolder.setLayoutData(mainTabFolderGrDt);
         mainTabFolder.setSelectionBackground(new Color[] { display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND), display.getSystemColor(SWT.COLOR_WIDGET_LIGHT_SHADOW) },
                 new int[] { 100 }, true);
+        mainTabFolder.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                if (mainTabFolder.getSelectionIndex() == 1) {
+                    updateProtectOption();
+                }
+            }
+        });
 
         // #################### ASSESS #################### //
         CTabItem assessTabItem = new CTabItem(mainTabFolder, SWT.NONE);
@@ -978,6 +1012,67 @@ public class Main implements PropertyChangeListener {
         attackListGrpGrDt.minimumHeight = 200;
         attackListGrp.setLayoutData(attackListGrpGrDt);
 
+        Composite attackTermGrp = new Composite(attackListGrp, SWT.NONE);
+        attackTermGrp.setLayout(new GridLayout(7, false));
+        GridData attackTermGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        attackTermGrp.setLayoutData(attackTermGrpGrDt);
+        attackTerm30days = new Button(attackTermGrp, SWT.RADIO);
+        attackTerm30days.setText("すべて（30日間）");
+        attackTermRadios.add(attackTerm30days);
+        attackTermYesterday = new Button(attackTermGrp, SWT.RADIO);
+        attackTermYesterday.setText("昨日");
+        attackTermRadios.add(attackTermYesterday);
+        attackTermToday = new Button(attackTermGrp, SWT.RADIO);
+        attackTermToday.setText("今日");
+        attackTermRadios.add(attackTermToday);
+        attackTermLastWeek = new Button(attackTermGrp, SWT.RADIO);
+        attackTermLastWeek.setText("先週");
+        attackTermRadios.add(attackTermLastWeek);
+        attackTermThisWeek = new Button(attackTermGrp, SWT.RADIO);
+        attackTermThisWeek.setText("今週");
+        attackTermRadios.add(attackTermThisWeek);
+        attackTermPeriod = new Button(attackTermGrp, SWT.RADIO);
+        attackTermPeriod.setText("任意");
+        attackTermRadios.add(attackTermPeriod);
+        attackDetectedFilterTxt = new Text(attackTermGrp, SWT.BORDER);
+        attackDetectedFilterTxt.setText("");
+        attackDetectedFilterTxt.setEditable(false);
+        attackDetectedFilterTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        attackDetectedFilterTxt.addListener(SWT.MouseUp, new Listener() {
+            public void handleEvent(Event e) {
+                FilterLastDetectedDialog filterDialog = new FilterLastDetectedDialog(shell, frDetectedDate, toDetectedDate);
+                int result = filterDialog.open();
+                if (IDialogConstants.OK_ID != result) {
+                    vulExecuteBtn.setFocus();
+                    return;
+                }
+                frDetectedDate = filterDialog.getFrDate();
+                toDetectedDate = filterDialog.getToDate();
+                if (frDetectedDate != null && toDetectedDate != null) {
+                    attackDetectedFilterTxt.setText(String.format("%s ～ %s", sdf.format(frDetectedDate), sdf.format(toDetectedDate)));
+                } else if (frDetectedDate != null) {
+                    attackDetectedFilterTxt.setText(String.format("%s ～", sdf.format(frDetectedDate)));
+                } else if (toDetectedDate != null) {
+                    attackDetectedFilterTxt.setText(String.format("～ %s", sdf.format(toDetectedDate)));
+                } else {
+                    attackDetectedFilterTxt.setText("");
+                }
+                if (!attackDetectedFilterTxt.getText().isEmpty()) {
+                    for (Button rdo : attackTermRadios) {
+                        rdo.setSelection(false);
+                    }
+                    attackTermPeriod.setSelection(true);
+                }
+                attackLoadBtn.setFocus();
+            }
+        });
+        for (Button termBtn : this.attackTermRadios) {
+            termBtn.setSelection(false);
+            if (this.attackTermRadios.indexOf(termBtn) == preferenceStore.getInt(PreferenceConstants.ATTACK_DETECTED_DATE_FILTER)) {
+                termBtn.setSelection(true);
+            }
+        }
+
         attackLoadBtn = new Button(attackListGrp, SWT.PUSH);
         GridData attackLoadBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
         attackLoadBtnGrDt.horizontalSpan = 3;
@@ -991,7 +1086,12 @@ public class Main implements PropertyChangeListener {
             public void widgetSelected(SelectionEvent event) {
                 attackTable.clearAll();
                 attackTable.removeAll();
-                AttackEventsGetWithProgress progress = new AttackEventsGetWithProgress(preferenceStore, getValidOrganizations());
+                Date[] frToDate = getFrToDetectedDate();
+                if (frToDate.length != 2) {
+                    MessageDialog.openError(shell, "攻撃一覧の取得", "取得期間を設定してください。");
+                    return;
+                }
+                AttackEventsGetWithProgress progress = new AttackEventsGetWithProgress(preferenceStore, getValidOrganizations(), frToDate[0], frToDate[1]);
                 ProgressMonitorDialog progDialog = new AttackGetProgressMonitorDialog(shell);
                 try {
                     progDialog.run(true, true, progress);
@@ -1251,9 +1351,12 @@ public class Main implements PropertyChangeListener {
             }
         });
 
-        TableColumn column1 = new TableColumn(attackTable, SWT.NONE);
-        column1.setWidth(0);
-        column1.setResizable(false);
+        TableColumn column0 = new TableColumn(attackTable, SWT.NONE);
+        column0.setWidth(0);
+        column0.setResizable(false);
+        TableColumn column1 = new TableColumn(attackTable, SWT.LEFT);
+        column1.setWidth(120);
+        column1.setText("ソース名");
         TableColumn column2 = new TableColumn(attackTable, SWT.LEFT);
         column2.setWidth(120);
         column2.setText("ソースIP");
@@ -1277,10 +1380,13 @@ public class Main implements PropertyChangeListener {
         column8.setText("URL");
         TableColumn column9 = new TableColumn(attackTable, SWT.LEFT);
         column9.setWidth(250);
-        column9.setText("タグ");
+        column9.setText("攻撃値");
         TableColumn column10 = new TableColumn(attackTable, SWT.LEFT);
-        column10.setWidth(150);
-        column10.setText("組織名");
+        column10.setWidth(250);
+        column10.setText("タグ");
+        TableColumn column11 = new TableColumn(attackTable, SWT.LEFT);
+        column11.setWidth(150);
+        column11.setText("組織名");
 
         Button attackEventFilterBtn = new Button(attackListGrp, SWT.PUSH);
         GridData attackEventFilterBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
@@ -1463,12 +1569,14 @@ public class Main implements PropertyChangeListener {
                 PreferenceManager mgr = new PreferenceManager();
                 PreferenceNode baseNode = new PreferenceNode("base", new BasePreferencePage());
                 PreferenceNode connectionNode = new PreferenceNode("connection", new ConnectionPreferencePage());
+                PreferenceNode otherNode = new PreferenceNode("other", new OtherPreferencePage());
                 PreferenceNode csvNode = new PreferenceNode("csv", new CSVPreferencePage());
                 PreferenceNode vulCsvColumnNode = new PreferenceNode("vulcsvcolumn", new VulCSVColumnPreferencePage());
                 PreferenceNode libCsvColumnNode = new PreferenceNode("libcsvcolumn", new LibCSVColumnPreferencePage());
                 PreferenceNode evtCsvColumnNode = new PreferenceNode("evtcsvcolumn", new AttackEventCSVColumnPreferencePage());
                 mgr.addToRoot(baseNode);
                 mgr.addToRoot(connectionNode);
+                mgr.addToRoot(otherNode);
                 mgr.addToRoot(csvNode);
                 mgr.addTo(csvNode.getId(), vulCsvColumnNode);
                 mgr.addTo(csvNode.getId(), libCsvColumnNode);
@@ -1527,19 +1635,21 @@ public class Main implements PropertyChangeListener {
         } else {
             item = new TableItem(attackTable, SWT.CENTER);
         }
-        item.setText(1, attackEvent.getSource());
-        item.setText(2, attackEvent.getResult());
-        item.setText(3, attackEvent.getApplication().getName());
-        item.setText(4, attackEvent.getServer().getName());
-        item.setText(5, attackEvent.getRule());
-        item.setText(6, attackEvent.getReceived());
-        item.setText(7, attackEvent.getUrl());
+        item.setText(1, attackEvent.getSource_name());
+        item.setText(2, attackEvent.getSource());
+        item.setText(3, attackEvent.getResult());
+        item.setText(4, attackEvent.getApplication().getName());
+        item.setText(5, attackEvent.getServer().getName());
+        item.setText(6, attackEvent.getRule());
+        item.setText(7, attackEvent.getReceived());
+        item.setText(8, attackEvent.getUrl());
+        item.setText(9, attackEvent.getUser_input().getValue());
         String tags = "";
         if (attackEvent.getTags() != null) {
             tags = String.join(",", attackEvent.getTags());
         }
-        item.setText(8, tags);
-        item.setText(9, attackEvent.getOrganization().getName());
+        item.setText(10, tags);
+        item.setText(11, attackEvent.getOrganization().getName());
     }
 
     private void addColToServerTable(Server server, int index) {
@@ -1617,6 +1727,88 @@ public class Main implements PropertyChangeListener {
         return orgs;
     }
 
+    private void updateProtectOption() {
+        this.attackEventDetectedFilterMap = getAttackEventDetectedDateMap();
+        attackTermToday.setToolTipText(this.attackEventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.TODAY).format(DateTimeFormatter.ofPattern("yyyy/MM/dd(E)")));
+        attackTermYesterday.setToolTipText(this.attackEventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.YESTERDAY).format(DateTimeFormatter.ofPattern("yyyy/MM/dd(E)")));
+        attackTerm30days.setToolTipText(String.format("%s ～ 現在",
+                this.attackEventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.BEFORE_30_DAYS).format(DateTimeFormatter.ofPattern("yyyy/MM/dd(E)"))));
+        attackTermLastWeek.setToolTipText(String.format("%s ～ %s",
+                this.attackEventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.LAST_WEEK_START).format(DateTimeFormatter.ofPattern("yyyy/MM/dd(E)")),
+                this.attackEventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.LAST_WEEK_END).format(DateTimeFormatter.ofPattern("yyyy/MM/dd(E)"))));
+        attackTermThisWeek.setToolTipText(String.format("%s ～ %s",
+                this.attackEventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.THIS_WEEK_START).format(DateTimeFormatter.ofPattern("yyyy/MM/dd(E)")),
+                this.attackEventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.THIS_WEEK_END).format(DateTimeFormatter.ofPattern("yyyy/MM/dd(E)"))));
+    }
+
+    private Date[] getFrToDetectedDate() {
+        int idx = -1;
+        for (Button termBtn : this.attackTermRadios) {
+            if (termBtn.getSelection()) {
+                idx = attackTermRadios.indexOf(termBtn);
+                break;
+            }
+        }
+        if (idx < 0) {
+            idx = 0;
+        }
+        LocalDate frLocalDate = null;
+        LocalDate toLocalDate = null;
+        switch (idx) {
+            case 0: // 30days
+                frLocalDate = this.attackEventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.BEFORE_30_DAYS);
+                toLocalDate = this.attackEventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.TODAY);
+                break;
+            case 1: // Yesterday
+                frLocalDate = this.attackEventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.YESTERDAY);
+                toLocalDate = this.attackEventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.YESTERDAY);
+                break;
+            case 2: // Today
+                frLocalDate = this.attackEventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.TODAY);
+                toLocalDate = this.attackEventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.TODAY);
+                break;
+            case 3: // LastWeek
+                frLocalDate = this.attackEventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.LAST_WEEK_START);
+                toLocalDate = this.attackEventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.LAST_WEEK_END);
+                break;
+            case 4: // ThisWeek
+                frLocalDate = this.attackEventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.THIS_WEEK_START);
+                toLocalDate = this.attackEventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.THIS_WEEK_END);
+                break;
+            case 5: // Specify
+                if (frDetectedDate == null || toDetectedDate == null) {
+                    return new Date[] {};
+                }
+                return new Date[] { frDetectedDate, toDetectedDate };
+            default:
+                frLocalDate = this.attackEventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.BEFORE_30_DAYS);
+                toLocalDate = this.attackEventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.TODAY);
+        }
+        Date frDate = Date.from(frLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        Calendar cal = Calendar.getInstance();
+        cal.set(toLocalDate.getYear(), toLocalDate.getDayOfMonth(), toLocalDate.getDayOfMonth(), 23, 59, 59);
+        Date toDate = cal.getTime();
+        return new Date[] { frDate, toDate };
+    }
+
+    public Map<AttackEventDetectedDateFilterEnum, LocalDate> getAttackEventDetectedDateMap() {
+        Map<AttackEventDetectedDateFilterEnum, LocalDate> map = new HashMap<AttackEventDetectedDateFilterEnum, LocalDate>();
+        LocalDate today = LocalDate.now();
+        map.put(AttackEventDetectedDateFilterEnum.TODAY, today);
+        map.put(AttackEventDetectedDateFilterEnum.YESTERDAY, today.minusDays(1));
+        map.put(AttackEventDetectedDateFilterEnum.BEFORE_30_DAYS, today.minusDays(30));
+        LocalDate lastWeekStart = today.with(TemporalAdjusters.previous(DayOfWeek.SUNDAY));
+        lastWeekStart = lastWeekStart.minusDays(7 - preferenceStore.getInt(PreferenceConstants.ATTACK_START_WEEKDAY));
+        if (lastWeekStart.plusDays(7).isAfter(today)) {
+            lastWeekStart = lastWeekStart.minusDays(7);
+        }
+        map.put(AttackEventDetectedDateFilterEnum.LAST_WEEK_START, lastWeekStart);
+        map.put(AttackEventDetectedDateFilterEnum.LAST_WEEK_END, lastWeekStart.plusDays(6));
+        map.put(AttackEventDetectedDateFilterEnum.THIS_WEEK_START, lastWeekStart.plusDays(7));
+        map.put(AttackEventDetectedDateFilterEnum.THIS_WEEK_END, lastWeekStart.plusDays(14));
+        return map;
+    }
+
     public void setWindowTitle() {
         String text = null;
         List<Organization> validOrgs = getValidOrganizations();
@@ -1644,7 +1836,14 @@ public class Main implements PropertyChangeListener {
             filteredAttackEvents.clear();
             for (AttackEvent attackEvent : attackEvents) {
                 boolean lostFlg = false;
-                for (Filter filter : filterMap.get(FilterEnum.SOURCEIP)) {
+                for (Filter filter : filterMap.get(FilterEnum.SOURCE_NAME)) {
+                    if (attackEvent.getSource_name().equals(filter.getLabel())) {
+                        if (!filter.isValid()) {
+                            lostFlg |= true;
+                        }
+                    }
+                }
+                for (Filter filter : filterMap.get(FilterEnum.SOURCE_IP)) {
                     if (attackEvent.getSource().equals(filter.getLabel())) {
                         if (!filter.isValid()) {
                             lostFlg |= true;
@@ -1667,13 +1866,13 @@ public class Main implements PropertyChangeListener {
                 }
                 for (Filter filter : filterMap.get(FilterEnum.TAG)) {
                     if (filter.getLabel().equals("")) {
-                        if (attackEvent.getTags().isEmpty()) {
+                        if (attackEvent.getTags() == null || attackEvent.getTags().isEmpty()) {
                             if (!filter.isValid()) {
                                 lostFlg |= true;
                             }
                         }
                     }
-                    if (attackEvent.getTags().contains(filter.getLabel())) {
+                    if (attackEvent.getTags() != null && attackEvent.getTags().contains(filter.getLabel())) {
                         if (!filter.isValid()) {
                             lostFlg |= true;
                         }

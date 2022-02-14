@@ -59,7 +59,7 @@ public class AttackEventsByAttackUuidApi extends Api {
     protected String getUrl() {
         String contrastUrl = preferenceStore.getString(PreferenceConstants.CONTRAST_URL);
         String orgId = this.organization.getOrganization_uuid();
-        return String.format("%s/api/ng/%s/rasp/events/new?expand=drilldownDetails,application_roles,skip_links&limit=%d&offset=%d&sort=-timestamp", contrastUrl, orgId, LIMIT,
+        return String.format("%s/api/ng/%s/rasp/events/new?expand=drilldownDetails,application_roles,tags,skip_links&limit=%d&offset=%d&sort=-timestamp", contrastUrl, orgId, LIMIT,
                 this.offset);
     }
 

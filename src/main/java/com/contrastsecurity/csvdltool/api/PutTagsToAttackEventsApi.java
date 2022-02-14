@@ -43,11 +43,13 @@ public class PutTagsToAttackEventsApi extends Api {
 
     private List<AttackEvent> attackEvents;
     private String tag;
+    private List<String> removeTags;
 
-    public PutTagsToAttackEventsApi(IPreferenceStore preferenceStore, Organization organization, List<AttackEvent> attackEvents, String tag) {
+    public PutTagsToAttackEventsApi(IPreferenceStore preferenceStore, Organization organization, List<AttackEvent> attackEvents, String tag, List<String> removeTags) {
         super(preferenceStore, organization);
         this.attackEvents = attackEvents;
         this.tag = tag;
+        this.removeTags = removeTags;
     }
 
     @Override
@@ -59,9 +61,14 @@ public class PutTagsToAttackEventsApi extends Api {
 
     @Override
     protected RequestBody getBody() {
+        String addTag = "";
+        if (!this.tag.isEmpty()) {
+            addTag = String.format("\"%s\"", this.tag);
+        }
         MediaType mediaTypeJson = MediaType.parse("application/json; charset=UTF-8");
-        String json = String.format("{\"attack_events_uuid\":[%s],\"tags\":[\"%s\"],\"tags_remove\":[]}",
-                this.attackEvents.stream().map(ae -> ae.getEvent_uuid()).collect(Collectors.joining("\",\"", "\"", "\"")), this.tag);
+        String json = String.format("{\"attack_events_uuid\":[%s],\"tags\":[%s],\"tags_remove\":[%s]}",
+                this.attackEvents.stream().map(ae -> ae.getEvent_uuid()).collect(Collectors.joining("\",\"", "\"", "\"")), addTag,
+                this.removeTags.stream().map(tag -> tag).collect(Collectors.joining("\",\"", "\"", "\"")));
         return RequestBody.create(json, mediaTypeJson);
     }
 

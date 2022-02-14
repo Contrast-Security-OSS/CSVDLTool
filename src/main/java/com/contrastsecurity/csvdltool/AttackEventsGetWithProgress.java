@@ -40,7 +40,6 @@ import org.eclipse.jface.preference.PreferenceStore;
 
 import com.contrastsecurity.csvdltool.api.Api;
 import com.contrastsecurity.csvdltool.api.AttackApi;
-import com.contrastsecurity.csvdltool.api.AttackEventsApi;
 import com.contrastsecurity.csvdltool.api.AttackEventsByAttackUuidApi;
 import com.contrastsecurity.csvdltool.api.AttacksApi;
 import com.contrastsecurity.csvdltool.model.Attack;
@@ -130,7 +129,7 @@ public class AttackEventsGetWithProgress implements IRunnableWithProgress {
                         if (monitor.isCanceled()) {
                             throw new InterruptedException("キャンセルされました。");
                         }
-                        attackEventsApi = new AttackEventsApi(preferenceStore, org, orgAttackEvents.size());
+                        attackEventsApi = new AttackEventsByAttackUuidApi(preferenceStore, org, attack.getUuid(), frDetectedDate, toDetectedDate, orgAttackEvents.size());
                         tmpAttackEvents = (List<AttackEvent>) attackEventsApi.post();
                         for (AttackEvent tmpAttackEvent : tmpAttackEvents) {
                             tmpAttackEvent.setSource_name(attack.getSource_name());
@@ -162,7 +161,7 @@ public class AttackEventsGetWithProgress implements IRunnableWithProgress {
             sourceIpFilterSet.add(new Filter(attackEvent.getSource()));
             applicationFilterSet.add(new Filter(attackEvent.getApplication().getName()));
             ruleFilterSet.add(new Filter(attackEvent.getRule()));
-            if (attackEvent.getTags() == null || attackEvent.getTags().isEmpty()) {
+            if (attackEvent.getTags().isEmpty()) {
                 tagFilterSet.add(new Filter(""));
             } else {
                 for (String tag : attackEvent.getTags()) {

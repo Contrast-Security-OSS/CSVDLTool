@@ -24,6 +24,8 @@
 package com.contrastsecurity.csvdltool;
 
 import java.awt.Desktop;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -56,6 +58,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringJoiner;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import org.apache.commons.csv.CSVFormat;
@@ -1136,19 +1139,28 @@ public class Main implements PropertyChangeListener {
         attackTable.setMenu(menuTable);
 
         MenuItem miTag = new MenuItem(menuTable, SWT.NONE);
-        miTag.setText("タグ付け");
+        miTag.setText("タグ編集");
         miTag.addSelectionListener(new SelectionAdapter() {
             @SuppressWarnings("unchecked")
             @Override
             public void widgetSelected(SelectionEvent e) {
                 int[] selectIndexes = attackTable.getSelectionIndices();
-                TagInputDialog tagInputDialog = new TagInputDialog(shell);
-                int result = tagInputDialog.open();
+                // TagInputDialog tagInputDialog = new TagInputDialog(shell);
+                Set<String> existTagSet = new TreeSet<String>();
+                for (int idx : selectIndexes) {
+                    AttackEvent attackEvent = filteredAttackEvents.get(idx);
+                    for (String existTag : attackEvent.getTags()) {
+                        existTagSet.add(existTag);
+                    }
+                }
+                TagEditDialog tagEditDialog = new TagEditDialog(shell, new ArrayList<>(existTagSet));
+                int result = tagEditDialog.open();
                 if (IDialogConstants.OK_ID != result) {
                     return;
                 }
-                String tag = tagInputDialog.getTag();
-                if (tag == null) {
+                String tag = tagEditDialog.getTag();
+                List<String> removeTags = tagEditDialog.getRemoveTags();
+                if (tag == null && removeTags.isEmpty()) {
                     return;
                 }
                 Map<Organization, List<AttackEvent>> orgMap = new HashMap<Organization, List<AttackEvent>>();
@@ -1163,7 +1175,7 @@ public class Main implements PropertyChangeListener {
                 try {
                     for (Organization org : orgMap.keySet()) {
                         List<AttackEvent> attackEvents = orgMap.get(org);
-                        Api putApi = new PutTagsToAttackEventsApi(preferenceStore, org, attackEvents, tag);
+                        Api putApi = new PutTagsToAttackEventsApi(preferenceStore, org, attackEvents, tag, removeTags);
                         String msg = (String) putApi.put();
                         if (Boolean.valueOf(msg)) {
                             for (AttackEvent attackEvent : attackEvents) {
@@ -1176,7 +1188,7 @@ public class Main implements PropertyChangeListener {
                             for (AttackEvent attackEvent : filteredAttackEvents) {
                                 addColToTable(attackEvent, -1);
                             }
-                            MessageDialog.openInformation(shell, "攻撃イベントへのタグ追加", "選択されている攻撃イベントにタグを追加しました。");
+                            MessageDialog.openInformation(shell, "攻撃イベントへのタグ編集", "選択されている攻撃イベントにタグを編集しました。");
                         }
                     }
                 } catch (Exception e2) {
@@ -1333,11 +1345,39 @@ public class Main implements PropertyChangeListener {
             }
         });
 
+        MenuItem miUrlCopy = new MenuItem(menuTable, SWT.NONE);
+        miUrlCopy.setText("TeamServerのURLをコピー");
+        miUrlCopy.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                int selectIndex = attackTable.getSelectionIndex();
+                AttackEvent attackEvent = filteredAttackEvents.get(selectIndex);
+                String contrastUrl = preferenceStore.getString(PreferenceConstants.CONTRAST_URL);
+                String orgUuid = attackEvent.getOrganization().getOrganization_uuid();
+                String eventUuid = attackEvent.getEvent_uuid();
+                Clipboard clipboard = java.awt.Toolkit.getDefaultToolkit().getSystemClipboard();
+                StringSelection selection = new StringSelection(String.format("%s/static/ng/index.html#/%s/attacks/events/%s", contrastUrl, orgUuid.trim(), eventUuid));
+                clipboard.setContents(selection, null);
+            }
+        });
+
+        MenuItem miSelectAll = new MenuItem(menuTable, SWT.NONE);
+        miSelectAll.setText("すべて選択（Ctrl + A）");
+        miSelectAll.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                attackTable.selectAll();
+            }
+        });
+
         attackTable.addListener(SWT.MenuDetect, new Listener() {
             @Override
             public void handleEvent(Event event) {
+                miUrlCopy.setEnabled(true);
                 if (attackTable.getSelectionCount() <= 0) {
                     event.doit = false;
+                } else if (attackTable.getSelectionCount() != 1) {
+                    miUrlCopy.setEnabled(false);
                 }
             }
         });
@@ -1644,10 +1684,7 @@ public class Main implements PropertyChangeListener {
         item.setText(7, attackEvent.getReceived());
         item.setText(8, attackEvent.getUrl());
         item.setText(9, attackEvent.getUser_input().getValue());
-        String tags = "";
-        if (attackEvent.getTags() != null) {
-            tags = String.join(",", attackEvent.getTags());
-        }
+        String tags = String.join(",", attackEvent.getTags());
         item.setText(10, tags);
         item.setText(11, attackEvent.getOrganization().getName());
     }
@@ -1866,7 +1903,7 @@ public class Main implements PropertyChangeListener {
                 }
                 for (Filter filter : filterMap.get(FilterEnum.TAG)) {
                     if (filter.getLabel().equals("")) {
-                        if (attackEvent.getTags() == null || attackEvent.getTags().isEmpty()) {
+                        if (attackEvent.getTags().isEmpty()) {
                             if (!filter.isValid()) {
                                 lostFlg |= true;
                             }

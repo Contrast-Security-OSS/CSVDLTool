@@ -145,6 +145,9 @@ public class AttackEvent {
     }
 
     public List<String> getTags() {
+        if (this.tags == null) {
+            return new ArrayList<String>();
+        }
         return tags;
     }
 

@@ -76,17 +76,22 @@ public class AttackEventsGetWithProgress implements IRunnableWithProgress {
         monitor.beginTask("攻撃イベント一覧の読み込み...", 100 * this.organizations.size());
         for (Organization org : this.organizations) {
             try {
+                monitor.setTaskName(String.format("[%s] 攻撃イベント一覧の読み込み", org.getName()));
                 // 攻撃一覧を読み込み
+                monitor.subTask("攻撃一覧の情報を取得...");
+                SubProgressMonitor sub1Monitor = new SubProgressMonitor(monitor, 30);
                 List<Attack> allAttacks = new ArrayList<Attack>();
                 Api attackssApi = new AttacksApi(preferenceStore, org, frDetectedDate, toDetectedDate, 0);
                 List<Attack> tmpAttacks = (List<Attack>) attackssApi.post();
+                int totalAttackCount = attackssApi.getTotalCount();
+                sub1Monitor.beginTask("", totalAttackCount);
                 allAttacks.addAll(tmpAttacks);
                 for (Attack atck : tmpAttacks) {
                     Api attackApi = new AttackApi(preferenceStore, org, atck.getUuid());
                     Attack attackDetail = (Attack) attackApi.get();
                     atck.setSource_name(attackDetail.getSource_name());
                 }
-                int totalAttackCount = attackssApi.getTotalCount();
+                sub1Monitor.worked(tmpAttacks.size());
                 boolean attackIncompleteFlg = false;
                 attackIncompleteFlg = totalAttackCount > allAttacks.size();
                 while (attackIncompleteFlg) {
@@ -99,14 +104,20 @@ public class AttackEventsGetWithProgress implements IRunnableWithProgress {
                         Attack attackDetail = (Attack) attackApi.get();
                         atck.setSource_name(attackDetail.getSource_name());
                     }
+                    sub1Monitor.worked(tmpAttacks.size());
                     attackIncompleteFlg = totalAttackCount > allAttacks.size();
                 }
+                sub1Monitor.done();
 
                 // 攻撃イベント一覧を読み込み
-                List<AttackEvent> orgAttackEvents = new ArrayList<AttackEvent>();
-                monitor.setTaskName(org.getName());
                 monitor.subTask("攻撃イベント一覧の情報を取得...");
+                SubProgressMonitor sub2Monitor = new SubProgressMonitor(monitor, 70);
+                sub2Monitor.beginTask("", allAttacks.size());
                 for (Attack attack : allAttacks) {
+                    if (monitor.isCanceled()) {
+                        throw new InterruptedException("キャンセルされました。");
+                    }
+                    List<AttackEvent> orgAttackEvents = new ArrayList<AttackEvent>();
                     Api attackEventsApi = new AttackEventsByAttackUuidApi(preferenceStore, org, attack.getUuid(), frDetectedDate, toDetectedDate, orgAttackEvents.size());
                     List<AttackEvent> tmpAttackEvents = (List<AttackEvent>) attackEventsApi.post();
                     for (AttackEvent tmpAttackEvent : tmpAttackEvents) {
@@ -114,14 +125,11 @@ public class AttackEventsGetWithProgress implements IRunnableWithProgress {
                     }
                     orgAttackEvents.addAll(tmpAttackEvents);
                     int totalCount = attackEventsApi.getTotalCount();
-                    SubProgressMonitor sub1Monitor = new SubProgressMonitor(monitor, 100);
-                    sub1Monitor.beginTask("", totalCount);
                     monitor.subTask(String.format("攻撃イベント一覧の情報を取得...(%d/%d)", orgAttackEvents.size(), totalCount));
-                    sub1Monitor.worked(tmpAttackEvents.size());
                     boolean incompleteFlg = false;
                     incompleteFlg = totalCount > orgAttackEvents.size();
                     while (incompleteFlg) {
-                        Thread.sleep(200);
+                        Thread.sleep(100);
                         if (monitor.isCanceled()) {
                             throw new InterruptedException("キャンセルされました。");
                         }
@@ -132,14 +140,13 @@ public class AttackEventsGetWithProgress implements IRunnableWithProgress {
                         }
                         orgAttackEvents.addAll(tmpAttackEvents);
                         monitor.subTask(String.format("攻撃イベント一覧の情報を取得...(%d/%d)", orgAttackEvents.size(), totalCount));
-                        sub1Monitor.worked(tmpAttackEvents.size());
                         incompleteFlg = totalCount > orgAttackEvents.size();
                     }
-                    sub1Monitor.done();
+                    sub2Monitor.worked(1);
                     this.allAttackEvents.addAll(orgAttackEvents);
-
                 }
-                Thread.sleep(500);
+                sub2Monitor.done();
+                Thread.sleep(100);
             } catch (Exception e) {
                 throw new InvocationTargetException(e);
             }

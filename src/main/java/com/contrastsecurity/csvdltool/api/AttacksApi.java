@@ -73,6 +73,7 @@ public class AttacksApi extends Api {
         Type contType = new TypeToken<AttacksJson>() {
         }.getType();
         AttacksJson attacksJson = gson.fromJson(response, contType);
+        this.totalCount = attacksJson.getCount();
         List<Attack> attacks = attacksJson.getAttacks();
         return attacks;
     }

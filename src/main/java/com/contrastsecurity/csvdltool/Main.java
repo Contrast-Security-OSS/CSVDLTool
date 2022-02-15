@@ -1103,7 +1103,7 @@ public class Main implements PropertyChangeListener {
                     Collections.reverse(attackEvents);
                     filteredAttackEvents.addAll(attackEvents);
                     for (AttackEvent attackEvent : attackEvents) {
-                        addColToTable(attackEvent, -1);
+                        addColToAttackTable(attackEvent, -1);
                     }
                     protectFilterMap = progress.getFilterMap();
                 } catch (InvocationTargetException e) {
@@ -1187,7 +1187,7 @@ public class Main implements PropertyChangeListener {
                             attackTable.clearAll();
                             attackTable.removeAll();
                             for (AttackEvent attackEvent : filteredAttackEvents) {
-                                addColToTable(attackEvent, -1);
+                                addColToAttackTable(attackEvent, -1);
                             }
                             MessageDialog.openInformation(shell, "攻撃イベントへのタグ編集", "選択されている攻撃イベントにタグを編集しました。");
                         }
@@ -1687,7 +1687,7 @@ public class Main implements PropertyChangeListener {
         display.dispose();
     }
 
-    private void addColToTable(AttackEvent attackEvent, int index) {
+    private void addColToAttackTable(AttackEvent attackEvent, int index) {
         if (attackEvent == null) {
             return;
         }
@@ -1845,7 +1845,7 @@ public class Main implements PropertyChangeListener {
         }
         Date frDate = Date.from(frLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
         Calendar cal = Calendar.getInstance();
-        cal.set(toLocalDate.getYear(), toLocalDate.getDayOfMonth(), toLocalDate.getDayOfMonth(), 23, 59, 59);
+        cal.set(toLocalDate.getYear(), toLocalDate.getMonthValue() - 1, toLocalDate.getDayOfMonth(), 23, 59, 59);
         Date toDate = cal.getTime();
         return new Date[] { frDate, toDate };
     }
@@ -2020,7 +2020,7 @@ public class Main implements PropertyChangeListener {
                     }
                 }
                 if (!lostFlg) {
-                    addColToTable(attackEvent, -1);
+                    addColToAttackTable(attackEvent, -1);
                     filteredAttackEvents.add(attackEvent);
                 }
             }

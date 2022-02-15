@@ -76,21 +76,16 @@ public class AttackEventsGetWithProgress implements IRunnableWithProgress {
         monitor.beginTask("攻撃イベント一覧の読み込み...", 100 * this.organizations.size());
         for (Organization org : this.organizations) {
             try {
-                // SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                // String startDateStr = "2022-02-01";
-                // Date startDate = dateFormat.parse(startDateStr);
-                // String endDateStr = "2022-02-28";
-                // Date endDate = dateFormat.parse(endDateStr);
                 // 攻撃一覧を読み込み
                 List<Attack> allAttacks = new ArrayList<Attack>();
                 Api attackssApi = new AttacksApi(preferenceStore, org, frDetectedDate, toDetectedDate, 0);
                 List<Attack> tmpAttacks = (List<Attack>) attackssApi.post();
+                allAttacks.addAll(tmpAttacks);
                 for (Attack atck : tmpAttacks) {
                     Api attackApi = new AttackApi(preferenceStore, org, atck.getUuid());
                     Attack attackDetail = (Attack) attackApi.get();
                     atck.setSource_name(attackDetail.getSource_name());
                 }
-                allAttacks.addAll(tmpAttacks);
                 int totalAttackCount = attackssApi.getTotalCount();
                 boolean attackIncompleteFlg = false;
                 attackIncompleteFlg = totalAttackCount > allAttacks.size();
@@ -98,6 +93,7 @@ public class AttackEventsGetWithProgress implements IRunnableWithProgress {
                     Thread.sleep(100);
                     attackssApi = new AttacksApi(preferenceStore, org, frDetectedDate, toDetectedDate, allAttacks.size());
                     tmpAttacks = (List<Attack>) attackssApi.post();
+                    allAttacks.addAll(tmpAttacks);
                     for (Attack atck : tmpAttacks) {
                         Api attackApi = new AttackApi(preferenceStore, org, atck.getUuid());
                         Attack attackDetail = (Attack) attackApi.get();

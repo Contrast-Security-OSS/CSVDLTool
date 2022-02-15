@@ -54,6 +54,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -1245,54 +1246,62 @@ public class Main implements PropertyChangeListener {
                         }
                         switch (csvColumn.getColumn()) {
                             case ATTACK_EVENT_01:
-                                // ==================== 01. ソースIP ====================
-                                csvLineList.add(attackEvent.getSource());
+                                // ==================== 01. ソース名 ====================
+                                csvLineList.add(attackEvent.getSource_name());
                                 break;
                             case ATTACK_EVENT_02:
-                                // ==================== 02. 結果 ====================
-                                csvLineList.add(attackEvent.getResult());
+                                // ==================== 02. ソースIP ====================
+                                csvLineList.add(attackEvent.getSource());
                                 break;
                             case ATTACK_EVENT_03:
-                                // ==================== 03. アプリケーション ====================
-                                csvLineList.add(attackEvent.getApplication().getName());
+                                // ==================== 03. 結果 ====================
+                                csvLineList.add(attackEvent.getResult());
                                 break;
                             case ATTACK_EVENT_04:
-                                // ==================== 04. サーバ ====================
-                                csvLineList.add(attackEvent.getServer().getName());
+                                // ==================== 04. アプリケーション ====================
+                                csvLineList.add(attackEvent.getApplication().getName());
                                 break;
                             case ATTACK_EVENT_05:
-                                // ==================== 05. ルール ====================
-                                csvLineList.add(attackEvent.getRule());
+                                // ==================== 05. サーバ ====================
+                                csvLineList.add(attackEvent.getServer().getName());
                                 break;
                             case ATTACK_EVENT_06:
-                                // ==================== 06. 時間 ====================
-                                csvLineList.add(attackEvent.getReceived());
+                                // ==================== 06. ルール ====================
+                                csvLineList.add(attackEvent.getRule());
                                 break;
                             case ATTACK_EVENT_07:
-                                // ==================== 07. URL ====================
-                                csvLineList.add(attackEvent.getUrl());
+                                // ==================== 07. 時間 ====================
+                                csvLineList.add(attackEvent.getFormatReceived());
                                 break;
                             case ATTACK_EVENT_08:
-                                // ==================== 08. タグ ====================
-                                csvLineList.add(String.join(csvColumn.getSeparateStr().replace("\\r", "\r").replace("\\n", "\n"), attackEvent.getTags()));
+                                // ==================== 08. URL ====================
+                                csvLineList.add(attackEvent.getUrl());
                                 break;
                             case ATTACK_EVENT_09:
-                                // ==================== 09. 組織名 ====================
-                                csvLineList.add(attackEvent.getOrganization().getName());
+                                // ==================== 09. 攻撃値 ====================
+                                csvLineList.add(attackEvent.getUser_input().getValue());
                                 break;
                             case ATTACK_EVENT_10:
-                                // ==================== 10. 組織ID ====================
+                                // ==================== 10. タグ ====================
+                                csvLineList.add(String.join(csvColumn.getSeparateStr().replace("\\r", "\r").replace("\\n", "\n"), attackEvent.getTags()));
+                                break;
+                            case ATTACK_EVENT_11:
+                                // ==================== 11. 組織名 ====================
+                                csvLineList.add(attackEvent.getOrganization().getName());
+                                break;
+                            case ATTACK_EVENT_12:
+                                // ==================== 12. 組織ID ====================
                                 csvLineList.add(attackEvent.getOrganization().getOrganization_uuid());
                                 break;
-                            case ATTACK_EVENT_11: {
-                                // ==================== 11. 攻撃イベントへのリンク ====================
+                            case ATTACK_EVENT_13: {
+                                // ==================== 13. 攻撃イベントへのリンク ====================
                                 String link = String.format("%s/static/ng/index.html#/%s/attacks/events/%s", preferenceStore.getString(PreferenceConstants.CONTRAST_URL),
                                         attackEvent.getOrganization().getOrganization_uuid().trim(), attackEvent.getEvent_uuid());
                                 csvLineList.add(link);
                                 break;
                             }
-                            case ATTACK_EVENT_12: {
-                                // ==================== 12. 攻撃イベントへのリンク（ハイパーリンク） ====================
+                            case ATTACK_EVENT_14: {
+                                // ==================== 14. 攻撃イベントへのリンク（ハイパーリンク） ====================
                                 String link = String.format("%s/static/ng/index.html#/%s/attacks/events/%s", preferenceStore.getString(PreferenceConstants.CONTRAST_URL),
                                         attackEvent.getOrganization().getOrganization_uuid().trim(), attackEvent.getEvent_uuid());
                                 csvLineList.add(String.format("=HYPERLINK(\"%s\",\"TeamServerへ\")", link));
@@ -1440,6 +1449,19 @@ public class Main implements PropertyChangeListener {
                 if (protectFilterMap == null) {
                     MessageDialog.openInformation(shell, "攻撃イベントフィルター", "攻撃イベント一覧を読み込んでください。");
                     return;
+                }
+                String dayTimeHours = preferenceStore.getString(PreferenceConstants.ATTACK_RANGE_DAYTIME);
+                String nightTimeHours = preferenceStore.getString(PreferenceConstants.ATTACK_RANGE_NIGHTTIME);
+                if (!dayTimeHours.isEmpty() || !nightTimeHours.isEmpty()) {
+                    Set<Filter> businessHoursFilterSet = new LinkedHashSet<Filter>();
+                    if (!dayTimeHours.isEmpty()) {
+                        businessHoursFilterSet.add(new Filter("日中時間帯"));
+                    }
+                    if (!nightTimeHours.isEmpty()) {
+                        businessHoursFilterSet.add(new Filter("夜間時間帯"));
+                    }
+                    businessHoursFilterSet.add(new Filter("その他時間帯"));
+                    protectFilterMap.put(FilterEnum.BUSINESS_HOURS, businessHoursFilterSet);
                 }
                 AttackEventFilterDialog filterDialog = new AttackEventFilterDialog(shell, protectFilterMap);
                 filterDialog.addPropertyChangeListener(shell.getMain());
@@ -1681,7 +1703,7 @@ public class Main implements PropertyChangeListener {
         item.setText(4, attackEvent.getApplication().getName());
         item.setText(5, attackEvent.getServer().getName());
         item.setText(6, attackEvent.getRule());
-        item.setText(7, attackEvent.getReceived());
+        item.setText(7, attackEvent.getFormatReceived());
         item.setText(8, attackEvent.getUrl());
         item.setText(9, attackEvent.getUser_input().getValue());
         String tags = String.join(",", attackEvent.getTags());
@@ -1912,6 +1934,88 @@ public class Main implements PropertyChangeListener {
                     if (attackEvent.getTags() != null && attackEvent.getTags().contains(filter.getLabel())) {
                         if (!filter.isValid()) {
                             lostFlg |= true;
+                        }
+                    }
+                }
+
+                // 時間帯フィルタ
+                if (filterMap.containsKey(FilterEnum.BUSINESS_HOURS)) {
+                    int target = Integer.parseInt(attackEvent.getTimeStrReceived());
+                    String termDayTime = preferenceStore.getString(PreferenceConstants.ATTACK_RANGE_DAYTIME);
+                    String termNightTime = preferenceStore.getString(PreferenceConstants.ATTACK_RANGE_NIGHTTIME);
+                    for (Filter filter : filterMap.get(FilterEnum.BUSINESS_HOURS)) {
+                        if (filter.isValid()) {
+                            continue;
+                        }
+                        if (filter.getLabel().equals("日中時間帯")) {
+                            if (!termDayTime.isEmpty()) {
+                                String frDtStr = termDayTime.split("-")[0];
+                                String toDtStr = termDayTime.split("-")[1];
+                                int frDt = Integer.parseInt(frDtStr);
+                                int toDt = Integer.parseInt(toDtStr);
+                                if (toDt < frDt) {
+                                    if ((frDt <= target && target < 2400) || 0 <= target && target < toDt) {
+                                        lostFlg |= true;
+                                    }
+                                } else {
+                                    if (frDt <= target && target < toDt) {
+                                        lostFlg |= true;
+                                    }
+                                }
+                            }
+                        }
+                        if (filter.getLabel().equals("夜間時間帯")) {
+                            if (!termNightTime.isEmpty()) {
+                                String frNtStr = termNightTime.split("-")[0];
+                                String toNtStr = termNightTime.split("-")[1];
+                                int frNt = Integer.parseInt(frNtStr);
+                                int toNt = Integer.parseInt(toNtStr);
+                                if (toNt < frNt) {
+                                    if ((frNt <= target && target < 2400) || 0 <= target && target < toNt) {
+                                        lostFlg |= true;
+                                    }
+                                } else {
+                                    if (frNt <= target && target < toNt) {
+                                        lostFlg |= true;
+                                    }
+                                }
+                            }
+                        }
+                        if (filter.getLabel().equals("その他時間帯")) {
+                            boolean hitFlg = false;
+                            if (!termDayTime.isEmpty()) {
+                                String frDtStr = termDayTime.split("-")[0];
+                                String toDtStr = termDayTime.split("-")[1];
+                                int frDt = Integer.parseInt(frDtStr);
+                                int toDt = Integer.parseInt(toDtStr);
+                                if (toDt < frDt) {
+                                    if ((frDt <= target && target < 2400) || 0 <= target && target < toDt) {
+                                        hitFlg |= true;
+                                    }
+                                } else {
+                                    if (frDt <= target && target < toDt) {
+                                        hitFlg |= true;
+                                    }
+                                }
+                            }
+                            if (!termNightTime.isEmpty()) {
+                                String frNtStr = termNightTime.split("-")[0];
+                                String toNtStr = termNightTime.split("-")[1];
+                                int frNt = Integer.parseInt(frNtStr);
+                                int toNt = Integer.parseInt(toNtStr);
+                                if (toNt < frNt) {
+                                    if ((frNt <= target && target < 2400) || 0 <= target && target < toNt) {
+                                        hitFlg |= true;
+                                    }
+                                } else {
+                                    if (frNt <= target && target < toNt) {
+                                        hitFlg |= true;
+                                    }
+                                }
+                            }
+                            if (!hitFlg) {
+                                lostFlg |= true;
+                            }
                         }
                     }
                 }

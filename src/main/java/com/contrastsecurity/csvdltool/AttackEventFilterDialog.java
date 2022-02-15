@@ -60,6 +60,7 @@ public class AttackEventFilterDialog extends Dialog {
     private CheckboxTableViewer appViewer;
     private CheckboxTableViewer ruleViewer;
     private CheckboxTableViewer tagViewer;
+    private CheckboxTableViewer termViewer;
     private PropertyChangeSupport support = new PropertyChangeSupport(this);
 
     public AttackEventFilterDialog(Shell parentShell, Map<FilterEnum, Set<Filter>> filterMap) {
@@ -388,6 +389,70 @@ public class AttackEventFilterDialog extends Dialog {
             }
         });
 
+        // #################### 時間帯 #################### //
+        if (filterMap.containsKey(FilterEnum.BUSINESS_HOURS)) {
+            Group termGrp = new Group(composite, SWT.NONE);
+            GridLayout termGrpLt = new GridLayout(1, false);
+            termGrpLt.marginWidth = 10;
+            termGrpLt.marginHeight = 10;
+            termGrp.setLayout(termGrpLt);
+            GridData termGrpGrDt = new GridData(GridData.FILL_BOTH);
+            termGrpGrDt.minimumWidth = 200;
+            termGrp.setLayoutData(termGrpGrDt);
+            termGrp.setText("時間帯");
+
+            final Table termTable = new Table(termGrp, SWT.CHECK | SWT.BORDER | SWT.V_SCROLL);
+            GridData termTableGrDt = new GridData(GridData.FILL_BOTH);
+            termTable.setLayoutData(termTableGrDt);
+            termViewer = new CheckboxTableViewer(termTable);
+            termViewer.setLabelProvider(new ColumnLabelProvider() {
+                @Override
+                public String getText(Object element) {
+                    return element.toString();
+                }
+            });
+            List<String> termLabelList = new ArrayList<String>();
+            List<String> termValidLabelList = new ArrayList<String>();
+            for (Filter filter : filterMap.get(FilterEnum.BUSINESS_HOURS)) {
+                termLabelList.add(filter.getLabel());
+                if (filter.isValid()) {
+                    termValidLabelList.add(filter.getLabel());
+                } else {
+                }
+            }
+            if (termValidLabelList.isEmpty()) {
+                termValidLabelList.addAll(termLabelList);
+            }
+            termViewer.setContentProvider(new ArrayContentProvider());
+            termViewer.setInput(termLabelList);
+            termViewer.setCheckedElements(termValidLabelList.toArray());
+            termViewer.addCheckStateListener(new ICheckStateListener() {
+                @Override
+                public void checkStateChanged(CheckStateChangedEvent event) {
+                    checkStateUpdate();
+                }
+            });
+
+            final Button termBulkBtn = new Button(termGrp, SWT.CHECK);
+            termBulkBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+            termBulkBtn.setText("すべて");
+            termBulkBtn.setSelection(true);
+            termBulkBtn.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    if (termBulkBtn.getSelection()) {
+                        termValidLabelList.addAll(termLabelList);
+                        termViewer.setCheckedElements(termValidLabelList.toArray());
+                        termViewer.refresh();
+                    } else {
+                        termViewer.setCheckedElements(new ArrayList<String>().toArray());
+                        termViewer.refresh();
+                    }
+                    checkStateUpdate();
+                }
+            });
+        }
+
         return composite;
     }
 
@@ -450,6 +515,19 @@ public class AttackEventFilterDialog extends Dialog {
             strItems.add((String) item);
         }
         for (Filter filter : filterMap.get(FilterEnum.TAG)) {
+            if (strItems.contains(filter.getLabel())) {
+                filter.setValid(true);
+            } else {
+                filter.setValid(false);
+            }
+        }
+        // 時間帯
+        Object[] termItems = termViewer.getCheckedElements();
+        strItems.clear();
+        for (Object item : termItems) {
+            strItems.add((String) item);
+        }
+        for (Filter filter : filterMap.get(FilterEnum.BUSINESS_HOURS)) {
             if (strItems.contains(filter.getLabel())) {
                 filter.setValid(true);
             } else {

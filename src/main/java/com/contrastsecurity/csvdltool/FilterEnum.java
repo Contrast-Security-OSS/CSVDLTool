@@ -32,7 +32,8 @@ public enum FilterEnum {
     RULE("ルール"),
     LANGUAGE("言語"),
     AGENT_VERSION("エージェントバージョン"),
-    TAG("タグ");
+    TAG("タグ"),
+    BUSINESS_HOURS("時間帯");
 
     private String filterName;
 

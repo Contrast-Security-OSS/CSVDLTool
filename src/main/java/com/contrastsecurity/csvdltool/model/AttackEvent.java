@@ -26,6 +26,7 @@ package com.contrastsecurity.csvdltool.model;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,9 +48,20 @@ public class AttackEvent {
     // Jsonにはないフィールド
     private String source_name;
 
+    DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("HHmm");
+
     public String getReceived() {
+        return this.received;
+    }
+
+    public String getFormatReceived() {
         LocalDateTime ldt = LocalDateTime.ofInstant(Instant.ofEpochMilli(Long.parseLong(this.received)), ZoneId.systemDefault());
         return ldt.toString();
+    }
+
+    public String getTimeStrReceived() {
+        LocalDateTime ldt = LocalDateTime.ofInstant(Instant.ofEpochMilli(Long.parseLong(this.received)), ZoneId.systemDefault());
+        return ldt.format(dateFormatter);
     }
 
     public void setReceived(String received) {

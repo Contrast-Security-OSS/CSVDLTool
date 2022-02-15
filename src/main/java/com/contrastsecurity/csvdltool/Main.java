@@ -100,6 +100,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -1116,11 +1117,11 @@ public class Main implements PropertyChangeListener {
                     logger.error(trace);
                     String errorMsg = e.getTargetException().getMessage();
                     if (e.getTargetException() instanceof ApiException) {
-                        MessageDialog.openWarning(shell, "攻撃一覧の取得", String.format("TeamServerからエラーが返されました。\r\n%s", errorMsg));
+                        MessageDialog.openWarning(shell, "攻撃イベント一覧の取得", String.format("TeamServerからエラーが返されました。\r\n%s", errorMsg));
                     } else if (e.getTargetException() instanceof NonApiException) {
-                        MessageDialog.openError(shell, "攻撃一覧の取得", String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", errorMsg));
+                        MessageDialog.openError(shell, "攻撃イベント一覧の取得", String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", errorMsg));
                     } else {
-                        MessageDialog.openError(shell, "攻撃一覧の取得", String.format("不明なエラーです。ログファイルをご確認ください。\r\n%s", errorMsg));
+                        MessageDialog.openError(shell, "攻撃イベント一覧の取得", String.format("不明なエラーです。ログファイルをご確認ください。\r\n%s", errorMsg));
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -1337,6 +1338,7 @@ public class Main implements PropertyChangeListener {
                     for (List<String> csvLine : csvList) {
                         printer.printRecord(csvLine);
                     }
+                    MessageDialog.openInformation(shell, "攻撃イベント一覧のエクスポート", "csvファイルをエクスポートしました。");
                 } catch (IOException ioe) {
                     ioe.printStackTrace();
                 }
@@ -1344,11 +1346,20 @@ public class Main implements PropertyChangeListener {
         });
 
         MenuItem miJump = new MenuItem(menuTable, SWT.NONE);
-        miJump.setText("TeamServerへ");
+        miJump.setText("ブラウザで開く");
         miJump.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 int[] selectIndexes = attackTable.getSelectionIndices();
+                if (selectIndexes.length > 10) {
+                    MessageBox messageBox = new MessageBox(shell, SWT.ICON_QUESTION | SWT.YES | SWT.NO);
+                    messageBox.setText("攻撃イベントをブラウザで開く");
+                    messageBox.setMessage(String.format("選択されている攻撃イベントが%d個あります。すべて開きますか？", selectIndexes.length));
+                    int response = messageBox.open();
+                    if (response == SWT.NO) {
+                        return;
+                    }
+                }
                 try {
                     Desktop desktop = Desktop.getDesktop();
                     for (int idx : selectIndexes) {

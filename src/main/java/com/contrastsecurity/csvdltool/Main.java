@@ -186,6 +186,7 @@ public class Main implements PropertyChangeListener {
     private Date toLastDetectedDate;
 
     // PROTECT
+    private Label attackEventCount;
     private List<Button> attackTermRadios = new ArrayList<Button>();
     private Button attackTerm30days;
     private Button attackTermYesterday;
@@ -1106,6 +1107,7 @@ public class Main implements PropertyChangeListener {
                         addColToAttackTable(attackEvent, -1);
                     }
                     protectFilterMap = progress.getFilterMap();
+                    attackEventCount.setText(String.format("%d/%d", filteredAttackEvents.size(), attackEvents.size()));
                 } catch (InvocationTargetException e) {
                     StringWriter stringWriter = new StringWriter();
                     PrintWriter printWriter = new PrintWriter(stringWriter);
@@ -1129,6 +1131,16 @@ public class Main implements PropertyChangeListener {
             public void widgetDefaultSelected(SelectionEvent event) {
             }
         });
+
+        this.attackEventCount = new Label(attackListGrp, SWT.RIGHT);
+        GridData attackEventCountGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        attackEventCountGrDt.minimumHeight = 12;
+        attackEventCountGrDt.minimumWidth = 30;
+        attackEventCountGrDt.heightHint = 12;
+        attackEventCountGrDt.widthHint = 30;
+        this.attackEventCount.setLayoutData(attackEventCountGrDt);
+        this.attackEventCount.setFont(new Font(display, "ＭＳ ゴシック", 10, SWT.NORMAL));
+        this.attackEventCount.setText("0/0");
 
         attackTable = new Table(attackListGrp, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
         GridData tableGrDt = new GridData(GridData.FILL_BOTH);
@@ -2024,6 +2036,7 @@ public class Main implements PropertyChangeListener {
                     filteredAttackEvents.add(attackEvent);
                 }
             }
+            attackEventCount.setText(String.format("%d/%d", filteredAttackEvents.size(), attackEvents.size()));
         } else if ("serverFilter".equals(event.getPropertyName())) {
             Map<FilterEnum, Set<Filter>> filterMap = (Map<FilterEnum, Set<Filter>>) event.getNewValue();
             serverTable.clearAll();

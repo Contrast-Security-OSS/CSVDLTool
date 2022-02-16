@@ -54,6 +54,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -1212,7 +1213,7 @@ public class Main implements PropertyChangeListener {
         });
 
         MenuItem miExp = new MenuItem(menuTable, SWT.NONE);
-        miExp.setText("エクスポート");
+        miExp.setText("CSVエクスポート");
         miExp.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -1339,6 +1340,65 @@ public class Main implements PropertyChangeListener {
                         printer.printRecord(csvLine);
                     }
                     MessageDialog.openInformation(shell, "攻撃イベント一覧のエクスポート", "csvファイルをエクスポートしました。");
+                } catch (IOException ioe) {
+                    ioe.printStackTrace();
+                }
+            }
+        });
+
+        MenuItem miReport = new MenuItem(menuTable, SWT.NONE);
+        miReport.setText("レポート出力");
+        miReport.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                int[] selectIndexes = attackTable.getSelectionIndices();
+                Set<String> srcIpSet = new HashSet<String>();
+                Set<String> ruleSet = new HashSet<String>();
+                for (int idx : selectIndexes) {
+                    AttackEvent attackEvent = filteredAttackEvents.get(idx);
+                    srcIpSet.add(attackEvent.getSource());
+                    ruleSet.add(attackEvent.getRule());
+                }
+                Map<String, Map<String, Integer>> srcIpMap = new HashMap<String, Map<String, Integer>>();
+                for (String srcIp : srcIpSet) {
+                    Map<String, Integer> ruleMap = new HashMap<String, Integer>();
+                    for (String rule : ruleSet) {
+                        ruleMap.put(rule, 0);
+                    }
+                    srcIpMap.put(srcIp, ruleMap);
+                }
+                for (int idx : selectIndexes) {
+                    AttackEvent attackEvent = filteredAttackEvents.get(idx);
+                    String srcIp = attackEvent.getSource();
+                    String rule = attackEvent.getRule();
+                    int cnt = srcIpMap.get(srcIp).get(rule).intValue();
+                    srcIpMap.get(srcIp).put(rule, ++cnt);
+                }
+                String timestamp = new SimpleDateFormat("'protect_report'_yyyy-MM-dd_HHmmss").format(new Date());
+                String currentPath = System.getProperty("user.dir");
+                String filePath = timestamp + ".txt";
+                if (OS.isFamilyMac()) {
+                    if (currentPath.contains(".app/Contents/Java")) {
+                        filePath = "../../../" + timestamp + ".txt";
+                    }
+                }
+                String txt_encoding = Main.CSV_WIN_ENCODING;
+                if (OS.isFamilyMac()) {
+                    txt_encoding = Main.CSV_MAC_ENCODING;
+                }
+                File f = new File(filePath);
+                try (PrintWriter printWriter = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(f), txt_encoding)))) {
+                    for (String srcIp : srcIpMap.keySet()) {
+                        printWriter.println(String.format("- %s", srcIp));
+                        Map<String, Integer> ruleMap = srcIpMap.get(srcIp);
+                        for (String rule : ruleMap.keySet()) {
+                            int cnt = ruleMap.get(rule).intValue();
+                            if (cnt > 0) {
+                                printWriter.println(String.format("  - %s: %d", rule, cnt));
+                            }
+                        }
+                    }
+                    MessageDialog.openInformation(shell, "攻撃イベント一覧のレポート出力", "txtファイルをエクスポートしました。");
                 } catch (IOException ioe) {
                     ioe.printStackTrace();
                 }

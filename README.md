@@ -95,7 +95,7 @@ Eclipseでプロジェクトをリフレッシュすると、あとは実行でc
     launch4jのsign4jを使用します。
     ```powershell
     cd C:\Program Files (x86)\launch4j\sign4j
-    sign4j.exe java -jar jsign-2.0.jar --alias 1 --keystore C:\Users\turbou\Desktop\CSVDLTool_work\XXXXX.pfx --storepass [パスワード] C:\Users\turbou\Desktop\CSVDLTool_work\common\CSVDLTool_1.6.0.exe
+    sign4j.exe java -jar jsign-2.0.jar --alias 1 --keystore C:\Users\turbou\Desktop\CSVDLTool_work\XXXXX.pfx --storepass [パスワード] C:\Users\turbou\Desktop\CSVDLTool_work\common\CSVDLTool_1.6.1.exe
     ```
   - 署名の確認  
     署名の確認については、exeを右クリック->プロパティ で確認できます。
@@ -105,18 +105,18 @@ Eclipseでプロジェクトをリフレッシュすると、あとは実行でc
     読み込めたら、Common Name(通称)をコピー
   - 署名
     ```bash
-    codesign --deep -s "Contrast Security, Inc." -v CSVDLTool_1.6.0.app
+    codesign --deep -s "Contrast Security, Inc." -v CSVDLTool_1.6.1.app
     ```
   - 署名の確認
     ```bash
-    codesign -d --verbose=4 CSVDLTool_1.6.0.app
+    codesign -d --verbose=4 CSVDLTool_1.6.1.app
     ```
     
 #### 圧縮について補足
 
 - Mac
   ```bash
-  7z a CSVDLTool_1.6.0.cli7z CSVDLTool_1.6.0.app/
+  7z a CSVDLTool_1.6.1.cli7z CSVDLTool_1.6.1.app/
   ```
 
 ### 起動後の使い方について

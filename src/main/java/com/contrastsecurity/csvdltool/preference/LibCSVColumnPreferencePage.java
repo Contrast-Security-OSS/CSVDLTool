@@ -251,6 +251,7 @@ public class LibCSVColumnPreferencePage extends PreferencePage {
                         text.dispose();
                     }
                     falseTextList.clear();
+                    table.clearAll();
                     table.removeAll();
                     for (LibCSVColumn col : columnList) {
                         addColToTable(col, -1);
@@ -342,6 +343,7 @@ public class LibCSVColumnPreferencePage extends PreferencePage {
                     text.dispose();
                 }
                 falseTextList.clear();
+                table.clearAll();
                 table.removeAll();
                 for (LibCSVColmunEnum colEnum : LibCSVColmunEnum.sortedValues()) {
                     columnList.add(new LibCSVColumn(colEnum));

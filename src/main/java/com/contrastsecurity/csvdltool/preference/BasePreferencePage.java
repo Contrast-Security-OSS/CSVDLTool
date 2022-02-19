@@ -315,6 +315,7 @@ public class BasePreferencePage extends PreferencePage {
                     button.dispose();
                 }
                 checkBoxList.clear();
+                table.clearAll();
                 table.removeAll();
                 for (Organization org : orgList) {
                     addOrgToTable(org);

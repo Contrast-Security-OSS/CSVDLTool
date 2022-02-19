@@ -251,6 +251,7 @@ public class VulCSVColumnPreferencePage extends PreferencePage {
                         text.dispose();
                     }
                     falseTextList.clear();
+                    table.clearAll();
                     table.removeAll();
                     for (VulCSVColumn col : columnList) {
                         addColToTable(col, -1);
@@ -342,6 +343,7 @@ public class VulCSVColumnPreferencePage extends PreferencePage {
                     text.dispose();
                 }
                 falseTextList.clear();
+                table.clearAll();
                 table.removeAll();
                 for (VulCSVColmunEnum colEnum : VulCSVColmunEnum.sortedValues()) {
                     columnList.add(new VulCSVColumn(colEnum));

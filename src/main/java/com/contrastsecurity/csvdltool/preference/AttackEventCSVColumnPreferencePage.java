@@ -235,6 +235,7 @@ public class AttackEventCSVColumnPreferencePage extends PreferencePage {
                         text.dispose();
                     }
                     separateTextList.clear();
+                    table.clearAll();
                     table.removeAll();
                     for (AttackEventCSVColumn col : columnList) {
                         addColToTable(col, -1);
@@ -314,6 +315,7 @@ public class AttackEventCSVColumnPreferencePage extends PreferencePage {
                     text.dispose();
                 }
                 separateTextList.clear();
+                table.clearAll();
                 table.removeAll();
                 for (AttackEventCSVColmunEnum colEnum : AttackEventCSVColmunEnum.sortedValues()) {
                     columnList.add(new AttackEventCSVColumn(colEnum));

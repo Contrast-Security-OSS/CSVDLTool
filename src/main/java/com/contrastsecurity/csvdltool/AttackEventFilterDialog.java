@@ -522,16 +522,18 @@ public class AttackEventFilterDialog extends Dialog {
             }
         }
         // 時間帯
-        Object[] termItems = termViewer.getCheckedElements();
-        strItems.clear();
-        for (Object item : termItems) {
-            strItems.add((String) item);
-        }
-        for (Filter filter : filterMap.get(FilterEnum.BUSINESS_HOURS)) {
-            if (strItems.contains(filter.getLabel())) {
-                filter.setValid(true);
-            } else {
-                filter.setValid(false);
+        if (filterMap.containsKey(FilterEnum.BUSINESS_HOURS)) {
+            Object[] termItems = termViewer.getCheckedElements();
+            strItems.clear();
+            for (Object item : termItems) {
+                strItems.add((String) item);
+            }
+            for (Filter filter : filterMap.get(FilterEnum.BUSINESS_HOURS)) {
+                if (strItems.contains(filter.getLabel())) {
+                    filter.setValid(true);
+                } else {
+                    filter.setValid(false);
+                }
             }
         }
         support.firePropertyChange("attackEventFilter", null, filterMap);

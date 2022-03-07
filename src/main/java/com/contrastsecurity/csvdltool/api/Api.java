@@ -46,13 +46,20 @@ import org.apache.http.Header;
 import org.apache.http.HttpHeaders;
 import org.apache.http.message.BasicHeader;
 import org.apache.log4j.Logger;
+import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.widgets.Shell;
 import org.jasypt.util.text.BasicTextEncryptor;
 
 import com.contrastsecurity.csvdltool.Main;
+import com.contrastsecurity.csvdltool.TsvDialog;
+import com.contrastsecurity.csvdltool.TsvStatusEnum;
 import com.contrastsecurity.csvdltool.exception.ApiException;
 import com.contrastsecurity.csvdltool.exception.NonApiException;
+import com.contrastsecurity.csvdltool.exception.TsvException;
 import com.contrastsecurity.csvdltool.model.Organization;
+import com.contrastsecurity.csvdltool.model.TsvSettings;
 import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
 
 import okhttp3.Authenticator;
@@ -74,17 +81,79 @@ public abstract class Api {
 
     Logger logger = Logger.getLogger("csvdltool");
 
-    protected IPreferenceStore preferenceStore;
-    protected Organization organization;
+    protected Shell shell;
+    protected IPreferenceStore ps;
+    protected Organization org;
+    protected String contrastUrl;
     protected boolean success;
     protected int totalCount;
+    private String rtnCode;
 
-    public Api(IPreferenceStore preferenceStore, Organization organization) {
-        this.preferenceStore = preferenceStore;
-        this.organization = organization;
+    public Api(Shell shell, IPreferenceStore ps, Organization org) {
+        this.shell = shell;
+        this.ps = ps;
+        this.org = org;
+        this.contrastUrl = this.ps.getString(PreferenceConstants.CONTRAST_URL);
+    }
+
+    protected TsvSettings checkTsv() {
+        Api tsvSettingsApi = new TsvSettingsApi(shell, ps, org);
+        try {
+            TsvSettings tsvSettings = (TsvSettings) tsvSettingsApi.getWithoutCheckTsv();
+            return tsvSettings;
+        } catch (ApiException e) {
+            MessageDialog.openWarning(shell, "二段階認証", String.format("TeamServerからエラーが返されました。\r\n%s", e.getMessage()));
+        } catch (NonApiException e) {
+            MessageDialog.openError(shell, "二段階認証", String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", e.getMessage()));
+        } catch (Exception e) {
+            MessageDialog.openError(shell, "二段階認証", String.format("不明なエラーです。ログファイルをご確認ください。\r\n%s", e.getMessage()));
+        }
+        return null;
+    }
+
+    public Object getWithoutCheckTsv() throws Exception {
+        String response = this.getResponse(HttpMethod.GET);
+        return this.convert(response);
     }
 
     public Object get() throws Exception {
+        // 二段階認証チェック ここから
+        TsvStatusEnum tsvStatusEnum = TsvStatusEnum.NONE;
+        String tsvStatusEnumStr = this.ps.getString(PreferenceConstants.TSV_STATUS);
+        if (tsvStatusEnumStr != null && !tsvStatusEnumStr.isEmpty()) {
+            tsvStatusEnum = TsvStatusEnum.valueOf(this.ps.getString(PreferenceConstants.TSV_STATUS));
+        }
+        if (TsvStatusEnum.NONE == tsvStatusEnum) {
+            TsvSettings tsvSettings = checkTsv();
+            if (!tsvSettings.isTsv_enabled()) {
+                this.ps.setValue(PreferenceConstants.TSV_STATUS, TsvStatusEnum.SKIP.name());
+            } else {
+                TsvDialog tsvDialog = new TsvDialog(shell);
+                shell.getDisplay().syncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        int result = tsvDialog.open();
+                        if (IDialogConstants.OK_ID != result) {
+                            rtnCode = "";
+                        }
+                        rtnCode = tsvDialog.getCode();
+                        if (rtnCode == null) {
+                            rtnCode = "";
+                        }
+                    }
+                });
+                if (!rtnCode.isEmpty()) {
+                    Api tsvAuthorizeApi = new TsvAuthorizeApi(this.shell, this.ps, this.org, rtnCode);
+                    String rtnMsg = (String) tsvAuthorizeApi.post();
+                    if (rtnMsg.equals("true")) {
+                        this.ps.setValue(PreferenceConstants.TSV_STATUS, TsvStatusEnum.AUTH.name());
+                    } else {
+                        throw new TsvException("TSV ng");
+                    }
+                }
+            }
+        }
+        // 二段階認証チェック ここまで
         String response = this.getResponse(HttpMethod.GET);
         return this.convert(response);
     }
@@ -112,9 +181,9 @@ public abstract class Api {
     protected abstract Object convert(String response);
 
     protected List<Header> getHeaders() {
-        String apiKey = this.organization.getApikey();
-        String serviceKey = preferenceStore.getString(PreferenceConstants.SERVICE_KEY);
-        String userName = preferenceStore.getString(PreferenceConstants.USERNAME);
+        String apiKey = this.org.getApikey();
+        String serviceKey = this.ps.getString(PreferenceConstants.SERVICE_KEY);
+        String userName = this.ps.getString(PreferenceConstants.USERNAME);
         String auth = String.format("%s:%s", userName, serviceKey);
         byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(StandardCharsets.ISO_8859_1));
         String authHeader = new String(encodedAuth);
@@ -154,11 +223,11 @@ public abstract class Api {
         Request request = requestBuilder.build();
         Response response = null;
         try {
-            int connectTimeout = Integer.parseInt(this.preferenceStore.getString(PreferenceConstants.CONNECTION_TIMEOUT));
-            int sockettTimeout = Integer.parseInt(this.preferenceStore.getString(PreferenceConstants.SOCKET_TIMEOUT));
+            int connectTimeout = Integer.parseInt(this.ps.getString(PreferenceConstants.CONNECTION_TIMEOUT));
+            int sockettTimeout = Integer.parseInt(this.ps.getString(PreferenceConstants.SOCKET_TIMEOUT));
             clientBuilder.readTimeout(sockettTimeout, TimeUnit.MILLISECONDS).connectTimeout(connectTimeout, TimeUnit.MILLISECONDS);
 
-            if (preferenceStore.getBoolean(PreferenceConstants.IGNORE_SSLCERT_CHECK)) {
+            if (this.ps.getBoolean(PreferenceConstants.IGNORE_SSLCERT_CHECK)) {
                 SSLContext sslContext = SSLContext.getInstance("SSL");
                 TrustManager[] trustAllCerts = getTrustManager();
                 sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
@@ -172,18 +241,17 @@ public abstract class Api {
                 });
             }
 
-            if (this.preferenceStore.getBoolean(PreferenceConstants.PROXY_YUKO)) {
-                clientBuilder.proxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress(this.preferenceStore.getString(PreferenceConstants.PROXY_HOST),
-                        Integer.parseInt(this.preferenceStore.getString(PreferenceConstants.PROXY_PORT)))));
-                if (!this.preferenceStore.getString(PreferenceConstants.PROXY_AUTH).equals("none")) {
+            if (this.ps.getBoolean(PreferenceConstants.PROXY_YUKO)) {
+                clientBuilder.proxy(new Proxy(Proxy.Type.HTTP,
+                        new InetSocketAddress(this.ps.getString(PreferenceConstants.PROXY_HOST), Integer.parseInt(this.ps.getString(PreferenceConstants.PROXY_PORT)))));
+                if (!this.ps.getString(PreferenceConstants.PROXY_AUTH).equals("none")) {
                     Authenticator proxyAuthenticator = null;
                     // プロキシ認証あり
-                    if (this.preferenceStore.getString(PreferenceConstants.PROXY_AUTH).equals("input")) {
+                    if (this.ps.getString(PreferenceConstants.PROXY_AUTH).equals("input")) {
                         proxyAuthenticator = new Authenticator() {
                             @Override
                             public Request authenticate(Route route, Response response) throws IOException {
-                                String credential = Credentials.basic(preferenceStore.getString(PreferenceConstants.PROXY_TMP_USER),
-                                        preferenceStore.getString(PreferenceConstants.PROXY_TMP_PASS));
+                                String credential = Credentials.basic(ps.getString(PreferenceConstants.PROXY_TMP_USER), ps.getString(PreferenceConstants.PROXY_TMP_PASS));
                                 return response.request().newBuilder().header("Proxy-Authorization", credential).build();
                             }
                         };
@@ -191,11 +259,11 @@ public abstract class Api {
                         BasicTextEncryptor encryptor = new BasicTextEncryptor();
                         encryptor.setPassword(Main.MASTER_PASSWORD);
                         try {
-                            String proxy_pass = encryptor.decrypt(preferenceStore.getString(PreferenceConstants.PROXY_PASS));
+                            String proxy_pass = encryptor.decrypt(this.ps.getString(PreferenceConstants.PROXY_PASS));
                             proxyAuthenticator = new Authenticator() {
                                 @Override
                                 public Request authenticate(Route route, Response response) throws IOException {
-                                    String credential = Credentials.basic(preferenceStore.getString(PreferenceConstants.PROXY_USER), proxy_pass);
+                                    String credential = Credentials.basic(ps.getString(PreferenceConstants.PROXY_USER), proxy_pass);
                                     return response.request().newBuilder().header("Proxy-Authorization", credential).build();
                                 }
                             };

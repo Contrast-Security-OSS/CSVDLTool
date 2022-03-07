@@ -28,35 +28,43 @@ import java.lang.reflect.Type;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Shell;
 
-import com.contrastsecurity.csvdltool.json.EventDetailJson;
+import com.contrastsecurity.csvdltool.json.ContrastJson;
 import com.contrastsecurity.csvdltool.model.Organization;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-public class EventDetailApi extends Api {
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
 
-    private String traceId;
-    private String eventId;
+public class TsvAuthorizeApi extends Api {
 
-    public EventDetailApi(Shell shell, IPreferenceStore ps, Organization org, String traceId, String eventId) {
+    private String code;
+
+    public TsvAuthorizeApi(Shell shell, IPreferenceStore ps, Organization org, String code) {
         super(shell, ps, org);
-        this.traceId = traceId;
-        this.eventId = eventId;
+        this.code = code;
     }
 
     @Override
     protected String getUrl() {
-        String orgId = this.org.getOrganization_uuid();
-        return String.format("%s/api/ng/%s/traces/%s/events/%s/details?expand=skip_links", this.contrastUrl, orgId, this.traceId, this.eventId);
+        return String.format("%s/api/ng/tsv/authorize?expand=skip_links", this.contrastUrl);
+    }
+
+    @Override
+    protected RequestBody getBody() {
+        MediaType mediaTypeJson = MediaType.parse("application/json; charset=UTF-8");
+        String json = String.format("{\"code\":\"%s\"}", this.code);
+        return RequestBody.create(json, mediaTypeJson);
     }
 
     @Override
     protected Object convert(String response) {
+        System.out.println(response);
         Gson gson = new Gson();
-        Type eventDetailType = new TypeToken<EventDetailJson>() {
+        Type contType = new TypeToken<ContrastJson>() {
         }.getType();
-        EventDetailJson eventDetailJson = gson.fromJson(response, eventDetailType);
-        return eventDetailJson.getEvent();
+        ContrastJson contrastJson = gson.fromJson(response, contType);
+        return contrastJson.getSuccess();
     }
 
 }

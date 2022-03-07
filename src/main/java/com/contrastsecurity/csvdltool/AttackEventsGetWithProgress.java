@@ -37,6 +37,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.PreferenceStore;
+import org.eclipse.swt.widgets.Shell;
 
 import com.contrastsecurity.csvdltool.api.Api;
 import com.contrastsecurity.csvdltool.api.AttackApi;
@@ -49,8 +50,9 @@ import com.contrastsecurity.csvdltool.model.Organization;
 
 public class AttackEventsGetWithProgress implements IRunnableWithProgress {
 
-    private PreferenceStore preferenceStore;
-    private List<Organization> organizations;
+    private Shell shell;
+    private PreferenceStore ps;
+    private List<Organization> orgs;
     private Date frDetectedDate;
     private Date toDetectedDate;
     private List<AttackEvent> allAttackEvents;
@@ -62,9 +64,10 @@ public class AttackEventsGetWithProgress implements IRunnableWithProgress {
 
     Logger logger = Logger.getLogger("csvdltool");
 
-    public AttackEventsGetWithProgress(PreferenceStore preferenceStore, List<Organization> organizations, Date frDate, Date toDate) {
-        this.preferenceStore = preferenceStore;
-        this.organizations = organizations;
+    public AttackEventsGetWithProgress(Shell shell, PreferenceStore ps, List<Organization> orgs, Date frDate, Date toDate) {
+        this.shell = shell;
+        this.ps = ps;
+        this.orgs = orgs;
         this.frDetectedDate = frDate;
         this.toDetectedDate = toDate;
         this.allAttackEvents = new ArrayList<AttackEvent>();
@@ -73,21 +76,21 @@ public class AttackEventsGetWithProgress implements IRunnableWithProgress {
     @SuppressWarnings("unchecked")
     @Override
     public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-        monitor.beginTask("攻撃イベント一覧の読み込み...", 100 * this.organizations.size());
-        for (Organization org : this.organizations) {
+        monitor.beginTask("攻撃イベント一覧の読み込み...", 100 * this.orgs.size());
+        for (Organization org : this.orgs) {
             try {
                 monitor.setTaskName(String.format("[%s] 攻撃イベント一覧の読み込み", org.getName()));
                 // 攻撃一覧を読み込み
                 monitor.subTask("攻撃一覧の情報を取得...");
                 SubProgressMonitor sub1Monitor = new SubProgressMonitor(monitor, 30);
                 List<Attack> allAttacks = new ArrayList<Attack>();
-                Api attackssApi = new AttacksApi(preferenceStore, org, frDetectedDate, toDetectedDate, 0);
+                Api attackssApi = new AttacksApi(this.shell, this.ps, org, frDetectedDate, toDetectedDate, 0);
                 List<Attack> tmpAttacks = (List<Attack>) attackssApi.post();
                 int totalAttackCount = attackssApi.getTotalCount();
                 sub1Monitor.beginTask("", totalAttackCount);
                 allAttacks.addAll(tmpAttacks);
                 for (Attack atck : tmpAttacks) {
-                    Api attackApi = new AttackApi(preferenceStore, org, atck.getUuid());
+                    Api attackApi = new AttackApi(this.shell, this.ps, org, atck.getUuid());
                     Attack attackDetail = (Attack) attackApi.get();
                     atck.setSource_name(attackDetail.getSource_name());
                 }
@@ -96,11 +99,11 @@ public class AttackEventsGetWithProgress implements IRunnableWithProgress {
                 attackIncompleteFlg = totalAttackCount > allAttacks.size();
                 while (attackIncompleteFlg) {
                     Thread.sleep(100);
-                    attackssApi = new AttacksApi(preferenceStore, org, frDetectedDate, toDetectedDate, allAttacks.size());
+                    attackssApi = new AttacksApi(this.shell, this.ps, org, frDetectedDate, toDetectedDate, allAttacks.size());
                     tmpAttacks = (List<Attack>) attackssApi.post();
                     allAttacks.addAll(tmpAttacks);
                     for (Attack atck : tmpAttacks) {
-                        Api attackApi = new AttackApi(preferenceStore, org, atck.getUuid());
+                        Api attackApi = new AttackApi(this.shell, this.ps, org, atck.getUuid());
                         Attack attackDetail = (Attack) attackApi.get();
                         atck.setSource_name(attackDetail.getSource_name());
                     }
@@ -118,7 +121,7 @@ public class AttackEventsGetWithProgress implements IRunnableWithProgress {
                         throw new InterruptedException("キャンセルされました。");
                     }
                     List<AttackEvent> orgAttackEvents = new ArrayList<AttackEvent>();
-                    Api attackEventsApi = new AttackEventsByAttackUuidApi(preferenceStore, org, attack.getUuid(), frDetectedDate, toDetectedDate, orgAttackEvents.size());
+                    Api attackEventsApi = new AttackEventsByAttackUuidApi(this.shell, this.ps, org, attack.getUuid(), frDetectedDate, toDetectedDate, orgAttackEvents.size());
                     List<AttackEvent> tmpAttackEvents = (List<AttackEvent>) attackEventsApi.post();
                     for (AttackEvent tmpAttackEvent : tmpAttackEvents) {
                         tmpAttackEvent.setSource_name(attack.getSource_name());
@@ -133,7 +136,7 @@ public class AttackEventsGetWithProgress implements IRunnableWithProgress {
                         if (monitor.isCanceled()) {
                             throw new InterruptedException("キャンセルされました。");
                         }
-                        attackEventsApi = new AttackEventsByAttackUuidApi(preferenceStore, org, attack.getUuid(), frDetectedDate, toDetectedDate, orgAttackEvents.size());
+                        attackEventsApi = new AttackEventsByAttackUuidApi(this.shell, this.ps, org, attack.getUuid(), frDetectedDate, toDetectedDate, orgAttackEvents.size());
                         tmpAttackEvents = (List<AttackEvent>) attackEventsApi.post();
                         for (AttackEvent tmpAttackEvent : tmpAttackEvents) {
                             tmpAttackEvent.setSource_name(attack.getSource_name());

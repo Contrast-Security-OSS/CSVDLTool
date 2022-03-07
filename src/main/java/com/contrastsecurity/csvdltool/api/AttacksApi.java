@@ -28,11 +28,11 @@ import java.util.Date;
 import java.util.List;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.widgets.Shell;
 
 import com.contrastsecurity.csvdltool.json.AttacksJson;
 import com.contrastsecurity.csvdltool.model.Attack;
 import com.contrastsecurity.csvdltool.model.Organization;
-import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -46,8 +46,8 @@ public class AttacksApi extends Api {
     private Date endDate;
     private int offset;
 
-    public AttacksApi(IPreferenceStore preferenceStore, Organization organization, Date startDate, Date endDate, int offset) {
-        super(preferenceStore, organization);
+    public AttacksApi(Shell shell, IPreferenceStore ps, Organization org, Date startDate, Date endDate, int offset) {
+        super(shell, ps, org);
         this.startDate = startDate;
         this.endDate = endDate;
         this.offset = offset;
@@ -55,9 +55,8 @@ public class AttacksApi extends Api {
 
     @Override
     protected String getUrl() {
-        String contrastUrl = preferenceStore.getString(PreferenceConstants.CONTRAST_URL);
-        String orgId = this.organization.getOrganization_uuid();
-        return String.format("%s/api/ng/%s/attacks?expand=skip_links&limit=%d&offset=%d&sort=-startTime", contrastUrl, orgId, LIMIT, this.offset);
+        String orgId = this.org.getOrganization_uuid();
+        return String.format("%s/api/ng/%s/attacks?expand=skip_links&limit=%d&offset=%d&sort=-startTime", this.contrastUrl, orgId, LIMIT, this.offset);
     }
 
     @Override

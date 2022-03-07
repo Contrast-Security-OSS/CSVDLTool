@@ -33,6 +33,7 @@ import org.apache.http.Header;
 import org.apache.http.HttpHeaders;
 import org.apache.http.message.BasicHeader;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.widgets.Shell;
 
 import com.contrastsecurity.csvdltool.json.OrganizationJson;
 import com.contrastsecurity.csvdltool.model.Organization;
@@ -42,29 +43,29 @@ import com.google.gson.reflect.TypeToken;
 public class OrganizationApi extends Api {
     private String url;
     private String username;
-    private String sevice_key;
+    private String seviceKey;
 
-    public OrganizationApi(IPreferenceStore preferenceStore, Organization organization, String url, String username, String sevice_key) {
-        super(preferenceStore, organization);
+    public OrganizationApi(Shell shell, IPreferenceStore ps, Organization org, String url, String username, String seviceKey) {
+        super(shell, ps, org);
         this.url = url;
         this.username = username;
-        this.sevice_key = sevice_key;
+        this.seviceKey = seviceKey;
     }
 
     @Override
     protected String getUrl() {
-        String orgId = this.organization.getOrganization_uuid();
+        String orgId = this.org.getOrganization_uuid();
         return String.format("%s/api/ng/profile/organizations/%s?expand=freemium,skip_links", this.url, orgId);
     }
 
     @Override
     protected List<Header> getHeaders() {
-        String auth = String.format("%s:%s", this.username, this.sevice_key);
+        String auth = String.format("%s:%s", this.username, this.seviceKey);
         byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(StandardCharsets.ISO_8859_1));
         String authHeader = new String(encodedAuth);
         List<Header> headers = new ArrayList<Header>();
         headers.add(new BasicHeader(HttpHeaders.ACCEPT, "application/json"));
-        headers.add(new BasicHeader("API-Key", this.organization.getApikey()));
+        headers.add(new BasicHeader("API-Key", this.org.getApikey()));
         headers.add(new BasicHeader(HttpHeaders.AUTHORIZATION, authHeader));
         return headers;
     }

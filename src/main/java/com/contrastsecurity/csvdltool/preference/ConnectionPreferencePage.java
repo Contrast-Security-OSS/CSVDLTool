@@ -35,7 +35,6 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -70,8 +69,8 @@ public class ConnectionPreferencePage extends PreferencePage {
 
     @Override
     protected Control createContents(Composite parent) {
-        IPreferenceStore preferenceStore = getPreferenceStore();
-        preferenceStore.addPropertyChangeListener(new IPropertyChangeListener() {
+        IPreferenceStore ps = getPreferenceStore();
+        ps.addPropertyChangeListener(new IPropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent event) {
                 if (event.getProperty().equals(PreferenceConstants.PROXY_AUTH)) {
@@ -113,7 +112,7 @@ public class ConnectionPreferencePage extends PreferencePage {
         // validFlgGrDt.horizontalSpan = 4;
         // validFlg.setLayoutData(validFlgGrDt);
         validFlg.setText("プロキシ経由");
-        if (preferenceStore.getBoolean(PreferenceConstants.PROXY_YUKO)) {
+        if (ps.getBoolean(PreferenceConstants.PROXY_YUKO)) {
             validFlg.setSelection(true);
         }
 
@@ -130,7 +129,7 @@ public class ConnectionPreferencePage extends PreferencePage {
         new Label(proxyHostGrp, SWT.LEFT).setText("ホスト：");
         hostTxt = new Text(proxyHostGrp, SWT.BORDER);
         hostTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        hostTxt.setText(preferenceStore.getString(PreferenceConstants.PROXY_HOST));
+        hostTxt.setText(ps.getString(PreferenceConstants.PROXY_HOST));
         hostTxt.addListener(SWT.FocusIn, new Listener() {
             public void handleEvent(Event e) {
                 hostTxt.selectAll();
@@ -143,7 +142,7 @@ public class ConnectionPreferencePage extends PreferencePage {
         GridData portTxtGrDt = new GridData();
         portTxtGrDt.widthHint = 100;
         portTxt.setLayoutData(portTxtGrDt);
-        portTxt.setText(preferenceStore.getString(PreferenceConstants.PROXY_PORT));
+        portTxt.setText(ps.getString(PreferenceConstants.PROXY_PORT));
         portTxt.setTextLimit(5);
         portTxt.addListener(SWT.FocusIn, new Listener() {
             public void handleEvent(Event e) {
@@ -229,7 +228,7 @@ public class ConnectionPreferencePage extends PreferencePage {
         new Label(authGrp, SWT.LEFT).setText("ユーザー：");
         userTxt = new Text(authGrp, SWT.BORDER);
         userTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        userTxt.setText(preferenceStore.getString(PreferenceConstants.PROXY_USER));
+        userTxt.setText(ps.getString(PreferenceConstants.PROXY_USER));
         userTxt.addListener(SWT.FocusIn, new Listener() {
             public void handleEvent(Event e) {
                 userTxt.selectAll();
@@ -247,20 +246,20 @@ public class ConnectionPreferencePage extends PreferencePage {
             }
         });
 
-        if (preferenceStore.getString(PreferenceConstants.PROXY_AUTH).equals("input")) {
+        if (ps.getString(PreferenceConstants.PROXY_AUTH).equals("input")) {
             authInput.setSelection(true);
             userTxt.setText("");
             userTxt.setEnabled(false);
             passTxt.setText("");
             passTxt.setEnabled(false);
-        } else if (preferenceStore.getString(PreferenceConstants.PROXY_AUTH).equals("save")) {
+        } else if (ps.getString(PreferenceConstants.PROXY_AUTH).equals("save")) {
             authSave.setSelection(true);
             userTxt.setEnabled(true);
             passTxt.setEnabled(true);
             BasicTextEncryptor encryptor = new BasicTextEncryptor();
             encryptor.setPassword(Main.MASTER_PASSWORD);
             try {
-                passTxt.setText(encryptor.decrypt(preferenceStore.getString(PreferenceConstants.PROXY_PASS)));
+                passTxt.setText(encryptor.decrypt(ps.getString(PreferenceConstants.PROXY_PASS)));
             } catch (Exception e) {
                 MessageDialog.openError(getShell(), "接続設定", "プロキシパスワードの復号化に失敗しました。\r\nパスワードの設定をやり直してください。");
                 passTxt.setText("");
@@ -288,7 +287,7 @@ public class ConnectionPreferencePage extends PreferencePage {
         // ignoreSSLCertCheckFlgGrDt.horizontalSpan = 4;
         // ignoreSSLCertCheckFlg.setLayoutData(ignoreSSLCertCheckFlgGrDt);
         ignoreSSLCertCheckFlg.setText("検証を無効にする");
-        if (preferenceStore.getBoolean(PreferenceConstants.IGNORE_SSLCERT_CHECK)) {
+        if (ps.getBoolean(PreferenceConstants.IGNORE_SSLCERT_CHECK)) {
             ignoreSSLCertCheckFlg.setSelection(true);
         }
 
@@ -305,7 +304,7 @@ public class ConnectionPreferencePage extends PreferencePage {
         new Label(timeoutGrp, SWT.LEFT).setText("ConnetionTimeout：");
         connectionTimeoutTxt = new Text(timeoutGrp, SWT.BORDER);
         connectionTimeoutTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        connectionTimeoutTxt.setText(preferenceStore.getString(PreferenceConstants.CONNECTION_TIMEOUT));
+        connectionTimeoutTxt.setText(ps.getString(PreferenceConstants.CONNECTION_TIMEOUT));
         connectionTimeoutTxt.addListener(SWT.FocusIn, new Listener() {
             public void handleEvent(Event e) {
                 connectionTimeoutTxt.selectAll();
@@ -315,7 +314,7 @@ public class ConnectionPreferencePage extends PreferencePage {
         new Label(timeoutGrp, SWT.LEFT).setText("SocketTimeout：");
         socketTimeoutTxt = new Text(timeoutGrp, SWT.BORDER);
         socketTimeoutTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        socketTimeoutTxt.setText(preferenceStore.getString(PreferenceConstants.SOCKET_TIMEOUT));
+        socketTimeoutTxt.setText(ps.getString(PreferenceConstants.SOCKET_TIMEOUT));
         socketTimeoutTxt.addListener(SWT.FocusIn, new Listener() {
             public void handleEvent(Event e) {
                 socketTimeoutTxt.selectAll();
@@ -338,13 +337,11 @@ public class ConnectionPreferencePage extends PreferencePage {
         defaultBtnGrDt.widthHint = 90;
         defaultBtn.setLayoutData(defaultBtnGrDt);
         defaultBtn.setText("デフォルトに戻す");
-        defaultBtn.addSelectionListener(new SelectionListener() {
-            public void widgetDefaultSelected(SelectionEvent e) {
-            }
-
+        defaultBtn.addSelectionListener(new SelectionAdapter() {
+            @Override
             public void widgetSelected(SelectionEvent e) {
-                connectionTimeoutTxt.setText(preferenceStore.getDefaultString(PreferenceConstants.CONNECTION_TIMEOUT));
-                socketTimeoutTxt.setText(preferenceStore.getDefaultString(PreferenceConstants.SOCKET_TIMEOUT));
+                connectionTimeoutTxt.setText(ps.getDefaultString(PreferenceConstants.CONNECTION_TIMEOUT));
+                socketTimeoutTxt.setText(ps.getDefaultString(PreferenceConstants.SOCKET_TIMEOUT));
             }
         });
 
@@ -353,10 +350,8 @@ public class ConnectionPreferencePage extends PreferencePage {
         applyBtnGrDt.widthHint = 90;
         applyBtn.setLayoutData(applyBtnGrDt);
         applyBtn.setText("適用");
-        applyBtn.addSelectionListener(new SelectionListener() {
-            public void widgetDefaultSelected(SelectionEvent e) {
-            }
-
+        applyBtn.addSelectionListener(new SelectionAdapter() {
+            @Override
             public void widgetSelected(SelectionEvent e) {
                 performOk();
             }

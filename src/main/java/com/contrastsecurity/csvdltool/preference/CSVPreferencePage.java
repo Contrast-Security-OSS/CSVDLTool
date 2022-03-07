@@ -31,8 +31,8 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -56,7 +56,7 @@ public class CSVPreferencePage extends PreferencePage {
 
     @Override
     protected Control createContents(Composite parent) {
-        IPreferenceStore preferenceStore = getPreferenceStore();
+        IPreferenceStore ps = getPreferenceStore();
 
         final Composite composite = new Composite(parent, SWT.NONE);
         GridLayout compositeLt = new GridLayout(1, false);
@@ -91,8 +91,8 @@ public class CSVPreferencePage extends PreferencePage {
 
         vulCSVFileFmtTxt = new Text(vulCSVFileFmtGrp, SWT.BORDER);
         vulCSVFileFmtTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        vulCSVFileFmtTxt.setText(preferenceStore.getString(PreferenceConstants.CSV_FILE_FORMAT_VUL));
-        vulCSVFileFmtTxt.setMessage(preferenceStore.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT_VUL));
+        vulCSVFileFmtTxt.setText(ps.getString(PreferenceConstants.CSV_FILE_FORMAT_VUL));
+        vulCSVFileFmtTxt.setMessage(ps.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT_VUL));
 
         Group libCSVFileFmtGrp = new Group(csvFileFmtGrp, SWT.NONE);
         GridLayout libCSVFileFmtGrpLt = new GridLayout(1, false);
@@ -107,8 +107,8 @@ public class CSVPreferencePage extends PreferencePage {
 
         libCSVFileFmtTxt = new Text(libCSVFileFmtGrp, SWT.BORDER);
         libCSVFileFmtTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        libCSVFileFmtTxt.setText(preferenceStore.getString(PreferenceConstants.CSV_FILE_FORMAT_LIB));
-        libCSVFileFmtTxt.setMessage(preferenceStore.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT_LIB));
+        libCSVFileFmtTxt.setText(ps.getString(PreferenceConstants.CSV_FILE_FORMAT_LIB));
+        libCSVFileFmtTxt.setMessage(ps.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT_LIB));
 
         Group evtCSVFileFmtGrp = new Group(csvFileFmtGrp, SWT.NONE);
         GridLayout evtCSVFileFmtGrpLt = new GridLayout(1, false);
@@ -123,8 +123,8 @@ public class CSVPreferencePage extends PreferencePage {
 
         evtCSVFileFmtTxt = new Text(evtCSVFileFmtGrp, SWT.BORDER);
         evtCSVFileFmtTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        evtCSVFileFmtTxt.setText(preferenceStore.getString(PreferenceConstants.CSV_FILE_FORMAT_ATTACKEVENT));
-        evtCSVFileFmtTxt.setMessage(preferenceStore.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT_ATTACKEVENT));
+        evtCSVFileFmtTxt.setText(ps.getString(PreferenceConstants.CSV_FILE_FORMAT_ATTACKEVENT));
+        evtCSVFileFmtTxt.setMessage(ps.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT_ATTACKEVENT));
 
         Label csvFileFormatHint = new Label(csvFileFmtGrp, SWT.LEFT);
         GridData csvFileFormatHintGrDt = new GridData(GridData.FILL_HORIZONTAL);
@@ -145,13 +145,13 @@ public class CSVPreferencePage extends PreferencePage {
         new Label(ctrlGrp, SWT.LEFT).setText("脆弱性取得間隔スリープ（ミリ秒）：");
         vulSleepTxt = new Text(ctrlGrp, SWT.BORDER);
         vulSleepTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        vulSleepTxt.setText(preferenceStore.getString(PreferenceConstants.SLEEP_VUL));
+        vulSleepTxt.setText(ps.getString(PreferenceConstants.SLEEP_VUL));
 
         // ========== ライブラリ取得ごとスリープ ========== //
         new Label(ctrlGrp, SWT.LEFT).setText("ライブラリ取得間隔スリープ（ミリ秒）：");
         libSleepTxt = new Text(ctrlGrp, SWT.BORDER);
         libSleepTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        libSleepTxt.setText(preferenceStore.getString(PreferenceConstants.SLEEP_LIB));
+        libSleepTxt.setText(ps.getString(PreferenceConstants.SLEEP_LIB));
 
         Composite buttonGrp = new Composite(parent, SWT.NONE);
         GridLayout buttonGrpLt = new GridLayout(2, false);
@@ -169,15 +169,13 @@ public class CSVPreferencePage extends PreferencePage {
         defaultBtnGrDt.widthHint = 90;
         defaultBtn.setLayoutData(defaultBtnGrDt);
         defaultBtn.setText("デフォルトに戻す");
-        defaultBtn.addSelectionListener(new SelectionListener() {
-            public void widgetDefaultSelected(SelectionEvent e) {
-            }
-
+        defaultBtn.addSelectionListener(new SelectionAdapter() {
+            @Override
             public void widgetSelected(SelectionEvent e) {
-                vulCSVFileFmtTxt.setText(preferenceStore.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT_VUL));
-                libCSVFileFmtTxt.setText(preferenceStore.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT_LIB));
-                vulSleepTxt.setText(preferenceStore.getDefaultString(PreferenceConstants.SLEEP_VUL));
-                libSleepTxt.setText(preferenceStore.getDefaultString(PreferenceConstants.SLEEP_LIB));
+                vulCSVFileFmtTxt.setText(ps.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT_VUL));
+                libCSVFileFmtTxt.setText(ps.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT_LIB));
+                vulSleepTxt.setText(ps.getDefaultString(PreferenceConstants.SLEEP_VUL));
+                libSleepTxt.setText(ps.getDefaultString(PreferenceConstants.SLEEP_LIB));
             }
         });
 
@@ -186,10 +184,8 @@ public class CSVPreferencePage extends PreferencePage {
         applyBtnGrDt.widthHint = 90;
         applyBtn.setLayoutData(applyBtnGrDt);
         applyBtn.setText("適用");
-        applyBtn.addSelectionListener(new SelectionListener() {
-            public void widgetDefaultSelected(SelectionEvent e) {
-            }
-
+        applyBtn.addSelectionListener(new SelectionAdapter() {
+            @Override
             public void widgetSelected(SelectionEvent e) {
                 performOk();
             }

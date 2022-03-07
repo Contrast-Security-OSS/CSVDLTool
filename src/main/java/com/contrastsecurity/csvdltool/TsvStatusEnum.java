@@ -21,40 +21,10 @@
  * 
  */
 
-package com.contrastsecurity.csvdltool.api;
+package com.contrastsecurity.csvdltool;
 
-import java.lang.reflect.Type;
-
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.swt.widgets.Shell;
-
-import com.contrastsecurity.csvdltool.json.TraceTagsJson;
-import com.contrastsecurity.csvdltool.model.Organization;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-public class TraceTagsApi extends Api {
-
-    private String traceId;
-
-    public TraceTagsApi(Shell shell, IPreferenceStore ps, Organization org, String traceId) {
-        super(shell, ps, org);
-        this.traceId = traceId;
-    }
-
-    @Override
-    protected String getUrl() {
-        String orgId = this.org.getOrganization_uuid();
-        return String.format("%s/api/ng/%s/tags/traces/trace/%s?expand=skip_links", this.contrastUrl, orgId, this.traceId);
-    }
-
-    @Override
-    protected Object convert(String response) {
-        Gson gson = new Gson();
-        Type traceTagsType = new TypeToken<TraceTagsJson>() {
-        }.getType();
-        TraceTagsJson traceTagsJson = gson.fromJson(response, traceTagsType);
-        return traceTagsJson.getTags();
-    }
-
+public enum TsvStatusEnum {
+    NONE,
+    SKIP,
+    AUTH,
 }

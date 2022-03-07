@@ -27,26 +27,25 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.widgets.Shell;
 
 import com.contrastsecurity.csvdltool.json.GroupsJson;
 import com.contrastsecurity.csvdltool.model.CustomGroup;
 import com.contrastsecurity.csvdltool.model.CustomGroups;
 import com.contrastsecurity.csvdltool.model.Organization;
-import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 public class GroupsApi extends Api {
 
-    public GroupsApi(IPreferenceStore preferenceStore, Organization organization) {
-        super(preferenceStore, organization);
+    public GroupsApi(Shell shell, IPreferenceStore ps, Organization org) {
+        super(shell, ps, org);
     }
 
     @Override
     protected String getUrl() {
-        String contrastUrl = preferenceStore.getString(PreferenceConstants.CONTRAST_URL);
-        String orgId = this.organization.getOrganization_uuid();
-        return String.format("%s/api/ng/%s/groups?expand=users,applications,skip_links&q=&quickFilter=ALL", contrastUrl, orgId);
+        String orgId = this.org.getOrganization_uuid();
+        return String.format("%s/api/ng/%s/groups?expand=users,applications,skip_links&q=&quickFilter=ALL", this.contrastUrl, orgId);
     }
 
     @Override

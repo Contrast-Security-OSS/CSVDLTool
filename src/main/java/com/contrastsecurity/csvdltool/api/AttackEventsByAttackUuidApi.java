@@ -28,11 +28,11 @@ import java.util.Date;
 import java.util.List;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.widgets.Shell;
 
 import com.contrastsecurity.csvdltool.json.AttackEventsJson;
 import com.contrastsecurity.csvdltool.model.AttackEvent;
 import com.contrastsecurity.csvdltool.model.Organization;
-import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -47,8 +47,8 @@ public class AttackEventsByAttackUuidApi extends Api {
     private Date endDate;
     private int offset;
 
-    public AttackEventsByAttackUuidApi(IPreferenceStore preferenceStore, Organization organization, String attackUuid, Date startDate, Date endDate, int offset) {
-        super(preferenceStore, organization);
+    public AttackEventsByAttackUuidApi(Shell shell, IPreferenceStore ps, Organization org, String attackUuid, Date startDate, Date endDate, int offset) {
+        super(shell, ps, org);
         this.attackUuid = attackUuid;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -57,10 +57,9 @@ public class AttackEventsByAttackUuidApi extends Api {
 
     @Override
     protected String getUrl() {
-        String contrastUrl = preferenceStore.getString(PreferenceConstants.CONTRAST_URL);
-        String orgId = this.organization.getOrganization_uuid();
-        return String.format("%s/api/ng/%s/rasp/events/new?expand=drilldownDetails,application_roles,tags,skip_links&limit=%d&offset=%d&sort=-timestamp", contrastUrl, orgId, LIMIT,
-                this.offset);
+        String orgId = this.org.getOrganization_uuid();
+        return String.format("%s/api/ng/%s/rasp/events/new?expand=drilldownDetails,application_roles,tags,skip_links&limit=%d&offset=%d&sort=-timestamp", this.contrastUrl, orgId,
+                LIMIT, this.offset);
     }
 
     @Override
@@ -80,7 +79,7 @@ public class AttackEventsByAttackUuidApi extends Api {
         this.totalCount = attackEventsJson.getCount();
         List<AttackEvent> attackEvents = attackEventsJson.getEvents();
         for (AttackEvent attackEvent : attackEvents) {
-            attackEvent.setOrganization(this.organization);
+            attackEvent.setOrganization(this.org);
         }
         return attackEvents;
     }

@@ -38,6 +38,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.PreferenceStore;
+import org.eclipse.swt.widgets.Shell;
 
 import com.contrastsecurity.csvdltool.api.Api;
 import com.contrastsecurity.csvdltool.api.ApplicationsApi;
@@ -53,17 +54,19 @@ import com.contrastsecurity.csvdltool.model.Organization;
 
 public class AppsGetWithProgress implements IRunnableWithProgress {
 
-    private PreferenceStore preferenceStore;
-    private List<Organization> organizations;
+    private Shell shell;
+    private PreferenceStore ps;
+    private List<Organization> orgs;
     private Map<String, AppInfo> fullAppMap;
     private Set<Filter> severityFilterSet = new LinkedHashSet<Filter>();
     private Set<Filter> vulnTypeFilterSet = new LinkedHashSet<Filter>();
 
     Logger logger = Logger.getLogger("csvdltool");
 
-    public AppsGetWithProgress(PreferenceStore preferenceStore, List<Organization> organizations) {
-        this.preferenceStore = preferenceStore;
-        this.organizations = organizations;
+    public AppsGetWithProgress(Shell shell, PreferenceStore ps, List<Organization> orgs) {
+        this.shell = shell;
+        this.ps = ps;
+        this.orgs = orgs;
     }
 
     @SuppressWarnings("unchecked")
@@ -71,20 +74,20 @@ public class AppsGetWithProgress implements IRunnableWithProgress {
     public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
         fullAppMap = new TreeMap<String, AppInfo>();
         boolean prefix_org_flg = false;
-        if (this.organizations.size() > 1) {
+        if (this.orgs.size() > 1) {
             prefix_org_flg = true;
         }
-        monitor.beginTask("アプリケーション一覧の読み込み...", 100 * this.organizations.size());
+        monitor.beginTask("アプリケーション一覧の読み込み...", 100 * this.orgs.size());
         Thread.sleep(300);
-        for (Organization org : this.organizations) {
+        for (Organization org : this.orgs) {
             try {
                 monitor.setTaskName(org.getName());
                 // フィルタの情報を取得
                 monitor.subTask("フィルタの情報を取得...");
                 SubProgressMonitor sub1Monitor = new SubProgressMonitor(monitor, 10);
                 sub1Monitor.beginTask("", 2);
-                Api filterSeverityApi = new FilterSeverityApi(preferenceStore, org);
-                Api filterVulnTypeApi = new FilterVulnTypeApi(preferenceStore, org);
+                Api filterSeverityApi = new FilterSeverityApi(this.shell, this.ps, org);
+                Api filterVulnTypeApi = new FilterVulnTypeApi(this.shell, this.ps, org);
                 try {
                     List<Filter> filterSeverities = (List<Filter>) filterSeverityApi.get();
                     for (Filter filter : filterSeverities) {
@@ -103,7 +106,7 @@ public class AppsGetWithProgress implements IRunnableWithProgress {
                 // アプリケーショングループの情報を取得
                 monitor.subTask("アプリケーショングループの情報を取得...");
                 Map<String, List<String>> appGroupMap = new HashMap<String, List<String>>();
-                Api groupsApi = new GroupsApi(preferenceStore, org);
+                Api groupsApi = new GroupsApi(this.shell, this.ps, org);
                 try {
                     List<CustomGroup> customGroups = (List<CustomGroup>) groupsApi.get();
                     SubProgressMonitor sub2Monitor = new SubProgressMonitor(monitor, 10);
@@ -128,7 +131,7 @@ public class AppsGetWithProgress implements IRunnableWithProgress {
                 }
                 // アプリケーション一覧を取得
                 monitor.subTask("アプリケーション一覧の情報を取得...");
-                Api applicationsApi = new ApplicationsApi(preferenceStore, org);
+                Api applicationsApi = new ApplicationsApi(this.shell, this.ps, org);
                 List<Application> applications = (List<Application>) applicationsApi.get();
                 SubProgressMonitor sub3Monitor = new SubProgressMonitor(monitor, 80);
                 sub3Monitor.beginTask("", applications.size());

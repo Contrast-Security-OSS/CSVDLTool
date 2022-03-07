@@ -50,7 +50,7 @@ import com.contrastsecurity.csvdltool.model.Organization;
 
 public class OrganizationDialog extends Dialog {
 
-    private IPreferenceStore preferenceStore;
+    private IPreferenceStore ps;
     private String url;
     private String usr;
     private String svc;
@@ -59,9 +59,9 @@ public class OrganizationDialog extends Dialog {
 
     private Organization org;
 
-    public OrganizationDialog(Shell parentShell, IPreferenceStore preferenceStore, String url, String usr, String svc) {
+    public OrganizationDialog(Shell parentShell, IPreferenceStore ps, String url, String usr, String svc) {
         super(parentShell);
-        this.preferenceStore = preferenceStore;
+        this.ps = ps;
         this.url = url;
         this.usr = usr;
         this.svc = svc;
@@ -128,15 +128,15 @@ public class OrganizationDialog extends Dialog {
 
     @Override
     protected void okPressed() {
-        Organization organization = new Organization();
-        organization.setApikey(apiKeyTxt.getText().trim());
-        organization.setOrganization_uuid(orgIdTxt.getText().trim());
-        organization.setValid(false);
-        Api orgApi = new OrganizationApi(preferenceStore, organization, url, usr, svc);
+        Organization org = new Organization();
+        org.setApikey(apiKeyTxt.getText().trim());
+        org.setOrganization_uuid(orgIdTxt.getText().trim());
+        org.setValid(false);
+        Api orgApi = new OrganizationApi(getShell(), this.ps, org, url, usr, svc);
         try {
             Organization rtnOrg = (Organization) orgApi.get();
-            organization.setName(rtnOrg.getName());
-            this.org = organization;
+            org.setName(rtnOrg.getName());
+            this.org = org;
         } catch (ApiException e) {
             MessageDialog.openWarning(getShell(), "組織情報の確認", String.format("TeamServerからエラーが返されました。\r\n%s", e.getMessage()));
         } catch (NonApiException e) {

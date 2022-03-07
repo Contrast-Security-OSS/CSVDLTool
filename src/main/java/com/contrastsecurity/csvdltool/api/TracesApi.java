@@ -31,12 +31,12 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.widgets.Shell;
 
 import com.contrastsecurity.csvdltool.FilterEnum;
 import com.contrastsecurity.csvdltool.json.TracesJson;
 import com.contrastsecurity.csvdltool.model.Filter;
 import com.contrastsecurity.csvdltool.model.Organization;
-import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -47,8 +47,8 @@ public class TracesApi extends Api {
     private Date frLastDetectedDate;
     private Date toLastDetectedDate;
 
-    public TracesApi(IPreferenceStore preferenceStore, Organization organization, String appId, Map<FilterEnum, Set<Filter>> filterMap, Date frDate, Date toDate) {
-        super(preferenceStore, organization);
+    public TracesApi(Shell shell, IPreferenceStore ps, Organization org, String appId, Map<FilterEnum, Set<Filter>> filterMap, Date frDate, Date toDate) {
+        super(shell, ps, org);
         this.appId = appId;
         this.filterMap = filterMap;
         this.frLastDetectedDate = frDate;
@@ -57,8 +57,7 @@ public class TracesApi extends Api {
 
     @Override
     protected String getUrl() {
-        String contrastUrl = preferenceStore.getString(PreferenceConstants.CONTRAST_URL);
-        String orgId = this.organization.getOrganization_uuid();
+        String orgId = this.org.getOrganization_uuid();
         boolean inValidFoundFlg = false;
         // 重大度のクエリ文字列
         List<String> severityFilters = new ArrayList<String>();
@@ -110,9 +109,9 @@ public class TracesApi extends Api {
         }
 
         if (severityFilterQuery.isEmpty() && vulnTypeFilterQuery.isEmpty() && lastDetectedFilterQuery.isEmpty()) {
-            return String.format("%s/api/ng/%s/traces/%s/ids", contrastUrl, orgId, this.appId);
+            return String.format("%s/api/ng/%s/traces/%s/ids", this.contrastUrl, orgId, this.appId);
         } else {
-            return String.format("%s/api/ng/%s/traces/%s/ids?%s%s%s", contrastUrl, orgId, this.appId, severityFilterQuery, vulnTypeFilterQuery, lastDetectedFilterQuery);
+            return String.format("%s/api/ng/%s/traces/%s/ids?%s%s%s", this.contrastUrl, orgId, this.appId, severityFilterQuery, vulnTypeFilterQuery, lastDetectedFilterQuery);
         }
     }
 

@@ -21,40 +21,24 @@
  * 
  */
 
-package com.contrastsecurity.csvdltool.api;
+package com.contrastsecurity.csvdltool.json;
 
-import java.lang.reflect.Type;
+import com.contrastsecurity.csvdltool.model.TsvSettings;
 
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.swt.widgets.Shell;
+public class TsvSettingsJson extends ContrastJson {
+    private TsvSettings tsv;
 
-import com.contrastsecurity.csvdltool.json.EventSummaryJson;
-import com.contrastsecurity.csvdltool.model.Organization;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+    public TsvSettings getTsv() {
+        return tsv;
+    }
 
-public class EventSummaryApi extends Api {
-
-    private String traceId;
-
-    public EventSummaryApi(Shell shell, IPreferenceStore ps, Organization org, String traceId) {
-        super(shell, ps, org);
-        this.traceId = traceId;
+    public void setTsv(TsvSettings tsv) {
+        this.tsv = tsv;
     }
 
     @Override
-    protected String getUrl() {
-        String orgId = this.org.getOrganization_uuid();
-        return String.format("%s/api/ng/%s/traces/%s/events/summary?expand=skip_links&legacy=false", this.contrastUrl, orgId, this.traceId);
-    }
-
-    @Override
-    protected Object convert(String response) {
-        Gson gson = new Gson();
-        Type eventSummaryType = new TypeToken<EventSummaryJson>() {
-        }.getType();
-        EventSummaryJson eventSummaryJson = gson.fromJson(response, eventSummaryType);
-        return eventSummaryJson.getEvents();
+    public String toString() {
+        return this.tsv.toString();
     }
 
 }

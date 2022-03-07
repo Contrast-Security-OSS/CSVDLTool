@@ -26,11 +26,11 @@ package com.contrastsecurity.csvdltool.api;
 import java.lang.reflect.Type;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.widgets.Shell;
 
 import com.contrastsecurity.csvdltool.json.AttackEventSummaryJson;
 import com.contrastsecurity.csvdltool.model.AttackEvent;
 import com.contrastsecurity.csvdltool.model.Organization;
-import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -38,16 +38,15 @@ public class AttackEventSummaryApi extends Api {
 
     private String uuid;
 
-    public AttackEventSummaryApi(IPreferenceStore preferenceStore, Organization organization, String uuid) {
-        super(preferenceStore, organization);
+    public AttackEventSummaryApi(Shell shell, IPreferenceStore ps, Organization org, String uuid) {
+        super(shell, ps, org);
         this.uuid = uuid;
     }
 
     @Override
     protected String getUrl() {
-        String contrastUrl = preferenceStore.getString(PreferenceConstants.CONTRAST_URL);
-        String orgId = this.organization.getOrganization_uuid();
-        return String.format("%s/api/ng/%s/rasp/events/summary/%s/?expand=event,drilldownDetails,skip_links", contrastUrl, orgId, this.uuid);
+        String orgId = this.org.getOrganization_uuid();
+        return String.format("%s/api/ng/%s/rasp/events/summary/%s/?expand=event,drilldownDetails,skip_links", this.contrastUrl, orgId, this.uuid);
     }
 
     @Override
@@ -57,7 +56,7 @@ public class AttackEventSummaryApi extends Api {
         }.getType();
         AttackEventSummaryJson attackEventSummaryJson = gson.fromJson(response, contType);
         AttackEvent attackEvent = attackEventSummaryJson.getSummary().getEvent();
-        attackEvent.setOrganization(this.organization);
+        attackEvent.setOrganization(this.org);
         return attackEvent;
     }
 

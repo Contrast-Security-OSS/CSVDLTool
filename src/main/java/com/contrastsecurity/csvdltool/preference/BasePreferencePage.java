@@ -37,7 +37,6 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -79,7 +78,7 @@ public class BasePreferencePage extends PreferencePage {
 
     @Override
     protected Control createContents(Composite parent) {
-        IPreferenceStore preferenceStore = getPreferenceStore();
+        IPreferenceStore ps = getPreferenceStore();
 
         final Composite composite = new Composite(parent, SWT.NONE);
         GridLayout compositeLt = new GridLayout(1, false);
@@ -101,7 +100,7 @@ public class BasePreferencePage extends PreferencePage {
         new Label(baseGrp, SWT.LEFT).setText("");
         contrastUrlTxt = new Text(baseGrp, SWT.BORDER);
         contrastUrlTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        contrastUrlTxt.setText(preferenceStore.getString(PreferenceConstants.CONTRAST_URL));
+        contrastUrlTxt.setText(ps.getString(PreferenceConstants.CONTRAST_URL));
         contrastUrlTxt.setMessage("http://xxx.xxx.xxx.xxx/Contrast");
         contrastUrlTxt.addListener(SWT.FocusIn, new Listener() {
             public void handleEvent(Event e) {
@@ -126,7 +125,7 @@ public class BasePreferencePage extends PreferencePage {
         new Label(baseGrp, SWT.LEFT).setText("");
         serviceKeyTxt = new Text(baseGrp, SWT.BORDER);
         serviceKeyTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        serviceKeyTxt.setText(preferenceStore.getString(PreferenceConstants.SERVICE_KEY));
+        serviceKeyTxt.setText(ps.getString(PreferenceConstants.SERVICE_KEY));
         serviceKeyTxt.setMessage("個人のサービスキー");
         serviceKeyTxt.addListener(SWT.FocusIn, new Listener() {
             public void handleEvent(Event e) {
@@ -154,7 +153,7 @@ public class BasePreferencePage extends PreferencePage {
         icon.setToolTipText("設定するユーザーの権限について\r\n・組織ロールはView権限以上が必要です。\r\n・Admin権限を持つユーザーの場合、アプリケーショングループの情報も取得できます。\r\n・アプリケーションアクセスグループはView権限以上が必要です。");
         userNameTxt = new Text(baseGrp, SWT.BORDER);
         userNameTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        userNameTxt.setText(preferenceStore.getString(PreferenceConstants.USERNAME));
+        userNameTxt.setText(ps.getString(PreferenceConstants.USERNAME));
         userNameTxt.setMessage("メールアドレス");
         userNameTxt.addListener(SWT.FocusIn, new Listener() {
             public void handleEvent(Event e) {
@@ -185,7 +184,7 @@ public class BasePreferencePage extends PreferencePage {
         orgTableGrp.setLayoutData(orgTableGrpGrDt);
         orgTableGrp.setText("組織一覧");
 
-        String orgJsonStr = preferenceStore.getString(PreferenceConstants.TARGET_ORGS);
+        String orgJsonStr = ps.getString(PreferenceConstants.TARGET_ORGS);
         if (orgJsonStr.trim().length() > 0) {
             try {
                 orgList = new Gson().fromJson(orgJsonStr, new TypeToken<List<Organization>>() {
@@ -257,21 +256,21 @@ public class BasePreferencePage extends PreferencePage {
         addBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                if (preferenceStore.getBoolean(PreferenceConstants.PROXY_YUKO) && preferenceStore.getString(PreferenceConstants.PROXY_AUTH).equals("input")) {
-                    String usr = preferenceStore.getString(PreferenceConstants.PROXY_TMP_USER);
-                    String pwd = preferenceStore.getString(PreferenceConstants.PROXY_TMP_PASS);
+                if (ps.getBoolean(PreferenceConstants.PROXY_YUKO) && ps.getString(PreferenceConstants.PROXY_AUTH).equals("input")) {
+                    String usr = ps.getString(PreferenceConstants.PROXY_TMP_USER);
+                    String pwd = ps.getString(PreferenceConstants.PROXY_TMP_PASS);
                     if (usr == null || usr.isEmpty() || pwd == null || pwd.isEmpty()) {
                         ProxyAuthDialog proxyAuthDialog = new ProxyAuthDialog(getShell());
                         int result = proxyAuthDialog.open();
                         if (IDialogConstants.CANCEL_ID == result) {
-                            preferenceStore.setValue(PreferenceConstants.PROXY_AUTH, "none");
+                            ps.setValue(PreferenceConstants.PROXY_AUTH, "none");
                         } else {
-                            preferenceStore.setValue(PreferenceConstants.PROXY_TMP_USER, proxyAuthDialog.getUsername());
-                            preferenceStore.setValue(PreferenceConstants.PROXY_TMP_PASS, proxyAuthDialog.getPassword());
+                            ps.setValue(PreferenceConstants.PROXY_TMP_USER, proxyAuthDialog.getUsername());
+                            ps.setValue(PreferenceConstants.PROXY_TMP_PASS, proxyAuthDialog.getPassword());
                         }
                     }
                 }
-                OrganizationDialog orgDialog = new OrganizationDialog(getShell(), preferenceStore, contrastUrlTxt.getText().trim(), userNameTxt.getText().trim(),
+                OrganizationDialog orgDialog = new OrganizationDialog(getShell(), ps, contrastUrlTxt.getText().trim(), userNameTxt.getText().trim(),
                         serviceKeyTxt.getText().trim());
                 int result = orgDialog.open();
                 if (IDialogConstants.OK_ID != result) {
@@ -354,10 +353,8 @@ public class BasePreferencePage extends PreferencePage {
         applyBtnGrDt.horizontalSpan = 2;
         applyBtn.setLayoutData(applyBtnGrDt);
         applyBtn.setText("適用");
-        applyBtn.addSelectionListener(new SelectionListener() {
-            public void widgetDefaultSelected(SelectionEvent e) {
-            }
-
+        applyBtn.addSelectionListener(new SelectionAdapter() {
+            @Override
             public void widgetSelected(SelectionEvent e) {
                 performOk();
             }
@@ -409,7 +406,7 @@ public class BasePreferencePage extends PreferencePage {
         if (org.isValid()) {
             button.setSelection(true);
         }
-        button.addSelectionListener(new SelectionListener() {
+        button.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 selectedIdxes.clear();
@@ -418,10 +415,6 @@ public class BasePreferencePage extends PreferencePage {
                         selectedIdxes.add(checkBoxList.indexOf(button));
                     }
                 }
-            }
-
-            @Override
-            public void widgetDefaultSelected(SelectionEvent e) {
             }
         });
         button.pack();

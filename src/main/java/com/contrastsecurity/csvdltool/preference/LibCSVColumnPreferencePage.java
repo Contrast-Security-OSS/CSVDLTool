@@ -44,7 +44,6 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -79,7 +78,7 @@ public class LibCSVColumnPreferencePage extends PreferencePage {
 
     @Override
     protected Control createContents(Composite parent) {
-        IPreferenceStore preferenceStore = getPreferenceStore();
+        IPreferenceStore ps = getPreferenceStore();
 
         final Composite composite = new Composite(parent, SWT.NONE);
         GridLayout compositeLt = new GridLayout(1, false);
@@ -106,11 +105,11 @@ public class LibCSVColumnPreferencePage extends PreferencePage {
         outCsvHeaderFlgGrDt.horizontalSpan = 3;
         outCsvHeaderFlg.setLayoutData(outCsvHeaderFlgGrDt);
         outCsvHeaderFlg.setText("カラムヘッダ（項目名）を出力");
-        if (preferenceStore.getBoolean(PreferenceConstants.CSV_OUT_HEADER_LIB)) {
+        if (ps.getBoolean(PreferenceConstants.CSV_OUT_HEADER_LIB)) {
             outCsvHeaderFlg.setSelection(true);
         }
 
-        String columnJsonStr = preferenceStore.getString(PreferenceConstants.CSV_COLUMN_LIB);
+        String columnJsonStr = ps.getString(PreferenceConstants.CSV_COLUMN_LIB);
         if (columnJsonStr.trim().length() > 0) {
             try {
                 columnList = new Gson().fromJson(columnJsonStr, new TypeToken<List<LibCSVColumn>>() {
@@ -320,12 +319,10 @@ public class LibCSVColumnPreferencePage extends PreferencePage {
         defaultBtnGrDt.widthHint = 90;
         defaultBtn.setLayoutData(defaultBtnGrDt);
         defaultBtn.setText("デフォルトに戻す");
-        defaultBtn.addSelectionListener(new SelectionListener() {
-            public void widgetDefaultSelected(SelectionEvent e) {
-            }
-
+        defaultBtn.addSelectionListener(new SelectionAdapter() {
+            @Override
             public void widgetSelected(SelectionEvent e) {
-                outCsvHeaderFlg.setSelection(preferenceStore.getDefaultBoolean(PreferenceConstants.CSV_OUT_HEADER_LIB));
+                outCsvHeaderFlg.setSelection(ps.getDefaultBoolean(PreferenceConstants.CSV_OUT_HEADER_LIB));
                 columnList.clear();
                 for (Button button : checkBoxList) {
                     button.dispose();
@@ -359,10 +356,8 @@ public class LibCSVColumnPreferencePage extends PreferencePage {
         applyBtnGrDt.widthHint = 90;
         applyBtn.setLayoutData(applyBtnGrDt);
         applyBtn.setText("適用");
-        applyBtn.addSelectionListener(new SelectionListener() {
-            public void widgetDefaultSelected(SelectionEvent e) {
-            }
-
+        applyBtn.addSelectionListener(new SelectionAdapter() {
+            @Override
             public void widgetSelected(SelectionEvent e) {
                 performOk();
             }
@@ -397,7 +392,7 @@ public class LibCSVColumnPreferencePage extends PreferencePage {
         if (col.isValid()) {
             button.setSelection(true);
         }
-        button.addSelectionListener(new SelectionListener() {
+        button.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 Button triggerBtn = (Button) e.getSource();
@@ -405,10 +400,6 @@ public class LibCSVColumnPreferencePage extends PreferencePage {
                 boolean selected = triggerBtn.getSelection();
                 LibCSVColumn targetColumn = columnList.get(clickIndex);
                 targetColumn.setValid(selected);
-            }
-
-            @Override
-            public void widgetDefaultSelected(SelectionEvent e) {
             }
         });
         button.pack();

@@ -26,23 +26,22 @@ package com.contrastsecurity.csvdltool.api;
 import java.lang.reflect.Type;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.widgets.Shell;
 
 import com.contrastsecurity.csvdltool.json.ApplicationsJson;
 import com.contrastsecurity.csvdltool.model.Organization;
-import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 public class ApplicationsApi extends Api {
-    public ApplicationsApi(IPreferenceStore preferenceStore, Organization organization) {
-        super(preferenceStore, organization);
+    public ApplicationsApi(Shell shell, IPreferenceStore ps, Organization org) {
+        super(shell, ps, org);
     }
 
     @Override
     protected String getUrl() {
-        String contrastUrl = preferenceStore.getString(PreferenceConstants.CONTRAST_URL);
-        String orgId = this.organization.getOrganization_uuid();
-        return String.format("%s/api/ng/%s/applications?expand=modules,license,skip_links", contrastUrl, orgId);
+        String orgId = this.org.getOrganization_uuid();
+        return String.format("%s/api/ng/%s/applications?expand=modules,license,skip_links", this.contrastUrl, orgId);
     }
 
     @Override

@@ -27,11 +27,11 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.widgets.Shell;
 
 import com.contrastsecurity.csvdltool.json.AttackEventsJson;
 import com.contrastsecurity.csvdltool.model.AttackEvent;
 import com.contrastsecurity.csvdltool.model.Organization;
-import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -40,17 +40,16 @@ public class AttackEventsApi extends Api {
     private final static int LIMIT = 1000;
     private int offset;
 
-    public AttackEventsApi(IPreferenceStore preferenceStore, Organization organization, int offset) {
-        super(preferenceStore, organization);
+    public AttackEventsApi(Shell shell, IPreferenceStore ps, Organization org, int offset) {
+        super(shell, ps, org);
         this.offset = offset;
     }
 
     @Override
     protected String getUrl() {
-        String contrastUrl = preferenceStore.getString(PreferenceConstants.CONTRAST_URL);
-        String orgId = this.organization.getOrganization_uuid();
-        return String.format("%s/api/ng/%s/rasp/events/new?expand=drilldownDetails,application_roles,tags,skip_links&limit=%d&offset=%d&sort=timestamp", contrastUrl, orgId, LIMIT,
-                this.offset);
+        String orgId = this.org.getOrganization_uuid();
+        return String.format("%s/api/ng/%s/rasp/events/new?expand=drilldownDetails,application_roles,tags,skip_links&limit=%d&offset=%d&sort=timestamp", this.contrastUrl, orgId,
+                LIMIT, this.offset);
     }
 
     @Override
@@ -62,7 +61,7 @@ public class AttackEventsApi extends Api {
         this.totalCount = attackEventsJson.getCount();
         List<AttackEvent> attackEvents = attackEventsJson.getEvents();
         for (AttackEvent attackEvent : attackEvents) {
-            attackEvent.setOrganization(this.organization);
+            attackEvent.setOrganization(this.org);
         }
         return attackEvents;
     }

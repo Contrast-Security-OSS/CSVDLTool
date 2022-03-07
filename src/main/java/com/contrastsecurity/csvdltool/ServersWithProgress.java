@@ -36,6 +36,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.PreferenceStore;
+import org.eclipse.swt.widgets.Shell;
 
 import com.contrastsecurity.csvdltool.api.Api;
 import com.contrastsecurity.csvdltool.api.ServersApi;
@@ -45,31 +46,33 @@ import com.contrastsecurity.csvdltool.model.Server;
 
 public class ServersWithProgress implements IRunnableWithProgress {
 
-    private PreferenceStore preferenceStore;
-    private List<Organization> organizations;
+    private PreferenceStore ps;
+    private Shell shell;
+    private List<Organization> orgs;
     private List<Server> allServers;
     private Set<Filter> agentVerFilterSet = new LinkedHashSet<Filter>();
     private Set<Filter> languageFilterSet = new LinkedHashSet<Filter>();
 
     Logger logger = Logger.getLogger("csvdltool");
 
-    public ServersWithProgress(PreferenceStore preferenceStore, List<Organization> organizations) {
-        this.preferenceStore = preferenceStore;
-        this.organizations = organizations;
+    public ServersWithProgress(Shell shell, PreferenceStore ps, List<Organization> orgs) {
+        this.shell = shell;
+        this.ps = ps;
+        this.orgs = orgs;
         this.allServers = new ArrayList<Server>();
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-        monitor.beginTask("サーバ一覧の読み込み...", 100 * this.organizations.size());
-        for (Organization org : this.organizations) {
+        monitor.beginTask("サーバ一覧の読み込み...", 100 * this.orgs.size());
+        for (Organization org : this.orgs) {
             try {
                 List<Server> orgAttackEvents = new ArrayList<Server>();
                 monitor.setTaskName(org.getName());
                 // アプリケーション一覧を取得
                 monitor.subTask("サーバ一覧の情報を取得...");
-                Api attacksApi = new ServersApi(preferenceStore, org, orgAttackEvents.size());
+                Api attacksApi = new ServersApi(this.shell, this.ps, org, orgAttackEvents.size());
                 List<Server> tmpAttackEvents = (List<Server>) attacksApi.get();
                 orgAttackEvents.addAll(tmpAttackEvents);
                 int totalCount = attacksApi.getTotalCount();
@@ -84,7 +87,7 @@ public class ServersWithProgress implements IRunnableWithProgress {
                     if (monitor.isCanceled()) {
                         throw new InterruptedException("キャンセルされました。");
                     }
-                    attacksApi = new ServersApi(preferenceStore, org, orgAttackEvents.size());
+                    attacksApi = new ServersApi(this.shell, this.ps, org, orgAttackEvents.size());
                     tmpAttackEvents = (List<Server>) attacksApi.get();
                     orgAttackEvents.addAll(tmpAttackEvents);
                     monitor.subTask(String.format("サーバ一覧の情報を取得...(%d/%d)", orgAttackEvents.size(), totalCount));

@@ -26,10 +26,10 @@ package com.contrastsecurity.csvdltool.api;
 import java.lang.reflect.Type;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.widgets.Shell;
 
 import com.contrastsecurity.csvdltool.json.StoryJson;
 import com.contrastsecurity.csvdltool.model.Organization;
-import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -37,16 +37,15 @@ public class StoryApi extends Api {
 
     private String trace_id;
 
-    public StoryApi(IPreferenceStore preferenceStore, Organization organization, String trace_id) {
-        super(preferenceStore, organization);
+    public StoryApi(Shell shell, IPreferenceStore ps, Organization org, String trace_id) {
+        super(shell, ps, org);
         this.trace_id = trace_id;
     }
 
     @Override
     protected String getUrl() {
-        String contrastUrl = preferenceStore.getString(PreferenceConstants.CONTRAST_URL);
-        String orgId = this.organization.getOrganization_uuid();
-        return String.format("%s/api/ng/%s/traces/%s/story", contrastUrl, orgId, this.trace_id);
+        String orgId = this.org.getOrganization_uuid();
+        return String.format("%s/api/ng/%s/traces/%s/story", this.contrastUrl, orgId, this.trace_id);
     }
 
     @Override

@@ -34,7 +34,6 @@ import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -60,7 +59,7 @@ public class OtherPreferencePage extends PreferencePage {
 
     @Override
     protected Control createContents(Composite parent) {
-        IPreferenceStore preferenceStore = getPreferenceStore();
+        IPreferenceStore ps = getPreferenceStore();
 
         final Composite composite = new Composite(parent, SWT.NONE);
         GridLayout compositeLt = new GridLayout(1, false);
@@ -83,7 +82,7 @@ public class OtherPreferencePage extends PreferencePage {
         new Label(protectGrp, SWT.LEFT).setText("日中時間帯：");
         dayTimeTxt = new Text(protectGrp, SWT.BORDER);
         dayTimeTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        dayTimeTxt.setText(preferenceStore.getString(PreferenceConstants.ATTACK_RANGE_DAYTIME));
+        dayTimeTxt.setText(ps.getString(PreferenceConstants.ATTACK_RANGE_DAYTIME));
         dayTimeTxt.setMessage("0900-1800");
         dayTimeTxt.addListener(SWT.FocusIn, new Listener() {
             public void handleEvent(Event e) {
@@ -94,7 +93,7 @@ public class OtherPreferencePage extends PreferencePage {
         new Label(protectGrp, SWT.LEFT).setText("夜間時間帯：");
         nightTimeTxt = new Text(protectGrp, SWT.BORDER);
         nightTimeTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        nightTimeTxt.setText(preferenceStore.getString(PreferenceConstants.ATTACK_RANGE_NIGHTTIME));
+        nightTimeTxt.setText(ps.getString(PreferenceConstants.ATTACK_RANGE_NIGHTTIME));
         nightTimeTxt.setMessage("1800-0100");
         nightTimeTxt.addListener(SWT.FocusIn, new Listener() {
             public void handleEvent(Event e) {
@@ -123,7 +122,7 @@ public class OtherPreferencePage extends PreferencePage {
         for (String weekDay : WEEKDAYS) {
             Button weekDayBtn = new Button(weekDayGrp, SWT.RADIO);
             weekDayBtn.setText(weekDay);
-            if (preferenceStore.getInt(PreferenceConstants.ATTACK_START_WEEKDAY) == weekDayIdx) {
+            if (ps.getInt(PreferenceConstants.ATTACK_START_WEEKDAY) == weekDayIdx) {
                 weekDayBtn.setSelection(true);
             } else {
                 weekDayBtn.setSelection(false);
@@ -153,7 +152,7 @@ public class OtherPreferencePage extends PreferencePage {
                 for (Button btn : weekDayBtns) {
                     btn.setSelection(false);
                 }
-                Button btn = weekDayBtns.get(preferenceStore.getDefaultInt(PreferenceConstants.ATTACK_START_WEEKDAY));
+                Button btn = weekDayBtns.get(ps.getDefaultInt(PreferenceConstants.ATTACK_START_WEEKDAY));
                 btn.setSelection(true);
             }
         });
@@ -163,10 +162,8 @@ public class OtherPreferencePage extends PreferencePage {
         applyBtnGrDt.widthHint = 90;
         applyBtn.setLayoutData(applyBtnGrDt);
         applyBtn.setText("適用");
-        applyBtn.addSelectionListener(new SelectionListener() {
-            public void widgetDefaultSelected(SelectionEvent e) {
-            }
-
+        applyBtn.addSelectionListener(new SelectionAdapter() {
+            @Override
             public void widgetSelected(SelectionEvent e) {
                 performOk();
             }

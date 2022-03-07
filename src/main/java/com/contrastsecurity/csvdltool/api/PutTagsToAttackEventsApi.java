@@ -28,11 +28,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.widgets.Shell;
 
 import com.contrastsecurity.csvdltool.json.ContrastJson;
 import com.contrastsecurity.csvdltool.model.AttackEvent;
 import com.contrastsecurity.csvdltool.model.Organization;
-import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -45,8 +45,8 @@ public class PutTagsToAttackEventsApi extends Api {
     private String tag;
     private List<String> removeTags;
 
-    public PutTagsToAttackEventsApi(IPreferenceStore preferenceStore, Organization organization, List<AttackEvent> attackEvents, String tag, List<String> removeTags) {
-        super(preferenceStore, organization);
+    public PutTagsToAttackEventsApi(Shell shell, IPreferenceStore ps, Organization org, List<AttackEvent> attackEvents, String tag, List<String> removeTags) {
+        super(shell, ps, org);
         this.attackEvents = attackEvents;
         this.tag = tag;
         this.removeTags = removeTags;
@@ -54,9 +54,8 @@ public class PutTagsToAttackEventsApi extends Api {
 
     @Override
     protected String getUrl() {
-        String contrastUrl = preferenceStore.getString(PreferenceConstants.CONTRAST_URL);
-        String orgId = this.organization.getOrganization_uuid();
-        return String.format("%s/api/ng/%s/tags/attack/events/bulk?expand=skip_links", contrastUrl, orgId);
+        String orgId = this.org.getOrganization_uuid();
+        return String.format("%s/api/ng/%s/tags/attack/events/bulk?expand=skip_links", this.contrastUrl, orgId);
     }
 
     @Override

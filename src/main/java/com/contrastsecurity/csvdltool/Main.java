@@ -84,7 +84,6 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.graphics.Color;
@@ -209,7 +208,7 @@ public class Main implements PropertyChangeListener {
     private List<Server> servers;
     private List<Server> filteredServers = new ArrayList<Server>();
 
-    private PreferenceStore preferenceStore;
+    private PreferenceStore ps;
 
     private PropertyChangeSupport support = new PropertyChangeSupport(this);
 
@@ -229,50 +228,51 @@ public class Main implements PropertyChangeListener {
     private void initialize() {
         try {
             String homeDir = System.getProperty("user.home");
-            this.preferenceStore = new PreferenceStore(homeDir + "\\csvdltool.properties");
+            this.ps = new PreferenceStore(homeDir + "\\csvdltool.properties");
             if (OS.isFamilyMac()) {
-                this.preferenceStore = new PreferenceStore(homeDir + "/csvdltool.properties");
+                this.ps = new PreferenceStore(homeDir + "/csvdltool.properties");
             }
             try {
-                this.preferenceStore.load();
+                this.ps.load();
             } catch (FileNotFoundException fnfe) {
-                this.preferenceStore = new PreferenceStore("csvdltool.properties");
-                this.preferenceStore.load();
+                this.ps = new PreferenceStore("csvdltool.properties");
+                this.ps.load();
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
         try {
-            this.preferenceStore.setDefault(PreferenceConstants.PROXY_AUTH, "none");
-            this.preferenceStore.setDefault(PreferenceConstants.CONNECTION_TIMEOUT, 3000);
-            this.preferenceStore.setDefault(PreferenceConstants.SOCKET_TIMEOUT, 3000);
+            this.ps.setDefault(PreferenceConstants.TSV_STATUS, TsvStatusEnum.NONE.name());
+            this.ps.setDefault(PreferenceConstants.PROXY_AUTH, "none");
+            this.ps.setDefault(PreferenceConstants.CONNECTION_TIMEOUT, 3000);
+            this.ps.setDefault(PreferenceConstants.SOCKET_TIMEOUT, 3000);
 
-            this.preferenceStore.setDefault(PreferenceConstants.CSV_COLUMN_VUL, VulCSVColmunEnum.defaultValuesStr());
-            this.preferenceStore.setDefault(PreferenceConstants.SLEEP_VUL, 300);
-            this.preferenceStore.setDefault(PreferenceConstants.CSV_OUT_HEADER_VUL, true);
-            this.preferenceStore.setDefault(PreferenceConstants.CSV_FILE_FORMAT_VUL, "'vul'_yyyy-MM-dd_HHmmss");
+            this.ps.setDefault(PreferenceConstants.CSV_COLUMN_VUL, VulCSVColmunEnum.defaultValuesStr());
+            this.ps.setDefault(PreferenceConstants.SLEEP_VUL, 300);
+            this.ps.setDefault(PreferenceConstants.CSV_OUT_HEADER_VUL, true);
+            this.ps.setDefault(PreferenceConstants.CSV_FILE_FORMAT_VUL, "'vul'_yyyy-MM-dd_HHmmss");
 
-            this.preferenceStore.setDefault(PreferenceConstants.CSV_COLUMN_LIB, LibCSVColmunEnum.defaultValuesStr());
-            this.preferenceStore.setDefault(PreferenceConstants.SLEEP_LIB, 300);
-            this.preferenceStore.setDefault(PreferenceConstants.CSV_OUT_HEADER_LIB, true);
-            this.preferenceStore.setDefault(PreferenceConstants.CSV_FILE_FORMAT_LIB, "'lib'_yyyy-MM-dd_HHmmss");
+            this.ps.setDefault(PreferenceConstants.CSV_COLUMN_LIB, LibCSVColmunEnum.defaultValuesStr());
+            this.ps.setDefault(PreferenceConstants.SLEEP_LIB, 300);
+            this.ps.setDefault(PreferenceConstants.CSV_OUT_HEADER_LIB, true);
+            this.ps.setDefault(PreferenceConstants.CSV_FILE_FORMAT_LIB, "'lib'_yyyy-MM-dd_HHmmss");
 
-            this.preferenceStore.setDefault(PreferenceConstants.ATTACK_START_WEEKDAY, 1); // 月曜日
-            this.preferenceStore.setDefault(PreferenceConstants.ATTACK_DETECTED_DATE_FILTER, 0);
-            this.preferenceStore.setDefault(PreferenceConstants.CSV_COLUMN_ATTACKEVENT, AttackEventCSVColmunEnum.defaultValuesStr());
-            this.preferenceStore.setDefault(PreferenceConstants.CSV_OUT_HEADER_ATTACKEVENT, true);
-            this.preferenceStore.setDefault(PreferenceConstants.CSV_FILE_FORMAT_ATTACKEVENT, "'attackevent'_yyyy-MM-dd_HHmmss");
+            this.ps.setDefault(PreferenceConstants.ATTACK_START_WEEKDAY, 1); // 月曜日
+            this.ps.setDefault(PreferenceConstants.ATTACK_DETECTED_DATE_FILTER, 0);
+            this.ps.setDefault(PreferenceConstants.CSV_COLUMN_ATTACKEVENT, AttackEventCSVColmunEnum.defaultValuesStr());
+            this.ps.setDefault(PreferenceConstants.CSV_OUT_HEADER_ATTACKEVENT, true);
+            this.ps.setDefault(PreferenceConstants.CSV_FILE_FORMAT_ATTACKEVENT, "'attackevent'_yyyy-MM-dd_HHmmss");
 
-            this.preferenceStore.setDefault(PreferenceConstants.OPENED_MAIN_TAB_IDX, 0);
-            this.preferenceStore.setDefault(PreferenceConstants.OPENED_SUB_TAB_IDX, 0);
+            this.ps.setDefault(PreferenceConstants.OPENED_MAIN_TAB_IDX, 0);
+            this.ps.setDefault(PreferenceConstants.OPENED_SUB_TAB_IDX, 0);
 
             Yaml yaml = new Yaml();
             InputStream is = new FileInputStream("contrast_security.yaml");
             ContrastSecurityYaml contrastSecurityYaml = yaml.loadAs(is, ContrastSecurityYaml.class);
             is.close();
-            this.preferenceStore.setDefault(PreferenceConstants.CONTRAST_URL, contrastSecurityYaml.getUrl());
-            this.preferenceStore.setDefault(PreferenceConstants.SERVICE_KEY, contrastSecurityYaml.getServiceKey());
-            this.preferenceStore.setDefault(PreferenceConstants.USERNAME, contrastSecurityYaml.getUserName());
+            this.ps.setDefault(PreferenceConstants.CONTRAST_URL, contrastSecurityYaml.getUrl());
+            this.ps.setDefault(PreferenceConstants.SERVICE_KEY, contrastSecurityYaml.getServiceKey());
+            this.ps.setDefault(PreferenceConstants.USERNAME, contrastSecurityYaml.getUserName());
         } catch (Exception e) {
             // e.printStackTrace();
         }
@@ -308,24 +308,25 @@ public class Main implements PropertyChangeListener {
             public void shellClosed(ShellEvent event) {
                 int main_idx = mainTabFolder.getSelectionIndex();
                 int sub_idx = subTabFolder.getSelectionIndex();
-                preferenceStore.setValue(PreferenceConstants.OPENED_MAIN_TAB_IDX, main_idx);
-                preferenceStore.setValue(PreferenceConstants.OPENED_SUB_TAB_IDX, sub_idx);
-                preferenceStore.setValue(PreferenceConstants.MEM_WIDTH, shell.getSize().x);
-                preferenceStore.setValue(PreferenceConstants.MEM_HEIGHT, shell.getSize().y);
-                preferenceStore.setValue(PreferenceConstants.VUL_ONLY_PARENT_APP, vulOnlyParentAppChk.getSelection());
-                preferenceStore.setValue(PreferenceConstants.INCLUDE_DESCRIPTION, includeDescChk.getSelection());
-                preferenceStore.setValue(PreferenceConstants.INCLUDE_STACKTRACE, includeStackTraceChk.getSelection());
-                preferenceStore.setValue(PreferenceConstants.ONLY_HAS_CVE, onlyHasCVEChk.getSelection());
-                preferenceStore.setValue(PreferenceConstants.INCLUDE_CVE_DETAIL, includeCVEDetailChk.getSelection());
-                preferenceStore.setValue(PreferenceConstants.PROXY_TMP_USER, "");
-                preferenceStore.setValue(PreferenceConstants.PROXY_TMP_PASS, "");
+                ps.setValue(PreferenceConstants.OPENED_MAIN_TAB_IDX, main_idx);
+                ps.setValue(PreferenceConstants.OPENED_SUB_TAB_IDX, sub_idx);
+                ps.setValue(PreferenceConstants.MEM_WIDTH, shell.getSize().x);
+                ps.setValue(PreferenceConstants.MEM_HEIGHT, shell.getSize().y);
+                ps.setValue(PreferenceConstants.VUL_ONLY_PARENT_APP, vulOnlyParentAppChk.getSelection());
+                ps.setValue(PreferenceConstants.INCLUDE_DESCRIPTION, includeDescChk.getSelection());
+                ps.setValue(PreferenceConstants.INCLUDE_STACKTRACE, includeStackTraceChk.getSelection());
+                ps.setValue(PreferenceConstants.ONLY_HAS_CVE, onlyHasCVEChk.getSelection());
+                ps.setValue(PreferenceConstants.INCLUDE_CVE_DETAIL, includeCVEDetailChk.getSelection());
+                ps.setValue(PreferenceConstants.PROXY_TMP_USER, "");
+                ps.setValue(PreferenceConstants.PROXY_TMP_PASS, "");
+                ps.setValue(PreferenceConstants.TSV_STATUS, "");
                 for (Button termBtn : attackTermRadios) {
                     if (termBtn.getSelection()) {
-                        preferenceStore.setValue(PreferenceConstants.ATTACK_DETECTED_DATE_FILTER, attackTermRadios.indexOf(termBtn));
+                        ps.setValue(PreferenceConstants.ATTACK_DETECTED_DATE_FILTER, attackTermRadios.indexOf(termBtn));
                     }
                 }
                 try {
-                    preferenceStore.save();
+                    ps.save();
                 } catch (IOException ioe) {
                     ioe.printStackTrace();
                 }
@@ -355,17 +356,17 @@ public class Main implements PropertyChangeListener {
                 }
                 updateProtectOption();
                 setWindowTitle();
-                if (preferenceStore.getBoolean(PreferenceConstants.PROXY_YUKO) && preferenceStore.getString(PreferenceConstants.PROXY_AUTH).equals("input")) {
-                    String usr = preferenceStore.getString(PreferenceConstants.PROXY_TMP_USER);
-                    String pwd = preferenceStore.getString(PreferenceConstants.PROXY_TMP_PASS);
+                if (ps.getBoolean(PreferenceConstants.PROXY_YUKO) && ps.getString(PreferenceConstants.PROXY_AUTH).equals("input")) {
+                    String usr = ps.getString(PreferenceConstants.PROXY_TMP_USER);
+                    String pwd = ps.getString(PreferenceConstants.PROXY_TMP_PASS);
                     if (usr == null || usr.isEmpty() || pwd == null || pwd.isEmpty()) {
                         ProxyAuthDialog proxyAuthDialog = new ProxyAuthDialog(shell);
                         int result = proxyAuthDialog.open();
                         if (IDialogConstants.CANCEL_ID == result) {
-                            preferenceStore.setValue(PreferenceConstants.PROXY_AUTH, "none");
+                            ps.setValue(PreferenceConstants.PROXY_AUTH, "none");
                         } else {
-                            preferenceStore.setValue(PreferenceConstants.PROXY_TMP_USER, proxyAuthDialog.getUsername());
-                            preferenceStore.setValue(PreferenceConstants.PROXY_TMP_PASS, proxyAuthDialog.getPassword());
+                            ps.setValue(PreferenceConstants.PROXY_TMP_USER, proxyAuthDialog.getUsername());
+                            ps.setValue(PreferenceConstants.PROXY_TMP_PASS, proxyAuthDialog.getPassword());
                         }
                     }
                 }
@@ -425,12 +426,12 @@ public class Main implements PropertyChangeListener {
         appLoadBtn.setLayoutData(appLoadBtnGrDt);
         appLoadBtn.setText("アプリケーション一覧の読み込み");
         appLoadBtn.setToolTipText("TeamServerにオンボードされているアプリケーションを読み込みます。");
-        appLoadBtn.addSelectionListener(new SelectionListener() {
+        appLoadBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
                 uiReset();
 
-                AppsGetWithProgress progress = new AppsGetWithProgress(preferenceStore, getValidOrganizations());
+                AppsGetWithProgress progress = new AppsGetWithProgress(shell, ps, getValidOrganizations());
                 ProgressMonitorDialog progDialog = new AppGetProgressMonitorDialog(shell);
                 try {
                     progDialog.run(true, true, progress);
@@ -453,7 +454,7 @@ public class Main implements PropertyChangeListener {
                 }
                 fullAppMap = progress.getFullAppMap();
                 if (fullAppMap.isEmpty()) {
-                    String userName = preferenceStore.getString(PreferenceConstants.USERNAME);
+                    String userName = ps.getString(PreferenceConstants.USERNAME);
                     StringJoiner sj = new StringJoiner("\r\n");
                     sj.add("アプリケーションの取得件数が０件です。考えられる原因としては以下となります。");
                     sj.add("・下記ユーザーのアプリケーションアクセスグループにView権限が設定されていない。");
@@ -470,10 +471,6 @@ public class Main implements PropertyChangeListener {
                 assessFilterMap = progress.getFilterMap();
                 vulSeverityFilterTxt.setText("すべて");
                 vulVulnTypeFilterTxt.setText("すべて");
-            }
-
-            @Override
-            public void widgetDefaultSelected(SelectionEvent event) {
             }
         });
 
@@ -553,7 +550,7 @@ public class Main implements PropertyChangeListener {
         Button allRightBtn = new Button(btnGrp, SWT.PUSH);
         allRightBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         allRightBtn.setText(">>");
-        allRightBtn.addSelectionListener(new SelectionListener() {
+        allRightBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
                 for (String appName : srcApps) {
@@ -565,16 +562,12 @@ public class Main implements PropertyChangeListener {
                 srcCount.setText(String.valueOf(srcList.getItemCount()));
                 dstCount.setText(String.valueOf(dstList.getItemCount()));
             }
-
-            @Override
-            public void widgetDefaultSelected(SelectionEvent event) {
-            }
         });
 
         Button rightBtn = new Button(btnGrp, SWT.PUSH);
         rightBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         rightBtn.setText(">");
-        rightBtn.addSelectionListener(new SelectionListener() {
+        rightBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
                 for (int idx : srcList.getSelectionIndices()) {
@@ -594,16 +587,12 @@ public class Main implements PropertyChangeListener {
                 srcCount.setText(String.valueOf(srcList.getItemCount()));
                 dstCount.setText(String.valueOf(dstList.getItemCount()));
             }
-
-            @Override
-            public void widgetDefaultSelected(SelectionEvent event) {
-            }
         });
 
         Button leftBtn = new Button(btnGrp, SWT.PUSH);
         leftBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         leftBtn.setText("<");
-        leftBtn.addSelectionListener(new SelectionListener() {
+        leftBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
                 for (int idx : dstList.getSelectionIndices()) {
@@ -623,16 +612,12 @@ public class Main implements PropertyChangeListener {
                 srcCount.setText(String.valueOf(srcList.getItemCount()));
                 dstCount.setText(String.valueOf(dstList.getItemCount()));
             }
-
-            @Override
-            public void widgetDefaultSelected(SelectionEvent event) {
-            }
         });
 
         Button allLeftBtn = new Button(btnGrp, SWT.PUSH);
         allLeftBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         allLeftBtn.setText("<<");
-        allLeftBtn.addSelectionListener(new SelectionListener() {
+        allLeftBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
                 for (String appName : dstApps) {
@@ -643,10 +628,6 @@ public class Main implements PropertyChangeListener {
                 dstApps.clear();
                 srcCount.setText(String.valueOf(srcList.getItemCount()));
                 dstCount.setText(String.valueOf(dstList.getItemCount()));
-            }
-
-            @Override
-            public void widgetDefaultSelected(SelectionEvent event) {
             }
         });
 
@@ -852,14 +833,14 @@ public class Main implements PropertyChangeListener {
         vulExecuteBtn.setText("取得");
         vulExecuteBtn.setToolTipText("脆弱性情報を取得し、CSV形式で出力します。");
         vulExecuteBtn.setFont(new Font(display, "ＭＳ ゴシック", 20, SWT.NORMAL));
-        vulExecuteBtn.addSelectionListener(new SelectionListener() {
+        vulExecuteBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
                 if (dstApps.isEmpty()) {
                     MessageDialog.openInformation(shell, "脆弱性情報取得", "取得対象のアプリケーションを選択してください。");
                     return;
                 }
-                VulGetWithProgress progress = new VulGetWithProgress(shell, preferenceStore, dstApps, fullAppMap, assessFilterMap, frLastDetectedDate, toLastDetectedDate,
+                VulGetWithProgress progress = new VulGetWithProgress(shell, ps, dstApps, fullAppMap, assessFilterMap, frLastDetectedDate, toLastDetectedDate,
                         vulOnlyParentAppChk.getSelection(), includeDescChk.getSelection(), includeStackTraceChk.getSelection());
                 ProgressMonitorDialog progDialog = new VulGetProgressMonitorDialog(shell);
                 try {
@@ -884,22 +865,18 @@ public class Main implements PropertyChangeListener {
                     e.printStackTrace();
                 }
             }
-
-            @Override
-            public void widgetDefaultSelected(SelectionEvent event) {
-            }
         });
 
         vulOnlyParentAppChk = new Button(vulButtonGrp, SWT.CHECK);
         vulOnlyParentAppChk.setText("マージされたアプリの場合、親アプリの脆弱性だけを出力する。");
-        if (preferenceStore.getBoolean(PreferenceConstants.VUL_ONLY_PARENT_APP)) {
+        if (this.ps.getBoolean(PreferenceConstants.VUL_ONLY_PARENT_APP)) {
             vulOnlyParentAppChk.setSelection(true);
         }
 
         includeDescChk = new Button(vulButtonGrp, SWT.CHECK);
         includeDescChk.setText("改行を含む長文の項目（ルート、HTTP情報、修正方法、コメントなど）も添付ファイルで出力する。（フォルダ出力）");
         includeDescChk.setToolTipText("ルート、HTTP情報、コメント、何が起こったか？、どんなリスクであるか？、修正方法の５つの項目が添付ファイルで出力されます。");
-        if (preferenceStore.getBoolean(PreferenceConstants.INCLUDE_DESCRIPTION)) {
+        if (this.ps.getBoolean(PreferenceConstants.INCLUDE_DESCRIPTION)) {
             includeDescChk.setSelection(true);
         }
         includeDescChk.addSelectionListener(new SelectionAdapter() {
@@ -914,7 +891,7 @@ public class Main implements PropertyChangeListener {
 
         includeStackTraceChk = new Button(vulButtonGrp, SWT.CHECK);
         includeStackTraceChk.setText("脆弱性の詳細（スタックトレース）も添付ファイルで出力する。（フォルダ出力）");
-        if (preferenceStore.getBoolean(PreferenceConstants.INCLUDE_STACKTRACE)) {
+        if (this.ps.getBoolean(PreferenceConstants.INCLUDE_STACKTRACE)) {
             includeStackTraceChk.setSelection(true);
         }
         includeStackTraceChk.addSelectionListener(new SelectionAdapter() {
@@ -951,14 +928,14 @@ public class Main implements PropertyChangeListener {
         libExecuteBtn.setText("取得");
         libExecuteBtn.setToolTipText("ライブラリ情報を取得し、CSV形式で出力します。");
         libExecuteBtn.setFont(new Font(display, "ＭＳ ゴシック", 20, SWT.NORMAL));
-        libExecuteBtn.addSelectionListener(new SelectionListener() {
+        libExecuteBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
                 if (dstApps.isEmpty()) {
                     MessageDialog.openInformation(shell, "ライブラリ情報取得", "取得対象のアプリケーションを選択してください。");
                     return;
                 }
-                LibGetWithProgress progress = new LibGetWithProgress(shell, preferenceStore, dstApps, fullAppMap, onlyHasCVEChk.getSelection(), includeCVEDetailChk.getSelection());
+                LibGetWithProgress progress = new LibGetWithProgress(shell, ps, dstApps, fullAppMap, onlyHasCVEChk.getSelection(), includeCVEDetailChk.getSelection());
                 ProgressMonitorDialog progDialog = new LibGetProgressMonitorDialog(shell);
                 try {
                     progDialog.run(true, true, progress);
@@ -982,26 +959,22 @@ public class Main implements PropertyChangeListener {
                     e.printStackTrace();
                 }
             }
-
-            @Override
-            public void widgetDefaultSelected(SelectionEvent event) {
-            }
         });
 
         onlyHasCVEChk = new Button(libButtonGrp, SWT.CHECK);
         onlyHasCVEChk.setText("CVE（脆弱性）を含むライブラリのみ出力する。");
-        if (preferenceStore.getBoolean(PreferenceConstants.ONLY_HAS_CVE)) {
+        if (this.ps.getBoolean(PreferenceConstants.ONLY_HAS_CVE)) {
             onlyHasCVEChk.setSelection(true);
         }
         includeCVEDetailChk = new Button(libButtonGrp, SWT.CHECK);
         includeCVEDetailChk.setText("CVEの詳細情報も出力する。（フォルダ出力）");
         includeCVEDetailChk.setToolTipText("CVEの詳細情報が添付ファイルで出力されます。");
-        if (preferenceStore.getBoolean(PreferenceConstants.INCLUDE_CVE_DETAIL)) {
+        if (this.ps.getBoolean(PreferenceConstants.INCLUDE_CVE_DETAIL)) {
             includeCVEDetailChk.setSelection(true);
         }
         libTabItem.setControl(libButtonGrp);
 
-        int sub_idx = this.preferenceStore.getInt(PreferenceConstants.OPENED_SUB_TAB_IDX);
+        int sub_idx = this.ps.getInt(PreferenceConstants.OPENED_SUB_TAB_IDX);
         subTabFolder.setSelection(sub_idx);
 
         assessTabItem.setControl(assessShell);
@@ -1075,7 +1048,7 @@ public class Main implements PropertyChangeListener {
         });
         for (Button termBtn : this.attackTermRadios) {
             termBtn.setSelection(false);
-            if (this.attackTermRadios.indexOf(termBtn) == preferenceStore.getInt(PreferenceConstants.ATTACK_DETECTED_DATE_FILTER)) {
+            if (this.attackTermRadios.indexOf(termBtn) == this.ps.getInt(PreferenceConstants.ATTACK_DETECTED_DATE_FILTER)) {
                 termBtn.setSelection(true);
             }
         }
@@ -1088,7 +1061,7 @@ public class Main implements PropertyChangeListener {
         attackLoadBtn.setText("取得");
         attackLoadBtn.setToolTipText("攻撃イベント一覧を読み込みます。");
         attackLoadBtn.setFont(new Font(display, "ＭＳ ゴシック", 20, SWT.NORMAL));
-        attackLoadBtn.addSelectionListener(new SelectionListener() {
+        attackLoadBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
                 attackTable.clearAll();
@@ -1098,7 +1071,7 @@ public class Main implements PropertyChangeListener {
                     MessageDialog.openError(shell, "攻撃一覧の取得", "取得期間を設定してください。");
                     return;
                 }
-                AttackEventsGetWithProgress progress = new AttackEventsGetWithProgress(preferenceStore, getValidOrganizations(), frToDate[0], frToDate[1]);
+                AttackEventsGetWithProgress progress = new AttackEventsGetWithProgress(shell, ps, getValidOrganizations(), frToDate[0], frToDate[1]);
                 ProgressMonitorDialog progDialog = new AttackGetProgressMonitorDialog(shell);
                 try {
                     progDialog.run(true, true, progress);
@@ -1127,10 +1100,6 @@ public class Main implements PropertyChangeListener {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-            }
-
-            @Override
-            public void widgetDefaultSelected(SelectionEvent event) {
             }
         });
 
@@ -1190,11 +1159,11 @@ public class Main implements PropertyChangeListener {
                 try {
                     for (Organization org : orgMap.keySet()) {
                         List<AttackEvent> attackEvents = orgMap.get(org);
-                        Api putApi = new PutTagsToAttackEventsApi(preferenceStore, org, attackEvents, tag, removeTags);
+                        Api putApi = new PutTagsToAttackEventsApi(shell, ps, org, attackEvents, tag, removeTags);
                         String msg = (String) putApi.put();
                         if (Boolean.valueOf(msg)) {
                             for (AttackEvent attackEvent : attackEvents) {
-                                Api attackEventTagsApi = new AttackEventTagsApi(preferenceStore, org, attackEvent.getEvent_uuid());
+                                Api attackEventTagsApi = new AttackEventTagsApi(shell, ps, org, attackEvent.getEvent_uuid());
                                 List<String> tags = (List<String>) attackEventTagsApi.get();
                                 attackEvent.setTags(tags);
                             }
@@ -1219,9 +1188,9 @@ public class Main implements PropertyChangeListener {
             public void widgetSelected(SelectionEvent e) {
                 int[] selectIndexes = attackTable.getSelectionIndices();
                 List<List<String>> csvList = new ArrayList<List<String>>();
-                String csvFileFormat = preferenceStore.getString(PreferenceConstants.CSV_FILE_FORMAT_ATTACKEVENT);
+                String csvFileFormat = ps.getString(PreferenceConstants.CSV_FILE_FORMAT_ATTACKEVENT);
                 if (csvFileFormat == null || csvFileFormat.isEmpty()) {
-                    csvFileFormat = preferenceStore.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT_ATTACKEVENT);
+                    csvFileFormat = ps.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT_ATTACKEVENT);
                 }
                 String timestamp = new SimpleDateFormat(csvFileFormat).format(new Date());
                 String currentPath = System.getProperty("user.dir");
@@ -1235,7 +1204,7 @@ public class Main implements PropertyChangeListener {
                 if (OS.isFamilyMac()) {
                     csv_encoding = Main.CSV_MAC_ENCODING;
                 }
-                String columnJsonStr = preferenceStore.getString(PreferenceConstants.CSV_COLUMN_ATTACKEVENT);
+                String columnJsonStr = ps.getString(PreferenceConstants.CSV_COLUMN_ATTACKEVENT);
                 List<AttackEventCSVColumn> columnList = null;
                 if (columnJsonStr.trim().length() > 0) {
                     try {
@@ -1309,14 +1278,14 @@ public class Main implements PropertyChangeListener {
                                 break;
                             case ATTACK_EVENT_13: {
                                 // ==================== 13. 攻撃イベントへのリンク ====================
-                                String link = String.format("%s/static/ng/index.html#/%s/attacks/events/%s", preferenceStore.getString(PreferenceConstants.CONTRAST_URL),
+                                String link = String.format("%s/static/ng/index.html#/%s/attacks/events/%s", ps.getString(PreferenceConstants.CONTRAST_URL),
                                         attackEvent.getOrganization().getOrganization_uuid().trim(), attackEvent.getEvent_uuid());
                                 csvLineList.add(link);
                                 break;
                             }
                             case ATTACK_EVENT_14: {
                                 // ==================== 14. 攻撃イベントへのリンク（ハイパーリンク） ====================
-                                String link = String.format("%s/static/ng/index.html#/%s/attacks/events/%s", preferenceStore.getString(PreferenceConstants.CONTRAST_URL),
+                                String link = String.format("%s/static/ng/index.html#/%s/attacks/events/%s", ps.getString(PreferenceConstants.CONTRAST_URL),
                                         attackEvent.getOrganization().getOrganization_uuid().trim(), attackEvent.getEvent_uuid());
                                 csvLineList.add(String.format("=HYPERLINK(\"%s\",\"TeamServerへ\")", link));
                                 break;
@@ -1327,7 +1296,7 @@ public class Main implements PropertyChangeListener {
                 }
                 try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(filePath)), csv_encoding))) {
                     CSVPrinter printer = CSVFormat.EXCEL.print(bw);
-                    if (preferenceStore.getBoolean(PreferenceConstants.CSV_OUT_HEADER_ATTACKEVENT)) {
+                    if (ps.getBoolean(PreferenceConstants.CSV_OUT_HEADER_ATTACKEVENT)) {
                         List<String> csvHeaderList = new ArrayList<String>();
                         for (AttackEventCSVColumn csvColumn : columnList) {
                             if (csvColumn.isValid()) {
@@ -1424,7 +1393,7 @@ public class Main implements PropertyChangeListener {
                     Desktop desktop = Desktop.getDesktop();
                     for (int idx : selectIndexes) {
                         AttackEvent attackEvent = filteredAttackEvents.get(idx);
-                        String contrastUrl = preferenceStore.getString(PreferenceConstants.CONTRAST_URL);
+                        String contrastUrl = ps.getString(PreferenceConstants.CONTRAST_URL);
                         String orgUuid = attackEvent.getOrganization().getOrganization_uuid();
                         String eventUuid = attackEvent.getEvent_uuid();
                         desktop.browse(new URI(String.format("%s/static/ng/index.html#/%s/attacks/events/%s", contrastUrl, orgUuid.trim(), eventUuid)));
@@ -1444,7 +1413,7 @@ public class Main implements PropertyChangeListener {
             public void widgetSelected(SelectionEvent e) {
                 int selectIndex = attackTable.getSelectionIndex();
                 AttackEvent attackEvent = filteredAttackEvents.get(selectIndex);
-                String contrastUrl = preferenceStore.getString(PreferenceConstants.CONTRAST_URL);
+                String contrastUrl = ps.getString(PreferenceConstants.CONTRAST_URL);
                 String orgUuid = attackEvent.getOrganization().getOrganization_uuid();
                 String eventUuid = attackEvent.getEvent_uuid();
                 Clipboard clipboard = java.awt.Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -1526,15 +1495,15 @@ public class Main implements PropertyChangeListener {
         attackEventFilterBtn.setLayoutData(attackEventFilterBtnGrDt);
         attackEventFilterBtn.setText("フィルター");
         attackEventFilterBtn.setToolTipText("攻撃イベントのフィルタリングを行います。");
-        attackEventFilterBtn.addSelectionListener(new SelectionListener() {
+        attackEventFilterBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 if (protectFilterMap == null) {
                     MessageDialog.openInformation(shell, "攻撃イベントフィルター", "攻撃イベント一覧を読み込んでください。");
                     return;
                 }
-                String dayTimeHours = preferenceStore.getString(PreferenceConstants.ATTACK_RANGE_DAYTIME);
-                String nightTimeHours = preferenceStore.getString(PreferenceConstants.ATTACK_RANGE_NIGHTTIME);
+                String dayTimeHours = ps.getString(PreferenceConstants.ATTACK_RANGE_DAYTIME);
+                String nightTimeHours = ps.getString(PreferenceConstants.ATTACK_RANGE_NIGHTTIME);
                 if (!dayTimeHours.isEmpty() || !nightTimeHours.isEmpty()) {
                     Set<Filter> businessHoursFilterSet = new LinkedHashSet<Filter>();
                     if (!dayTimeHours.isEmpty()) {
@@ -1552,10 +1521,6 @@ public class Main implements PropertyChangeListener {
                 if (IDialogConstants.OK_ID != result) {
                     return;
                 }
-            }
-
-            @Override
-            public void widgetDefaultSelected(SelectionEvent e) {
             }
         });
 
@@ -1582,12 +1547,12 @@ public class Main implements PropertyChangeListener {
         serverLoadBtn.setText("取得");
         serverLoadBtn.setToolTipText("サーバ一覧を読み込みます。");
         serverLoadBtn.setFont(new Font(display, "ＭＳ ゴシック", 20, SWT.NORMAL));
-        serverLoadBtn.addSelectionListener(new SelectionListener() {
+        serverLoadBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
                 serverTable.clearAll();
                 serverTable.removeAll();
-                ServersWithProgress progress = new ServersWithProgress(preferenceStore, getValidOrganizations());
+                ServersWithProgress progress = new ServersWithProgress(shell, ps, getValidOrganizations());
                 ProgressMonitorDialog progDialog = new AttackGetProgressMonitorDialog(shell);
                 try {
                     progDialog.run(true, true, progress);
@@ -1614,10 +1579,6 @@ public class Main implements PropertyChangeListener {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-            }
-
-            @Override
-            public void widgetDefaultSelected(SelectionEvent event) {
             }
         });
 
@@ -1680,7 +1641,7 @@ public class Main implements PropertyChangeListener {
         serverFilterBtn.setLayoutData(serverFilterBtnGrDt);
         serverFilterBtn.setText("フィルター");
         serverFilterBtn.setToolTipText("サーバのフィルタリングを行います。");
-        serverFilterBtn.addSelectionListener(new SelectionListener() {
+        serverFilterBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 if (serverFilterMap == null) {
@@ -1694,13 +1655,9 @@ public class Main implements PropertyChangeListener {
                     return;
                 }
             }
-
-            @Override
-            public void widgetDefaultSelected(SelectionEvent e) {
-            }
         });
 
-        int main_idx = this.preferenceStore.getInt(PreferenceConstants.OPENED_MAIN_TAB_IDX);
+        int main_idx = this.ps.getInt(PreferenceConstants.OPENED_MAIN_TAB_IDX);
         mainTabFolder.setSelection(main_idx);
 
         // ========== 設定ボタン ==========
@@ -1708,7 +1665,7 @@ public class Main implements PropertyChangeListener {
         settingBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         settingBtn.setText("設定");
         settingBtn.setToolTipText("動作に必要な設定を行います。");
-        settingBtn.addSelectionListener(new SelectionListener() {
+        settingBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
                 PreferenceManager mgr = new PreferenceManager();
@@ -1729,25 +1686,21 @@ public class Main implements PropertyChangeListener {
                 PreferenceNode aboutNode = new PreferenceNode("about", new AboutPage());
                 mgr.addToRoot(aboutNode);
                 PreferenceDialog dialog = new MyPreferenceDialog(shell, mgr);
-                dialog.setPreferenceStore(preferenceStore);
+                dialog.setPreferenceStore(ps);
                 dialog.open();
                 try {
-                    preferenceStore.save();
+                    ps.save();
                 } catch (IOException ioe) {
                     ioe.printStackTrace();
                 }
-            }
-
-            @Override
-            public void widgetDefaultSelected(SelectionEvent event) {
             }
         });
 
         Logger logger = Logger.getLogger("csvdltool");
 
         uiUpdate();
-        int width = this.preferenceStore.getInt(PreferenceConstants.MEM_WIDTH);
-        int height = this.preferenceStore.getInt(PreferenceConstants.MEM_HEIGHT);
+        int width = this.ps.getInt(PreferenceConstants.MEM_WIDTH);
+        int height = this.ps.getInt(PreferenceConstants.MEM_HEIGHT);
         if (width > 0 && height > 0) {
             shell.setSize(width, height);
         } else {
@@ -1829,11 +1782,11 @@ public class Main implements PropertyChangeListener {
     }
 
     public PreferenceStore getPreferenceStore() {
-        return preferenceStore;
+        return ps;
     }
 
     public Organization getValidOrganization() {
-        String orgJsonStr = preferenceStore.getString(PreferenceConstants.TARGET_ORGS);
+        String orgJsonStr = ps.getString(PreferenceConstants.TARGET_ORGS);
         if (orgJsonStr.trim().length() > 0) {
             try {
                 List<Organization> orgList = new Gson().fromJson(orgJsonStr, new TypeToken<List<Organization>>() {
@@ -1852,7 +1805,7 @@ public class Main implements PropertyChangeListener {
 
     public List<Organization> getValidOrganizations() {
         List<Organization> orgs = new ArrayList<Organization>();
-        String orgJsonStr = preferenceStore.getString(PreferenceConstants.TARGET_ORGS);
+        String orgJsonStr = ps.getString(PreferenceConstants.TARGET_ORGS);
         if (orgJsonStr.trim().length() > 0) {
             try {
                 List<Organization> orgList = new Gson().fromJson(orgJsonStr, new TypeToken<List<Organization>>() {
@@ -1940,7 +1893,7 @@ public class Main implements PropertyChangeListener {
         map.put(AttackEventDetectedDateFilterEnum.YESTERDAY, today.minusDays(1));
         map.put(AttackEventDetectedDateFilterEnum.BEFORE_30_DAYS, today.minusDays(30));
         LocalDate lastWeekStart = today.with(TemporalAdjusters.previous(DayOfWeek.SUNDAY));
-        lastWeekStart = lastWeekStart.minusDays(7 - preferenceStore.getInt(PreferenceConstants.ATTACK_START_WEEKDAY));
+        lastWeekStart = lastWeekStart.minusDays(7 - ps.getInt(PreferenceConstants.ATTACK_START_WEEKDAY));
         if (lastWeekStart.plusDays(7).isAfter(today)) {
             lastWeekStart = lastWeekStart.minusDays(7);
         }
@@ -2024,8 +1977,8 @@ public class Main implements PropertyChangeListener {
                 // 時間帯フィルタ
                 if (filterMap.containsKey(FilterEnum.BUSINESS_HOURS)) {
                     int target = Integer.parseInt(attackEvent.getTimeStrReceived());
-                    String termDayTime = preferenceStore.getString(PreferenceConstants.ATTACK_RANGE_DAYTIME);
-                    String termNightTime = preferenceStore.getString(PreferenceConstants.ATTACK_RANGE_NIGHTTIME);
+                    String termDayTime = ps.getString(PreferenceConstants.ATTACK_RANGE_DAYTIME);
+                    String termNightTime = ps.getString(PreferenceConstants.ATTACK_RANGE_NIGHTTIME);
                     for (Filter filter : filterMap.get(FilterEnum.BUSINESS_HOURS)) {
                         if (filter.isValid()) {
                             continue;
@@ -2134,6 +2087,8 @@ public class Main implements PropertyChangeListener {
                     filteredServers.add(server);
                 }
             }
+        } else if ("tsv".equals(event.getPropertyName())) {
+            System.out.println("tsv main");
         }
 
     }

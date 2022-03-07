@@ -21,40 +21,45 @@
  * 
  */
 
-package com.contrastsecurity.csvdltool.api;
+package com.contrastsecurity.csvdltool.model;
 
-import java.lang.reflect.Type;
+public class TsvSettings {
 
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.swt.widgets.Shell;
+    private boolean tsv_enabled;
+    private String tsv_type;
+    private String tsv_device;
+    private String google_configured;
 
-import com.contrastsecurity.csvdltool.json.EventSummaryJson;
-import com.contrastsecurity.csvdltool.model.Organization;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-public class EventSummaryApi extends Api {
-
-    private String traceId;
-
-    public EventSummaryApi(Shell shell, IPreferenceStore ps, Organization org, String traceId) {
-        super(shell, ps, org);
-        this.traceId = traceId;
+    public boolean isTsv_enabled() {
+        return tsv_enabled;
     }
 
-    @Override
-    protected String getUrl() {
-        String orgId = this.org.getOrganization_uuid();
-        return String.format("%s/api/ng/%s/traces/%s/events/summary?expand=skip_links&legacy=false", this.contrastUrl, orgId, this.traceId);
+    public void setTsv_enabled(boolean tsv_enabled) {
+        this.tsv_enabled = tsv_enabled;
     }
 
-    @Override
-    protected Object convert(String response) {
-        Gson gson = new Gson();
-        Type eventSummaryType = new TypeToken<EventSummaryJson>() {
-        }.getType();
-        EventSummaryJson eventSummaryJson = gson.fromJson(response, eventSummaryType);
-        return eventSummaryJson.getEvents();
+    public String getTsv_type() {
+        return tsv_type;
+    }
+
+    public void setTsv_type(String tsv_type) {
+        this.tsv_type = tsv_type;
+    }
+
+    public String getTsv_device() {
+        return tsv_device;
+    }
+
+    public void setTsv_device(String tsv_device) {
+        this.tsv_device = tsv_device;
+    }
+
+    public String getGoogle_configured() {
+        return google_configured;
+    }
+
+    public void setGoogle_configured(String google_configured) {
+        this.google_configured = google_configured;
     }
 
 }

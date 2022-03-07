@@ -28,6 +28,7 @@ public class PreferenceConstants {
     public static final String SERVICE_KEY = new String("com.contrastsecurity.csvdltool.service_key");
     public static final String USERNAME = new String("com.contrastsecurity.csvdltool.username");
     public static final String TARGET_ORGS = new String("com.contrastsecurity.csvdltool.target_orgs");
+    public static final String TSV_STATUS = new String("com.contrastsecurity.csvdltool.tsv_status");
 
     public static final String PROXY_YUKO = new String("com.contrastsecurity.csvdltool.proxy_yuko");
     public static final String PROXY_HOST = new String("com.contrastsecurity.csvdltool.proxy_host");

@@ -68,7 +68,7 @@ import com.google.gson.reflect.TypeToken;
 public class LibGetWithProgress implements IRunnableWithProgress {
 
     private Shell shell;
-    private PreferenceStore preferenceStore;
+    private PreferenceStore ps;
     private List<String> dstApps;
     private Map<String, AppInfo> fullAppMap;
     private boolean isOnlyHasCVE;
@@ -76,10 +76,9 @@ public class LibGetWithProgress implements IRunnableWithProgress {
 
     Logger logger = Logger.getLogger("csvdltool");
 
-    public LibGetWithProgress(Shell shell, PreferenceStore preferenceStore, List<String> dstApps, Map<String, AppInfo> fullAppMap, boolean isOnlyHasCVE,
-            boolean isIncludeCVEDetail) {
+    public LibGetWithProgress(Shell shell, PreferenceStore ps, List<String> dstApps, Map<String, AppInfo> fullAppMap, boolean isOnlyHasCVE, boolean isIncludeCVEDetail) {
         this.shell = shell;
-        this.preferenceStore = preferenceStore;
+        this.ps = ps;
         this.dstApps = dstApps;
         this.fullAppMap = fullAppMap;
         this.isOnlyHasCVE = isOnlyHasCVE;
@@ -95,20 +94,20 @@ public class LibGetWithProgress implements IRunnableWithProgress {
         if (isOnlyHasCVE) {
             filter = "VULNERABLE";
         }
-        String csvFileFormat = preferenceStore.getString(PreferenceConstants.CSV_FILE_FORMAT_LIB);
+        String csvFileFormat = this.ps.getString(PreferenceConstants.CSV_FILE_FORMAT_LIB);
         if (csvFileFormat == null || csvFileFormat.isEmpty()) {
-            csvFileFormat = preferenceStore.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT_LIB);
+            csvFileFormat = this.ps.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT_LIB);
         }
         String timestamp = new SimpleDateFormat(csvFileFormat).format(new Date());
-        int sleepTrace = preferenceStore.getInt(PreferenceConstants.SLEEP_LIB);
-        String columnJsonStr = preferenceStore.getString(PreferenceConstants.CSV_COLUMN_LIB);
+        int sleepTrace = this.ps.getInt(PreferenceConstants.SLEEP_LIB);
+        String columnJsonStr = this.ps.getString(PreferenceConstants.CSV_COLUMN_LIB);
         List<LibCSVColumn> columnList = null;
         if (columnJsonStr.trim().length() > 0) {
             try {
                 columnList = new Gson().fromJson(columnJsonStr, new TypeToken<List<LibCSVColumn>>() {
                 }.getType());
             } catch (JsonSyntaxException e) {
-                MessageDialog.openError(shell, "脆弱性出力項目の読み込み", String.format("脆弱性出力項目の内容に問題があります。\r\n%s", columnJsonStr));
+                MessageDialog.openError(this.shell, "脆弱性出力項目の読み込み", String.format("脆弱性出力項目の内容に問題があります。\r\n%s", columnJsonStr));
                 columnList = new ArrayList<LibCSVColumn>();
             }
         } else {
@@ -135,12 +134,12 @@ public class LibGetWithProgress implements IRunnableWithProgress {
             sub1Monitor.beginTask("", dstApps.size());
             int appIdx = 1;
             for (String appLabel : dstApps) {
-                Organization organization = fullAppMap.get(appLabel).getOrganization();
+                Organization org = fullAppMap.get(appLabel).getOrganization();
                 String appName = fullAppMap.get(appLabel).getAppName();
                 String appId = fullAppMap.get(appLabel).getAppId();
-                monitor.setTaskName(String.format("[%s] %s (%d/%d)", organization.getName(), appName, appIdx, dstApps.size()));
+                monitor.setTaskName(String.format("[%s] %s (%d/%d)", org.getName(), appName, appIdx, dstApps.size()));
                 List<Library> allLibraries = new ArrayList<Library>();
-                Api librariesApi = new LibrariesApi(preferenceStore, organization, appId, filter, allLibraries.size());
+                Api librariesApi = new LibrariesApi(this.shell, this.ps, org, appId, filter, allLibraries.size());
                 allLibraries.addAll((List<Library>) librariesApi.get());
                 int totalCount = librariesApi.getTotalCount();
                 boolean incompleteFlg = false;
@@ -149,7 +148,7 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                     if (monitor.isCanceled()) {
                         throw new InterruptedException("キャンセルされました。");
                     }
-                    librariesApi = new LibrariesApi(preferenceStore, organization, appId, filter, allLibraries.size());
+                    librariesApi = new LibrariesApi(this.shell, this.ps, org, appId, filter, allLibraries.size());
                     allLibraries.addAll((List<Library>) librariesApi.get());
                     incompleteFlg = totalCount > allLibraries.size();
                     Thread.sleep(sleepTrace);
@@ -253,18 +252,18 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                             }
                             case LIB_15:
                                 // ==================== 15. 組織名 ====================
-                                csvLineList.add(organization.getName());
+                                csvLineList.add(org.getName());
                                 break;
                             case LIB_16:
                                 // ==================== 16. 組織ID ====================
-                                csvLineList.add(organization.getOrganization_uuid());
+                                csvLineList.add(org.getOrganization_uuid());
                                 break;
                             case LIB_17: {
                                 // ==================== 17. ライブラリへのリンク ====================
                                 String languageCode = library.getLanguageCode();
                                 if (languageCode != null) {
-                                    String link = String.format("%s/static/ng/index.html#/%s/libraries/%s/%s", preferenceStore.getString(PreferenceConstants.CONTRAST_URL),
-                                            organization.getOrganization_uuid(), languageCode, library.getHash());
+                                    String link = String.format("%s/static/ng/index.html#/%s/libraries/%s/%s", this.ps.getString(PreferenceConstants.CONTRAST_URL),
+                                            org.getOrganization_uuid(), languageCode, library.getHash());
                                     csvLineList.add(link);
                                 } else {
                                     csvLineList.add("-");
@@ -275,8 +274,8 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                                 // ==================== 18. ライブラリへのリンク（ハイパーリンク） ====================
                                 String languageCode = library.getLanguageCode();
                                 if (languageCode != null) {
-                                    String link = String.format("%s/static/ng/index.html#/%s/libraries/%s/%s", preferenceStore.getString(PreferenceConstants.CONTRAST_URL),
-                                            organization.getOrganization_uuid(), languageCode, library.getHash());
+                                    String link = String.format("%s/static/ng/index.html#/%s/libraries/%s/%s", this.ps.getString(PreferenceConstants.CONTRAST_URL),
+                                            org.getOrganization_uuid(), languageCode, library.getHash());
                                     csvLineList.add(String.format("=HYPERLINK(\"%s\",\"TeamServerへ\")", link));
                                 } else {
                                     csvLineList.add("-");
@@ -394,7 +393,7 @@ public class LibGetWithProgress implements IRunnableWithProgress {
         }
         try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(filePath)), csv_encoding))) {
             CSVPrinter printer = CSVFormat.EXCEL.print(bw);
-            if (preferenceStore.getBoolean(PreferenceConstants.CSV_OUT_HEADER_LIB)) {
+            if (this.ps.getBoolean(PreferenceConstants.CSV_OUT_HEADER_LIB)) {
                 List<String> csvHeaderList = new ArrayList<String>();
                 for (LibCSVColumn csvColumn : columnList) {
                     if (csvColumn.isValid()) {

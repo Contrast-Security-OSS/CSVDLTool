@@ -28,35 +28,32 @@ import java.lang.reflect.Type;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Shell;
 
-import com.contrastsecurity.csvdltool.json.EventDetailJson;
+import com.contrastsecurity.csvdltool.json.TsvSettingsJson;
 import com.contrastsecurity.csvdltool.model.Organization;
+import com.contrastsecurity.csvdltool.model.TsvSettings;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-public class EventDetailApi extends Api {
+public class TsvSettingsApi extends Api {
 
-    private String traceId;
-    private String eventId;
-
-    public EventDetailApi(Shell shell, IPreferenceStore ps, Organization org, String traceId, String eventId) {
+    public TsvSettingsApi(Shell shell, IPreferenceStore ps, Organization org) {
         super(shell, ps, org);
-        this.traceId = traceId;
-        this.eventId = eventId;
     }
 
     @Override
     protected String getUrl() {
         String orgId = this.org.getOrganization_uuid();
-        return String.format("%s/api/ng/%s/traces/%s/events/%s/details?expand=skip_links", this.contrastUrl, orgId, this.traceId, this.eventId);
+        return String.format("%s/api/ng/%s/tsv/user?expand=skip_links", this.contrastUrl, orgId);
     }
 
     @Override
     protected Object convert(String response) {
         Gson gson = new Gson();
-        Type eventDetailType = new TypeToken<EventDetailJson>() {
+        Type contType = new TypeToken<TsvSettingsJson>() {
         }.getType();
-        EventDetailJson eventDetailJson = gson.fromJson(response, eventDetailType);
-        return eventDetailJson.getEvent();
+        TsvSettingsJson tsvSettingsJson = gson.fromJson(response, contType);
+        TsvSettings tsvSettings = tsvSettingsJson.getTsv();
+        return tsvSettings;
     }
 
 }

@@ -26,10 +26,10 @@ package com.contrastsecurity.csvdltool.api;
 import java.lang.reflect.Type;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.widgets.Shell;
 
 import com.contrastsecurity.csvdltool.json.ServersJson;
 import com.contrastsecurity.csvdltool.model.Organization;
-import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -39,17 +39,16 @@ public class ServersApi extends Api {
 
     private int offset;
 
-    public ServersApi(IPreferenceStore preferenceStore, Organization organization, int offset) {
-        super(preferenceStore, organization);
+    public ServersApi(Shell shell, IPreferenceStore ps, Organization org, int offset) {
+        super(shell, ps, org);
         this.offset = offset;
     }
 
     @Override
     protected String getUrl() {
-        String contrastUrl = preferenceStore.getString(PreferenceConstants.CONTRAST_URL);
-        String orgId = this.organization.getOrganization_uuid();
-        return String.format("%s/api/ng/%s/servers/filter?limit=%d&offset=%d&expand=applications&server_license&inspect_app_instrumentation&sort=serverName", contrastUrl, orgId,
-                LIMIT, this.offset);
+        String orgId = this.org.getOrganization_uuid();
+        return String.format("%s/api/ng/%s/servers/filter?limit=%d&offset=%d&expand=applications&server_license&inspect_app_instrumentation&sort=serverName", this.contrastUrl,
+                orgId, LIMIT, this.offset);
     }
 
     @Override

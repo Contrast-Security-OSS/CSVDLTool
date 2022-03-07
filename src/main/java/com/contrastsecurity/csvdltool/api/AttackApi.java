@@ -26,11 +26,11 @@ package com.contrastsecurity.csvdltool.api;
 import java.lang.reflect.Type;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.widgets.Shell;
 
 import com.contrastsecurity.csvdltool.json.AttackJson;
 import com.contrastsecurity.csvdltool.model.Attack;
 import com.contrastsecurity.csvdltool.model.Organization;
-import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -38,16 +38,15 @@ public class AttackApi extends Api {
 
     private String uuid;
 
-    public AttackApi(IPreferenceStore preferenceStore, Organization organization, String uuid) {
-        super(preferenceStore, organization);
+    public AttackApi(Shell shell, IPreferenceStore ps, Organization org, String uuid) {
+        super(shell, ps, org);
         this.uuid = uuid;
     }
 
     @Override
     protected String getUrl() {
-        String contrastUrl = preferenceStore.getString(PreferenceConstants.CONTRAST_URL);
-        String orgId = this.organization.getOrganization_uuid();
-        return String.format("%s/api/ng/%s/attacks/%s?expand=source_name,skip_links", contrastUrl, orgId, this.uuid);
+        String orgId = this.org.getOrganization_uuid();
+        return String.format("%s/api/ng/%s/attacks/%s?expand=source_name,skip_links", this.contrastUrl, orgId, this.uuid);
     }
 
     @Override

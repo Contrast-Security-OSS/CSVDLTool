@@ -26,10 +26,10 @@ package com.contrastsecurity.csvdltool.api;
 import java.lang.reflect.Type;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.widgets.Shell;
 
 import com.contrastsecurity.csvdltool.json.LibrariesJson;
 import com.contrastsecurity.csvdltool.model.Organization;
-import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -41,8 +41,8 @@ public class LibrariesApi extends Api {
     private String filter;
     private int offset;
 
-    public LibrariesApi(IPreferenceStore preferenceStore, Organization organization, String appId, String filter, int offset) {
-        super(preferenceStore, organization);
+    public LibrariesApi(Shell shell, IPreferenceStore ps, Organization org, String appId, String filter, int offset) {
+        super(shell, ps, org);
         this.appId = appId;
         this.filter = filter;
         this.offset = offset;
@@ -50,9 +50,8 @@ public class LibrariesApi extends Api {
 
     @Override
     protected String getUrl() {
-        String contrastUrl = preferenceStore.getString(PreferenceConstants.CONTRAST_URL);
-        String orgId = this.organization.getOrganization_uuid();
-        return String.format("%s/api/ng/%s/applications/%s/libraries?limit=%d&offset=%d&expand=servers,vulns,apps,skip_links&quickFilter=%s&sort=fileName", contrastUrl, orgId,
+        String orgId = this.org.getOrganization_uuid();
+        return String.format("%s/api/ng/%s/applications/%s/libraries?limit=%d&offset=%d&expand=servers,vulns,apps,skip_links&quickFilter=%s&sort=fileName", this.contrastUrl, orgId,
                 this.appId, LIMIT, this.offset, this.filter);
     }
 

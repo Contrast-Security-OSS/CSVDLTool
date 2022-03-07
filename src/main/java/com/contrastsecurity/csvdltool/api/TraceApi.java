@@ -26,30 +26,29 @@ package com.contrastsecurity.csvdltool.api;
 import java.lang.reflect.Type;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.widgets.Shell;
 
 import com.contrastsecurity.csvdltool.json.TraceJson;
 import com.contrastsecurity.csvdltool.model.Organization;
-import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 public class TraceApi extends Api {
 
     private String appId;
-    private String trace_id;
+    private String traceId;
 
-    public TraceApi(IPreferenceStore preferenceStore, Organization organization, String appId, String trace_id) {
-        super(preferenceStore, organization);
+    public TraceApi(Shell shell, IPreferenceStore ps, Organization org, String appId, String traceId) {
+        super(shell, ps, org);
         this.appId = appId;
-        this.trace_id = trace_id;
+        this.traceId = traceId;
     }
 
     @Override
     protected String getUrl() {
-        String contrastUrl = preferenceStore.getString(PreferenceConstants.CONTRAST_URL);
-        String orgId = this.organization.getOrganization_uuid();
-        return String.format("%s/api/ng/%s/traces/%s/trace/%s?expand=events,notes,request,application,servers,server_environments,skip_links", contrastUrl, orgId, this.appId,
-                this.trace_id);
+        String orgId = this.org.getOrganization_uuid();
+        return String.format("%s/api/ng/%s/traces/%s/trace/%s?expand=events,notes,request,application,servers,server_environments,skip_links", this.contrastUrl, orgId, this.appId,
+                this.traceId);
     }
 
     @Override

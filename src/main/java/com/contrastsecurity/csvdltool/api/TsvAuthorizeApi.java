@@ -40,8 +40,11 @@ public class TsvAuthorizeApi extends Api {
 
     private String code;
 
-    public TsvAuthorizeApi(Shell shell, IPreferenceStore ps, Organization org, String code) {
+    public TsvAuthorizeApi(Shell shell, IPreferenceStore ps, Organization org, String contrastUrl, String userName, String seviceKey, String code) {
         super(shell, ps, org);
+        this.contrastUrl = contrastUrl;
+        this.userName = userName;
+        this.serviceKey = seviceKey;
         this.code = code;
     }
 

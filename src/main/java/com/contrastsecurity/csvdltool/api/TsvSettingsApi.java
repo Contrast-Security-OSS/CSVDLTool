@@ -36,8 +36,11 @@ import com.google.gson.reflect.TypeToken;
 
 public class TsvSettingsApi extends Api {
 
-    public TsvSettingsApi(Shell shell, IPreferenceStore ps, Organization org) {
+    public TsvSettingsApi(Shell shell, IPreferenceStore ps, Organization org, String contrastUrl, String userName, String seviceKey) {
         super(shell, ps, org);
+        this.contrastUrl = contrastUrl;
+        this.userName = userName;
+        this.serviceKey = seviceKey;
     }
 
     @Override

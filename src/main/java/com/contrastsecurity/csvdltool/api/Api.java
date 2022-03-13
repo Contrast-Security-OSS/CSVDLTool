@@ -85,19 +85,23 @@ public abstract class Api {
     protected IPreferenceStore ps;
     protected Organization org;
     protected String contrastUrl;
+    protected String userName;
+    protected String serviceKey;
     protected boolean success;
     protected int totalCount;
-    private String rtnCode;
+    private String code;
 
     public Api(Shell shell, IPreferenceStore ps, Organization org) {
         this.shell = shell;
         this.ps = ps;
         this.org = org;
         this.contrastUrl = this.ps.getString(PreferenceConstants.CONTRAST_URL);
+        this.serviceKey = this.ps.getString(PreferenceConstants.SERVICE_KEY);
+        this.userName = this.ps.getString(PreferenceConstants.USERNAME);
     }
 
     protected TsvSettings checkTsv() {
-        Api tsvSettingsApi = new TsvSettingsApi(shell, ps, org);
+        Api tsvSettingsApi = new TsvSettingsApi(shell, ps, org, this.contrastUrl, this.userName, this.serviceKey);
         try {
             TsvSettings tsvSettings = (TsvSettings) tsvSettingsApi.getWithoutCheckTsv();
             return tsvSettings;
@@ -134,16 +138,16 @@ public abstract class Api {
                     public void run() {
                         int result = tsvDialog.open();
                         if (IDialogConstants.OK_ID != result) {
-                            rtnCode = "";
+                            code = "";
                         }
-                        rtnCode = tsvDialog.getCode();
-                        if (rtnCode == null) {
-                            rtnCode = "";
+                        code = tsvDialog.getCode();
+                        if (code == null) {
+                            code = "";
                         }
                     }
                 });
-                if (!rtnCode.isEmpty()) {
-                    Api tsvAuthorizeApi = new TsvAuthorizeApi(this.shell, this.ps, this.org, rtnCode);
+                if (!code.isEmpty()) {
+                    Api tsvAuthorizeApi = new TsvAuthorizeApi(this.shell, this.ps, this.org, this.contrastUrl, this.userName, this.serviceKey, code);
                     String rtnMsg = (String) tsvAuthorizeApi.post();
                     if (rtnMsg.equals("true")) {
                         this.ps.setValue(PreferenceConstants.TSV_STATUS, TsvStatusEnum.AUTH.name());
@@ -182,11 +186,10 @@ public abstract class Api {
 
     protected List<Header> getHeaders() {
         String apiKey = this.org.getApikey();
-        String serviceKey = this.ps.getString(PreferenceConstants.SERVICE_KEY);
-        String userName = this.ps.getString(PreferenceConstants.USERNAME);
-        String auth = String.format("%s:%s", userName, serviceKey);
+        String auth = String.format("%s:%s", this.userName, this.serviceKey);
         byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(StandardCharsets.ISO_8859_1));
         String authHeader = new String(encodedAuth);
+        System.out.println(authHeader);
         List<Header> headers = new ArrayList<Header>();
         headers.add(new BasicHeader(HttpHeaders.ACCEPT, "application/json"));
         headers.add(new BasicHeader("API-Key", apiKey));

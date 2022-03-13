@@ -24,14 +24,7 @@
 package com.contrastsecurity.csvdltool.api;
 
 import java.lang.reflect.Type;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
 
-import org.apache.commons.codec.binary.Base64;
-import org.apache.http.Header;
-import org.apache.http.HttpHeaders;
-import org.apache.http.message.BasicHeader;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Shell;
 
@@ -41,33 +34,17 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 public class OrganizationApi extends Api {
-    private String url;
-    private String username;
-    private String seviceKey;
-
-    public OrganizationApi(Shell shell, IPreferenceStore ps, Organization org, String url, String username, String seviceKey) {
+    public OrganizationApi(Shell shell, IPreferenceStore ps, Organization org, String contrastUrl, String userName, String seviceKey) {
         super(shell, ps, org);
-        this.url = url;
-        this.username = username;
-        this.seviceKey = seviceKey;
+        this.contrastUrl = contrastUrl;
+        this.userName = userName;
+        this.serviceKey = seviceKey;
     }
 
     @Override
     protected String getUrl() {
         String orgId = this.org.getOrganization_uuid();
-        return String.format("%s/api/ng/profile/organizations/%s?expand=freemium,skip_links", this.url, orgId);
-    }
-
-    @Override
-    protected List<Header> getHeaders() {
-        String auth = String.format("%s:%s", this.username, this.seviceKey);
-        byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(StandardCharsets.ISO_8859_1));
-        String authHeader = new String(encodedAuth);
-        List<Header> headers = new ArrayList<Header>();
-        headers.add(new BasicHeader(HttpHeaders.ACCEPT, "application/json"));
-        headers.add(new BasicHeader("API-Key", this.org.getApikey()));
-        headers.add(new BasicHeader(HttpHeaders.AUTHORIZATION, authHeader));
-        return headers;
+        return String.format("%s/api/ng/profile/organizations/%s?expand=freemium,skip_links", this.contrastUrl, orgId);
     }
 
     @Override

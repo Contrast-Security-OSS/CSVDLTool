@@ -29,12 +29,15 @@ import java.net.URI;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
+
+import com.contrastsecurity.csvdltool.Main;
 
 public class AboutPage extends PreferencePage {
 
@@ -53,6 +56,15 @@ public class AboutPage extends PreferencePage {
         appGrp.setLayout(new GridLayout(3, false));
         GridData appGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
         appGrp.setLayoutData(appGrpGrDt);
+
+        Label icon = new Label(appGrp, SWT.NONE);
+        GridData iconGrDt = new GridData();
+        iconGrDt.horizontalSpan = 3;
+        iconGrDt.heightHint = 72;
+        iconGrDt.widthHint = 300;
+        icon.setLayoutData(iconGrDt);
+        Image iconImg = new Image(parent.getDisplay(), Main.class.getClassLoader().getResourceAsStream("banner.png"));
+        icon.setImage(iconImg);
 
         Label versionTitleLbl = new Label(appGrp, SWT.NONE);
         GridData versionTitleLblGrDt = new GridData();

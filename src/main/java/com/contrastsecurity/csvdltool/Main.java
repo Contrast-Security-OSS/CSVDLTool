@@ -283,11 +283,11 @@ public class Main implements PropertyChangeListener {
         shell = new CSVDLToolShell(display, this);
         shell.setMinimumSize(640, 620);
         Image[] imageArray = new Image[5];
-        imageArray[0] = new Image(display, Main.class.getClassLoader().getResourceAsStream("icon16.png"));
-        imageArray[1] = new Image(display, Main.class.getClassLoader().getResourceAsStream("icon24.png"));
-        imageArray[2] = new Image(display, Main.class.getClassLoader().getResourceAsStream("icon32.png"));
-        imageArray[3] = new Image(display, Main.class.getClassLoader().getResourceAsStream("icon48.png"));
-        imageArray[4] = new Image(display, Main.class.getClassLoader().getResourceAsStream("icon128.png"));
+        imageArray[0] = new Image(display, Main.class.getClassLoader().getResourceAsStream("logo16.png"));
+        imageArray[1] = new Image(display, Main.class.getClassLoader().getResourceAsStream("logo24.png"));
+        imageArray[2] = new Image(display, Main.class.getClassLoader().getResourceAsStream("logo32.png"));
+        imageArray[3] = new Image(display, Main.class.getClassLoader().getResourceAsStream("logo48.png"));
+        imageArray[4] = new Image(display, Main.class.getClassLoader().getResourceAsStream("logo128.png"));
         shell.setImages(imageArray);
         Window.setDefaultImages(imageArray);
         setWindowTitle();
@@ -409,6 +409,7 @@ public class Main implements PropertyChangeListener {
         // #################### ASSESS #################### //
         CTabItem assessTabItem = new CTabItem(mainTabFolder, SWT.NONE);
         assessTabItem.setText("ASSESS");
+        assessTabItem.setImage(new Image(shell.getDisplay(), getClass().getClassLoader().getResourceAsStream("assess16.png")));
 
         Composite assessShell = new Composite(mainTabFolder, SWT.NONE);
         assessShell.setLayout(new GridLayout(1, false));
@@ -982,6 +983,7 @@ public class Main implements PropertyChangeListener {
         // #################### PROTECT #################### //
         CTabItem protectTabItem = new CTabItem(mainTabFolder, SWT.NONE);
         protectTabItem.setText("PROTECT");
+        protectTabItem.setImage(new Image(shell.getDisplay(), getClass().getClassLoader().getResourceAsStream("protect16.png")));
 
         Composite protectShell = new Composite(mainTabFolder, SWT.NONE);
         protectShell.setLayout(new GridLayout(1, false));
@@ -1529,6 +1531,7 @@ public class Main implements PropertyChangeListener {
         // #################### SERVER #################### //
         CTabItem serverTabItem = new CTabItem(mainTabFolder, SWT.NONE);
         serverTabItem.setText("SERVER(β版)");
+        serverTabItem.setImage(new Image(shell.getDisplay(), getClass().getClassLoader().getResourceAsStream("server16.png")));
 
         Composite serverShell = new Composite(mainTabFolder, SWT.NONE);
         serverShell.setLayout(new GridLayout(1, false));

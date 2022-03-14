@@ -283,11 +283,11 @@ public class Main implements PropertyChangeListener {
         shell = new CSVDLToolShell(display, this);
         shell.setMinimumSize(640, 620);
         Image[] imageArray = new Image[5];
-        imageArray[0] = new Image(display, Main.class.getClassLoader().getResourceAsStream("logo16.png"));
-        imageArray[1] = new Image(display, Main.class.getClassLoader().getResourceAsStream("logo24.png"));
-        imageArray[2] = new Image(display, Main.class.getClassLoader().getResourceAsStream("logo32.png"));
-        imageArray[3] = new Image(display, Main.class.getClassLoader().getResourceAsStream("logo48.png"));
-        imageArray[4] = new Image(display, Main.class.getClassLoader().getResourceAsStream("logo128.png"));
+        imageArray[0] = new Image(display, Main.class.getClassLoader().getResourceAsStream("icon16.png"));
+        imageArray[1] = new Image(display, Main.class.getClassLoader().getResourceAsStream("icon24.png"));
+        imageArray[2] = new Image(display, Main.class.getClassLoader().getResourceAsStream("icon32.png"));
+        imageArray[3] = new Image(display, Main.class.getClassLoader().getResourceAsStream("icon48.png"));
+        imageArray[4] = new Image(display, Main.class.getClassLoader().getResourceAsStream("icon128.png"));
         shell.setImages(imageArray);
         Window.setDefaultImages(imageArray);
         setWindowTitle();

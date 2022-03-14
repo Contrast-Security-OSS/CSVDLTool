@@ -60,7 +60,7 @@ public class AboutPage extends PreferencePage {
         Label icon = new Label(appGrp, SWT.NONE);
         GridData iconGrDt = new GridData();
         iconGrDt.horizontalSpan = 3;
-        iconGrDt.heightHint = 72;
+        iconGrDt.heightHint = 80;
         iconGrDt.widthHint = 300;
         icon.setLayoutData(iconGrDt);
         Image iconImg = new Image(parent.getDisplay(), Main.class.getClassLoader().getResourceAsStream("banner.png"));

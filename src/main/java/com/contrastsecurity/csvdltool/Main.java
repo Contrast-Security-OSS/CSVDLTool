@@ -112,6 +112,7 @@ import com.contrastsecurity.csvdltool.api.AttackEventTagsApi;
 import com.contrastsecurity.csvdltool.api.PutTagsToAttackEventsApi;
 import com.contrastsecurity.csvdltool.exception.ApiException;
 import com.contrastsecurity.csvdltool.exception.NonApiException;
+import com.contrastsecurity.csvdltool.exception.TsvException;
 import com.contrastsecurity.csvdltool.model.AttackEvent;
 import com.contrastsecurity.csvdltool.model.AttackEventCSVColumn;
 import com.contrastsecurity.csvdltool.model.ContrastSecurityYaml;
@@ -339,6 +340,7 @@ public class Main implements PropertyChangeListener {
                     appLoadBtn.setEnabled(false);
                     vulExecuteBtn.setEnabled(false);
                     attackLoadBtn.setEnabled(false);
+                    serverLoadBtn.setEnabled(false);
                     settingBtn.setText("このボタンから基本設定を行ってください。");
                     currentTitle = "";
                     uiReset();
@@ -346,6 +348,7 @@ public class Main implements PropertyChangeListener {
                     appLoadBtn.setEnabled(true);
                     vulExecuteBtn.setEnabled(true);
                     attackLoadBtn.setEnabled(true);
+                    serverLoadBtn.setEnabled(true);
                     settingBtn.setText("設定");
                     List<String> orgNameList = new ArrayList<String>();
                     String title = String.join(", ", orgNameList);
@@ -447,6 +450,9 @@ public class Main implements PropertyChangeListener {
                         MessageDialog.openWarning(shell, "アプリケーション一覧の取得", String.format("TeamServerからエラーが返されました。\r\n%s", errorMsg));
                     } else if (e.getTargetException() instanceof NonApiException) {
                         MessageDialog.openError(shell, "アプリケーション一覧の取得", String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", errorMsg));
+                    } else if (e.getTargetException() instanceof TsvException) {
+                        MessageDialog.openInformation(shell, "アプリケーション一覧の取得", errorMsg);
+                        return;
                     } else {
                         MessageDialog.openError(shell, "アプリケーション一覧の取得", String.format("不明なエラーです。ログファイルをご確認ください。\r\n%s", errorMsg));
                     }
@@ -1096,6 +1102,9 @@ public class Main implements PropertyChangeListener {
                         MessageDialog.openWarning(shell, "攻撃イベント一覧の取得", String.format("TeamServerからエラーが返されました。\r\n%s", errorMsg));
                     } else if (e.getTargetException() instanceof NonApiException) {
                         MessageDialog.openError(shell, "攻撃イベント一覧の取得", String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", errorMsg));
+                    } else if (e.getTargetException() instanceof TsvException) {
+                        MessageDialog.openInformation(shell, "攻撃イベント一覧の取得", errorMsg);
+                        return;
                     } else {
                         MessageDialog.openError(shell, "攻撃イベント一覧の取得", String.format("不明なエラーです。ログファイルをご確認ください。\r\n%s", errorMsg));
                     }
@@ -1573,11 +1582,14 @@ public class Main implements PropertyChangeListener {
                     logger.error(trace);
                     String errorMsg = e.getTargetException().getMessage();
                     if (e.getTargetException() instanceof ApiException) {
-                        MessageDialog.openWarning(shell, "攻撃一覧の取得", String.format("TeamServerからエラーが返されました。\r\n%s", errorMsg));
+                        MessageDialog.openWarning(shell, "サーバ一覧の取得", String.format("TeamServerからエラーが返されました。\r\n%s", errorMsg));
                     } else if (e.getTargetException() instanceof NonApiException) {
-                        MessageDialog.openError(shell, "攻撃一覧の取得", String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", errorMsg));
+                        MessageDialog.openError(shell, "サーバ一覧の取得", String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", errorMsg));
+                    } else if (e.getTargetException() instanceof TsvException) {
+                        MessageDialog.openInformation(shell, "サーバ一覧の取得", errorMsg);
+                        return;
                     } else {
-                        MessageDialog.openError(shell, "攻撃一覧の取得", String.format("不明なエラーです。ログファイルをご確認ください。\r\n%s", errorMsg));
+                        MessageDialog.openError(shell, "サーバ一覧の取得", String.format("不明なエラーです。ログファイルをご確認ください。\r\n%s", errorMsg));
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();

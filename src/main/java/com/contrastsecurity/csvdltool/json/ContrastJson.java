@@ -29,6 +29,7 @@ public class ContrastJson {
     private String success;
     private List<String> messages;
     private int count;
+    private String type;
 
     public String getSuccess() {
         return success;
@@ -52,6 +53,14 @@ public class ContrastJson {
 
     public void setCount(int count) {
         this.count = count;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     @Override

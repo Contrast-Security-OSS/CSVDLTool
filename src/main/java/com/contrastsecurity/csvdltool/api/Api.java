@@ -132,6 +132,13 @@ public abstract class Api {
             if (!tsvSettings.isTsv_enabled()) {
                 this.ps.setValue(PreferenceConstants.TSV_STATUS, TsvStatusEnum.SKIP.name());
             } else {
+                if (tsvSettings.getTsv_type().equals("EMAIL")) {
+                    Api tsvInitializeApi = new TsvInitializeApi(this.shell, this.ps, this.org, this.contrastUrl, this.userName, this.serviceKey);
+                    String rtnMsg = (String) tsvInitializeApi.post();
+                    if (!rtnMsg.equals("true")) {
+                        throw new TsvException("二段階認証コードのメール送信要求に失敗しました。");
+                    }
+                }
                 TsvDialog tsvDialog = new TsvDialog(shell);
                 shell.getDisplay().syncExec(new Runnable() {
                     @Override
@@ -148,12 +155,20 @@ public abstract class Api {
                 });
                 if (!code.isEmpty()) {
                     Api tsvAuthorizeApi = new TsvAuthorizeApi(this.shell, this.ps, this.org, this.contrastUrl, this.userName, this.serviceKey, code);
-                    String rtnMsg = (String) tsvAuthorizeApi.post();
-                    if (rtnMsg.equals("true")) {
-                        this.ps.setValue(PreferenceConstants.TSV_STATUS, TsvStatusEnum.AUTH.name());
-                    } else {
-                        throw new TsvException("TSV ng");
+                    try {
+                        String rtnMsg = (String) tsvAuthorizeApi.post();
+                        if (rtnMsg.equals("true")) {
+                            this.ps.setValue(PreferenceConstants.TSV_STATUS, TsvStatusEnum.AUTH.name());
+                        } else {
+                            throw new TsvException("二段階認証に失敗しました。");
+                        }
+                    } catch (NonApiException nae) {
+                        if (nae.getMessage().equals("400")) {
+                            throw new TsvException("二段階認証に失敗しました。");
+                        }
                     }
+                } else {
+                    throw new TsvException("二段階認証をキャンセルしました。");
                 }
             }
         }
@@ -189,7 +204,6 @@ public abstract class Api {
         String auth = String.format("%s:%s", this.userName, this.serviceKey);
         byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(StandardCharsets.ISO_8859_1));
         String authHeader = new String(encodedAuth);
-        System.out.println(authHeader);
         List<Header> headers = new ArrayList<Header>();
         headers.add(new BasicHeader(HttpHeaders.ACCEPT, "application/json"));
         headers.add(new BasicHeader("API-Key", apiKey));

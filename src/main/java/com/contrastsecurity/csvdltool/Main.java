@@ -145,6 +145,9 @@ public class Main implements PropertyChangeListener {
     public static final String CSV_MAC_ENCODING = "UTF-8";
     public static final String FILE_ENCODING = "UTF-8";
 
+    public static final int MINIMUM_SIZE_WIDTH = 640;
+    public static final int MINIMUM_SIZE_HEIGHT = 620;
+
     private CSVDLToolShell shell;
 
     // ASSESS
@@ -282,7 +285,7 @@ public class Main implements PropertyChangeListener {
     private void createPart() {
         Display display = new Display();
         shell = new CSVDLToolShell(display, this);
-        shell.setMinimumSize(640, 620);
+        shell.setMinimumSize(MINIMUM_SIZE_WIDTH, MINIMUM_SIZE_HEIGHT);
         Image[] imageArray = new Image[5];
         imageArray[0] = new Image(display, Main.class.getClassLoader().getResourceAsStream("icon16.png"));
         imageArray[1] = new Image(display, Main.class.getClassLoader().getResourceAsStream("icon24.png"));
@@ -1719,7 +1722,8 @@ public class Main implements PropertyChangeListener {
         if (width > 0 && height > 0) {
             shell.setSize(width, height);
         } else {
-            shell.pack();
+            shell.setSize(MINIMUM_SIZE_WIDTH, MINIMUM_SIZE_HEIGHT);
+            // shell.pack();
         }
         shell.open();
         try {

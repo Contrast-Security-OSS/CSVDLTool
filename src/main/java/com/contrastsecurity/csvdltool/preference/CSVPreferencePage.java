@@ -47,6 +47,7 @@ public class CSVPreferencePage extends PreferencePage {
     private Text vulCSVFileFmtTxt;
     private Text libCSVFileFmtTxt;
     private Text evtCSVFileFmtTxt;
+    private Text svrCSVFileFmtTxt;
     private Text vulSleepTxt;
     private Text libSleepTxt;
 
@@ -126,6 +127,22 @@ public class CSVPreferencePage extends PreferencePage {
         evtCSVFileFmtTxt.setText(ps.getString(PreferenceConstants.CSV_FILE_FORMAT_ATTACKEVENT));
         evtCSVFileFmtTxt.setMessage(ps.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT_ATTACKEVENT));
 
+        Group svrCSVFileFmtGrp = new Group(csvFileFmtGrp, SWT.NONE);
+        GridLayout svrCSVFileFmtGrpLt = new GridLayout(1, false);
+        svrCSVFileFmtGrpLt.marginWidth = 10;
+        svrCSVFileFmtGrpLt.marginHeight = 10;
+        svrCSVFileFmtGrpLt.horizontalSpacing = 10;
+        svrCSVFileFmtGrp.setLayout(svrCSVFileFmtGrpLt);
+        GridData svrCSVFileFmtGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        // svrCSVFileFmtGrpGrDt.horizontalSpan = 2;
+        svrCSVFileFmtGrp.setLayoutData(svrCSVFileFmtGrpGrDt);
+        svrCSVFileFmtGrp.setText("サーバ");
+
+        svrCSVFileFmtTxt = new Text(svrCSVFileFmtGrp, SWT.BORDER);
+        svrCSVFileFmtTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        svrCSVFileFmtTxt.setText(ps.getString(PreferenceConstants.CSV_FILE_FORMAT_SERVER));
+        svrCSVFileFmtTxt.setMessage(ps.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT_SERVER));
+
         Label csvFileFormatHint = new Label(csvFileFmtGrp, SWT.LEFT);
         GridData csvFileFormatHintGrDt = new GridData(GridData.FILL_HORIZONTAL);
         csvFileFormatHint.setLayoutData(csvFileFormatHintGrDt);
@@ -174,6 +191,8 @@ public class CSVPreferencePage extends PreferencePage {
             public void widgetSelected(SelectionEvent e) {
                 vulCSVFileFmtTxt.setText(ps.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT_VUL));
                 libCSVFileFmtTxt.setText(ps.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT_LIB));
+                evtCSVFileFmtTxt.setText(ps.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT_ATTACKEVENT));
+                svrCSVFileFmtTxt.setText(ps.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT_SERVER));
                 vulSleepTxt.setText(ps.getDefaultString(PreferenceConstants.SLEEP_VUL));
                 libSleepTxt.setText(ps.getDefaultString(PreferenceConstants.SLEEP_LIB));
             }
@@ -220,6 +239,8 @@ public class CSVPreferencePage extends PreferencePage {
         ps.setValue(PreferenceConstants.SLEEP_LIB, this.libSleepTxt.getText());
         ps.setValue(PreferenceConstants.CSV_FILE_FORMAT_VUL, this.vulCSVFileFmtTxt.getText());
         ps.setValue(PreferenceConstants.CSV_FILE_FORMAT_LIB, this.libCSVFileFmtTxt.getText());
+        ps.setValue(PreferenceConstants.CSV_FILE_FORMAT_ATTACKEVENT, this.evtCSVFileFmtTxt.getText());
+        ps.setValue(PreferenceConstants.CSV_FILE_FORMAT_SERVER, this.svrCSVFileFmtTxt.getText());
         if (!errors.isEmpty()) {
             MessageDialog.openError(getShell(), "その他設定", String.join("\r\n", errors));
             return false;

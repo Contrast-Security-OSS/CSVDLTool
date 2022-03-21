@@ -120,6 +120,7 @@ import com.contrastsecurity.csvdltool.model.ContrastSecurityYaml;
 import com.contrastsecurity.csvdltool.model.Filter;
 import com.contrastsecurity.csvdltool.model.Organization;
 import com.contrastsecurity.csvdltool.model.Server;
+import com.contrastsecurity.csvdltool.model.ServerCSVColumn;
 import com.contrastsecurity.csvdltool.preference.AboutPage;
 import com.contrastsecurity.csvdltool.preference.AttackEventCSVColumnPreferencePage;
 import com.contrastsecurity.csvdltool.preference.BasePreferencePage;
@@ -129,6 +130,7 @@ import com.contrastsecurity.csvdltool.preference.LibCSVColumnPreferencePage;
 import com.contrastsecurity.csvdltool.preference.MyPreferenceDialog;
 import com.contrastsecurity.csvdltool.preference.OtherPreferencePage;
 import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
+import com.contrastsecurity.csvdltool.preference.ServerCSVColumnPreferencePage;
 import com.contrastsecurity.csvdltool.preference.VulCSVColumnPreferencePage;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -267,6 +269,10 @@ public class Main implements PropertyChangeListener {
             this.ps.setDefault(PreferenceConstants.CSV_COLUMN_ATTACKEVENT, AttackEventCSVColmunEnum.defaultValuesStr());
             this.ps.setDefault(PreferenceConstants.CSV_OUT_HEADER_ATTACKEVENT, true);
             this.ps.setDefault(PreferenceConstants.CSV_FILE_FORMAT_ATTACKEVENT, "'attackevent'_yyyy-MM-dd_HHmmss");
+
+            this.ps.setDefault(PreferenceConstants.CSV_COLUMN_SERVER, ServerCSVColmunEnum.defaultValuesStr());
+            this.ps.setDefault(PreferenceConstants.CSV_OUT_HEADER_SERVER, true);
+            this.ps.setDefault(PreferenceConstants.CSV_FILE_FORMAT_SERVER, "'server'_yyyy-MM-dd_HHmmss");
 
             this.ps.setDefault(PreferenceConstants.OPENED_MAIN_TAB_IDX, 0);
             this.ps.setDefault(PreferenceConstants.OPENED_SUB_TAB_IDX, 0);
@@ -1234,7 +1240,7 @@ public class Main implements PropertyChangeListener {
                         columnList = new Gson().fromJson(columnJsonStr, new TypeToken<List<AttackEventCSVColumn>>() {
                         }.getType());
                     } catch (JsonSyntaxException jse) {
-                        MessageDialog.openError(shell, "脆弱性出力項目の読み込み", String.format("脆弱性出力項目の内容に問題があります。\r\n%s", columnJsonStr));
+                        MessageDialog.openError(shell, "攻撃イベント出力項目の読み込み", String.format("攻撃イベント出力項目の内容に問題があります。\r\n%s", columnJsonStr));
                         columnList = new ArrayList<AttackEventCSVColumn>();
                     }
                 } else {
@@ -1622,10 +1628,90 @@ public class Main implements PropertyChangeListener {
         serverTable.setMenu(menuServerTable);
 
         MenuItem miServerExp = new MenuItem(menuServerTable, SWT.NONE);
-        miServerExp.setText("エクスポート");
+        miServerExp.setText("CSVエクスポート");
         miServerExp.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
+                int[] selectIndexes = serverTable.getSelectionIndices();
+                List<List<String>> csvList = new ArrayList<List<String>>();
+                String csvFileFormat = ps.getString(PreferenceConstants.CSV_FILE_FORMAT_SERVER);
+                if (csvFileFormat == null || csvFileFormat.isEmpty()) {
+                    csvFileFormat = ps.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT_SERVER);
+                }
+                String timestamp = new SimpleDateFormat(csvFileFormat).format(new Date());
+                String currentPath = System.getProperty("user.dir");
+                String filePath = timestamp + ".csv";
+                if (OS.isFamilyMac()) {
+                    if (currentPath.contains(".app/Contents/Java")) {
+                        filePath = "../../../" + timestamp + ".csv";
+                    }
+                }
+                String csv_encoding = Main.CSV_WIN_ENCODING;
+                if (OS.isFamilyMac()) {
+                    csv_encoding = Main.CSV_MAC_ENCODING;
+                }
+                String columnJsonStr = ps.getString(PreferenceConstants.CSV_COLUMN_SERVER);
+                List<ServerCSVColumn> columnList = null;
+                if (columnJsonStr.trim().length() > 0) {
+                    try {
+                        columnList = new Gson().fromJson(columnJsonStr, new TypeToken<List<ServerCSVColumn>>() {
+                        }.getType());
+                    } catch (JsonSyntaxException jse) {
+                        MessageDialog.openError(shell, "サーバ出力項目の読み込み", String.format("サーバ出力項目の内容に問題があります。\r\n%s", columnJsonStr));
+                        columnList = new ArrayList<ServerCSVColumn>();
+                    }
+                } else {
+                    columnList = new ArrayList<ServerCSVColumn>();
+                    for (ServerCSVColmunEnum colEnum : ServerCSVColmunEnum.sortedValues()) {
+                        columnList.add(new ServerCSVColumn(colEnum));
+                    }
+                }
+                for (int idx : selectIndexes) {
+                    List<String> csvLineList = new ArrayList<String>();
+                    Server server = filteredServers.get(idx);
+                    for (ServerCSVColumn csvColumn : columnList) {
+                        if (!csvColumn.isValid()) {
+                            continue;
+                        }
+                        switch (csvColumn.getColumn()) {
+                            case SERVER_01:
+                                // ==================== 01. サーバ名 ====================
+                                csvLineList.add(server.getName());
+                                break;
+                            case SERVER_02:
+                                // ==================== 02. パス ====================
+                                csvLineList.add(server.getPath());
+                                break;
+                            case SERVER_03:
+                                // ==================== 03. 言語 ====================
+                                csvLineList.add(server.getLanguage());
+                                break;
+                            case SERVER_04:
+                                // ==================== 04. エージェントバージョン ====================
+                                csvLineList.add(server.getAgent_version());
+                                break;
+                        }
+                    }
+                    csvList.add(csvLineList);
+                }
+                try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(filePath)), csv_encoding))) {
+                    CSVPrinter printer = CSVFormat.EXCEL.print(bw);
+                    if (ps.getBoolean(PreferenceConstants.CSV_OUT_HEADER_SERVER)) {
+                        List<String> csvHeaderList = new ArrayList<String>();
+                        for (ServerCSVColumn csvColumn : columnList) {
+                            if (csvColumn.isValid()) {
+                                csvHeaderList.add(csvColumn.getColumn().getCulumn());
+                            }
+                        }
+                        printer.printRecord(csvHeaderList);
+                    }
+                    for (List<String> csvLine : csvList) {
+                        printer.printRecord(csvLine);
+                    }
+                    MessageDialog.openInformation(shell, "サーバ一覧のエクスポート", "csvファイルをエクスポートしました。");
+                } catch (IOException ioe) {
+                    ioe.printStackTrace();
+                }
             }
         });
 
@@ -1705,6 +1791,7 @@ public class Main implements PropertyChangeListener {
                 PreferenceNode vulCsvColumnNode = new PreferenceNode("vulcsvcolumn", new VulCSVColumnPreferencePage());
                 PreferenceNode libCsvColumnNode = new PreferenceNode("libcsvcolumn", new LibCSVColumnPreferencePage());
                 PreferenceNode evtCsvColumnNode = new PreferenceNode("evtcsvcolumn", new AttackEventCSVColumnPreferencePage());
+                PreferenceNode svrCsvColumnNode = new PreferenceNode("svrcsvcolumn", new ServerCSVColumnPreferencePage());
                 mgr.addToRoot(baseNode);
                 mgr.addToRoot(connectionNode);
                 mgr.addToRoot(otherNode);
@@ -1712,6 +1799,7 @@ public class Main implements PropertyChangeListener {
                 mgr.addTo(csvNode.getId(), vulCsvColumnNode);
                 mgr.addTo(csvNode.getId(), libCsvColumnNode);
                 mgr.addTo(csvNode.getId(), evtCsvColumnNode);
+                mgr.addTo(csvNode.getId(), svrCsvColumnNode);
                 PreferenceNode aboutNode = new PreferenceNode("about", new AboutPage());
                 mgr.addToRoot(aboutNode);
                 PreferenceDialog dialog = new MyPreferenceDialog(shell, mgr);

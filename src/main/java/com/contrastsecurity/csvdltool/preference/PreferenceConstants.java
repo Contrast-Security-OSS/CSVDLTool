@@ -62,6 +62,10 @@ public class PreferenceConstants {
     public static final String CSV_COLUMN_ATTACKEVENT = new String("com.contrastsecurity.csvdltool.csv_out_column_attackevent");
     public static final String CSV_FILE_FORMAT_ATTACKEVENT = new String("com.contrastsecurity.csvdltool.csv_file_format_attackevent");
 
+    public static final String CSV_OUT_HEADER_SERVER = new String("com.contrastsecurity.csvdltool.csv_out_header_server");
+    public static final String CSV_COLUMN_SERVER = new String("com.contrastsecurity.csvdltool.csv_out_column_server");
+    public static final String CSV_FILE_FORMAT_SERVER = new String("com.contrastsecurity.csvdltool.csv_file_format_server");
+
     public static final String VUL_ONLY_PARENT_APP = new String("com.contrastsecurity.csvdltool.only_parent_app_check");
     public static final String INCLUDE_DESCRIPTION = new String("com.contrastsecurity.csvdltool.include_description");
     public static final String INCLUDE_STACKTRACE = new String("com.contrastsecurity.csvdltool.include_stacktrace");

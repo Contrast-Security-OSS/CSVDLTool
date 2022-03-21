@@ -66,7 +66,8 @@ import java.util.stream.Collectors;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.exec.OS;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
@@ -216,7 +217,7 @@ public class Main implements PropertyChangeListener {
 
     private PropertyChangeSupport support = new PropertyChangeSupport(this);
 
-    Logger logger = Logger.getLogger("csvdltool");
+    Logger logger = LogManager.getLogger("csvdltool");
 
     String currentTitle;
 
@@ -1713,8 +1714,6 @@ public class Main implements PropertyChangeListener {
                 }
             }
         });
-
-        Logger logger = Logger.getLogger("csvdltool");
 
         uiUpdate();
         int width = this.ps.getInt(PreferenceConstants.MEM_WIDTH);

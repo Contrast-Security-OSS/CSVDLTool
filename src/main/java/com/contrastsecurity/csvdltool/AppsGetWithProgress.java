@@ -33,7 +33,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -61,7 +62,7 @@ public class AppsGetWithProgress implements IRunnableWithProgress {
     private Set<Filter> severityFilterSet = new LinkedHashSet<Filter>();
     private Set<Filter> vulnTypeFilterSet = new LinkedHashSet<Filter>();
 
-    Logger logger = Logger.getLogger("csvdltool");
+    Logger logger = LogManager.getLogger("csvdltool");
 
     public AppsGetWithProgress(Shell shell, PreferenceStore ps, List<Organization> orgs) {
         this.shell = shell;

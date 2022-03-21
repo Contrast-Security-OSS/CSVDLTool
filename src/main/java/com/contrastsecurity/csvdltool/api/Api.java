@@ -45,7 +45,8 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.http.Header;
 import org.apache.http.HttpHeaders;
 import org.apache.http.message.BasicHeader;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -79,7 +80,7 @@ public abstract class Api {
         DELETE
     }
 
-    Logger logger = Logger.getLogger("csvdltool");
+    Logger logger = LogManager.getLogger("csvdltool");
 
     protected Shell shell;
     protected IPreferenceStore ps;

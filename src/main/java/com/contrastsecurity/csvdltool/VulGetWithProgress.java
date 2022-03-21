@@ -52,7 +52,8 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.exec.OS;
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -120,7 +121,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
     private boolean isIncludeDesc;
     private boolean isIncludeStackTrace;
 
-    Logger logger = Logger.getLogger("csvdltool");
+    Logger logger = LogManager.getLogger("csvdltool");
 
     public VulGetWithProgress(Shell shell, PreferenceStore ps, List<String> dstApps, Map<String, AppInfo> fullAppMap, Map<FilterEnum, Set<Filter>> filterMap, Date frDate,
             Date toDate, boolean isOnlyParentApp, boolean isIncludeDesc, boolean isIncludeStackTrace) {

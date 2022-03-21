@@ -26,7 +26,8 @@ package com.contrastsecurity.csvdltool.preference;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -70,7 +71,7 @@ public class BasePreferencePage extends PreferencePage {
     private Table table;
     private Button addBtn;
 
-    Logger logger = Logger.getLogger("csvdltool");
+    Logger logger = LogManager.getLogger("csvdltool");
 
     public BasePreferencePage() {
         super("基本設定");

@@ -32,7 +32,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -62,7 +63,7 @@ public class AttackEventsGetWithProgress implements IRunnableWithProgress {
     private Set<Filter> ruleFilterSet = new LinkedHashSet<Filter>();
     private Set<Filter> tagFilterSet = new LinkedHashSet<Filter>();
 
-    Logger logger = Logger.getLogger("csvdltool");
+    Logger logger = LogManager.getLogger("csvdltool");
 
     public AttackEventsGetWithProgress(Shell shell, PreferenceStore ps, List<Organization> orgs, Date frDate, Date toDate) {
         this.shell = shell;

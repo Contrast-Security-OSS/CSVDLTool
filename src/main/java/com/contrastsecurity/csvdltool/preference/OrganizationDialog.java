@@ -46,6 +46,7 @@ import com.contrastsecurity.csvdltool.api.Api;
 import com.contrastsecurity.csvdltool.api.OrganizationApi;
 import com.contrastsecurity.csvdltool.exception.ApiException;
 import com.contrastsecurity.csvdltool.exception.NonApiException;
+import com.contrastsecurity.csvdltool.exception.TsvException;
 import com.contrastsecurity.csvdltool.model.Organization;
 
 public class OrganizationDialog extends Dialog {
@@ -141,6 +142,8 @@ public class OrganizationDialog extends Dialog {
             MessageDialog.openWarning(getShell(), "組織情報の確認", String.format("TeamServerからエラーが返されました。\r\n%s", e.getMessage()));
         } catch (NonApiException e) {
             MessageDialog.openError(getShell(), "組織情報の確認", String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", e.getMessage()));
+        } catch (TsvException e) {
+            MessageDialog.openError(getShell(), "組織情報の確認", e.getMessage());
         } catch (Exception e) {
             MessageDialog.openError(getShell(), "組織情報の確認", String.format("不明なエラーです。ログファイルをご確認ください。\r\n%s", e.getMessage()));
         }

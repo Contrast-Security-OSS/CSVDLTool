@@ -448,7 +448,9 @@ public class Main implements PropertyChangeListener {
                     PrintWriter printWriter = new PrintWriter(stringWriter);
                     e.printStackTrace(printWriter);
                     String trace = stringWriter.toString();
-                    logger.error(trace);
+                    if (!(e.getTargetException() instanceof TsvException)) {
+                        logger.error(trace);
+                    }
                     String errorMsg = e.getTargetException().getMessage();
                     if (e.getTargetException() instanceof ApiException) {
                         MessageDialog.openWarning(shell, "アプリケーション一覧の取得", String.format("TeamServerからエラーが返されました。\r\n%s", errorMsg));
@@ -861,7 +863,9 @@ public class Main implements PropertyChangeListener {
                     PrintWriter printWriter = new PrintWriter(stringWriter);
                     e.printStackTrace(printWriter);
                     String trace = stringWriter.toString();
-                    logger.error(trace);
+                    if (!(e.getTargetException() instanceof TsvException)) {
+                        logger.error(trace);
+                    }
                     String exceptionMsg = e.getTargetException().getMessage();
                     if (e.getTargetException() instanceof ApiException) {
                         MessageDialog.openWarning(shell, "脆弱性情報の取得", String.format("TeamServerからエラーが返されました。\r\n%s", exceptionMsg));
@@ -955,7 +959,9 @@ public class Main implements PropertyChangeListener {
                     PrintWriter printWriter = new PrintWriter(stringWriter);
                     e.printStackTrace(printWriter);
                     String trace = stringWriter.toString();
-                    logger.error(trace);
+                    if (!(e.getTargetException() instanceof TsvException)) {
+                        logger.error(trace);
+                    }
                     String exceptionMsg = e.getTargetException().getMessage();
                     if (e.getTargetException() instanceof ApiException) {
                         MessageDialog.openWarning(shell, "ライブラリ情報の取得", String.format("TeamServerからエラーが返されました。\r\n%s", exceptionMsg));
@@ -1100,7 +1106,9 @@ public class Main implements PropertyChangeListener {
                     PrintWriter printWriter = new PrintWriter(stringWriter);
                     e.printStackTrace(printWriter);
                     String trace = stringWriter.toString();
-                    logger.error(trace);
+                    if (!(e.getTargetException() instanceof TsvException)) {
+                        logger.error(trace);
+                    }
                     String errorMsg = e.getTargetException().getMessage();
                     if (e.getTargetException() instanceof ApiException) {
                         MessageDialog.openWarning(shell, "攻撃イベント一覧の取得", String.format("TeamServerからエラーが返されました。\r\n%s", errorMsg));
@@ -1583,7 +1591,9 @@ public class Main implements PropertyChangeListener {
                     PrintWriter printWriter = new PrintWriter(stringWriter);
                     e.printStackTrace(printWriter);
                     String trace = stringWriter.toString();
-                    logger.error(trace);
+                    if (!(e.getTargetException() instanceof TsvException)) {
+                        logger.error(trace);
+                    }
                     String errorMsg = e.getTargetException().getMessage();
                     if (e.getTargetException() instanceof ApiException) {
                         MessageDialog.openWarning(shell, "サーバ一覧の取得", String.format("TeamServerからエラーが返されました。\r\n%s", errorMsg));

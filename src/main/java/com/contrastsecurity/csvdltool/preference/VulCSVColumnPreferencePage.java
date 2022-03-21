@@ -377,7 +377,7 @@ public class VulCSVColumnPreferencePage extends PreferencePage {
         ps.setValue(PreferenceConstants.CSV_OUT_HEADER_VUL, this.outCsvHeaderFlg.getSelection());
         ps.setValue(PreferenceConstants.CSV_COLUMN_VUL, new Gson().toJson(this.columnList));
         if (!errors.isEmpty()) {
-            MessageDialog.openError(getShell(), "脆弱性情報の出力設定", String.join("\r\n", errors));
+            MessageDialog.openError(getShell(), "脆弱性の出力設定", String.join("\r\n", errors));
             return false;
         }
         return true;

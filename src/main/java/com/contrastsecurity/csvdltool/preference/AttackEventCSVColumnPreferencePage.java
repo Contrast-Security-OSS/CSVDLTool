@@ -124,7 +124,7 @@ public class AttackEventCSVColumnPreferencePage extends PreferencePage {
                     });
                 }
             } catch (JsonSyntaxException e) {
-                MessageDialog.openError(getShell(), "脆弱性出力項目の読み込み", String.format("脆弱性出力項目の内容に問題があります。\r\n%s", columnJsonStr));
+                MessageDialog.openError(getShell(), "攻撃イベント出力項目の読み込み", String.format("攻撃イベント出力項目の内容に問題があります。\r\n%s", columnJsonStr));
                 columnList = new ArrayList<AttackEventCSVColumn>();
             }
         } else {
@@ -349,7 +349,7 @@ public class AttackEventCSVColumnPreferencePage extends PreferencePage {
         ps.setValue(PreferenceConstants.CSV_OUT_HEADER_ATTACKEVENT, this.outCsvHeaderFlg.getSelection());
         ps.setValue(PreferenceConstants.CSV_COLUMN_ATTACKEVENT, new Gson().toJson(this.columnList));
         if (!errors.isEmpty()) {
-            MessageDialog.openError(getShell(), "脆弱性情報の出力設定", String.join("\r\n", errors));
+            MessageDialog.openError(getShell(), "攻撃イベントの出力設定", String.join("\r\n", errors));
             return false;
         }
         return true;

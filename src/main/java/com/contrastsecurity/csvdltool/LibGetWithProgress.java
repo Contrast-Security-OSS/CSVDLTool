@@ -108,7 +108,7 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                 columnList = new Gson().fromJson(columnJsonStr, new TypeToken<List<LibCSVColumn>>() {
                 }.getType());
             } catch (JsonSyntaxException e) {
-                MessageDialog.openError(this.shell, "脆弱性出力項目の読み込み", String.format("脆弱性出力項目の内容に問題があります。\r\n%s", columnJsonStr));
+                MessageDialog.openError(this.shell, "ライブラリ情報出力項目の読み込み", String.format("ライブラリ情報出力項目の内容に問題があります。\r\n%s", columnJsonStr));
                 columnList = new ArrayList<LibCSVColumn>();
             }
         } else {

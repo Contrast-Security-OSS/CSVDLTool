@@ -38,11 +38,12 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 
 import com.contrastsecurity.csvdltool.Main;
+import com.contrastsecurity.csvdltool.Messages;
 
 public class AboutPage extends PreferencePage {
 
     public AboutPage() {
-        super("CSVDLToolについて");
+        super(Messages.getString("aboutpage.about_csvdltool")); //$NON-NLS-1$
     }
 
     @Override
@@ -63,24 +64,24 @@ public class AboutPage extends PreferencePage {
         iconGrDt.heightHint = 80;
         iconGrDt.widthHint = 300;
         icon.setLayoutData(iconGrDt);
-        Image iconImg = new Image(parent.getDisplay(), Main.class.getClassLoader().getResourceAsStream("banner.png"));
+        Image iconImg = new Image(parent.getDisplay(), Main.class.getClassLoader().getResourceAsStream("banner.png")); //$NON-NLS-1$
         icon.setImage(iconImg);
 
         Label versionTitleLbl = new Label(appGrp, SWT.NONE);
         GridData versionTitleLblGrDt = new GridData();
         versionTitleLblGrDt.widthHint = 100;
         versionTitleLbl.setLayoutData(versionTitleLblGrDt);
-        versionTitleLbl.setText("Version:");
+        versionTitleLbl.setText("Version:"); //$NON-NLS-1$
         Label versionValueLbl = new Label(appGrp, SWT.NONE);
         GridData versionValueLblGrDt = new GridData();
         versionValueLbl.setLayoutData(versionValueLblGrDt);
-        versionValueLbl.setText("1.7.0");
+        versionValueLbl.setText("1.7.0"); //$NON-NLS-1$
 
         Label copyrightLbl = new Label(appGrp, SWT.NONE);
         GridData copyrightLblGrDt = new GridData();
         copyrightLblGrDt.horizontalSpan = 2;
         copyrightLbl.setLayoutData(copyrightLblGrDt);
-        copyrightLbl.setText("Copyright (c) 2020 Contrast Security Japan G.K.");
+        copyrightLbl.setText("Copyright (c) 2020 Contrast Security Japan G.K."); //$NON-NLS-1$
 
         Composite licenseGrp = new Composite(parent, SWT.NONE);
         GridLayout licenseGrpGrLt = new GridLayout(1, false);
@@ -89,64 +90,65 @@ public class AboutPage extends PreferencePage {
         licenseGrp.setLayoutData(licenseGroupGrDt);
 
         Link licenseLinkLbl = new Link(licenseGrp, SWT.NONE);
-        licenseLinkLbl.setText("This software includes the work that is distributed in the <a>Apache License 2.0</a>");
+        licenseLinkLbl.setText("This software includes the work that is distributed in the <a>Apache License 2.0</a>"); //$NON-NLS-1$
         licenseLinkLbl.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
             public void widgetSelected(org.eclipse.swt.events.SelectionEvent event) {
                 try {
                     if (Desktop.isDesktopSupported()) {
-                        Desktop.getDesktop().browse(new URI("http://www.apache.org/licenses/LICENSE-2.0"));
+                        Desktop.getDesktop().browse(new URI("http://www.apache.org/licenses/LICENSE-2.0")); //$NON-NLS-1$
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         });
-        new Link(licenseGrp, SWT.NONE).setText("- commons-codec 1.11");
-        new Link(licenseGrp, SWT.NONE).setText("- commons-csv 1.8");
-        new Link(licenseGrp, SWT.NONE).setText("- commons-io 2.8.0");
-        new Link(licenseGrp, SWT.NONE).setText("- commons-lang3 3.4");
-        new Link(licenseGrp, SWT.NONE).setText("- commons-logging 1.2");
-        new Link(licenseGrp, SWT.NONE).setText("- gson 2.8.6");
-        new Link(licenseGrp, SWT.NONE).setText("- httpclient 4.5.13");
-        new Link(licenseGrp, SWT.NONE).setText("- httpcore 4.4.13");
-        new Link(licenseGrp, SWT.NONE).setText("- okhttp 4.9.2");
-        new Link(licenseGrp, SWT.NONE).setText("- log4j 1.2.17");
-        new Link(licenseGrp, SWT.NONE).setText("- snakeyaml 1.16");
+        new Link(licenseGrp, SWT.NONE).setText("- commons-codec 1.11"); //$NON-NLS-1$
+        new Link(licenseGrp, SWT.NONE).setText("- commons-csv 1.8"); //$NON-NLS-1$
+        new Link(licenseGrp, SWT.NONE).setText("- commons-io 2.8.0"); //$NON-NLS-1$
+        new Link(licenseGrp, SWT.NONE).setText("- commons-lang3 3.4"); //$NON-NLS-1$
+        new Link(licenseGrp, SWT.NONE).setText("- commons-logging 1.2"); //$NON-NLS-1$
+        new Link(licenseGrp, SWT.NONE).setText("- gson 2.8.6"); //$NON-NLS-1$
+        new Link(licenseGrp, SWT.NONE).setText("- httpclient 4.5.13"); //$NON-NLS-1$
+        new Link(licenseGrp, SWT.NONE).setText("- httpcore 4.4.13"); //$NON-NLS-1$
+        new Link(licenseGrp, SWT.NONE).setText("- okhttp 4.9.2"); //$NON-NLS-1$
+        new Link(licenseGrp, SWT.NONE).setText("- log4j-core 2.17.2"); //$NON-NLS-1$
+        new Link(licenseGrp, SWT.NONE).setText("- log4j-api 2.17.2"); //$NON-NLS-1$
+        new Link(licenseGrp, SWT.NONE).setText("- snakeyaml 1.16"); //$NON-NLS-1$
 
         Link eplLicenseLinkLbl = new Link(licenseGrp, SWT.NONE);
-        eplLicenseLinkLbl.setText("This software includes the work that is distributed in the <a>Eclipse Public License 1.0</a>");
+        eplLicenseLinkLbl.setText("This software includes the work that is distributed in the <a>Eclipse Public License 1.0</a>"); //$NON-NLS-1$
         eplLicenseLinkLbl.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
             public void widgetSelected(org.eclipse.swt.events.SelectionEvent event) {
                 try {
                     if (Desktop.isDesktopSupported()) {
-                        Desktop.getDesktop().browse(new URI("https://www.eclipse.org/legal/epl-v10.html"));
+                        Desktop.getDesktop().browse(new URI("https://www.eclipse.org/legal/epl-v10.html")); //$NON-NLS-1$
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         });
-        new Link(licenseGrp, SWT.NONE).setText("- commands 3.3.0-I20070605-0010");
-        new Link(licenseGrp, SWT.NONE).setText("- common 3.3.0-v20070426");
-        new Link(licenseGrp, SWT.NONE).setText("- ide 3.3.0-I20070620");
-        new Link(licenseGrp, SWT.NONE).setText("- workbench 3.3.0-I20070608-1100");
-        new Link(licenseGrp, SWT.NONE).setText("- jface 3.3.0-I20070606-0010");
-        new Link(licenseGrp, SWT.NONE).setText("- org.eclipse.swt.win32.win32.x86 4.3");
+        new Link(licenseGrp, SWT.NONE).setText("- commands 3.3.0-I20070605-0010"); //$NON-NLS-1$
+        new Link(licenseGrp, SWT.NONE).setText("- common 3.3.0-v20070426"); //$NON-NLS-1$
+        new Link(licenseGrp, SWT.NONE).setText("- ide 3.3.0-I20070620"); //$NON-NLS-1$
+        new Link(licenseGrp, SWT.NONE).setText("- workbench 3.3.0-I20070608-1100"); //$NON-NLS-1$
+        new Link(licenseGrp, SWT.NONE).setText("- jface 3.3.0-I20070606-0010"); //$NON-NLS-1$
+        new Link(licenseGrp, SWT.NONE).setText("- org.eclipse.swt.win32.win32.x86 4.3"); //$NON-NLS-1$
 
         Link epl2LicenseLinkLbl = new Link(licenseGrp, SWT.NONE);
-        epl2LicenseLinkLbl.setText("This software includes the work that is distributed in the <a>Eclipse Public License 2.0</a>");
+        epl2LicenseLinkLbl.setText("This software includes the work that is distributed in the <a>Eclipse Public License 2.0</a>"); //$NON-NLS-1$
         epl2LicenseLinkLbl.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
             public void widgetSelected(org.eclipse.swt.events.SelectionEvent event) {
                 try {
                     if (Desktop.isDesktopSupported()) {
-                        Desktop.getDesktop().browse(new URI("https://www.eclipse.org/legal/epl-v20.html"));
+                        Desktop.getDesktop().browse(new URI("https://www.eclipse.org/legal/epl-v20.html")); //$NON-NLS-1$
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         });
-        new Link(licenseGrp, SWT.NONE).setText("- org.eclipse.swt.cocoa.macosx.x86_64 3.109.0");
+        new Link(licenseGrp, SWT.NONE).setText("- org.eclipse.swt.cocoa.macosx.x86_64 3.109.0"); //$NON-NLS-1$
 
         noDefaultAndApplyButton();
         return parent;

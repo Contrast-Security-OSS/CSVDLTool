@@ -62,7 +62,6 @@ public class TsvAuthorizeApi extends Api {
 
     @Override
     protected Object convert(String response) {
-        System.out.println(response);
         Gson gson = new Gson();
         Type contType = new TypeToken<ContrastJson>() {
         }.getType();

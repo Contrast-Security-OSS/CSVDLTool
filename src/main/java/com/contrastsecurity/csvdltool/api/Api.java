@@ -133,6 +133,9 @@ public abstract class Api {
             if (!tsvSettings.isTsv_enabled()) {
                 this.ps.setValue(PreferenceConstants.TSV_STATUS, TsvStatusEnum.SKIP.name());
             } else {
+                if (tsvSettings.getTsv_type() == null) {
+                    throw new TsvException("二段階認証コードの通知方法の取得に失敗しました。\r\n二段階認証の設定に問題がないかご確認ください。");
+                }
                 if (tsvSettings.getTsv_type().equals("EMAIL")) {
                     Api tsvInitializeApi = new TsvInitializeApi(this.shell, this.ps, this.org, this.contrastUrl, this.userName, this.serviceKey);
                     String rtnMsg = (String) tsvInitializeApi.post();
@@ -188,6 +191,11 @@ public abstract class Api {
         return this.convert(response);
     }
 
+    public Object delete() throws Exception {
+        String response = this.getResponse(HttpMethod.DELETE);
+        return this.convert(response);
+    }
+
     public boolean isSuccess() {
         return success;
     }
@@ -229,7 +237,8 @@ public abstract class Api {
                 requestBuilder = new Request.Builder().url(url).put(getBody());
                 break;
             case DELETE:
-                return "";
+                requestBuilder = new Request.Builder().url(url).delete(getBody());
+                break;
             default:
                 requestBuilder = new Request.Builder().url(url).get();
         }

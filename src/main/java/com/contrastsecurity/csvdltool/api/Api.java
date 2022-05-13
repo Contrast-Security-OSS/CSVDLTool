@@ -306,6 +306,8 @@ public abstract class Api {
                 response = httpClient.newCall(request).execute();
                 if (response.code() == 200) {
                     return response.body().string();
+                } else if (response.code() == 400) {
+                    throw new ApiException(response.body().string());
                 } else if (response.code() == 401) {
                     throw new ApiException(response.body().string());
                 } else if (response.code() == 403) {

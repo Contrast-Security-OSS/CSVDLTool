@@ -54,7 +54,7 @@ public class TsvAuthorizeApi extends Api {
     }
 
     @Override
-    protected RequestBody getBody() {
+    protected RequestBody getBody() throws Exception {
         MediaType mediaTypeJson = MediaType.parse("application/json; charset=UTF-8");
         String json = String.format("{\"code\":\"%s\"}", this.code);
         return RequestBody.create(json, mediaTypeJson);

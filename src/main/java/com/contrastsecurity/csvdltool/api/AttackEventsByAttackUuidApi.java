@@ -63,7 +63,7 @@ public class AttackEventsByAttackUuidApi extends Api {
     }
 
     @Override
-    protected RequestBody getBody() {
+    protected RequestBody getBody() throws Exception {
         MediaType mediaTypeJson = MediaType.parse("application/json; charset=UTF-8");
         String json = String.format("{\"attackUuid\":\"%s\",\"quickFilter\":\"ALL\",\"startDate\":\"%s\",\"endDate\":\"%s\"}", this.attackUuid, this.startDate.getTime(),
                 this.endDate.getTime());

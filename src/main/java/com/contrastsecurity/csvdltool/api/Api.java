@@ -220,7 +220,7 @@ public abstract class Api {
         return headers;
     }
 
-    protected RequestBody getBody() {
+    protected RequestBody getBody() throws Exception {
         return null;
     }
 

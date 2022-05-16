@@ -59,7 +59,7 @@ public class PutTagsToAttackEventsApi extends Api {
     }
 
     @Override
-    protected RequestBody getBody() {
+    protected RequestBody getBody() throws Exception {
         String addTag = "";
         if (!this.tag.isEmpty()) {
             addTag = String.format("\"%s\"", this.tag);

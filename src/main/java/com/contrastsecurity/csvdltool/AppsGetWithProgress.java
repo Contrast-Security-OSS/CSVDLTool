@@ -158,6 +158,7 @@ public class AppsGetWithProgress implements IRunnableWithProgress {
                         }
                     }
                     sub3Monitor.worked(1);
+                    Thread.sleep(50);
                 }
                 sub3Monitor.done();
                 Thread.sleep(500);

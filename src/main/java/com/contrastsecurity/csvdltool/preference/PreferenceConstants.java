@@ -25,8 +25,12 @@ package com.contrastsecurity.csvdltool.preference;
 
 public class PreferenceConstants {
     public static final String CONTRAST_URL = new String("com.contrastsecurity.csvdltool.contrast_url");
-    public static final String SERVICE_KEY = new String("com.contrastsecurity.csvdltool.service_key");
     public static final String USERNAME = new String("com.contrastsecurity.csvdltool.username");
+    public static final String SERVICE_KEY = new String("com.contrastsecurity.csvdltool.service_key");
+    public static final String PASSWORD = new String("com.contrastsecurity.csvdltool.password");
+    public static final String BASIC_AUTH_STATUS = new String("com.contrastsecurity.csvdltool.basic_auth_status");
+    public static final String PASS_TYPE = new String("com.contrastsecurity.csvdltool.pass_type");
+    public static final String XSRF_TOKEN = new String("com.contrastsecurity.csvdltool.xsrf_token");
     public static final String TARGET_ORGS = new String("com.contrastsecurity.csvdltool.target_orgs");
     public static final String TSV_STATUS = new String("com.contrastsecurity.csvdltool.tsv_status");
 

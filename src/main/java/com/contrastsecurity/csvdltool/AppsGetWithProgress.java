@@ -101,6 +101,7 @@ public class AppsGetWithProgress implements IRunnableWithProgress {
                     }
                     sub1Monitor.worked(1);
                 } catch (ApiException ae) {
+                    throw ae;
                 }
                 sub1Monitor.done();
 
@@ -129,6 +130,7 @@ public class AppsGetWithProgress implements IRunnableWithProgress {
                     }
                     sub2Monitor.done();
                 } catch (ApiException ae) {
+                    throw ae;
                 }
                 // アプリケーション一覧を取得
                 monitor.subTask("アプリケーション一覧の情報を取得...");

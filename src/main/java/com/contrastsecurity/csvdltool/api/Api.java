@@ -26,6 +26,10 @@ package com.contrastsecurity.csvdltool.api;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.Type;
+import java.net.CookieManager;
+import java.net.CookiePolicy;
+import java.net.HttpCookie;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.nio.charset.StandardCharsets;
@@ -53,18 +57,27 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Shell;
 import org.jasypt.util.text.BasicTextEncryptor;
 
+import com.contrastsecurity.csvdltool.BasicAuthStatusEnum;
+import com.contrastsecurity.csvdltool.CSVDLToolShell;
 import com.contrastsecurity.csvdltool.Main;
+import com.contrastsecurity.csvdltool.Main.AuthType;
+import com.contrastsecurity.csvdltool.PasswordDialog;
 import com.contrastsecurity.csvdltool.TsvDialog;
 import com.contrastsecurity.csvdltool.TsvStatusEnum;
 import com.contrastsecurity.csvdltool.exception.ApiException;
 import com.contrastsecurity.csvdltool.exception.NonApiException;
 import com.contrastsecurity.csvdltool.exception.TsvException;
+import com.contrastsecurity.csvdltool.json.ContrastJson;
 import com.contrastsecurity.csvdltool.model.Organization;
 import com.contrastsecurity.csvdltool.model.TsvSettings;
 import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import okhttp3.Authenticator;
 import okhttp3.Credentials;
+import okhttp3.FormBody;
+import okhttp3.JavaNetCookieJar;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -90,6 +103,7 @@ public abstract class Api {
     protected String serviceKey;
     protected boolean success;
     protected int totalCount;
+    private String pass;
     private String code;
 
     public Api(Shell shell, IPreferenceStore ps, Organization org) {
@@ -116,13 +130,84 @@ public abstract class Api {
         return null;
     }
 
-    public Object getWithoutCheckTsv() throws Exception {
-        String response = this.getResponse(HttpMethod.GET);
-        return this.convert(response);
+    private void basicAuth() {
+        if (((CSVDLToolShell) this.shell).getMain().getAuthType() != AuthType.BASIC) {
+            return;
+        }
+        BasicAuthStatusEnum basicAuthStatusEnum = BasicAuthStatusEnum.NONE;
+        String basicAuthStatusEnumStr = this.ps.getString(PreferenceConstants.BASIC_AUTH_STATUS);
+        if (basicAuthStatusEnumStr != null && !basicAuthStatusEnumStr.isEmpty()) {
+            basicAuthStatusEnum = BasicAuthStatusEnum.valueOf(this.ps.getString(PreferenceConstants.BASIC_AUTH_STATUS));
+        }
+        if (BasicAuthStatusEnum.AUTH == basicAuthStatusEnum) {
+            return;
+        }
+        boolean isNeedPassInput = false;
+        if (this.ps.getString(PreferenceConstants.PASS_TYPE).equals("input")) {
+            if (this.ps.getString(PreferenceConstants.PASSWORD).isEmpty()) {
+                isNeedPassInput = true;
+            }
+        } else {
+            BasicTextEncryptor encryptor = new BasicTextEncryptor();
+            encryptor.setPassword(Main.MASTER_PASSWORD);
+            try {
+                pass = encryptor.decrypt(ps.getString(PreferenceConstants.PASSWORD));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        if (isNeedPassInput) {
+            PasswordDialog passwordDialog = new PasswordDialog(shell);
+            shell.getDisplay().syncExec(new Runnable() {
+                @Override
+                public void run() {
+                    int result = passwordDialog.open();
+                    if (IDialogConstants.OK_ID != result) {
+                        pass = "";
+                    }
+                    pass = passwordDialog.getPass();
+                    if (pass == null) {
+                        pass = "";
+                    }
+                }
+            });
+        }
+        if (pass == null) {
+            return;
+        }
+        CookieManager cookieManager = new CookieManager();
+        cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
+        ((CSVDLToolShell) this.shell).getMain().setCookieManager(cookieManager);
+        OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();
+        clientBuilder.cookieJar(new JavaNetCookieJar(cookieManager));
+        RequestBody formBody = new FormBody.Builder().add("ui", "true").add("username", this.userName).add("password", pass).add("sso", "").build();
+        String url = String.format("%s/authenticate.html", this.contrastUrl);
+        Request.Builder requestBuilder = new Request.Builder().url(url).post(formBody);
+        OkHttpClient httpClient = null;
+        Request request = requestBuilder.build();
+        Response response = null;
+        httpClient = clientBuilder.build();
+        try {
+            response = httpClient.newCall(request).execute();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        final List<HttpCookie> cookies = cookieManager.getCookieStore().getCookies();
+        String xsrf_token = null;
+        for (HttpCookie c : cookies) {
+            if (c.getName().equals("XSRF-TOKEN")) {
+                xsrf_token = c.getValue();
+                this.ps.setValue(PreferenceConstants.XSRF_TOKEN, xsrf_token);
+                this.ps.setValue(PreferenceConstants.BASIC_AUTH_STATUS, BasicAuthStatusEnum.AUTH.name());
+                break;
+            }
+        }
     }
 
-    public Object get() throws Exception {
-        // 二段階認証チェック ここから
+    private void tsvCheck() throws Exception {
+        if (((CSVDLToolShell) this.shell).getMain().getAuthType() == AuthType.BASIC) {
+            return;
+        }
         TsvStatusEnum tsvStatusEnum = TsvStatusEnum.NONE;
         String tsvStatusEnumStr = this.ps.getString(PreferenceConstants.TSV_STATUS);
         if (tsvStatusEnumStr != null && !tsvStatusEnumStr.isEmpty()) {
@@ -176,22 +261,38 @@ public abstract class Api {
                 }
             }
         }
-        // 二段階認証チェック ここまで
+    }
+
+    public Object getWithoutCheckTsv() throws Exception {
+        basicAuth();
+        String response = this.getResponse(HttpMethod.GET);
+        return this.convert(response);
+    }
+
+    public Object get() throws Exception {
+        basicAuth();
+        tsvCheck();
         String response = this.getResponse(HttpMethod.GET);
         return this.convert(response);
     }
 
     public Object post() throws Exception {
+        basicAuth();
+        tsvCheck();
         String response = this.getResponse(HttpMethod.POST);
         return this.convert(response);
     }
 
     public Object put() throws Exception {
+        basicAuth();
+        tsvCheck();
         String response = this.getResponse(HttpMethod.PUT);
         return this.convert(response);
     }
 
     public Object delete() throws Exception {
+        basicAuth();
+        tsvCheck();
         String response = this.getResponse(HttpMethod.DELETE);
         return this.convert(response);
     }
@@ -209,14 +310,18 @@ public abstract class Api {
     protected abstract Object convert(String response);
 
     protected List<Header> getHeaders() {
-        String apiKey = this.org.getApikey();
-        String auth = String.format("%s:%s", this.userName, this.serviceKey);
-        byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(StandardCharsets.ISO_8859_1));
-        String authHeader = new String(encodedAuth);
         List<Header> headers = new ArrayList<Header>();
-        headers.add(new BasicHeader(HttpHeaders.ACCEPT, "application/json"));
-        headers.add(new BasicHeader("API-Key", apiKey));
-        headers.add(new BasicHeader(HttpHeaders.AUTHORIZATION, authHeader));
+        if (((CSVDLToolShell) this.shell).getMain().getAuthType() == AuthType.BASIC) {
+            headers.add(new BasicHeader("X-XSRF-TOKEN", ps.getString(PreferenceConstants.XSRF_TOKEN)));
+        } else {
+            String apiKey = this.org.getApikey();
+            String auth = String.format("%s:%s", this.userName, this.serviceKey);
+            byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(StandardCharsets.ISO_8859_1));
+            String authHeader = new String(encodedAuth);
+            headers.add(new BasicHeader(HttpHeaders.ACCEPT, "application/json"));
+            headers.add(new BasicHeader("API-Key", apiKey));
+            headers.add(new BasicHeader(HttpHeaders.AUTHORIZATION, authHeader));
+        }
         return headers;
     }
 
@@ -228,6 +333,10 @@ public abstract class Api {
         String url = this.getUrl();
         logger.trace(url);
         OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();
+        if (((CSVDLToolShell) this.shell).getMain().getAuthType() == AuthType.BASIC) {
+            CookieManager cookieManager = ((CSVDLToolShell) this.shell).getMain().getCookieManager();
+            clientBuilder.cookieJar(new JavaNetCookieJar(cookieManager));
+        }
         Request.Builder requestBuilder = null;
         switch (httpMethod) {
             case POST:
@@ -311,6 +420,17 @@ public abstract class Api {
                 } else if (response.code() == 401) {
                     throw new ApiException(response.body().string());
                 } else if (response.code() == 403) {
+                    if (((CSVDLToolShell) this.shell).getMain().getAuthType() == AuthType.BASIC) {
+                        Gson gson = new Gson();
+                        Type contrastType = new TypeToken<ContrastJson>() {
+                        }.getType();
+                        ContrastJson contrastJson = gson.fromJson(response.body().string(), contrastType);
+                        if (contrastJson.getSuccess().equals("false") && contrastJson.getMessages().contains("Invalid CSRF token")) {
+                            ps.setValue(PreferenceConstants.BASIC_AUTH_STATUS, BasicAuthStatusEnum.NONE.name());
+                            ps.setValue(PreferenceConstants.XSRF_TOKEN, "");
+                            throw new ApiException("認証が必要です。もう一度実行してください。");
+                        }
+                    }
                     throw new ApiException(response.body().string());
                 } else {
                     logger.warn(response.code());

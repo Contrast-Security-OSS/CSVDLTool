@@ -40,6 +40,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
+import java.net.CookieManager;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
@@ -218,18 +219,33 @@ public class Main implements PropertyChangeListener {
     private PreferenceStore ps;
 
     private PropertyChangeSupport support = new PropertyChangeSupport(this);
+    private CookieManager cookieManager;
+
+    public enum AuthType {
+        TOKEN,
+        BASIC
+    }
 
     Logger logger = LogManager.getLogger("csvdltool");
 
     String currentTitle;
+    private AuthType authType;
 
     /**
      * @param args
      */
     public static void main(String[] args) {
         Main main = new Main();
+        main.authType = AuthType.TOKEN;
+        if (System.getProperty("auth") != null && System.getProperty("auth").equals("basic")) {
+            main.authType = AuthType.BASIC;
+        }
         main.initialize();
         main.createPart();
+    }
+
+    public AuthType getAuthType() {
+        return authType;
     }
 
     private void initialize() {
@@ -249,6 +265,8 @@ public class Main implements PropertyChangeListener {
             e.printStackTrace();
         }
         try {
+            this.ps.setDefault(PreferenceConstants.BASIC_AUTH_STATUS, BasicAuthStatusEnum.NONE.name());
+            this.ps.setDefault(PreferenceConstants.PASS_TYPE, "input");
             this.ps.setDefault(PreferenceConstants.TSV_STATUS, TsvStatusEnum.NONE.name());
             this.ps.setDefault(PreferenceConstants.PROXY_AUTH, "none");
             this.ps.setDefault(PreferenceConstants.CONNECTION_TIMEOUT, 3000);
@@ -328,6 +346,8 @@ public class Main implements PropertyChangeListener {
                 ps.setValue(PreferenceConstants.INCLUDE_STACKTRACE, includeStackTraceChk.getSelection());
                 ps.setValue(PreferenceConstants.ONLY_HAS_CVE, onlyHasCVEChk.getSelection());
                 ps.setValue(PreferenceConstants.INCLUDE_CVE_DETAIL, includeCVEDetailChk.getSelection());
+                ps.setValue(PreferenceConstants.BASIC_AUTH_STATUS, "");
+                ps.setValue(PreferenceConstants.XSRF_TOKEN, "");
                 ps.setValue(PreferenceConstants.PROXY_TMP_USER, "");
                 ps.setValue(PreferenceConstants.PROXY_TMP_PASS, "");
                 ps.setValue(PreferenceConstants.TSV_STATUS, "");
@@ -471,6 +491,7 @@ public class Main implements PropertyChangeListener {
                     } else {
                         MessageDialog.openError(shell, "アプリケーション一覧の取得", String.format("不明なエラーです。ログファイルをご確認ください。\r\n%s", errorMsg));
                     }
+                    return;
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -1821,7 +1842,7 @@ public class Main implements PropertyChangeListener {
             @Override
             public void widgetSelected(SelectionEvent event) {
                 PreferenceManager mgr = new PreferenceManager();
-                PreferenceNode baseNode = new PreferenceNode("base", new BasePreferencePage());
+                PreferenceNode baseNode = new PreferenceNode("base", new BasePreferencePage(authType));
                 PreferenceNode connectionNode = new PreferenceNode("connection", new ConnectionPreferencePage());
                 PreferenceNode otherNode = new PreferenceNode("other", new OtherPreferencePage());
                 PreferenceNode csvNode = new PreferenceNode("csv", new CSVPreferencePage());
@@ -2244,6 +2265,14 @@ public class Main implements PropertyChangeListener {
             System.out.println("tsv main");
         }
 
+    }
+
+    public CookieManager getCookieManager() {
+        return cookieManager;
+    }
+
+    public void setCookieManager(CookieManager cookieManager) {
+        this.cookieManager = cookieManager;
     }
 
     /**

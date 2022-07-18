@@ -52,8 +52,10 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
+import org.jasypt.util.text.BasicTextEncryptor;
 
 import com.contrastsecurity.csvdltool.Main;
+import com.contrastsecurity.csvdltool.Main.AuthType;
 import com.contrastsecurity.csvdltool.ProxyAuthDialog;
 import com.contrastsecurity.csvdltool.model.Organization;
 import com.google.gson.Gson;
@@ -63,18 +65,23 @@ import com.google.gson.reflect.TypeToken;
 public class BasePreferencePage extends PreferencePage {
 
     private Text contrastUrlTxt;
-    private Text serviceKeyTxt;
     private Text userNameTxt;
+    private Text serviceKeyTxt;
+    private Button passInput;
+    private Button passSave;
+    private Text passTxt;
     private List<Organization> orgList;
     private List<Button> checkBoxList = new ArrayList<Button>();
     private List<Integer> selectedIdxes = new ArrayList<Integer>();
     private Table table;
     private Button addBtn;
+    private AuthType authType;
 
     Logger logger = LogManager.getLogger("csvdltool");
 
-    public BasePreferencePage() {
+    public BasePreferencePage(AuthType authType) {
         super("基本設定");
+        this.authType = authType;
     }
 
     @Override
@@ -122,31 +129,6 @@ public class BasePreferencePage extends PreferencePage {
             }
         });
 
-        new Label(baseGrp, SWT.LEFT).setText("Service Key：");
-        new Label(baseGrp, SWT.LEFT).setText("");
-        serviceKeyTxt = new Text(baseGrp, SWT.BORDER);
-        serviceKeyTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        serviceKeyTxt.setText(ps.getString(PreferenceConstants.SERVICE_KEY));
-        serviceKeyTxt.setMessage("個人のサービスキー");
-        serviceKeyTxt.addListener(SWT.FocusIn, new Listener() {
-            public void handleEvent(Event e) {
-                serviceKeyTxt.selectAll();
-            }
-        });
-        serviceKeyTxt.addModifyListener(new ModifyListener() {
-            @Override
-            public void modifyText(ModifyEvent e) {
-                String contrastUrlStr = contrastUrlTxt.getText().trim();
-                String serviceKeyStr = serviceKeyTxt.getText().trim();
-                String userNameStr = userNameTxt.getText().trim();
-                if (contrastUrlStr.isEmpty() || serviceKeyStr.isEmpty() || userNameStr.isEmpty()) {
-                    addBtn.setEnabled(false);
-                } else {
-                    addBtn.setEnabled(true);
-                }
-            }
-        });
-
         new Label(baseGrp, SWT.LEFT).setText("Username：");
         Label icon = new Label(baseGrp, SWT.NONE);
         Image iconImg = new Image(parent.getDisplay(), Main.class.getClassLoader().getResourceAsStream("help.png"));
@@ -174,6 +156,117 @@ public class BasePreferencePage extends PreferencePage {
                 }
             }
         });
+
+        if (this.authType == AuthType.BASIC) {
+            Label passwordLbl = new Label(baseGrp, SWT.LEFT);
+            GridData passwordLblGrDt = new GridData();
+            passwordLblGrDt.verticalAlignment = SWT.TOP;
+            passwordLbl.setLayoutData(passwordLblGrDt);
+            passwordLbl.setText("Password：");
+            new Label(baseGrp, SWT.LEFT).setText("");
+            Group passwordGrp = new Group(baseGrp, SWT.NONE);
+            GridLayout passwordGrpLt = new GridLayout(2, false);
+            passwordGrpLt.marginWidth = 15;
+            passwordGrpLt.horizontalSpacing = 10;
+            passwordGrp.setLayout(passwordGrpLt);
+            GridData passwordGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
+            passwordGrp.setLayoutData(passwordGrpGrDt);
+            // ========== Save or Input ========== //
+            Composite passInputTypeGrp = new Composite(passwordGrp, SWT.NONE);
+            GridLayout passInputTypeGrpLt = new GridLayout(1, false);
+            passInputTypeGrpLt.marginWidth = 0;
+            passInputTypeGrpLt.marginBottom = -5;
+            passInputTypeGrpLt.verticalSpacing = 10;
+            passInputTypeGrp.setLayout(passInputTypeGrpLt);
+            GridData passInputTypeGrpGrDt = new GridData();
+            passInputTypeGrpGrDt.horizontalSpan = 2;
+            passInputTypeGrp.setLayoutData(passInputTypeGrpGrDt);
+
+            passInput = new Button(passInputTypeGrp, SWT.RADIO);
+            passInput.setText("都度、パスワードを入力する（ツールを終了すると消えます）");
+            passInput.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    Button source = (Button) e.getSource();
+                    if (source.getSelection()) {
+                        passTxt.setText("");
+                        passTxt.setEnabled(false);
+                    }
+                }
+
+            });
+
+            passSave = new Button(passInputTypeGrp, SWT.RADIO);
+            passSave.setText("パスワードを保存する（パスワードは暗号化されます）");
+            passSave.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    Button source = (Button) e.getSource();
+                    if (source.getSelection()) {
+                        passTxt.setEnabled(true);
+                    }
+                }
+
+            });
+
+            Composite passTxtGrp = new Composite(passwordGrp, SWT.NONE);
+            GridLayout passTxtGrpLt = new GridLayout(2, false);
+            passTxtGrpLt.marginTop = -5;
+            passTxtGrpLt.marginLeft = 12;
+            passTxtGrp.setLayout(passTxtGrpLt);
+            GridData passTxtGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
+            passTxtGrp.setLayoutData(passTxtGrpGrDt);
+            // ========== パスワード ========== //
+            passTxt = new Text(passTxtGrp, SWT.BORDER);
+            passTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+            passTxt.setEchoChar('*');
+            passTxt.addListener(SWT.FocusIn, new Listener() {
+                public void handleEvent(Event e) {
+                    passTxt.selectAll();
+                }
+            });
+
+            if (ps.getString(PreferenceConstants.PASS_TYPE).equals("input")) {
+                passInput.setSelection(true);
+                passTxt.setText("");
+                passTxt.setEnabled(false);
+            } else if (ps.getString(PreferenceConstants.PASS_TYPE).equals("save")) {
+                passSave.setSelection(true);
+                BasicTextEncryptor encryptor = new BasicTextEncryptor();
+                encryptor.setPassword(Main.MASTER_PASSWORD);
+                try {
+                    passTxt.setText(encryptor.decrypt(ps.getString(PreferenceConstants.PASSWORD)));
+                } catch (Exception e) {
+                    MessageDialog.openError(getShell(), "接続設定", "パスワードの復号化に失敗しました。\r\nパスワードの設定をやり直してください。");
+                    passTxt.setText("");
+                }
+            }
+        } else {
+            new Label(baseGrp, SWT.LEFT).setText("Service Key：");
+            new Label(baseGrp, SWT.LEFT).setText("");
+            serviceKeyTxt = new Text(baseGrp, SWT.BORDER);
+            serviceKeyTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+            serviceKeyTxt.setText(ps.getString(PreferenceConstants.SERVICE_KEY));
+            serviceKeyTxt.setMessage("個人のサービスキー");
+            serviceKeyTxt.addListener(SWT.FocusIn, new Listener() {
+                public void handleEvent(Event e) {
+                    serviceKeyTxt.selectAll();
+                }
+            });
+            serviceKeyTxt.addModifyListener(new ModifyListener() {
+                @Override
+                public void modifyText(ModifyEvent e) {
+                    String contrastUrlStr = contrastUrlTxt.getText().trim();
+                    String serviceKeyStr = serviceKeyTxt.getText().trim();
+                    String userNameStr = userNameTxt.getText().trim();
+                    if (contrastUrlStr.isEmpty() || serviceKeyStr.isEmpty() || userNameStr.isEmpty()) {
+                        addBtn.setEnabled(false);
+                    } else {
+                        addBtn.setEnabled(true);
+                    }
+                }
+            });
+        }
 
         // ========== 組織テーブル ========== //
         Group orgTableGrp = new Group(composite, SWT.NONE);
@@ -249,10 +342,18 @@ public class BasePreferencePage extends PreferencePage {
         addBtn = new Button(buttonGrp, SWT.NULL);
         addBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         addBtn.setText("追加");
-        if (contrastUrlTxt.getText().trim().isEmpty() || serviceKeyTxt.getText().trim().isEmpty() || userNameTxt.getText().trim().isEmpty()) {
-            addBtn.setEnabled(false);
+        if (this.authType == AuthType.BASIC) {
+            if (contrastUrlTxt.getText().trim().isEmpty() || userNameTxt.getText().trim().isEmpty()) {
+                addBtn.setEnabled(false);
+            } else {
+                addBtn.setEnabled(true);
+            }
         } else {
-            addBtn.setEnabled(true);
+            if (contrastUrlTxt.getText().trim().isEmpty() || userNameTxt.getText().trim().isEmpty() || serviceKeyTxt.getText().trim().isEmpty()) {
+                addBtn.setEnabled(false);
+            } else {
+                addBtn.setEnabled(true);
+            }
         }
         addBtn.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -370,20 +471,32 @@ public class BasePreferencePage extends PreferencePage {
         if (ps == null) {
             return true;
         }
+        List<String> errors = new ArrayList<String>();
         String url = this.contrastUrlTxt.getText().trim();
-        String svc = this.serviceKeyTxt.getText().trim();
         String usr = this.userNameTxt.getText().trim();
-        if (url.isEmpty() || svc.isEmpty() || usr.isEmpty()) {
-            if (!this.orgList.isEmpty()) {
-                MessageDialog.openError(getShell(), "基本設定", "組織一覧に設定が残っている場合、Contrast URL, Service Key, Usernameはブランクにできません。\r\nこれらをブランクにする場合は組織一覧の設定をすべて削除してください。");
-                contrastUrlTxt.setText(ps.getString(PreferenceConstants.CONTRAST_URL));
-                serviceKeyTxt.setText(ps.getString(PreferenceConstants.SERVICE_KEY));
-                userNameTxt.setText(ps.getString(PreferenceConstants.USERNAME));
-                return false;
+        if (this.authType == AuthType.BASIC) {
+            if (url.isEmpty() || usr.isEmpty()) {
+                if (!this.orgList.isEmpty()) {
+                    errors.add("・組織一覧に設定が残っている場合、Contrast URL, Username, Service Keyはブランクにできません。\\r\\nこれらをブランクにする場合は組織一覧の設定をすべて削除してください。");
+                    contrastUrlTxt.setText(ps.getString(PreferenceConstants.CONTRAST_URL));
+                    serviceKeyTxt.setText(ps.getString(PreferenceConstants.SERVICE_KEY));
+                    userNameTxt.setText(ps.getString(PreferenceConstants.USERNAME));
+                    return false;
+                }
+            }
+        } else {
+            String svc = this.serviceKeyTxt.getText().trim();
+            if (url.isEmpty() || usr.isEmpty() || svc.isEmpty()) {
+                if (!this.orgList.isEmpty()) {
+                    errors.add("・組織一覧に設定が残っている場合、Contrast URL, Usernameはブランクにできません。\\r\\nこれらをブランクにする場合は組織一覧の設定をすべて削除してください。");
+                    contrastUrlTxt.setText(ps.getString(PreferenceConstants.CONTRAST_URL));
+                    serviceKeyTxt.setText(ps.getString(PreferenceConstants.SERVICE_KEY));
+                    userNameTxt.setText(ps.getString(PreferenceConstants.USERNAME));
+                    return false;
+                }
             }
         }
         ps.setValue(PreferenceConstants.CONTRAST_URL, url);
-        ps.setValue(PreferenceConstants.SERVICE_KEY, svc);
         ps.setValue(PreferenceConstants.USERNAME, usr);
         for (Organization org : this.orgList) {
             org.setValid(false);
@@ -394,7 +507,30 @@ public class BasePreferencePage extends PreferencePage {
                 }
             }
         }
+        if (this.authType == AuthType.BASIC) {
+            if (passInput.getSelection()) {
+                ps.setValue(PreferenceConstants.PASS_TYPE, "input");
+                ps.setValue(PreferenceConstants.PASSWORD, "");
+            } else if (passSave.getSelection()) {
+                ps.setValue(PreferenceConstants.PASS_TYPE, "save");
+                if (this.passTxt.getText().isEmpty()) {
+                    errors.add("・パスワードを設定してください。");
+                } else {
+                    BasicTextEncryptor encryptor = new BasicTextEncryptor();
+                    encryptor.setPassword(Main.MASTER_PASSWORD);
+                    ps.setValue(PreferenceConstants.PASSWORD, encryptor.encrypt(this.passTxt.getText()));
+                }
+            }
+        } else {
+            String svc = this.serviceKeyTxt.getText().trim();
+            ps.setValue(PreferenceConstants.SERVICE_KEY, svc);
+        }
+
         ps.setValue(PreferenceConstants.TARGET_ORGS, new Gson().toJson(this.orgList));
+        if (!errors.isEmpty()) {
+            MessageDialog.openError(getShell(), "基本設定", String.join("\r\n", errors));
+            return false;
+        }
         return true;
     }
 

@@ -69,7 +69,12 @@
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="C:/Users/turbou/.gradle/caches/modules-2/files-2.1/com.squareup.okhttp3/okhttp/4.9.2/b91a63731406b5ba6167cdb29ce86c18874a5451/okhttp-4.9.2-sources.jar" kind="lib" path="C:/Users/turbou/.gradle/caches/modules-2/files-2.1/com.squareup.okhttp3/okhttp/4.9.2/5302714ee9320b64cf65ed865e5f65981ef9ba46/okhttp-4.9.2.jar">
+	<classpathentry sourcepath="C:/Users/turbou/.gradle/caches/modules-2/files-2.1/com.squareup.okhttp3/okhttp-urlconnection/4.10.0/13c5007755f6342ec5aa6ba18817e74dc1a108f3/okhttp-urlconnection-4.10.0-sources.jar" kind="lib" path="C:/Users/turbou/.gradle/caches/modules-2/files-2.1/com.squareup.okhttp3/okhttp-urlconnection/4.10.0/c9dff59b2b2417028f17ae12e411a8a68deb69c/okhttp-urlconnection-4.10.0.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="C:/Users/turbou/.gradle/caches/modules-2/files-2.1/com.squareup.okhttp3/okhttp/4.10.0/4afcb4a940f3411594ba7dc899086a882293f22a/okhttp-4.10.0-sources.jar" kind="lib" path="C:/Users/turbou/.gradle/caches/modules-2/files-2.1/com.squareup.okhttp3/okhttp/4.10.0/cd63657ac15770ed1420647154c9f44645533bef/okhttp-4.10.0.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
@@ -114,17 +119,27 @@
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="C:/Users/turbou/.gradle/caches/modules-2/files-2.1/com.squareup.okio/okio/2.8.0/6d1b6e0ce288800b8662b4983a002620cd6ada95/okio-2.8.0-sources.jar" kind="lib" path="C:/Users/turbou/.gradle/caches/modules-2/files-2.1/com.squareup.okio/okio/2.8.0/49b64e09d81c0cc84b267edd0c2fd7df5a64c78c/okio-jvm-2.8.0.jar">
+	<classpathentry sourcepath="C:/Users/turbou/.gradle/caches/modules-2/files-2.1/com.squareup.okio/okio-jvm/3.0.0/73e518d3b5760645d525c24934e4efc01149060a/okio-jvm-3.0.0-sources.jar" kind="lib" path="C:/Users/turbou/.gradle/caches/modules-2/files-2.1/com.squareup.okio/okio-jvm/3.0.0/ab5a73fa2ccb4a36b0b5c69fe10b16d0255bcf8/okio-jvm-3.0.0.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="C:/Users/turbou/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/1.4.10/4a5e4f984e6c3e380f100857f04aba4f3e5fbda8/kotlin-stdlib-1.4.10-sources.jar" kind="lib" path="C:/Users/turbou/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/1.4.10/ea29e063d2bbe695be13e9d044dcfb0c7add398e/kotlin-stdlib-1.4.10.jar">
+	<classpathentry sourcepath="C:/Users/turbou/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-jdk8/1.6.10/a61c046a90a08dd30eb105b8b8530fce678ecb46/kotlin-stdlib-jdk8-1.6.10-sources.jar" kind="lib" path="C:/Users/turbou/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-jdk8/1.6.10/e80fe6ac3c3573a80305f5ec43f86b829e8ab53d/kotlin-stdlib-jdk8-1.6.10.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="C:/Users/turbou/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-common/1.4.10/d971e5bb07a7f610eda65e5efc8decbd0548a270/kotlin-stdlib-common-1.4.10-sources.jar" kind="lib" path="C:/Users/turbou/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-common/1.4.10/6229be3465805c99db1142ad75e6c6ddeac0b04c/kotlin-stdlib-common-1.4.10.jar">
+	<classpathentry sourcepath="C:/Users/turbou/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-jdk7/1.6.10/ccdfdab71f0f3ba104191d8f673d0620e7ed2e46/kotlin-stdlib-jdk7-1.6.10-sources.jar" kind="lib" path="C:/Users/turbou/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-jdk7/1.6.10/e1c380673654a089c4f0c9f83d0ddfdc1efdb498/kotlin-stdlib-jdk7-1.6.10.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="C:/Users/turbou/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/1.6.20/bc58085192d5abb48080e3670915133715a33ce0/kotlin-stdlib-1.6.20-sources.jar" kind="lib" path="C:/Users/turbou/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/1.6.20/6cedc143badbb4f1c6b7f5a340b04edff1743208/kotlin-stdlib-1.6.20.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="C:/Users/turbou/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-common/1.6.20/e81e108a2817747538df29b32a151db38e5da5a2/kotlin-stdlib-common-1.6.20-sources.jar" kind="lib" path="C:/Users/turbou/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-common/1.6.20/27b4562b6713d70f458c6d7ea39aadacb8e6a92b/kotlin-stdlib-common-1.6.20.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>

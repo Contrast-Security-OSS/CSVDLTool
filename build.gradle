@@ -29,7 +29,8 @@ dependencies {
 
     compile group: 'org.yaml', name: 'snakeyaml', version: '1.16'
     compile group: 'org.jasypt', name: 'jasypt', version: '1.9.3'
-    compile group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.9.2'
+    compile group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.10.0'
+    compile group: 'com.squareup.okhttp3', name: 'okhttp-urlconnection', version: '4.10.0'
 
     compile group: 'org.eclipse.core', name: 'commands', version: '3.3.0-I20070605-0010', transitive: false
     compile group: 'org.eclipse.equinox', name: 'common', version: '3.3.0-v20070426', transitive: false

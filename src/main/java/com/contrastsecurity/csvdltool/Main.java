@@ -113,6 +113,7 @@ import com.contrastsecurity.csvdltool.api.Api;
 import com.contrastsecurity.csvdltool.api.AttackEventTagsApi;
 import com.contrastsecurity.csvdltool.api.PutTagsToAttackEventsApi;
 import com.contrastsecurity.csvdltool.exception.ApiException;
+import com.contrastsecurity.csvdltool.exception.BasicAuthException;
 import com.contrastsecurity.csvdltool.exception.NonApiException;
 import com.contrastsecurity.csvdltool.exception.TsvException;
 import com.contrastsecurity.csvdltool.model.AttackEvent;
@@ -486,6 +487,9 @@ public class Main implements PropertyChangeListener {
                     } else if (e.getTargetException() instanceof NonApiException) {
                         MessageDialog.openError(shell, "アプリケーション一覧の取得", String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", errorMsg));
                     } else if (e.getTargetException() instanceof TsvException) {
+                        MessageDialog.openInformation(shell, "アプリケーション一覧の取得", errorMsg);
+                        return;
+                    } else if (e.getTargetException() instanceof BasicAuthException) {
                         MessageDialog.openInformation(shell, "アプリケーション一覧の取得", errorMsg);
                         return;
                     } else {
@@ -1664,6 +1668,9 @@ public class Main implements PropertyChangeListener {
                     } else if (e.getTargetException() instanceof NonApiException) {
                         MessageDialog.openError(shell, "サーバ一覧の取得", String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", errorMsg));
                     } else if (e.getTargetException() instanceof TsvException) {
+                        MessageDialog.openInformation(shell, "サーバ一覧の取得", errorMsg);
+                        return;
+                    } else if (e.getTargetException() instanceof BasicAuthException) {
                         MessageDialog.openInformation(shell, "サーバ一覧の取得", errorMsg);
                         return;
                     } else {

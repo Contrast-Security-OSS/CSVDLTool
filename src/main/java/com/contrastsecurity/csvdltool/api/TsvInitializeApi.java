@@ -45,6 +45,12 @@ public class TsvInitializeApi extends Api {
         this.serviceKey = seviceKey;
     }
 
+    public TsvInitializeApi(Shell shell, IPreferenceStore ps, Organization org, String contrastUrl, String userName) {
+        super(shell, ps, org);
+        this.contrastUrl = contrastUrl;
+        this.userName = userName;
+    }
+
     @Override
     protected String getUrl() {
         return String.format("%s/api/ng/tsv/initialize?expand=skip_links", this.contrastUrl);

@@ -65,6 +65,7 @@ import com.contrastsecurity.csvdltool.PasswordDialog;
 import com.contrastsecurity.csvdltool.TsvDialog;
 import com.contrastsecurity.csvdltool.TsvStatusEnum;
 import com.contrastsecurity.csvdltool.exception.ApiException;
+import com.contrastsecurity.csvdltool.exception.BasicAuthException;
 import com.contrastsecurity.csvdltool.exception.NonApiException;
 import com.contrastsecurity.csvdltool.exception.TsvException;
 import com.contrastsecurity.csvdltool.json.ContrastJson;
@@ -115,22 +116,7 @@ public abstract class Api {
         this.userName = this.ps.getString(PreferenceConstants.USERNAME);
     }
 
-    protected TsvSettings checkTsv() {
-        Api tsvSettingsApi = new TsvSettingsApi(shell, ps, org, this.contrastUrl, this.userName, this.serviceKey);
-        try {
-            TsvSettings tsvSettings = (TsvSettings) tsvSettingsApi.getWithoutCheckTsv();
-            return tsvSettings;
-        } catch (ApiException e) {
-            MessageDialog.openWarning(shell, "二段階認証", String.format("TeamServerからエラーが返されました。\r\n%s", e.getMessage()));
-        } catch (NonApiException e) {
-            MessageDialog.openError(shell, "二段階認証", String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", e.getMessage()));
-        } catch (Exception e) {
-            MessageDialog.openError(shell, "二段階認証", String.format("不明なエラーです。ログファイルをご確認ください。\r\n%s", e.getMessage()));
-        }
-        return null;
-    }
-
-    private void basicAuth() {
+    private void basicAuth() throws Exception {
         if (((CSVDLToolShell) this.shell).getMain().getAuthType() != AuthType.BASIC) {
             return;
         }
@@ -172,42 +158,75 @@ public abstract class Api {
                 }
             });
         }
-        if (pass == null) {
-            return;
-        }
-        CookieManager cookieManager = new CookieManager();
-        cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
-        ((CSVDLToolShell) this.shell).getMain().setCookieManager(cookieManager);
-        OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();
-        clientBuilder.cookieJar(new JavaNetCookieJar(cookieManager));
-        RequestBody formBody = new FormBody.Builder().add("ui", "true").add("username", this.userName).add("password", pass).add("sso", "").build();
-        String url = String.format("%s/authenticate.html", this.contrastUrl);
-        Request.Builder requestBuilder = new Request.Builder().url(url).post(formBody);
-        OkHttpClient httpClient = null;
-        Request request = requestBuilder.build();
-        Response response = null;
-        httpClient = clientBuilder.build();
-        try {
-            response = httpClient.newCall(request).execute();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        final List<HttpCookie> cookies = cookieManager.getCookieStore().getCookies();
-        String xsrf_token = null;
-        for (HttpCookie c : cookies) {
-            if (c.getName().equals("XSRF-TOKEN")) {
-                xsrf_token = c.getValue();
-                this.ps.setValue(PreferenceConstants.XSRF_TOKEN, xsrf_token);
-                this.ps.setValue(PreferenceConstants.BASIC_AUTH_STATUS, BasicAuthStatusEnum.AUTH.name());
-                break;
+        if (!pass.isEmpty()) {
+            try {
+                CookieManager cookieManager = new CookieManager();
+                cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
+                ((CSVDLToolShell) this.shell).getMain().setCookieManager(cookieManager);
+                OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();
+                clientBuilder.cookieJar(new JavaNetCookieJar(cookieManager));
+                RequestBody formBody = new FormBody.Builder().add("ui", "true").add("username", this.userName).add("password", pass).add("sso", "").build();
+                String url = String.format("%s/authenticate.html", this.contrastUrl);
+                Request.Builder requestBuilder = new Request.Builder().url(url).post(formBody);
+                OkHttpClient httpClient = null;
+                Request request = requestBuilder.build();
+                Response response = null;
+                httpClient = clientBuilder.build();
+                response = httpClient.newCall(request).execute();
+                final List<HttpCookie> cookies = cookieManager.getCookieStore().getCookies();
+                String xsrf_token = null;
+                for (HttpCookie c : cookies) {
+                    if (c.getName().equals("XSRF-TOKEN")) {
+                        xsrf_token = c.getValue();
+                        this.ps.setValue(PreferenceConstants.XSRF_TOKEN, xsrf_token);
+                        this.ps.setValue(PreferenceConstants.BASIC_AUTH_STATUS, BasicAuthStatusEnum.AUTH.name());
+                        break;
+                    }
+                }
+            } catch (Exception nae) {
+                if (nae.getMessage().equals("400")) {
+                    throw new TsvException("認証に失敗しました。");
+                }
             }
+        } else {
+            throw new BasicAuthException("認証をキャンセルしました。");
         }
     }
 
-    private void tsvCheck() throws Exception {
+    protected TsvSettings checkTsv() {
+        Api tsvSettingsApi = null;
         if (((CSVDLToolShell) this.shell).getMain().getAuthType() == AuthType.BASIC) {
-            return;
+            tsvSettingsApi = new TsvSettingsApi(shell, ps, org, this.contrastUrl, this.userName);
+        } else {
+            tsvSettingsApi = new TsvSettingsApi(shell, ps, org, this.contrastUrl, this.userName, this.serviceKey);
         }
+        try {
+            TsvSettings tsvSettings = (TsvSettings) tsvSettingsApi.getWithoutCheckTsv();
+            return tsvSettings;
+        } catch (ApiException e) {
+            Gson gson = new Gson();
+            Type contrastType = new TypeToken<ContrastJson>() {
+            }.getType();
+            ContrastJson contrastJson = gson.fromJson(e.getMessage(), contrastType);
+            if (contrastJson.getSuccess().equals("false") && contrastJson.getMessages().contains("TSV code required")) {
+                TsvSettings ts = new TsvSettings();
+                ts.setTsv_enabled(true);
+                ts.setTsv_type("EMAIL");
+                return ts;
+            }
+            MessageDialog.openWarning(shell, "二段階認証", String.format("TeamServerからエラーが返されました。\r\n%s", e.getMessage()));
+        } catch (NonApiException e) {
+            MessageDialog.openError(shell, "二段階認証", String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", e.getMessage()));
+        } catch (Exception e) {
+            MessageDialog.openError(shell, "二段階認証", String.format("不明なエラーです。ログファイルをご確認ください。\r\n%s", e.getMessage()));
+        }
+        return null;
+    }
+
+    private void tsvCheck() throws Exception {
+        // if (((CSVDLToolShell) this.shell).getMain().getAuthType() == AuthType.BASIC) {
+        // return;
+        // }
         TsvStatusEnum tsvStatusEnum = TsvStatusEnum.NONE;
         String tsvStatusEnumStr = this.ps.getString(PreferenceConstants.TSV_STATUS);
         if (tsvStatusEnumStr != null && !tsvStatusEnumStr.isEmpty()) {
@@ -222,8 +241,13 @@ public abstract class Api {
                     throw new TsvException("二段階認証コードの通知方法の取得に失敗しました。\r\n二段階認証の設定に問題がないかご確認ください。");
                 }
                 if (tsvSettings.getTsv_type().equals("EMAIL")) {
-                    Api tsvInitializeApi = new TsvInitializeApi(this.shell, this.ps, this.org, this.contrastUrl, this.userName, this.serviceKey);
-                    String rtnMsg = (String) tsvInitializeApi.post();
+                    Api tsvInitializeApi = null;
+                    if (((CSVDLToolShell) this.shell).getMain().getAuthType() == AuthType.BASIC) {
+                        tsvInitializeApi = new TsvInitializeApi(this.shell, this.ps, this.org, this.contrastUrl, this.userName);
+                    } else {
+                        tsvInitializeApi = new TsvInitializeApi(this.shell, this.ps, this.org, this.contrastUrl, this.userName, this.serviceKey);
+                    }
+                    String rtnMsg = (String) tsvInitializeApi.postWithoutCheckTsv();
                     if (!rtnMsg.equals("true")) {
                         throw new TsvException("二段階認証コードのメール送信要求に失敗しました。");
                     }
@@ -245,7 +269,7 @@ public abstract class Api {
                 if (!code.isEmpty()) {
                     Api tsvAuthorizeApi = new TsvAuthorizeApi(this.shell, this.ps, this.org, this.contrastUrl, this.userName, this.serviceKey, code);
                     try {
-                        String rtnMsg = (String) tsvAuthorizeApi.post();
+                        String rtnMsg = (String) tsvAuthorizeApi.postWithoutCheckTsv();
                         if (rtnMsg.equals("true")) {
                             this.ps.setValue(PreferenceConstants.TSV_STATUS, TsvStatusEnum.AUTH.name());
                         } else {
@@ -264,7 +288,6 @@ public abstract class Api {
     }
 
     public Object getWithoutCheckTsv() throws Exception {
-        basicAuth();
         String response = this.getResponse(HttpMethod.GET);
         return this.convert(response);
     }
@@ -276,6 +299,11 @@ public abstract class Api {
         return this.convert(response);
     }
 
+    public Object postWithoutCheckTsv() throws Exception {
+        String response = this.getResponse(HttpMethod.POST);
+        return this.convert(response);
+    }
+
     public Object post() throws Exception {
         basicAuth();
         tsvCheck();
@@ -284,15 +312,11 @@ public abstract class Api {
     }
 
     public Object put() throws Exception {
-        basicAuth();
-        tsvCheck();
         String response = this.getResponse(HttpMethod.PUT);
         return this.convert(response);
     }
 
     public Object delete() throws Exception {
-        basicAuth();
-        tsvCheck();
         String response = this.getResponse(HttpMethod.DELETE);
         return this.convert(response);
     }
@@ -385,6 +409,7 @@ public abstract class Api {
                     // プロキシ認証あり
                     if (this.ps.getString(PreferenceConstants.PROXY_AUTH).equals("input")) {
                         proxyAuthenticator = new Authenticator() {
+
                             @Override
                             public Request authenticate(Route route, Response response) throws IOException {
                                 String credential = Credentials.basic(ps.getString(PreferenceConstants.PROXY_TMP_USER), ps.getString(PreferenceConstants.PROXY_TMP_PASS));
@@ -392,6 +417,7 @@ public abstract class Api {
                             }
                         };
                     } else {
+
                         BasicTextEncryptor encryptor = new BasicTextEncryptor();
                         encryptor.setPassword(Main.MASTER_PASSWORD);
                         try {
@@ -415,6 +441,8 @@ public abstract class Api {
                 response = httpClient.newCall(request).execute();
                 if (response.code() == 200) {
                     return response.body().string();
+                } else if (response.code() == 303) {
+                    throw new ApiException(response.body().string());
                 } else if (response.code() == 400) {
                     throw new ApiException(response.body().string());
                 } else if (response.code() == 401) {

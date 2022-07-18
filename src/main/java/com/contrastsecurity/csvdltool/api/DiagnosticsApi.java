@@ -28,41 +28,30 @@ import java.lang.reflect.Type;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Shell;
 
-import com.contrastsecurity.csvdltool.json.TsvSettingsJson;
+import com.contrastsecurity.csvdltool.json.ContrastJson;
 import com.contrastsecurity.csvdltool.model.Organization;
-import com.contrastsecurity.csvdltool.model.TsvSettings;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-public class TsvSettingsApi extends Api {
+public class DiagnosticsApi extends Api {
 
-    public TsvSettingsApi(Shell shell, IPreferenceStore ps, Organization org, String contrastUrl, String userName, String seviceKey) {
+    public DiagnosticsApi(Shell shell, IPreferenceStore ps, Organization org) {
         super(shell, ps, org);
-        this.contrastUrl = contrastUrl;
-        this.userName = userName;
-        this.serviceKey = seviceKey;
-    }
-
-    public TsvSettingsApi(Shell shell, IPreferenceStore ps, Organization org, String contrastUrl, String userName) {
-        super(shell, ps, org);
-        this.contrastUrl = contrastUrl;
-        this.userName = userName;
     }
 
     @Override
     protected String getUrl() {
         String orgId = this.org.getOrganization_uuid();
-        return String.format("%s/api/ng/%s/tsv/user?expand=skip_links", this.contrastUrl, orgId);
+        return String.format("%s/api/ng/%s/settings/diagnostics?expand=skip_links", this.contrastUrl, orgId);
     }
 
     @Override
     protected Object convert(String response) {
         Gson gson = new Gson();
-        Type contType = new TypeToken<TsvSettingsJson>() {
+        Type contType = new TypeToken<ContrastJson>() {
         }.getType();
-        TsvSettingsJson tsvSettingsJson = gson.fromJson(response, contType);
-        TsvSettings tsvSettings = tsvSettingsJson.getTsv();
-        return tsvSettings;
+        ContrastJson contastJson = gson.fromJson(response, contType);
+        return contastJson;
     }
 
 }

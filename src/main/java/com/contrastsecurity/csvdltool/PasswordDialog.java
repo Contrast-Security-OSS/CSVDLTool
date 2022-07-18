@@ -61,6 +61,7 @@ public class PasswordDialog extends Dialog {
         new Label(composite, SWT.LEFT).setText("パスワード：");
         passTxt = new Text(composite, SWT.BORDER);
         passTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        passTxt.setEchoChar('*');
         passTxt.addListener(SWT.FocusIn, new Listener() {
             public void handleEvent(Event e) {
                 passTxt.selectAll();

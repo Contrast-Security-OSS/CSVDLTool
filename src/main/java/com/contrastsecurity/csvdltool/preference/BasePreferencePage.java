@@ -122,12 +122,20 @@ public class BasePreferencePage extends PreferencePage {
             @Override
             public void modifyText(ModifyEvent e) {
                 String contrastUrlStr = contrastUrlTxt.getText().trim();
-                String serviceKeyStr = serviceKeyTxt.getText().trim();
                 String userNameStr = userNameTxt.getText().trim();
-                if (contrastUrlStr.isEmpty() || serviceKeyStr.isEmpty() || userNameStr.isEmpty()) {
-                    addBtn.setEnabled(false);
+                if (authType == AuthType.BASIC) {
+                    if (contrastUrlStr.isEmpty() || userNameStr.isEmpty()) {
+                        addBtn.setEnabled(false);
+                    } else {
+                        addBtn.setEnabled(true);
+                    }
                 } else {
-                    addBtn.setEnabled(true);
+                    String serviceKeyStr = serviceKeyTxt.getText().trim();
+                    if (contrastUrlStr.isEmpty() || userNameStr.isEmpty() || serviceKeyStr.isEmpty()) {
+                        addBtn.setEnabled(false);
+                    } else {
+                        addBtn.setEnabled(true);
+                    }
                 }
             }
         });
@@ -150,12 +158,20 @@ public class BasePreferencePage extends PreferencePage {
             @Override
             public void modifyText(ModifyEvent e) {
                 String contrastUrlStr = contrastUrlTxt.getText().trim();
-                String serviceKeyStr = serviceKeyTxt.getText().trim();
                 String userNameStr = userNameTxt.getText().trim();
-                if (contrastUrlStr.isEmpty() || serviceKeyStr.isEmpty() || userNameStr.isEmpty()) {
-                    addBtn.setEnabled(false);
+                if (authType == AuthType.BASIC) {
+                    if (contrastUrlStr.isEmpty() || userNameStr.isEmpty()) {
+                        addBtn.setEnabled(false);
+                    } else {
+                        addBtn.setEnabled(true);
+                    }
                 } else {
-                    addBtn.setEnabled(true);
+                    String serviceKeyStr = serviceKeyTxt.getText().trim();
+                    if (contrastUrlStr.isEmpty() || userNameStr.isEmpty() || serviceKeyStr.isEmpty()) {
+                        addBtn.setEnabled(false);
+                    } else {
+                        addBtn.setEnabled(true);
+                    }
                 }
             }
         });

@@ -271,6 +271,7 @@ public class Main implements PropertyChangeListener {
                 this.ps = new PreferenceStore("csvdltool.properties");
                 this.ps.load();
             }
+        } catch (FileNotFoundException fnfe) {
         } catch (Exception e) {
             e.printStackTrace();
         }

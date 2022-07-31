@@ -173,7 +173,6 @@ public abstract class Api {
                 Response response = null;
                 httpClient = clientBuilder.build();
                 response = httpClient.newCall(request).execute();
-                System.out.println(response.body().string());
                 List<Cookie> cookies = cookieJar.loadForRequest(HttpUrl.parse(ps.getString(PreferenceConstants.CONTRAST_URL)));
                 String xsrf_token = null;
                 for (Cookie c : cookies) {
@@ -185,6 +184,7 @@ public abstract class Api {
                     }
                 }
                 cookieJar.saveFromResponse(null, cookies);
+                ((CSVDLToolShell) this.shell).getMain().loggedIn();
             } catch (Exception nae) {
                 if (nae.getMessage().equals("400")) {
                     throw new TsvException("認証に失敗しました。");

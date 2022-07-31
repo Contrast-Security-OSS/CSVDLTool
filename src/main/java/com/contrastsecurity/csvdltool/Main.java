@@ -110,6 +110,7 @@ import org.yaml.snakeyaml.Yaml;
 
 import com.contrastsecurity.csvdltool.api.Api;
 import com.contrastsecurity.csvdltool.api.AttackEventTagsApi;
+import com.contrastsecurity.csvdltool.api.LogoutApi;
 import com.contrastsecurity.csvdltool.api.PutTagsToAttackEventsApi;
 import com.contrastsecurity.csvdltool.exception.ApiException;
 import com.contrastsecurity.csvdltool.exception.BasicAuthException;
@@ -181,6 +182,7 @@ public class Main implements PropertyChangeListener {
     private Button serverLoadBtn;
 
     private Button settingBtn;
+    private Button logoutBtn;
 
     private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd(E)");
     private Text vulSeverityFilterTxt;
@@ -311,8 +313,11 @@ public class Main implements PropertyChangeListener {
             ContrastSecurityYaml contrastSecurityYaml = yaml.loadAs(is, ContrastSecurityYaml.class);
             is.close();
             this.ps.setDefault(PreferenceConstants.CONTRAST_URL, contrastSecurityYaml.getUrl());
-            this.ps.setDefault(PreferenceConstants.SERVICE_KEY, contrastSecurityYaml.getServiceKey());
             this.ps.setDefault(PreferenceConstants.USERNAME, contrastSecurityYaml.getUserName());
+            this.ps.setDefault(PreferenceConstants.SERVICE_KEY, contrastSecurityYaml.getServiceKey());
+            if (this.authType == AuthType.BASIC) {
+                this.ps.setValue(PreferenceConstants.SERVICE_KEY, "");
+            }
         } catch (Exception e) {
             // e.printStackTrace();
         }
@@ -1850,8 +1855,21 @@ public class Main implements PropertyChangeListener {
         int main_idx = this.ps.getInt(PreferenceConstants.OPENED_MAIN_TAB_IDX);
         mainTabFolder.setSelection(main_idx);
 
+        Composite bottomBtnGrp = new Composite(shell, SWT.NONE);
+        GridLayout bottomBtnGrpLt = new GridLayout();
+        if (this.authType == AuthType.BASIC) {
+            bottomBtnGrpLt.numColumns = 2;
+        } else {
+            bottomBtnGrpLt.numColumns = 1;
+        }
+        bottomBtnGrpLt.makeColumnsEqualWidth = false;
+        bottomBtnGrpLt.marginHeight = 0;
+        bottomBtnGrp.setLayout(bottomBtnGrpLt);
+        GridData bottomBtnGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        bottomBtnGrp.setLayoutData(bottomBtnGrpGrDt);
+
         // ========== 設定ボタン ==========
-        settingBtn = new Button(shell, SWT.PUSH);
+        settingBtn = new Button(bottomBtnGrp, SWT.PUSH);
         settingBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         settingBtn.setText("設定");
         settingBtn.setToolTipText("動作に必要な設定を行います。");
@@ -1887,6 +1905,29 @@ public class Main implements PropertyChangeListener {
                 }
             }
         });
+
+        // ========== ログアウトボタン ==========
+        if (this.authType == AuthType.BASIC) {
+            this.logoutBtn = new Button(bottomBtnGrp, SWT.PUSH);
+            this.logoutBtn.setLayoutData(new GridData());
+            this.logoutBtn.setText("ログアウト");
+            this.logoutBtn.setToolTipText("認証済みセッションからログアウトします。");
+            this.logoutBtn.setEnabled(false);
+            this.logoutBtn.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent event) {
+                    Api logoutApi = new LogoutApi(shell, ps, getValidOrganization());
+                    try {
+                        logoutApi.get();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    ps.setValue(PreferenceConstants.XSRF_TOKEN, "");
+                    ps.setValue(PreferenceConstants.BASIC_AUTH_STATUS, BasicAuthStatusEnum.NONE.name());
+                    logoutBtn.setEnabled(false);
+                }
+            });
+        }
 
         uiUpdate();
         int width = this.ps.getInt(PreferenceConstants.MEM_WIDTH);
@@ -2110,6 +2151,10 @@ public class Main implements PropertyChangeListener {
         } else {
             this.shell.setText(String.format(WINDOW_TITLE, text));
         }
+    }
+
+    public void loggedIn() {
+        this.logoutBtn.setEnabled(true);
     }
 
     @SuppressWarnings("unchecked")

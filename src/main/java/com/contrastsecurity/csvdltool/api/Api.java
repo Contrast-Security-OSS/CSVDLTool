@@ -27,9 +27,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Type;
-import java.net.CookieManager;
-import java.net.CookiePolicy;
-import java.net.HttpCookie;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.nio.charset.StandardCharsets;
@@ -76,9 +73,11 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import okhttp3.Authenticator;
+import okhttp3.Cookie;
+import okhttp3.CookieJar;
 import okhttp3.Credentials;
 import okhttp3.FormBody;
-import okhttp3.JavaNetCookieJar;
+import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -114,6 +113,9 @@ public abstract class Api {
         this.contrastUrl = this.ps.getString(PreferenceConstants.CONTRAST_URL);
         this.serviceKey = this.ps.getString(PreferenceConstants.SERVICE_KEY);
         this.userName = this.ps.getString(PreferenceConstants.USERNAME);
+        if (((CSVDLToolShell) this.shell).getMain().getCookieJar() == null) {
+            ((CSVDLToolShell) this.shell).getMain().setCookieJar(new MyCookieJar(this.contrastUrl));
+        }
     }
 
     private void basicAuth() throws Exception {
@@ -160,11 +162,9 @@ public abstract class Api {
         }
         if (!pass.isEmpty()) {
             try {
-                CookieManager cookieManager = new CookieManager();
-                cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
-                ((CSVDLToolShell) this.shell).getMain().setCookieManager(cookieManager);
                 OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();
-                clientBuilder.cookieJar(new JavaNetCookieJar(cookieManager));
+                CookieJar cookieJar = ((CSVDLToolShell) this.shell).getMain().getCookieJar();
+                clientBuilder.cookieJar(cookieJar);
                 RequestBody formBody = new FormBody.Builder().add("ui", "true").add("username", this.userName).add("password", pass).add("sso", "").build();
                 String url = String.format("%s/authenticate.html", this.contrastUrl);
                 Request.Builder requestBuilder = new Request.Builder().url(url).post(formBody);
@@ -173,16 +173,18 @@ public abstract class Api {
                 Response response = null;
                 httpClient = clientBuilder.build();
                 response = httpClient.newCall(request).execute();
-                final List<HttpCookie> cookies = cookieManager.getCookieStore().getCookies();
+                System.out.println(response.body().string());
+                List<Cookie> cookies = cookieJar.loadForRequest(HttpUrl.parse(ps.getString(PreferenceConstants.CONTRAST_URL)));
                 String xsrf_token = null;
-                for (HttpCookie c : cookies) {
-                    if (c.getName().equals("XSRF-TOKEN")) {
-                        xsrf_token = c.getValue();
+                for (Cookie c : cookies) {
+                    if (c.name().equals("XSRF-TOKEN")) {
+                        xsrf_token = c.value();
                         this.ps.setValue(PreferenceConstants.XSRF_TOKEN, xsrf_token);
                         this.ps.setValue(PreferenceConstants.BASIC_AUTH_STATUS, BasicAuthStatusEnum.AUTH.name());
                         break;
                     }
                 }
+                cookieJar.saveFromResponse(null, cookies);
             } catch (Exception nae) {
                 if (nae.getMessage().equals("400")) {
                     throw new TsvException("認証に失敗しました。");
@@ -358,8 +360,7 @@ public abstract class Api {
         logger.trace(url);
         OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();
         if (((CSVDLToolShell) this.shell).getMain().getAuthType() == AuthType.BASIC) {
-            CookieManager cookieManager = ((CSVDLToolShell) this.shell).getMain().getCookieManager();
-            clientBuilder.cookieJar(new JavaNetCookieJar(cookieManager));
+            clientBuilder.cookieJar(((CSVDLToolShell) this.shell).getMain().getCookieJar());
         }
         Request.Builder requestBuilder = null;
         switch (httpMethod) {

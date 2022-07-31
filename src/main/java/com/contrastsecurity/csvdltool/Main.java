@@ -40,7 +40,6 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
-import java.net.CookieManager;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
@@ -138,6 +137,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
+import okhttp3.CookieJar;
+
 public class Main implements PropertyChangeListener {
 
     public static final String WINDOW_TITLE = "CSVDLTool - %s";
@@ -220,7 +221,7 @@ public class Main implements PropertyChangeListener {
     private PreferenceStore ps;
 
     private PropertyChangeSupport support = new PropertyChangeSupport(this);
-    private CookieManager cookieManager;
+    private CookieJar cookieJar;
 
     public enum AuthType {
         TOKEN,
@@ -247,6 +248,14 @@ public class Main implements PropertyChangeListener {
 
     public AuthType getAuthType() {
         return authType;
+    }
+
+    public void setCookieJar(CookieJar cookieJar) {
+        this.cookieJar = cookieJar;
+    }
+
+    public CookieJar getCookieJar() {
+        return this.cookieJar;
     }
 
     private void initialize() {
@@ -1849,7 +1858,7 @@ public class Main implements PropertyChangeListener {
             @Override
             public void widgetSelected(SelectionEvent event) {
                 PreferenceManager mgr = new PreferenceManager();
-                PreferenceNode baseNode = new PreferenceNode("base", new BasePreferencePage(authType));
+                PreferenceNode baseNode = new PreferenceNode("base", new BasePreferencePage(shell, authType));
                 PreferenceNode connectionNode = new PreferenceNode("connection", new ConnectionPreferencePage());
                 PreferenceNode otherNode = new PreferenceNode("other", new OtherPreferencePage());
                 PreferenceNode csvNode = new PreferenceNode("csv", new CSVPreferencePage());
@@ -2272,14 +2281,6 @@ public class Main implements PropertyChangeListener {
             System.out.println("tsv main");
         }
 
-    }
-
-    public CookieManager getCookieManager() {
-        return cookieManager;
-    }
-
-    public void setCookieManager(CookieManager cookieManager) {
-        this.cookieManager = cookieManager;
     }
 
     /**

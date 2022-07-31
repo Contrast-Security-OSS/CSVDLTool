@@ -54,6 +54,7 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.jasypt.util.text.BasicTextEncryptor;
 
+import com.contrastsecurity.csvdltool.CSVDLToolShell;
 import com.contrastsecurity.csvdltool.Main;
 import com.contrastsecurity.csvdltool.Main.AuthType;
 import com.contrastsecurity.csvdltool.ProxyAuthDialog;
@@ -75,12 +76,14 @@ public class BasePreferencePage extends PreferencePage {
     private List<Integer> selectedIdxes = new ArrayList<Integer>();
     private Table table;
     private Button addBtn;
+    private CSVDLToolShell shell;
     private AuthType authType;
 
     Logger logger = LogManager.getLogger("csvdltool");
 
-    public BasePreferencePage(AuthType authType) {
+    public BasePreferencePage(CSVDLToolShell shell, AuthType authType) {
         super("基本設定");
+        this.shell = shell;
         this.authType = authType;
     }
 
@@ -372,8 +375,12 @@ public class BasePreferencePage extends PreferencePage {
                         }
                     }
                 }
-                OrganizationDialog orgDialog = new OrganizationDialog(getShell(), ps, contrastUrlTxt.getText().trim(), userNameTxt.getText().trim(),
-                        serviceKeyTxt.getText().trim());
+                OrganizationDialog orgDialog = null;
+                if (authType == AuthType.BASIC) {
+                    orgDialog = new OrganizationDialog(shell, ps, contrastUrlTxt.getText().trim(), userNameTxt.getText().trim());
+                } else {
+                    orgDialog = new OrganizationDialog(shell, ps, contrastUrlTxt.getText().trim(), userNameTxt.getText().trim(), serviceKeyTxt.getText().trim());
+                }
                 int result = orgDialog.open();
                 if (IDialogConstants.OK_ID != result) {
                     return;

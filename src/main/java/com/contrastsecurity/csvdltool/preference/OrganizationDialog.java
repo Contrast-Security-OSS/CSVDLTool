@@ -42,8 +42,10 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+import com.contrastsecurity.csvdltool.CSVDLToolShell;
 import com.contrastsecurity.csvdltool.api.Api;
 import com.contrastsecurity.csvdltool.api.OrganizationApi;
+import com.contrastsecurity.csvdltool.api.OrganizationForBasicApi;
 import com.contrastsecurity.csvdltool.exception.ApiException;
 import com.contrastsecurity.csvdltool.exception.NonApiException;
 import com.contrastsecurity.csvdltool.exception.TsvException;
@@ -57,15 +59,25 @@ public class OrganizationDialog extends Dialog {
     private String svc;
     private Text orgIdTxt;
     private Text apiKeyTxt;
+    private CSVDLToolShell shell;
 
     private Organization org;
 
-    public OrganizationDialog(Shell parentShell, IPreferenceStore ps, String url, String usr, String svc) {
+    public OrganizationDialog(CSVDLToolShell parentShell, IPreferenceStore ps, String url, String usr, String svc) {
         super(parentShell);
+        this.shell = parentShell;
         this.ps = ps;
         this.url = url;
         this.usr = usr;
         this.svc = svc;
+    }
+
+    public OrganizationDialog(CSVDLToolShell parentShell, IPreferenceStore ps, String url, String usr) {
+        super(parentShell);
+        this.shell = parentShell;
+        this.ps = ps;
+        this.url = url;
+        this.usr = usr;
     }
 
     @Override
@@ -133,11 +145,20 @@ public class OrganizationDialog extends Dialog {
         org.setApikey(apiKeyTxt.getText().trim());
         org.setOrganization_uuid(orgIdTxt.getText().trim());
         org.setValid(false);
-        Api orgApi = new OrganizationApi(getShell(), this.ps, org, url, usr, svc);
+        Api orgApi = null;
+        if (svc == null) {
+            orgApi = new OrganizationForBasicApi(this.shell, this.ps, org, url, usr);
+        } else {
+            orgApi = new OrganizationApi(this.shell, this.ps, org, url, usr, svc);
+        }
         try {
             Organization rtnOrg = (Organization) orgApi.get();
-            org.setName(rtnOrg.getName());
-            this.org = org;
+            if (rtnOrg == null) {
+                MessageDialog.openError(getShell(), "組織情報の確認", "組織が見つかりません。");
+            } else {
+                org.setName(rtnOrg.getName());
+                this.org = org;
+            }
         } catch (ApiException e) {
             MessageDialog.openWarning(getShell(), "組織情報の確認", String.format("TeamServerからエラーが返されました。\r\n%s", e.getMessage()));
         } catch (NonApiException e) {

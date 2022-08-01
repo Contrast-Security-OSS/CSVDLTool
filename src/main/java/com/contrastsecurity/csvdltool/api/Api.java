@@ -295,8 +295,17 @@ public abstract class Api {
     }
 
     public Object get() throws Exception {
-        basicAuth();
-        tsvCheck();
+        if (((CSVDLToolShell) this.shell).getMain().getAuthType() == AuthType.BASIC) {
+            basicAuth();
+            try {
+                tsvCheck();
+            } catch (TsvException tsve) {
+                ((CSVDLToolShell) this.shell).getMain().logout();
+                throw tsve;
+            }
+        } else {
+            tsvCheck();
+        }
         String response = this.getResponse(HttpMethod.GET);
         return this.convert(response);
     }
@@ -307,8 +316,17 @@ public abstract class Api {
     }
 
     public Object post() throws Exception {
-        basicAuth();
-        tsvCheck();
+        if (((CSVDLToolShell) this.shell).getMain().getAuthType() == AuthType.BASIC) {
+            basicAuth();
+            try {
+                tsvCheck();
+            } catch (TsvException tsve) {
+                ((CSVDLToolShell) this.shell).getMain().logout();
+                throw tsve;
+            }
+        } else {
+            tsvCheck();
+        }
         String response = this.getResponse(HttpMethod.POST);
         return this.convert(response);
     }

@@ -1916,15 +1916,7 @@ public class Main implements PropertyChangeListener {
             this.logoutBtn.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
-                    Api logoutApi = new LogoutApi(shell, ps, getValidOrganization());
-                    try {
-                        logoutApi.get();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    ps.setValue(PreferenceConstants.XSRF_TOKEN, "");
-                    ps.setValue(PreferenceConstants.BASIC_AUTH_STATUS, BasicAuthStatusEnum.NONE.name());
-                    logoutBtn.setEnabled(false);
+                    logout();
                 }
             });
         }
@@ -1953,6 +1945,18 @@ public class Main implements PropertyChangeListener {
             logger.error(trace);
         }
         display.dispose();
+    }
+
+    public void logout() {
+        Api logoutApi = new LogoutApi(shell, ps, getValidOrganization());
+        try {
+            logoutApi.get();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        ps.setValue(PreferenceConstants.XSRF_TOKEN, "");
+        ps.setValue(PreferenceConstants.BASIC_AUTH_STATUS, BasicAuthStatusEnum.NONE.name());
+        logoutBtn.setEnabled(false);
     }
 
     private void addColToAttackTable(AttackEvent attackEvent, int index) {

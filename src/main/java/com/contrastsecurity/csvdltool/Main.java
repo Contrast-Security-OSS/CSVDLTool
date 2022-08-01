@@ -184,6 +184,8 @@ public class Main implements PropertyChangeListener {
     private Button settingBtn;
     private Button logoutBtn;
 
+    private Label statusBar;
+
     private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd(E)");
     private Text vulSeverityFilterTxt;
     private Text vulVulnTypeFilterTxt;
@@ -437,7 +439,7 @@ public class Main implements PropertyChangeListener {
 
         GridLayout baseLayout = new GridLayout(1, false);
         baseLayout.marginWidth = 8;
-        baseLayout.marginBottom = 8;
+        baseLayout.marginBottom = 0;
         baseLayout.verticalSpacing = 8;
         shell.setLayout(baseLayout);
 
@@ -1916,10 +1918,18 @@ public class Main implements PropertyChangeListener {
             this.logoutBtn.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
-                    logout();
+                    loggedOut();
                 }
             });
         }
+
+        this.statusBar = new Label(shell, SWT.RIGHT);
+        GridData statusBarGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        statusBarGrDt.minimumHeight = 11;
+        statusBarGrDt.heightHint = 11;
+        this.statusBar.setLayoutData(statusBarGrDt);
+        this.statusBar.setFont(new Font(display, "ＭＳ ゴシック", 9, SWT.NORMAL));
+        this.statusBar.setForeground(shell.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
 
         uiUpdate();
         int width = this.ps.getInt(PreferenceConstants.MEM_WIDTH);
@@ -1947,15 +1957,27 @@ public class Main implements PropertyChangeListener {
         display.dispose();
     }
 
-    public void logout() {
+    public void loggedIn() {
+        String timestamp = new SimpleDateFormat("yyyy/MM/dd HH:mm").format(new Date());
+        String userName = ps.getString(PreferenceConstants.USERNAME);
+        this.statusBar.setText(String.format("%s %s successfully logged in", userName, timestamp));
+        this.logoutBtn.setEnabled(true);
+    }
+
+    public void loggedOut() {
         Api logoutApi = new LogoutApi(shell, ps, getValidOrganization());
         try {
             logoutApi.getWithoutCheckTsv();
         } catch (Exception e) {
             e.printStackTrace();
         }
+        // String timestamp = new SimpleDateFormat("yyyy/MM/dd HH:mm").format(new Date());
+        // String userName = ps.getString(PreferenceConstants.USERNAME);
+        // this.statusBar.setText(String.format("%s %s successfully logged out", userName, timestamp));
+        this.statusBar.setText("");
         ps.setValue(PreferenceConstants.XSRF_TOKEN, "");
         ps.setValue(PreferenceConstants.BASIC_AUTH_STATUS, BasicAuthStatusEnum.NONE.name());
+        ps.setValue(PreferenceConstants.TSV_STATUS, TsvStatusEnum.NONE.name());
         logoutBtn.setEnabled(false);
     }
 
@@ -2155,10 +2177,6 @@ public class Main implements PropertyChangeListener {
         } else {
             this.shell.setText(String.format(WINDOW_TITLE, text));
         }
-    }
-
-    public void loggedIn() {
-        this.logoutBtn.setEnabled(true);
     }
 
     @SuppressWarnings("unchecked")

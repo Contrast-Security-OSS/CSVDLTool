@@ -119,9 +119,6 @@ public abstract class Api {
     }
 
     private void basicAuth() throws Exception {
-        if (((CSVDLToolShell) this.shell).getMain().getAuthType() != AuthType.BASIC) {
-            return;
-        }
         BasicAuthStatusEnum basicAuthStatusEnum = BasicAuthStatusEnum.NONE;
         String basicAuthStatusEnumStr = this.ps.getString(PreferenceConstants.BASIC_AUTH_STATUS);
         if (basicAuthStatusEnumStr != null && !basicAuthStatusEnumStr.isEmpty()) {
@@ -184,7 +181,12 @@ public abstract class Api {
                     }
                 }
                 cookieJar.saveFromResponse(null, cookies);
-                ((CSVDLToolShell) this.shell).getMain().loggedIn();
+                shell.getDisplay().syncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        ((CSVDLToolShell) shell).getMain().loggedIn();
+                    }
+                });
             } catch (Exception nae) {
                 if (nae.getMessage().equals("400")) {
                     throw new TsvException("認証に失敗しました。");
@@ -300,7 +302,12 @@ public abstract class Api {
             try {
                 tsvCheck();
             } catch (TsvException tsve) {
-                ((CSVDLToolShell) this.shell).getMain().logout();
+                shell.getDisplay().syncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        ((CSVDLToolShell) shell).getMain().loggedOut();
+                    }
+                });
                 throw tsve;
             }
         } else {
@@ -321,7 +328,12 @@ public abstract class Api {
             try {
                 tsvCheck();
             } catch (TsvException tsve) {
-                ((CSVDLToolShell) this.shell).getMain().logout();
+                shell.getDisplay().syncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        ((CSVDLToolShell) shell).getMain().loggedOut();
+                    }
+                });
                 throw tsve;
             }
         } else {

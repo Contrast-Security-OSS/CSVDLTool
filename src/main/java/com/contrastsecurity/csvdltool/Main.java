@@ -1950,7 +1950,7 @@ public class Main implements PropertyChangeListener {
     public void logout() {
         Api logoutApi = new LogoutApi(shell, ps, getValidOrganization());
         try {
-            logoutApi.get();
+            logoutApi.getWithoutCheckTsv();
         } catch (Exception e) {
             e.printStackTrace();
         }

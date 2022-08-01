@@ -1974,6 +1974,7 @@ public class Main implements PropertyChangeListener {
         // String timestamp = new SimpleDateFormat("yyyy/MM/dd HH:mm").format(new Date());
         // String userName = ps.getString(PreferenceConstants.USERNAME);
         // this.statusBar.setText(String.format("%s %s successfully logged out", userName, timestamp));
+        this.cookieJar = null;
         this.statusBar.setText("");
         ps.setValue(PreferenceConstants.XSRF_TOKEN, "");
         ps.setValue(PreferenceConstants.BASIC_AUTH_STATUS, BasicAuthStatusEnum.NONE.name());

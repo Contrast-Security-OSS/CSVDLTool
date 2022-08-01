@@ -207,7 +207,7 @@ public abstract class Api {
         try {
             TsvSettings tsvSettings = (TsvSettings) tsvSettingsApi.getWithoutCheckTsv();
             return tsvSettings;
-        } catch (ApiException e) {
+        } catch (TsvException e) {
             Gson gson = new Gson();
             Type contrastType = new TypeToken<ContrastJson>() {
             }.getType();
@@ -218,6 +218,7 @@ public abstract class Api {
                 ts.setTsv_type("EMAIL");
                 return ts;
             }
+        } catch (ApiException e) {
             MessageDialog.openWarning(shell, "二段階認証", String.format("TeamServerからエラーが返されました。\r\n%s", e.getMessage()));
         } catch (NonApiException e) {
             MessageDialog.openError(shell, "二段階認証", String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", e.getMessage()));
@@ -473,7 +474,7 @@ public abstract class Api {
                 if (response.code() == 200) {
                     return response.body().string();
                 } else if (response.code() == 303) {
-                    throw new ApiException(response.body().string());
+                    throw new TsvException(response.body().string());
                 } else if (response.code() == 400) {
                     throw new ApiException(response.body().string());
                 } else if (response.code() == 401) {
@@ -500,6 +501,9 @@ public abstract class Api {
                 throw ioe;
             }
         } catch (Exception e) {
+            if (e instanceof TsvException) {
+                throw e;
+            }
             StringWriter stringWriter = new StringWriter();
             PrintWriter printWriter = new PrintWriter(stringWriter);
             e.printStackTrace(printWriter);

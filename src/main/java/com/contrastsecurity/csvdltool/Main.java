@@ -153,7 +153,7 @@ public class Main implements PropertyChangeListener {
     public static final String FILE_ENCODING = "UTF-8";
 
     public static final int MINIMUM_SIZE_WIDTH = 640;
-    public static final int MINIMUM_SIZE_HEIGHT = 620;
+    public static final int MINIMUM_SIZE_HEIGHT = 640;
 
     private CSVDLToolShell shell;
 

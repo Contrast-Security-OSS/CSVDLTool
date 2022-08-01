@@ -75,7 +75,7 @@ public class AboutPage extends PreferencePage {
         Label versionValueLbl = new Label(appGrp, SWT.NONE);
         GridData versionValueLblGrDt = new GridData();
         versionValueLbl.setLayoutData(versionValueLblGrDt);
-        versionValueLbl.setText("1.7.0"); //$NON-NLS-1$
+        versionValueLbl.setText("1.8.0"); //$NON-NLS-1$
 
         Label copyrightLbl = new Label(appGrp, SWT.NONE);
         GridData copyrightLblGrDt = new GridData();
@@ -104,13 +104,16 @@ public class AboutPage extends PreferencePage {
         });
         new Link(licenseGrp, SWT.NONE).setText("- commons-codec 1.11"); //$NON-NLS-1$
         new Link(licenseGrp, SWT.NONE).setText("- commons-csv 1.8"); //$NON-NLS-1$
+        new Link(licenseGrp, SWT.NONE).setText("- commons-exec 1.3"); //$NON-NLS-1$
         new Link(licenseGrp, SWT.NONE).setText("- commons-io 2.8.0"); //$NON-NLS-1$
         new Link(licenseGrp, SWT.NONE).setText("- commons-lang3 3.4"); //$NON-NLS-1$
         new Link(licenseGrp, SWT.NONE).setText("- commons-logging 1.2"); //$NON-NLS-1$
         new Link(licenseGrp, SWT.NONE).setText("- gson 2.8.6"); //$NON-NLS-1$
         new Link(licenseGrp, SWT.NONE).setText("- httpclient 4.5.13"); //$NON-NLS-1$
         new Link(licenseGrp, SWT.NONE).setText("- httpcore 4.4.13"); //$NON-NLS-1$
-        new Link(licenseGrp, SWT.NONE).setText("- okhttp 4.9.2"); //$NON-NLS-1$
+        new Link(licenseGrp, SWT.NONE).setText("- jasypt 1.9.3"); //$NON-NLS-1$
+        new Link(licenseGrp, SWT.NONE).setText("- okhttp 4.10.0"); //$NON-NLS-1$
+        new Link(licenseGrp, SWT.NONE).setText("- okhttp-urlconnection 4.10.0"); //$NON-NLS-1$
         new Link(licenseGrp, SWT.NONE).setText("- log4j-core 2.17.2"); //$NON-NLS-1$
         new Link(licenseGrp, SWT.NONE).setText("- log4j-api 2.17.2"); //$NON-NLS-1$
         new Link(licenseGrp, SWT.NONE).setText("- snakeyaml 1.16"); //$NON-NLS-1$

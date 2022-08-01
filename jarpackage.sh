@@ -3,7 +3,7 @@
 JAVA_HOME="/Library/Java/JavaVirtualMachines/jdk1.8.0_231.jdk/Contents/Home"
 BUNDLE_JRE_HOME="/Users/XXXXX/Downloads/jre1.8.0_202.jre"
 APP_NAME="CSVDLTool"
-APP_VERSION="1.7.0"
+APP_VERSION="1.8.0"
 APP_DIR_NAME="${APP_NAME}_${APP_VERSION}.app"
 
 javapackager \

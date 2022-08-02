@@ -3,7 +3,7 @@
   <dontWrapJar>false</dontWrapJar>
   <headerType>gui</headerType>
   <jar>C:\Users\turbou\Desktop\CSVDLTool_work\common\CSVDLTool-1.8.0.jar</jar>
-  <outfile>C:\Users\turbou\Desktop\CSVDLTool_work\common\CSVDLTool_1.8.0.exe</outfile>
+  <outfile>C:\Users\turbou\Desktop\CSVDLTool_work\common\CSVDLTool_1.8.0_auditlog.exe</outfile>
   <errTitle></errTitle>
   <cmdLine></cmdLine>
   <chdir>.</chdir>
@@ -24,5 +24,6 @@
     <runtimeBits>32</runtimeBits>
     <initialHeapSize>256</initialHeapSize>
     <maxHeapSize>512</maxHeapSize>
+    <opt>-Dauth=password</opt>
   </jre>
 </launch4jConfig>

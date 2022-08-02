@@ -19,6 +19,7 @@ javapackager \
   -BjvmOptions=-XstartOnFirstThread \
   -BjvmOptions=-Xms256m \
   -BjvmOptions=-Xmx512m \
+  -argument auth=password \
   -vendor "Contrast Security Japan G.K." \
   -Bicon=src/main/resources/csvdltool.icns \
   -Bmac.CFBundleVersion=${APP_VERSION} \

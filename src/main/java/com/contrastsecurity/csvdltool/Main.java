@@ -230,7 +230,7 @@ public class Main implements PropertyChangeListener {
 
     public enum AuthType {
         TOKEN,
-        BASIC
+        PASSWORD
     }
 
     Logger logger = LogManager.getLogger("csvdltool");
@@ -244,8 +244,8 @@ public class Main implements PropertyChangeListener {
     public static void main(String[] args) {
         Main main = new Main();
         main.authType = AuthType.TOKEN;
-        if (System.getProperty("auth") != null && System.getProperty("auth").equals("basic")) {
-            main.authType = AuthType.BASIC;
+        if (System.getProperty("auth") != null && System.getProperty("auth").equals("password")) {
+            main.authType = AuthType.PASSWORD;
         }
         main.initialize();
         main.createPart();
@@ -318,7 +318,7 @@ public class Main implements PropertyChangeListener {
             this.ps.setDefault(PreferenceConstants.CONTRAST_URL, contrastSecurityYaml.getUrl());
             this.ps.setDefault(PreferenceConstants.USERNAME, contrastSecurityYaml.getUserName());
             this.ps.setDefault(PreferenceConstants.SERVICE_KEY, contrastSecurityYaml.getServiceKey());
-            if (this.authType == AuthType.BASIC) {
+            if (this.authType == AuthType.PASSWORD) {
                 this.ps.setValue(PreferenceConstants.SERVICE_KEY, "");
             }
         } catch (Exception e) {
@@ -1864,7 +1864,7 @@ public class Main implements PropertyChangeListener {
 
         Composite bottomBtnGrp = new Composite(shell, SWT.NONE);
         GridLayout bottomBtnGrpLt = new GridLayout();
-        if (this.authType == AuthType.BASIC) {
+        if (this.authType == AuthType.PASSWORD) {
             bottomBtnGrpLt.numColumns = 2;
         } else {
             bottomBtnGrpLt.numColumns = 1;
@@ -1914,7 +1914,7 @@ public class Main implements PropertyChangeListener {
         });
 
         // ========== ログアウトボタン ==========
-        if (this.authType == AuthType.BASIC) {
+        if (this.authType == AuthType.PASSWORD) {
             this.logoutBtn = new Button(bottomBtnGrp, SWT.PUSH);
             this.logoutBtn.setLayoutData(new GridData());
             this.logoutBtn.setText("ログアウト");

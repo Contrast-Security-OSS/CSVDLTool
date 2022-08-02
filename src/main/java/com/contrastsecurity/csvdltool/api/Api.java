@@ -199,7 +199,7 @@ public abstract class Api {
 
     protected TsvSettings checkTsv() {
         Api tsvSettingsApi = null;
-        if (((CSVDLToolShell) this.shell).getMain().getAuthType() == AuthType.BASIC) {
+        if (((CSVDLToolShell) this.shell).getMain().getAuthType() == AuthType.PASSWORD) {
             tsvSettingsApi = new TsvSettingsApi(shell, ps, org, this.contrastUrl, this.userName);
         } else {
             tsvSettingsApi = new TsvSettingsApi(shell, ps, org, this.contrastUrl, this.userName, this.serviceKey);
@@ -247,7 +247,7 @@ public abstract class Api {
                 }
                 if (tsvSettings.getTsv_type().equals("EMAIL")) {
                     Api tsvInitializeApi = null;
-                    if (((CSVDLToolShell) this.shell).getMain().getAuthType() == AuthType.BASIC) {
+                    if (((CSVDLToolShell) this.shell).getMain().getAuthType() == AuthType.PASSWORD) {
                         tsvInitializeApi = new TsvInitializeApi(this.shell, this.ps, this.org, this.contrastUrl, this.userName);
                     } else {
                         tsvInitializeApi = new TsvInitializeApi(this.shell, this.ps, this.org, this.contrastUrl, this.userName, this.serviceKey);
@@ -298,7 +298,7 @@ public abstract class Api {
     }
 
     public Object get() throws Exception {
-        if (((CSVDLToolShell) this.shell).getMain().getAuthType() == AuthType.BASIC) {
+        if (((CSVDLToolShell) this.shell).getMain().getAuthType() == AuthType.PASSWORD) {
             basicAuth();
             try {
                 tsvCheck();
@@ -324,7 +324,7 @@ public abstract class Api {
     }
 
     public Object post() throws Exception {
-        if (((CSVDLToolShell) this.shell).getMain().getAuthType() == AuthType.BASIC) {
+        if (((CSVDLToolShell) this.shell).getMain().getAuthType() == AuthType.PASSWORD) {
             basicAuth();
             try {
                 tsvCheck();
@@ -368,7 +368,7 @@ public abstract class Api {
 
     protected List<Header> getHeaders() {
         List<Header> headers = new ArrayList<Header>();
-        if (((CSVDLToolShell) this.shell).getMain().getAuthType() == AuthType.BASIC) {
+        if (((CSVDLToolShell) this.shell).getMain().getAuthType() == AuthType.PASSWORD) {
             headers.add(new BasicHeader("X-XSRF-TOKEN", ps.getString(PreferenceConstants.XSRF_TOKEN)));
         } else {
             String apiKey = this.org.getApikey();
@@ -390,7 +390,7 @@ public abstract class Api {
         String url = this.getUrl();
         logger.trace(url);
         OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();
-        if (((CSVDLToolShell) this.shell).getMain().getAuthType() == AuthType.BASIC) {
+        if (((CSVDLToolShell) this.shell).getMain().getAuthType() == AuthType.PASSWORD) {
             clientBuilder.cookieJar(((CSVDLToolShell) this.shell).getMain().getCookieJar());
         }
         Request.Builder requestBuilder = null;
@@ -480,7 +480,7 @@ public abstract class Api {
                 } else if (response.code() == 401) {
                     throw new ApiException(response.body().string());
                 } else if (response.code() == 403) {
-                    if (((CSVDLToolShell) this.shell).getMain().getAuthType() == AuthType.BASIC) {
+                    if (((CSVDLToolShell) this.shell).getMain().getAuthType() == AuthType.PASSWORD) {
                         Gson gson = new Gson();
                         Type contrastType = new TypeToken<ContrastJson>() {
                         }.getType();

@@ -123,7 +123,7 @@ public class BasePreferencePage extends PreferencePage {
             public void modifyText(ModifyEvent e) {
                 String contrastUrlStr = contrastUrlTxt.getText().trim();
                 String userNameStr = userNameTxt.getText().trim();
-                if (authType == AuthType.BASIC) {
+                if (authType == AuthType.PASSWORD) {
                     if (contrastUrlStr.isEmpty() || userNameStr.isEmpty()) {
                         addBtn.setEnabled(false);
                     } else {
@@ -159,7 +159,7 @@ public class BasePreferencePage extends PreferencePage {
             public void modifyText(ModifyEvent e) {
                 String contrastUrlStr = contrastUrlTxt.getText().trim();
                 String userNameStr = userNameTxt.getText().trim();
-                if (authType == AuthType.BASIC) {
+                if (authType == AuthType.PASSWORD) {
                     if (contrastUrlStr.isEmpty() || userNameStr.isEmpty()) {
                         addBtn.setEnabled(false);
                     } else {
@@ -176,7 +176,7 @@ public class BasePreferencePage extends PreferencePage {
             }
         });
 
-        if (this.authType == AuthType.BASIC) {
+        if (this.authType == AuthType.PASSWORD) {
             Label passwordLbl = new Label(baseGrp, SWT.LEFT);
             GridData passwordLblGrDt = new GridData();
             passwordLblGrDt.verticalAlignment = SWT.TOP;
@@ -361,7 +361,7 @@ public class BasePreferencePage extends PreferencePage {
         addBtn = new Button(buttonGrp, SWT.NULL);
         addBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         addBtn.setText("追加");
-        if (this.authType == AuthType.BASIC) {
+        if (this.authType == AuthType.PASSWORD) {
             if (contrastUrlTxt.getText().trim().isEmpty() || userNameTxt.getText().trim().isEmpty()) {
                 addBtn.setEnabled(false);
             } else {
@@ -392,7 +392,7 @@ public class BasePreferencePage extends PreferencePage {
                     }
                 }
                 OrganizationDialog orgDialog = null;
-                if (authType == AuthType.BASIC) {
+                if (authType == AuthType.PASSWORD) {
                     orgDialog = new OrganizationDialog(shell, ps, contrastUrlTxt.getText().trim(), userNameTxt.getText().trim());
                 } else {
                     orgDialog = new OrganizationDialog(shell, ps, contrastUrlTxt.getText().trim(), userNameTxt.getText().trim(), serviceKeyTxt.getText().trim());
@@ -497,7 +497,7 @@ public class BasePreferencePage extends PreferencePage {
         List<String> errors = new ArrayList<String>();
         String url = this.contrastUrlTxt.getText().trim();
         String usr = this.userNameTxt.getText().trim();
-        if (this.authType == AuthType.BASIC) {
+        if (this.authType == AuthType.PASSWORD) {
             if (url.isEmpty() || usr.isEmpty()) {
                 if (!this.orgList.isEmpty()) {
                     errors.add("・組織一覧に設定が残っている場合、Contrast URL, Username, Service Keyはブランクにできません。\\r\\nこれらをブランクにする場合は組織一覧の設定をすべて削除してください。");
@@ -530,7 +530,7 @@ public class BasePreferencePage extends PreferencePage {
                 }
             }
         }
-        if (this.authType == AuthType.BASIC) {
+        if (this.authType == AuthType.PASSWORD) {
             if (passInput.getSelection()) {
                 ps.setValue(PreferenceConstants.PASS_TYPE, "input");
                 ps.setValue(PreferenceConstants.PASSWORD, "");

@@ -4,7 +4,7 @@ JAVA_HOME="/Library/Java/JavaVirtualMachines/jdk1.8.0_231.jdk/Contents/Home"
 BUNDLE_JRE_HOME="/Users/turbou/Downloads/jre1.8.0_202.jre"
 APP_NAME="CSVDLTool"
 APP_VERSION="1.8.0"
-APP_DIR_NAME="${APP_NAME}_${APP_VERSION}.app"
+APP_DIR_NAME="${APP_NAME}_${APP_VERSION}_auditlog.app"
 
 javapackager \
   -deploy -Bruntime=${BUNDLE_JRE_HOME} \
@@ -14,7 +14,7 @@ javapackager \
   -outdir  ./build/libs \
   -outfile ${APP_DIR_NAME} \
   -appclass com.contrastsecurity.csvdltool.Main \
-  -name "${APP_NAME}_${APP_VERSION}" \
+  -name "${APP_NAME}_${APP_VERSION}_auditlog" \
   -title "${APP_NAME}" \
   -BjvmOptions=-XstartOnFirstThread \
   -BjvmOptions=-Xms256m \

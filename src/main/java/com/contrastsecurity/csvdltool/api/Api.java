@@ -49,7 +49,6 @@ import org.apache.http.message.BasicHeader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Shell;
 import org.jasypt.util.text.BasicTextEncryptor;
@@ -70,6 +69,7 @@ import com.contrastsecurity.csvdltool.model.Organization;
 import com.contrastsecurity.csvdltool.model.TsvSettings;
 import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
 import okhttp3.Authenticator;
@@ -170,6 +170,9 @@ public abstract class Api {
                 Response response = null;
                 httpClient = clientBuilder.build();
                 response = httpClient.newCall(request).execute();
+                if (response.code() != 200) {
+                    throw new BasicAuthException("認証に失敗しました。\r\nUsername, Passwordが正しいか再度ご確認ください。");
+                }
                 List<Cookie> cookies = cookieJar.loadForRequest(HttpUrl.parse(ps.getString(PreferenceConstants.CONTRAST_URL)));
                 String xsrf_token = null;
                 for (Cookie c : cookies) {
@@ -187,17 +190,15 @@ public abstract class Api {
                         ((CSVDLToolShell) shell).getMain().loggedIn();
                     }
                 });
-            } catch (Exception nae) {
-                if (nae.getMessage().equals("400")) {
-                    throw new TsvException("認証に失敗しました。");
-                }
+            } catch (Exception e) {
+                throw new BasicAuthException(e.getMessage());
             }
         } else {
             throw new BasicAuthException("認証をキャンセルしました。");
         }
     }
 
-    protected TsvSettings checkTsv() {
+    protected TsvSettings checkTsv() throws Exception {
         Api tsvSettingsApi = null;
         if (((CSVDLToolShell) this.shell).getMain().getAuthType() == AuthType.PASSWORD) {
             tsvSettingsApi = new TsvSettingsApi(shell, ps, org, this.contrastUrl, this.userName);
@@ -219,11 +220,11 @@ public abstract class Api {
                 return ts;
             }
         } catch (ApiException e) {
-            MessageDialog.openWarning(shell, "二段階認証", String.format("TeamServerからエラーが返されました。\r\n%s", e.getMessage()));
+            throw new TsvException(String.format("TeamServerからエラーが返されました。\r\n%s", e.getMessage()));
         } catch (NonApiException e) {
-            MessageDialog.openError(shell, "二段階認証", String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", e.getMessage()));
+            throw new TsvException(String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", e.getMessage()));
         } catch (Exception e) {
-            MessageDialog.openError(shell, "二段階認証", String.format("不明なエラーです。ログファイルをご確認ください。\r\n%s", e.getMessage()));
+            throw new TsvException(String.format("不明なエラーです。ログファイルをご確認ください。\r\n%s", e.getMessage()));
         }
         return null;
     }
@@ -306,7 +307,7 @@ public abstract class Api {
                 shell.getDisplay().syncExec(new Runnable() {
                     @Override
                     public void run() {
-                        ((CSVDLToolShell) shell).getMain().loggedOut();
+                        ((CSVDLToolShell) shell).getMain().logOut();
                     }
                 });
                 throw tsve;
@@ -332,7 +333,7 @@ public abstract class Api {
                 shell.getDisplay().syncExec(new Runnable() {
                     @Override
                     public void run() {
-                        ((CSVDLToolShell) shell).getMain().loggedOut();
+                        ((CSVDLToolShell) shell).getMain().logOut();
                     }
                 });
                 throw tsve;
@@ -472,22 +473,46 @@ public abstract class Api {
             try {
                 response = httpClient.newCall(request).execute();
                 if (response.code() == 200) {
-                    return response.body().string();
+                    String res = response.body().string();
+                    try {
+                        Gson gson = new Gson();
+                        Type contrastType = new TypeToken<ContrastJson>() {
+                        }.getType();
+                        gson.fromJson(res, contrastType);
+                    } catch (JsonSyntaxException jse) {
+                        shell.getDisplay().syncExec(new Runnable() {
+                            @Override
+                            public void run() {
+                                ((CSVDLToolShell) shell).getMain().loggedOut();
+                            }
+                        });
+                        // ps.setValue(PreferenceConstants.TSV_STATUS, TsvStatusEnum.NONE.name());
+                        // ps.setValue(PreferenceConstants.BASIC_AUTH_STATUS, BasicAuthStatusEnum.NONE.name());
+                        // ps.setValue(PreferenceConstants.XSRF_TOKEN, "");
+                        throw new ApiException("認証が必要です。もう一度実行してください。");
+                    }
+                    return res;
                 } else if (response.code() == 303) {
                     throw new TsvException(response.body().string());
                 } else if (response.code() == 400) {
                     throw new ApiException(response.body().string());
-                } else if (response.code() == 401) {
-                    throw new ApiException(response.body().string());
-                } else if (response.code() == 403) {
+                } else if (response.code() == 401 || response.code() == 403) {
                     if (((CSVDLToolShell) this.shell).getMain().getAuthType() == AuthType.PASSWORD) {
                         Gson gson = new Gson();
                         Type contrastType = new TypeToken<ContrastJson>() {
                         }.getType();
                         ContrastJson contrastJson = gson.fromJson(response.body().string(), contrastType);
-                        if (contrastJson.getSuccess().equals("false") && contrastJson.getMessages().contains("Invalid CSRF token")) {
-                            ps.setValue(PreferenceConstants.BASIC_AUTH_STATUS, BasicAuthStatusEnum.NONE.name());
-                            ps.setValue(PreferenceConstants.XSRF_TOKEN, "");
+                        if (contrastJson.getSuccess().equals("false")
+                                && (contrastJson.getMessages().contains("Invalid CSRF token") || contrastJson.getMessages().contains("Authorization failure"))) {
+                            shell.getDisplay().syncExec(new Runnable() {
+                                @Override
+                                public void run() {
+                                    ((CSVDLToolShell) shell).getMain().loggedOut();
+                                }
+                            });
+                            // ps.setValue(PreferenceConstants.TSV_STATUS, TsvStatusEnum.NONE.name());
+                            // ps.setValue(PreferenceConstants.BASIC_AUTH_STATUS, BasicAuthStatusEnum.NONE.name());
+                            // ps.setValue(PreferenceConstants.XSRF_TOKEN, "");
                             throw new ApiException("認証が必要です。もう一度実行してください。");
                         }
                     }

@@ -1923,7 +1923,7 @@ public class Main implements PropertyChangeListener {
             this.logoutBtn.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
-                    loggedOut();
+                    logOut();
                 }
             });
         }
@@ -1969,16 +1969,17 @@ public class Main implements PropertyChangeListener {
         this.logoutBtn.setEnabled(true);
     }
 
-    public void loggedOut() {
+    public void logOut() {
         Api logoutApi = new LogoutApi(shell, ps, getValidOrganization());
         try {
             logoutApi.getWithoutCheckTsv();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        // String timestamp = new SimpleDateFormat("yyyy/MM/dd HH:mm").format(new Date());
-        // String userName = ps.getString(PreferenceConstants.USERNAME);
-        // this.statusBar.setText(String.format("%s %s successfully logged out", userName, timestamp));
+        loggedOut();
+    }
+
+    public void loggedOut() {
         this.cookieJar = null;
         this.statusBar.setText("");
         ps.setValue(PreferenceConstants.XSRF_TOKEN, "");

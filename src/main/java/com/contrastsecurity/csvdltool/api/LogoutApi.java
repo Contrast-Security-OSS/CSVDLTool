@@ -30,7 +30,7 @@ import com.contrastsecurity.csvdltool.model.Organization;
 
 public class LogoutApi extends Api {
     public LogoutApi(Shell shell, IPreferenceStore ps, Organization org) {
-        super(shell, ps, org);
+        super(shell, ps, org, false);
     }
 
     @Override

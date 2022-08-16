@@ -388,8 +388,21 @@ public class Main implements PropertyChangeListener {
 
             @Override
             public void shellActivated(ShellEvent event) {
+                boolean ngRequiredFields = false;
+                String url = ps.getString(PreferenceConstants.CONTRAST_URL);
+                String usr = ps.getString(PreferenceConstants.USERNAME);
+                if (authType == AuthType.PASSWORD) {
+                    if (url.isEmpty() || usr.isEmpty()) {
+                        ngRequiredFields = true;
+                    }
+                } else {
+                    String svc = ps.getString(PreferenceConstants.SERVICE_KEY);
+                    if (url.isEmpty() || usr.isEmpty() || svc.isEmpty()) {
+                        ngRequiredFields = true;
+                    }
+                }
                 List<Organization> orgs = getValidOrganizations();
-                if (orgs.isEmpty()) {
+                if (ngRequiredFields || orgs.isEmpty()) {
                     appLoadBtn.setEnabled(false);
                     vulExecuteBtn.setEnabled(false);
                     attackLoadBtn.setEnabled(false);
@@ -413,9 +426,9 @@ public class Main implements PropertyChangeListener {
                 updateProtectOption();
                 setWindowTitle();
                 if (ps.getBoolean(PreferenceConstants.PROXY_YUKO) && ps.getString(PreferenceConstants.PROXY_AUTH).equals("input")) {
-                    String usr = ps.getString(PreferenceConstants.PROXY_TMP_USER);
-                    String pwd = ps.getString(PreferenceConstants.PROXY_TMP_PASS);
-                    if (usr == null || usr.isEmpty() || pwd == null || pwd.isEmpty()) {
+                    String proxy_usr = ps.getString(PreferenceConstants.PROXY_TMP_USER);
+                    String proxy_pwd = ps.getString(PreferenceConstants.PROXY_TMP_PASS);
+                    if (proxy_usr == null || proxy_usr.isEmpty() || proxy_pwd == null || proxy_pwd.isEmpty()) {
                         ProxyAuthDialog proxyAuthDialog = new ProxyAuthDialog(shell);
                         int result = proxyAuthDialog.open();
                         if (IDialogConstants.CANCEL_ID == result) {

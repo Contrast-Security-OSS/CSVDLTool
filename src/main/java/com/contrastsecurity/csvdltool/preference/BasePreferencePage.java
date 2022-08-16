@@ -500,22 +500,19 @@ public class BasePreferencePage extends PreferencePage {
         if (this.authType == AuthType.PASSWORD) {
             if (url.isEmpty() || usr.isEmpty()) {
                 if (!this.orgList.isEmpty()) {
-                    errors.add("・組織一覧に設定が残っている場合、Contrast URL, Username, Service Keyはブランクにできません。\\r\\nこれらをブランクにする場合は組織一覧の設定をすべて削除してください。");
+                    errors.add("・組織一覧に設定が残っている場合、Contrast URL, Usernameはブランクにできません。\r\nこれらをブランクにする場合は組織一覧の設定をすべて削除してください。");
                     contrastUrlTxt.setText(ps.getString(PreferenceConstants.CONTRAST_URL));
-                    serviceKeyTxt.setText(ps.getString(PreferenceConstants.SERVICE_KEY));
                     userNameTxt.setText(ps.getString(PreferenceConstants.USERNAME));
-                    return false;
                 }
             }
         } else {
             String svc = this.serviceKeyTxt.getText().trim();
             if (url.isEmpty() || usr.isEmpty() || svc.isEmpty()) {
                 if (!this.orgList.isEmpty()) {
-                    errors.add("・組織一覧に設定が残っている場合、Contrast URL, Usernameはブランクにできません。\\r\\nこれらをブランクにする場合は組織一覧の設定をすべて削除してください。");
+                    errors.add("・組織一覧に設定が残っている場合、Contrast URL, Username, Service Keyはブランクにできません。\r\nこれらをブランクにする場合は組織一覧の設定をすべて削除してください。");
                     contrastUrlTxt.setText(ps.getString(PreferenceConstants.CONTRAST_URL));
                     serviceKeyTxt.setText(ps.getString(PreferenceConstants.SERVICE_KEY));
                     userNameTxt.setText(ps.getString(PreferenceConstants.USERNAME));
-                    return false;
                 }
             }
         }

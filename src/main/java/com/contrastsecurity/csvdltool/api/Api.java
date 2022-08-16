@@ -105,6 +105,7 @@ public abstract class Api {
     protected int totalCount;
     private String pass;
     private String code;
+    private boolean jsonResponseFlg;
 
     public Api(Shell shell, IPreferenceStore ps, Organization org) {
         this.shell = shell;
@@ -116,6 +117,12 @@ public abstract class Api {
         if (((CSVDLToolShell) this.shell).getMain().getCookieJar() == null) {
             ((CSVDLToolShell) this.shell).getMain().setCookieJar(new MyCookieJar(this.contrastUrl));
         }
+        this.jsonResponseFlg = true;
+    }
+
+    public Api(Shell shell, IPreferenceStore ps, Organization org, boolean jsonResponseFlg) {
+        this(shell, ps, org);
+        this.jsonResponseFlg = jsonResponseFlg;
     }
 
     private void basicAuth() throws Exception {
@@ -474,22 +481,24 @@ public abstract class Api {
                 response = httpClient.newCall(request).execute();
                 if (response.code() == 200) {
                     String res = response.body().string();
-                    try {
-                        Gson gson = new Gson();
-                        Type contrastType = new TypeToken<ContrastJson>() {
-                        }.getType();
-                        gson.fromJson(res, contrastType);
-                    } catch (JsonSyntaxException jse) {
-                        shell.getDisplay().syncExec(new Runnable() {
-                            @Override
-                            public void run() {
-                                ((CSVDLToolShell) shell).getMain().loggedOut();
-                            }
-                        });
-                        // ps.setValue(PreferenceConstants.TSV_STATUS, TsvStatusEnum.NONE.name());
-                        // ps.setValue(PreferenceConstants.BASIC_AUTH_STATUS, BasicAuthStatusEnum.NONE.name());
-                        // ps.setValue(PreferenceConstants.XSRF_TOKEN, "");
-                        throw new ApiException("認証が必要です。もう一度実行してください。");
+                    if (jsonResponseFlg) {
+                        try {
+                            Gson gson = new Gson();
+                            Type contrastType = new TypeToken<ContrastJson>() {
+                            }.getType();
+                            gson.fromJson(res, contrastType);
+                        } catch (JsonSyntaxException jse) {
+                            shell.getDisplay().syncExec(new Runnable() {
+                                @Override
+                                public void run() {
+                                    ((CSVDLToolShell) shell).getMain().loggedOut();
+                                }
+                            });
+                            // ps.setValue(PreferenceConstants.TSV_STATUS, TsvStatusEnum.NONE.name());
+                            // ps.setValue(PreferenceConstants.BASIC_AUTH_STATUS, BasicAuthStatusEnum.NONE.name());
+                            // ps.setValue(PreferenceConstants.XSRF_TOKEN, "");
+                            throw new ApiException("認証が必要です。もう一度実行してください。");
+                        }
                     }
                     return res;
                 } else if (response.code() == 303) {

@@ -78,6 +78,7 @@ Eclipseでプロジェクトをリフレッシュすると、あとは実行でc
 - jarpackage.shを実行します。
   ```bash
   ./jarpackage.sh
+  ./jarpackage_auditlog.sh
   ```
   build/libs/bundle下にappフォルダが作られます。
 
@@ -106,10 +107,12 @@ Eclipseでプロジェクトをリフレッシュすると、あとは実行でc
   - 署名
     ```bash
     codesign --deep -s "Contrast Security, Inc." -v CSVDLTool_1.8.1.app
+    codesign --deep -s "Contrast Security, Inc." -v CSVDLTool_1.8.1_auditlog.app
     ```
   - 署名の確認
     ```bash
     codesign -d --verbose=4 CSVDLTool_1.8.1.app
+    codesign -d --verbose=4 CSVDLTool_1.8.1_auditlog.app
     ```
     
 #### 圧縮について補足
@@ -117,6 +120,7 @@ Eclipseでプロジェクトをリフレッシュすると、あとは実行でc
 - Mac
   ```bash
   7z a CSVDLTool_1.8.1.cli7z CSVDLTool_1.8.1.app/
+  7z a CSVDLTool_1.8.1_auditlog.cli7z CSVDLTool_1.8.1_auditlog.app/
   ```
 
 ### 起動後の使い方について

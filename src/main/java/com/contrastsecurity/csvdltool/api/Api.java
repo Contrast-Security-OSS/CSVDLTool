@@ -164,44 +164,43 @@ public abstract class Api {
                 }
             });
         }
-        if (!pass.isEmpty()) {
-            try {
-                OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();
-                CookieJar cookieJar = ((CSVDLToolShell) this.shell).getMain().getCookieJar();
-                clientBuilder.cookieJar(cookieJar);
-                RequestBody formBody = new FormBody.Builder().add("ui", "true").add("username", this.userName).add("password", pass).add("sso", "").build();
-                String url = String.format("%s/authenticate.html", this.contrastUrl);
-                Request.Builder requestBuilder = new Request.Builder().url(url).post(formBody);
-                OkHttpClient httpClient = null;
-                Request request = requestBuilder.build();
-                Response response = null;
-                httpClient = clientBuilder.build();
-                response = httpClient.newCall(request).execute();
-                if (response.code() != 200) {
-                    throw new BasicAuthException("認証に失敗しました。\r\nUsername, Passwordが正しいか再度ご確認ください。");
-                }
-                List<Cookie> cookies = cookieJar.loadForRequest(HttpUrl.parse(ps.getString(PreferenceConstants.CONTRAST_URL)));
-                String xsrf_token = null;
-                for (Cookie c : cookies) {
-                    if (c.name().equals("XSRF-TOKEN")) {
-                        xsrf_token = c.value();
-                        this.ps.setValue(PreferenceConstants.XSRF_TOKEN, xsrf_token);
-                        this.ps.setValue(PreferenceConstants.BASIC_AUTH_STATUS, BasicAuthStatusEnum.AUTH.name());
-                        break;
-                    }
-                }
-                cookieJar.saveFromResponse(null, cookies);
-                shell.getDisplay().syncExec(new Runnable() {
-                    @Override
-                    public void run() {
-                        ((CSVDLToolShell) shell).getMain().loggedIn();
-                    }
-                });
-            } catch (Exception e) {
-                throw new BasicAuthException(e.getMessage());
-            }
-        } else {
+        if (pass.isEmpty()) {
             throw new BasicAuthException("認証をキャンセルしました。");
+        }
+        try {
+            OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();
+            CookieJar cookieJar = ((CSVDLToolShell) this.shell).getMain().getCookieJar();
+            clientBuilder.cookieJar(cookieJar);
+            RequestBody formBody = new FormBody.Builder().add("ui", "true").add("username", this.userName).add("password", pass).add("sso", "").build();
+            String url = String.format("%s/authenticate.html", this.contrastUrl);
+            Request.Builder requestBuilder = new Request.Builder().url(url).post(formBody);
+            OkHttpClient httpClient = null;
+            Request request = requestBuilder.build();
+            Response response = null;
+            httpClient = clientBuilder.build();
+            response = httpClient.newCall(request).execute();
+            if (response.code() != 200) {
+                throw new BasicAuthException("認証に失敗しました。\r\nUsername, Passwordが正しいか再度ご確認ください。");
+            }
+            List<Cookie> cookies = cookieJar.loadForRequest(HttpUrl.parse(ps.getString(PreferenceConstants.CONTRAST_URL)));
+            String xsrf_token = null;
+            for (Cookie c : cookies) {
+                if (c.name().equals("XSRF-TOKEN")) {
+                    xsrf_token = c.value();
+                    this.ps.setValue(PreferenceConstants.XSRF_TOKEN, xsrf_token);
+                    this.ps.setValue(PreferenceConstants.BASIC_AUTH_STATUS, BasicAuthStatusEnum.AUTH.name());
+                    break;
+                }
+            }
+            cookieJar.saveFromResponse(null, cookies);
+            shell.getDisplay().syncExec(new Runnable() {
+                @Override
+                public void run() {
+                    ((CSVDLToolShell) shell).getMain().loggedIn();
+                }
+            });
+        } catch (Exception e) {
+            throw new BasicAuthException(e.getMessage());
         }
     }
 

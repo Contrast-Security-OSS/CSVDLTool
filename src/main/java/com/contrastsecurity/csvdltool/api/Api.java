@@ -143,9 +143,10 @@ public abstract class Api {
             BasicTextEncryptor encryptor = new BasicTextEncryptor();
             encryptor.setPassword(Main.MASTER_PASSWORD);
             try {
-                pass = encryptor.decrypt(ps.getString(PreferenceConstants.PASSWORD));
+                pass = encryptor.decrypt(this.ps.getString(PreferenceConstants.PASSWORD));
             } catch (Exception e) {
                 e.printStackTrace();
+                throw new BasicAuthException("パスワードの復号化に失敗しました。\r\nパスワードの設定をやり直してください。");
             }
         }
         if (isNeedPassInput) {

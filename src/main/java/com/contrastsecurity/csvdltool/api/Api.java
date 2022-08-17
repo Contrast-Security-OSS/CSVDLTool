@@ -134,6 +134,7 @@ public abstract class Api {
         if (BasicAuthStatusEnum.AUTH == basicAuthStatusEnum) {
             return;
         }
+
         boolean isNeedPassInput = false;
         if (this.ps.getString(PreferenceConstants.PASS_TYPE).equals("input")) {
             if (this.ps.getString(PreferenceConstants.PASSWORD).isEmpty()) {
@@ -143,7 +144,7 @@ public abstract class Api {
             BasicTextEncryptor encryptor = new BasicTextEncryptor();
             encryptor.setPassword(Main.MASTER_PASSWORD);
             try {
-                pass = encryptor.decrypt(this.ps.getString(PreferenceConstants.PASSWORD));
+                this.pass = encryptor.decrypt(this.ps.getString(PreferenceConstants.PASSWORD));
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new BasicAuthException("パスワードの復号化に失敗しました。\r\nパスワードの設定をやり直してください。");
@@ -165,14 +166,15 @@ public abstract class Api {
                 }
             });
         }
-        if (pass.isEmpty()) {
+        if (this.pass.isEmpty()) {
             throw new BasicAuthException("認証をキャンセルしました。");
         }
+
         try {
             OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();
             CookieJar cookieJar = ((CSVDLToolShell) this.shell).getMain().getCookieJar();
             clientBuilder.cookieJar(cookieJar);
-            RequestBody formBody = new FormBody.Builder().add("ui", "true").add("username", this.userName).add("password", pass).add("sso", "").build();
+            RequestBody formBody = new FormBody.Builder().add("ui", "true").add("username", this.userName).add("password", this.pass).add("sso", "").build();
             String url = String.format("%s/authenticate.html", this.contrastUrl);
             Request.Builder requestBuilder = new Request.Builder().url(url).post(formBody);
             OkHttpClient httpClient = null;
@@ -237,9 +239,6 @@ public abstract class Api {
     }
 
     private void tsvCheck() throws Exception {
-        // if (((CSVDLToolShell) this.shell).getMain().getAuthType() == AuthType.BASIC) {
-        // return;
-        // }
         TsvStatusEnum tsvStatusEnum = TsvStatusEnum.NONE;
         String tsvStatusEnumStr = this.ps.getString(PreferenceConstants.TSV_STATUS);
         if (tsvStatusEnumStr != null && !tsvStatusEnumStr.isEmpty()) {

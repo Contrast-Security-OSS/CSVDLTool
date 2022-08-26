@@ -1144,7 +1144,7 @@ public class Main implements PropertyChangeListener {
                 FilterLastDetectedDialog filterDialog = new FilterLastDetectedDialog(shell, frDetectedDate, toDetectedDate);
                 int result = filterDialog.open();
                 if (IDialogConstants.OK_ID != result) {
-                    vulExecuteBtn.setFocus();
+                    attackLoadBtn.setFocus();
                     return;
                 }
                 frDetectedDate = filterDialog.getFrDate();

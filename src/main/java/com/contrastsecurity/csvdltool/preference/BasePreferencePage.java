@@ -104,7 +104,7 @@ public class BasePreferencePage extends PreferencePage {
         baseGrpLt.marginWidth = 15;
         baseGrpLt.horizontalSpacing = 10;
         baseGrp.setLayout(baseGrpLt);
-        GridData baseGrpLtGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        GridData baseGrpLtGrDt = new GridData(GridData.FILL_BOTH);
         baseGrp.setLayoutData(baseGrpLtGrDt);
 
         new Label(baseGrp, SWT.LEFT).setText("Contrast URL：");
@@ -288,12 +288,13 @@ public class BasePreferencePage extends PreferencePage {
         }
 
         // ========== 組織テーブル ========== //
-        Group orgTableGrp = new Group(composite, SWT.NONE);
+        Group orgTableGrp = new Group(baseGrp, SWT.NONE);
         GridLayout orgTableGrpLt = new GridLayout(2, false);
-        orgTableGrpLt.marginWidth = 15;
+        orgTableGrpLt.marginWidth = 10;
         orgTableGrpLt.horizontalSpacing = 10;
         orgTableGrp.setLayout(orgTableGrpLt);
         GridData orgTableGrpGrDt = new GridData(GridData.FILL_BOTH);
+        orgTableGrpGrDt.horizontalSpan = 3;
         orgTableGrp.setLayoutData(orgTableGrpGrDt);
         orgTableGrp.setText("組織一覧");
 

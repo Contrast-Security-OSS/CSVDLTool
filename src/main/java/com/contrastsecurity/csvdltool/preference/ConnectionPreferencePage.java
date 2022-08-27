@@ -184,7 +184,6 @@ public class ConnectionPreferencePage extends PreferencePage {
                     passTxt.setEnabled(false);
                 }
             }
-
         });
 
         authInput = new Button(authInputTypeGrp, SWT.RADIO);
@@ -200,7 +199,6 @@ public class ConnectionPreferencePage extends PreferencePage {
                     passTxt.setEnabled(false);
                 }
             }
-
         });
 
         authSave = new Button(authInputTypeGrp, SWT.RADIO);

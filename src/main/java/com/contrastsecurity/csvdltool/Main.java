@@ -235,7 +235,6 @@ public class Main implements PropertyChangeListener {
 
     Logger logger = LogManager.getLogger("csvdltool");
 
-    String currentTitle;
     private AuthType authType;
 
     /**
@@ -408,7 +407,6 @@ public class Main implements PropertyChangeListener {
                     attackLoadBtn.setEnabled(false);
                     serverLoadBtn.setEnabled(false);
                     settingBtn.setText("このボタンから基本設定を行ってください。");
-                    currentTitle = "";
                     uiReset();
                 } else {
                     appLoadBtn.setEnabled(true);
@@ -416,12 +414,6 @@ public class Main implements PropertyChangeListener {
                     attackLoadBtn.setEnabled(true);
                     serverLoadBtn.setEnabled(true);
                     settingBtn.setText("設定");
-                    List<String> orgNameList = new ArrayList<String>();
-                    String title = String.join(", ", orgNameList);
-                    if (currentTitle != null && !currentTitle.equals(title)) {
-                        uiReset();
-                        currentTitle = title;
-                    }
                 }
                 updateProtectOption();
                 setWindowTitle();

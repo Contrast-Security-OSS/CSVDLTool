@@ -510,14 +510,14 @@ public class Main implements PropertyChangeListener {
                     }
                     String errorMsg = e.getTargetException().getMessage();
                     if (e.getTargetException() instanceof ApiException) {
-                        MessageDialog.openWarning(shell, "アプリケーション一覧の取得", String.format("TeamServerからエラーが返されました。\r\n%s", errorMsg));
+                        MessageDialog.openError(shell, "アプリケーション一覧の取得", String.format("TeamServerからエラーが返されました。\r\n%s", errorMsg));
                     } else if (e.getTargetException() instanceof NonApiException) {
                         MessageDialog.openError(shell, "アプリケーション一覧の取得", String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", errorMsg));
                     } else if (e.getTargetException() instanceof TsvException) {
-                        MessageDialog.openInformation(shell, "アプリケーション一覧の取得", errorMsg);
+                        MessageDialog.openError(shell, "アプリケーション一覧の取得", errorMsg);
                         return;
                     } else if (e.getTargetException() instanceof BasicAuthException) {
-                        MessageDialog.openInformation(shell, "アプリケーション一覧の取得", errorMsg);
+                        MessageDialog.openError(shell, "アプリケーション一覧の取得", errorMsg);
                         return;
                     } else {
                         MessageDialog.openError(shell, "アプリケーション一覧の取得", String.format("不明なエラーです。ログファイルをご確認ください。\r\n%s", errorMsg));
@@ -963,11 +963,11 @@ public class Main implements PropertyChangeListener {
                     }
                     String exceptionMsg = e.getTargetException().getMessage();
                     if (e.getTargetException() instanceof ApiException) {
-                        MessageDialog.openWarning(shell, "脆弱性情報の取得", String.format("TeamServerからエラーが返されました。\r\n%s", exceptionMsg));
+                        MessageDialog.openError(shell, "脆弱性情報の取得", String.format("TeamServerからエラーが返されました。\r\n%s", exceptionMsg));
                     } else if (e.getTargetException() instanceof NonApiException) {
                         MessageDialog.openError(shell, "脆弱性情報の取得", String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", exceptionMsg));
                     } else if (e.getTargetException() instanceof InterruptedException) {
-                        MessageDialog.openInformation(shell, "脆弱性情報の取得", exceptionMsg);
+                        MessageDialog.openError(shell, "脆弱性情報の取得", exceptionMsg);
                     } else {
                         MessageDialog.openError(shell, "脆弱性情報の取得", String.format("不明なエラーです。ログファイルをご確認ください。\r\n%s", exceptionMsg));
                     }
@@ -1059,11 +1059,11 @@ public class Main implements PropertyChangeListener {
                     }
                     String exceptionMsg = e.getTargetException().getMessage();
                     if (e.getTargetException() instanceof ApiException) {
-                        MessageDialog.openWarning(shell, "ライブラリ情報の取得", String.format("TeamServerからエラーが返されました。\r\n%s", exceptionMsg));
+                        MessageDialog.openError(shell, "ライブラリ情報の取得", String.format("TeamServerからエラーが返されました。\r\n%s", exceptionMsg));
                     } else if (e.getTargetException() instanceof NonApiException) {
                         MessageDialog.openError(shell, "ライブラリ情報の取得", String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", exceptionMsg));
                     } else if (e.getTargetException() instanceof InterruptedException) {
-                        MessageDialog.openInformation(shell, "ライブラリ情報の取得", exceptionMsg);
+                        MessageDialog.openError(shell, "ライブラリ情報の取得", exceptionMsg);
                     } else {
                         MessageDialog.openError(shell, "ライブラリ情報の取得", String.format("不明なエラーです。ログファイルをご確認ください。\r\n%s", exceptionMsg));
                     }
@@ -1206,11 +1206,14 @@ public class Main implements PropertyChangeListener {
                     }
                     String errorMsg = e.getTargetException().getMessage();
                     if (e.getTargetException() instanceof ApiException) {
-                        MessageDialog.openWarning(shell, "攻撃イベント一覧の取得", String.format("TeamServerからエラーが返されました。\r\n%s", errorMsg));
+                        MessageDialog.openError(shell, "攻撃イベント一覧の取得", String.format("TeamServerからエラーが返されました。\r\n%s", errorMsg));
                     } else if (e.getTargetException() instanceof NonApiException) {
                         MessageDialog.openError(shell, "攻撃イベント一覧の取得", String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", errorMsg));
                     } else if (e.getTargetException() instanceof TsvException) {
-                        MessageDialog.openInformation(shell, "攻撃イベント一覧の取得", errorMsg);
+                        MessageDialog.openError(shell, "攻撃イベント一覧の取得", errorMsg);
+                        return;
+                    } else if (e.getTargetException() instanceof BasicAuthException) {
+                        MessageDialog.openError(shell, "攻撃イベント一覧の取得", errorMsg);
                         return;
                     } else {
                         MessageDialog.openError(shell, "攻撃イベント一覧の取得", String.format("不明なエラーです。ログファイルをご確認ください。\r\n%s", errorMsg));
@@ -1691,14 +1694,14 @@ public class Main implements PropertyChangeListener {
                     }
                     String errorMsg = e.getTargetException().getMessage();
                     if (e.getTargetException() instanceof ApiException) {
-                        MessageDialog.openWarning(shell, "サーバ一覧の取得", String.format("TeamServerからエラーが返されました。\r\n%s", errorMsg));
+                        MessageDialog.openError(shell, "サーバ一覧の取得", String.format("TeamServerからエラーが返されました。\r\n%s", errorMsg));
                     } else if (e.getTargetException() instanceof NonApiException) {
                         MessageDialog.openError(shell, "サーバ一覧の取得", String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", errorMsg));
                     } else if (e.getTargetException() instanceof TsvException) {
-                        MessageDialog.openInformation(shell, "サーバ一覧の取得", errorMsg);
+                        MessageDialog.openError(shell, "サーバ一覧の取得", errorMsg);
                         return;
                     } else if (e.getTargetException() instanceof BasicAuthException) {
-                        MessageDialog.openInformation(shell, "サーバ一覧の取得", errorMsg);
+                        MessageDialog.openError(shell, "サーバ一覧の取得", errorMsg);
                         return;
                     } else {
                         MessageDialog.openError(shell, "サーバ一覧の取得", String.format("不明なエラーです。ログファイルをご確認ください。\r\n%s", errorMsg));

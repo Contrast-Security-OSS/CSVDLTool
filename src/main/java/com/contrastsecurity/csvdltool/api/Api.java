@@ -29,6 +29,7 @@ import java.io.StringWriter;
 import java.lang.reflect.Type;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -203,7 +204,15 @@ public abstract class Api {
                 }
             });
         } catch (Exception e) {
-            throw new BasicAuthException(e.getMessage());
+            StringWriter stringWriter = new StringWriter();
+            PrintWriter printWriter = new PrintWriter(stringWriter);
+            e.printStackTrace(printWriter);
+            String trace = stringWriter.toString();
+            logger.error(trace);
+            if (e instanceof UnknownHostException) {
+                throw new BasicAuthException(String.format("ホストが見つかりません。\r\n%s", e.getMessage()));
+            }
+            throw new BasicAuthException(String.format("%s\r\nエラーの詳細はログファイルでご確認ください。", e.getMessage()));
         }
     }
 

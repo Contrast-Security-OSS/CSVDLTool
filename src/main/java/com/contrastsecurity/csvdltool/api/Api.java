@@ -77,7 +77,6 @@ import okhttp3.Authenticator;
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
 import okhttp3.Credentials;
-import okhttp3.FormBody;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -172,20 +171,12 @@ public abstract class Api {
         }
 
         try {
-            OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();
-            CookieJar cookieJar = ((CSVDLToolShell) this.shell).getMain().getCookieJar();
-            clientBuilder.cookieJar(cookieJar);
-            RequestBody formBody = new FormBody.Builder().add("ui", "true").add("username", this.userName).add("password", this.pass).add("sso", "").build();
-            String url = String.format("%s/authenticate.html", this.contrastUrl);
-            Request.Builder requestBuilder = new Request.Builder().url(url).post(formBody);
-            OkHttpClient httpClient = null;
-            Request request = requestBuilder.build();
-            Response response = null;
-            httpClient = clientBuilder.build();
-            response = httpClient.newCall(request).execute();
-            if (response.code() != 200) {
+            Api passwordAuthApi = new PasswordAuthApi(this.shell, this.ps, this.org, this.contrastUrl, this.userName, this.pass);
+            String success = (String) passwordAuthApi.postWithoutCheckTsv();
+            if (!Boolean.valueOf(success)) {
                 throw new BasicAuthException("認証に失敗しました。\r\nUsername, Passwordが正しいか再度ご確認ください。");
             }
+            CookieJar cookieJar = ((CSVDLToolShell) this.shell).getMain().getCookieJar();
             List<Cookie> cookies = cookieJar.loadForRequest(HttpUrl.parse(ps.getString(PreferenceConstants.CONTRAST_URL)));
             String xsrf_token = null;
             for (Cookie c : cookies) {
@@ -519,18 +510,21 @@ public abstract class Api {
                         Type contrastType = new TypeToken<ContrastJson>() {
                         }.getType();
                         ContrastJson contrastJson = gson.fromJson(response.body().string(), contrastType);
-                        if (contrastJson.getSuccess().equals("false")
-                                && (contrastJson.getMessages().contains("Invalid CSRF token") || contrastJson.getMessages().contains("Authorization failure"))) {
-                            shell.getDisplay().syncExec(new Runnable() {
-                                @Override
-                                public void run() {
-                                    ((CSVDLToolShell) shell).getMain().loggedOut();
-                                }
-                            });
-                            // ps.setValue(PreferenceConstants.TSV_STATUS, TsvStatusEnum.NONE.name());
-                            // ps.setValue(PreferenceConstants.BASIC_AUTH_STATUS, BasicAuthStatusEnum.NONE.name());
-                            // ps.setValue(PreferenceConstants.XSRF_TOKEN, "");
-                            throw new ApiException("認証が必要です。もう一度実行してください。");
+                        if (contrastJson.getSuccess().equals("false")) {
+                            if (contrastJson.getMessages().contains("Invalid CSRF token") || contrastJson.getMessages().contains("Authorization failure")) {
+                                shell.getDisplay().syncExec(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        ((CSVDLToolShell) shell).getMain().loggedOut();
+                                    }
+                                });
+                                // ps.setValue(PreferenceConstants.TSV_STATUS, TsvStatusEnum.NONE.name());
+                                // ps.setValue(PreferenceConstants.BASIC_AUTH_STATUS, BasicAuthStatusEnum.NONE.name());
+                                // ps.setValue(PreferenceConstants.XSRF_TOKEN, "");
+                                throw new ApiException("認証が必要です。もう一度実行してください。");
+                            } else {
+                                throw new BasicAuthException("認証に失敗しました。\r\nUsername, Passwordが正しいか再度ご確認ください。");
+                            }
                         }
                     }
                     throw new ApiException(response.body().string());

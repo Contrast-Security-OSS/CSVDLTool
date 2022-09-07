@@ -2174,7 +2174,7 @@ public class Main implements PropertyChangeListener {
         map.put(AttackEventDetectedDateFilterEnum.LAST_WEEK_START, lastWeekStart);
         map.put(AttackEventDetectedDateFilterEnum.LAST_WEEK_END, lastWeekStart.plusDays(6));
         map.put(AttackEventDetectedDateFilterEnum.THIS_WEEK_START, lastWeekStart.plusDays(7));
-        map.put(AttackEventDetectedDateFilterEnum.THIS_WEEK_END, lastWeekStart.plusDays(14));
+        map.put(AttackEventDetectedDateFilterEnum.THIS_WEEK_END, lastWeekStart.plusDays(13));
         return map;
     }
 

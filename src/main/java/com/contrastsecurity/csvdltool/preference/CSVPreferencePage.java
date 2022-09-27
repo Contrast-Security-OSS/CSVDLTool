@@ -38,8 +38,10 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 
 public class CSVPreferencePage extends PreferencePage {
@@ -163,12 +165,22 @@ public class CSVPreferencePage extends PreferencePage {
         vulSleepTxt = new Text(ctrlGrp, SWT.BORDER);
         vulSleepTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         vulSleepTxt.setText(ps.getString(PreferenceConstants.SLEEP_VUL));
+        vulSleepTxt.addListener(SWT.FocusIn, new Listener() {
+            public void handleEvent(Event e) {
+                vulSleepTxt.selectAll();
+            }
+        });
 
         // ========== ライブラリ取得ごとスリープ ========== //
         new Label(ctrlGrp, SWT.LEFT).setText("ライブラリ取得間隔スリープ（ミリ秒）：");
         libSleepTxt = new Text(ctrlGrp, SWT.BORDER);
         libSleepTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         libSleepTxt.setText(ps.getString(PreferenceConstants.SLEEP_LIB));
+        libSleepTxt.addListener(SWT.FocusIn, new Listener() {
+            public void handleEvent(Event e) {
+                libSleepTxt.selectAll();
+            }
+        });
 
         Composite buttonGrp = new Composite(parent, SWT.NONE);
         GridLayout buttonGrpLt = new GridLayout(2, false);

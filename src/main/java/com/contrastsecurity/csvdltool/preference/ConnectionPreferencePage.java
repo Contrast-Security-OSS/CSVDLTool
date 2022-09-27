@@ -48,6 +48,7 @@ import org.eclipse.swt.widgets.Text;
 import org.jasypt.util.text.BasicTextEncryptor;
 
 import com.contrastsecurity.csvdltool.Main;
+import com.contrastsecurity.csvdltool.Main.AuthType;
 
 public class ConnectionPreferencePage extends PreferencePage {
 
@@ -62,9 +63,12 @@ public class ConnectionPreferencePage extends PreferencePage {
     private Button ignoreSSLCertCheckFlg;
     private Text connectionTimeoutTxt;
     private Text socketTimeoutTxt;
+    private Text autoReLogInIntervalTxt;
+    private AuthType authType;
 
-    public ConnectionPreferencePage() {
+    public ConnectionPreferencePage(AuthType authType) {
         super("接続設定");
+        this.authType = authType;
     }
 
     @Override
@@ -308,6 +312,7 @@ public class ConnectionPreferencePage extends PreferencePage {
                 connectionTimeoutTxt.selectAll();
             }
         });
+
         // ========== SocketTimeout ========== //
         new Label(timeoutGrp, SWT.LEFT).setText("SocketTimeout：");
         socketTimeoutTxt = new Text(timeoutGrp, SWT.BORDER);
@@ -318,6 +323,32 @@ public class ConnectionPreferencePage extends PreferencePage {
                 socketTimeoutTxt.selectAll();
             }
         });
+
+        if (authType == AuthType.PASSWORD) {
+            Group sessionTimeoutPlanGrp = new Group(composite, SWT.NONE);
+            GridLayout autoLogOutGrpLt = new GridLayout(2, false);
+            autoLogOutGrpLt.marginWidth = 15;
+            autoLogOutGrpLt.horizontalSpacing = 10;
+            sessionTimeoutPlanGrp.setLayout(autoLogOutGrpLt);
+            GridData autoLogOutGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
+            sessionTimeoutPlanGrp.setLayoutData(autoLogOutGrpGrDt);
+            sessionTimeoutPlanGrp.setText("セッションタイムアウト対策");
+
+            // ========== ConnetionTimeout ========== //
+            new Label(sessionTimeoutPlanGrp, SWT.LEFT).setText("自動再ログイン間隔（分）：");
+            autoReLogInIntervalTxt = new Text(sessionTimeoutPlanGrp, SWT.BORDER);
+            autoReLogInIntervalTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+            autoReLogInIntervalTxt.setText(ps.getString(PreferenceConstants.AUTO_RELOGIN_INTERVAL));
+            autoReLogInIntervalTxt.addListener(SWT.FocusIn, new Listener() {
+                public void handleEvent(Event e) {
+                    autoReLogInIntervalTxt.selectAll();
+                }
+            });
+            new Label(sessionTimeoutPlanGrp, SWT.LEFT).setText("");
+            Label connectionHint = new Label(sessionTimeoutPlanGrp, SWT.LEFT);
+            connectionHint.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+            connectionHint.setText("時間のかかる処理中にセッションタイムアウトが発生してしまうのを防ぐため指定された間隔で自動再ログインを行います。\r\n自動再ログインが不要な場合は0を指定してください。");
+        }
 
         Composite buttonGrp = new Composite(parent, SWT.NONE);
         GridLayout buttonGrpLt = new GridLayout(2, false);
@@ -340,6 +371,9 @@ public class ConnectionPreferencePage extends PreferencePage {
             public void widgetSelected(SelectionEvent e) {
                 connectionTimeoutTxt.setText(ps.getDefaultString(PreferenceConstants.CONNECTION_TIMEOUT));
                 socketTimeoutTxt.setText(ps.getDefaultString(PreferenceConstants.SOCKET_TIMEOUT));
+                if (authType == AuthType.PASSWORD) {
+                    autoReLogInIntervalTxt.setText(ps.getDefaultString(PreferenceConstants.AUTO_RELOGIN_INTERVAL));
+                }
             }
         });
 
@@ -425,6 +459,17 @@ public class ConnectionPreferencePage extends PreferencePage {
                 errors.add("・SocketTimeoutは数値を指定してください。");
             } else {
                 ps.setValue(PreferenceConstants.SOCKET_TIMEOUT, this.socketTimeoutTxt.getText());
+            }
+        }
+        if (authType == AuthType.PASSWORD) {
+            if (this.autoReLogInIntervalTxt.getText().isEmpty()) {
+                errors.add("・SocketTimeoutを指定してください。");
+            } else {
+                if (!StringUtils.isNumeric(this.autoReLogInIntervalTxt.getText())) {
+                    errors.add("・SocketTimeoutは数値を指定してください。");
+                } else {
+                    ps.setValue(PreferenceConstants.AUTO_RELOGIN_INTERVAL, this.autoReLogInIntervalTxt.getText());
+                }
             }
         }
         if (!errors.isEmpty()) {

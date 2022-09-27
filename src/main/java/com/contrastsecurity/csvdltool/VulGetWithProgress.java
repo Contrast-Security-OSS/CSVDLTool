@@ -44,6 +44,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -120,6 +122,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
     private boolean isOnlyParentApp;
     private boolean isIncludeDesc;
     private boolean isIncludeStackTrace;
+    private Timer timer;
 
     Logger logger = LogManager.getLogger("csvdltool");
 
@@ -140,6 +143,22 @@ public class VulGetWithProgress implements IRunnableWithProgress {
     @SuppressWarnings("unchecked")
     @Override
     public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+        int auto_login_interval = this.ps.getInt(PreferenceConstants.AUTO_RELOGIN_INTERVAL);
+        if (auto_login_interval > 0) {
+            TimerTask task = new TimerTask() {
+                public void run() {
+                    shell.getDisplay().syncExec(new Runnable() {
+                        @Override
+                        public void run() {
+                            ((CSVDLToolShell) shell).getMain().loggedOut();
+                        }
+                    });
+                }
+            };
+            this.timer = new Timer();
+            int time = 1000 * 60 * auto_login_interval;
+            this.timer.schedule(task, time, time);
+        }
         monitor.setTaskName("脆弱性情報の取得を開始しています...");
         monitor.beginTask("脆弱性情報の取得を開始しています...", 100);
         String csvFileFormat = this.ps.getString(PreferenceConstants.CSV_FILE_FORMAT_VUL);
@@ -233,6 +252,9 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                 sub2_1Monitor.beginTask("", traces.size());
                 for (String trace_id : traces) {
                     if (monitor.isCanceled()) {
+                        if (this.timer != null) {
+                            timer.cancel();
+                        }
                         throw new InterruptedException("キャンセルされました。");
                     }
                     List<String> csvLineList = new ArrayList<String>();
@@ -632,6 +654,9 @@ public class VulGetWithProgress implements IRunnableWithProgress {
             sub3Monitor.done();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+        if (this.timer != null) {
+            this.timer.cancel();
         }
         monitor.done();
     }

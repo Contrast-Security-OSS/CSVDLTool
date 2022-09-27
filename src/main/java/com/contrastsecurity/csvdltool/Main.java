@@ -183,7 +183,7 @@ public class Main implements PropertyChangeListener {
     private Button serverLoadBtn;
 
     private Button settingBtn;
-    private Button logoutBtn;
+    private Button logOutBtn;
 
     private Label statusBar;
 
@@ -286,6 +286,7 @@ public class Main implements PropertyChangeListener {
             this.ps.setDefault(PreferenceConstants.PROXY_AUTH, "none");
             this.ps.setDefault(PreferenceConstants.CONNECTION_TIMEOUT, 3000);
             this.ps.setDefault(PreferenceConstants.SOCKET_TIMEOUT, 3000);
+            this.ps.setDefault(PreferenceConstants.AUTO_RELOGIN_INTERVAL, 0);
 
             this.ps.setDefault(PreferenceConstants.CSV_COLUMN_VUL, VulCSVColmunEnum.defaultValuesStr());
             this.ps.setDefault(PreferenceConstants.SLEEP_VUL, 300);
@@ -1894,7 +1895,7 @@ public class Main implements PropertyChangeListener {
             public void widgetSelected(SelectionEvent event) {
                 PreferenceManager mgr = new PreferenceManager();
                 PreferenceNode baseNode = new PreferenceNode("base", new BasePreferencePage(shell, authType));
-                PreferenceNode connectionNode = new PreferenceNode("connection", new ConnectionPreferencePage());
+                PreferenceNode connectionNode = new PreferenceNode("connection", new ConnectionPreferencePage(authType));
                 PreferenceNode otherNode = new PreferenceNode("other", new OtherPreferencePage());
                 PreferenceNode csvNode = new PreferenceNode("csv", new CSVPreferencePage());
                 PreferenceNode vulCsvColumnNode = new PreferenceNode("vulcsvcolumn", new VulCSVColumnPreferencePage());
@@ -1924,12 +1925,12 @@ public class Main implements PropertyChangeListener {
 
         // ========== ログアウトボタン ==========
         if (this.authType == AuthType.PASSWORD) {
-            this.logoutBtn = new Button(bottomBtnGrp, SWT.PUSH);
-            this.logoutBtn.setLayoutData(new GridData());
-            this.logoutBtn.setText("ログアウト");
-            this.logoutBtn.setToolTipText("認証済みセッションからログアウトします。");
-            this.logoutBtn.setEnabled(false);
-            this.logoutBtn.addSelectionListener(new SelectionAdapter() {
+            this.logOutBtn = new Button(bottomBtnGrp, SWT.PUSH);
+            this.logOutBtn.setLayoutData(new GridData());
+            this.logOutBtn.setText("ログアウト");
+            this.logOutBtn.setToolTipText("認証済みセッションからログアウトします。");
+            this.logOutBtn.setEnabled(false);
+            this.logOutBtn.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
                     logOut();
@@ -1975,7 +1976,7 @@ public class Main implements PropertyChangeListener {
         String timestamp = new SimpleDateFormat("yyyy/MM/dd HH:mm").format(new Date());
         String userName = ps.getString(PreferenceConstants.USERNAME);
         this.statusBar.setText(String.format("%s %s successfully logged in", userName, timestamp));
-        this.logoutBtn.setEnabled(true);
+        this.logOutBtn.setEnabled(true);
     }
 
     public void logOut() {
@@ -1994,7 +1995,7 @@ public class Main implements PropertyChangeListener {
         ps.setValue(PreferenceConstants.XSRF_TOKEN, "");
         ps.setValue(PreferenceConstants.BASIC_AUTH_STATUS, BasicAuthStatusEnum.NONE.name());
         ps.setValue(PreferenceConstants.TSV_STATUS, TsvStatusEnum.NONE.name());
-        logoutBtn.setEnabled(false);
+        logOutBtn.setEnabled(false);
     }
 
     private void addColToAttackTable(AttackEvent attackEvent, int index) {

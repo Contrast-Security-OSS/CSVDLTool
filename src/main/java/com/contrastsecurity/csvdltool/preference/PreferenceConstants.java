@@ -45,6 +45,7 @@ public class PreferenceConstants {
     public static final String IGNORE_SSLCERT_CHECK = new String("com.contrastsecurity.csvdltool.ignore_sslcert_check");
     public static final String CONNECTION_TIMEOUT = new String("com.contrastsecurity.csvdltool.connection_timeout");
     public static final String SOCKET_TIMEOUT = new String("com.contrastsecurity.csvdltool.socket_timeout");
+    public static final String AUTO_RELOGIN_INTERVAL = new String("com.contrastsecurity.csvdltool.auto_relogin_interval");
 
     public static final String SLEEP_VUL = new String("com.contrastsecurity.csvdltool.sleep_vul");
 

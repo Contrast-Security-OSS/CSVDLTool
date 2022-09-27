@@ -39,6 +39,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -74,6 +76,7 @@ public class LibGetWithProgress implements IRunnableWithProgress {
     private Map<String, AppInfo> fullAppMap;
     private boolean isOnlyHasCVE;
     private boolean isIncludeCVEDetail;
+    private Timer timer;
 
     Logger logger = LogManager.getLogger("csvdltool");
 
@@ -89,6 +92,22 @@ public class LibGetWithProgress implements IRunnableWithProgress {
     @SuppressWarnings("unchecked")
     @Override
     public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+        int auto_login_interval = this.ps.getInt(PreferenceConstants.AUTO_RELOGIN_INTERVAL);
+        if (auto_login_interval > 0) {
+            TimerTask task = new TimerTask() {
+                public void run() {
+                    shell.getDisplay().syncExec(new Runnable() {
+                        @Override
+                        public void run() {
+                            ((CSVDLToolShell) shell).getMain().loggedOut();
+                        }
+                    });
+                }
+            };
+            this.timer = new Timer();
+            int time = 1000 * 60 * auto_login_interval;
+            this.timer.schedule(task, time, time);
+        }
         monitor.setTaskName("ライブラリ情報の取得を開始しています...");
         monitor.beginTask("ライブラリ情報の取得を開始しています...", 100);
         String filter = "ALL";
@@ -147,6 +166,9 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                 incompleteFlg = totalCount > allLibraries.size();
                 while (incompleteFlg) {
                     if (monitor.isCanceled()) {
+                        if (this.timer != null) {
+                            timer.cancel();
+                        }
                         throw new InterruptedException("キャンセルされました。");
                     }
                     librariesApi = new LibrariesApi(this.shell, this.ps, org, appId, filter, allLibraries.size());
@@ -158,6 +180,9 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                 sub1_1Monitor.beginTask("", allLibraries.size());
                 for (Library library : allLibraries) {
                     if (monitor.isCanceled()) {
+                        if (this.timer != null) {
+                            timer.cancel();
+                        }
                         throw new InterruptedException("キャンセルされました。");
                     }
                     List<String> csvLineList = new ArrayList<String>();
@@ -414,6 +439,9 @@ public class LibGetWithProgress implements IRunnableWithProgress {
             sub2Monitor.done();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+        if (this.timer != null) {
+            this.timer.cancel();
         }
         monitor.done();
     }

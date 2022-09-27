@@ -10,3 +10,4 @@
 /csvdltool.log
 .DS_Store
 contrast-code.pfx
+*.csv

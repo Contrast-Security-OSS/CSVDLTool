@@ -391,6 +391,10 @@ public class LibGetWithProgress implements IRunnableWithProgress {
             sub1Monitor.done();
         } catch (Exception e) {
             throw new InvocationTargetException(e);
+        } finally {
+            if (this.timer != null) {
+                this.timer.cancel();
+            }
         }
 
         // ========== CSV出力 ==========
@@ -439,9 +443,6 @@ public class LibGetWithProgress implements IRunnableWithProgress {
             sub2Monitor.done();
         } catch (IOException e) {
             e.printStackTrace();
-        }
-        if (this.timer != null) {
-            this.timer.cancel();
         }
         monitor.done();
     }

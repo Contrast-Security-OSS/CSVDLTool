@@ -1,7 +1,7 @@
 keytool -list -v -storetype pkcs12 -keystore C:\Users\turbou\Desktop\CSVDLTool_work\XXXXX.pfx
-[ƒpƒXƒ[ƒh]‚ğ“ü—Í
-ƒGƒCƒŠƒAƒX‚ğŠm”F
+[ï¿½pï¿½Xï¿½ï¿½ï¿½[ï¿½h]ï¿½ï¿½ï¿½ï¿½ï¿½
+ï¿½Gï¿½Cï¿½ï¿½ï¿½Aï¿½Xï¿½ï¿½ï¿½mï¿½F
 
 cd C:\Program Files (x86)\launch4j\sign4j
-sign4j.exe java -jar jsign-2.0.jar --alias 1 --keystore C:\Users\turbou\Desktop\CSVDLTool_work\contrast-code.pfx --storepass [ƒpƒXƒ[ƒh] C:\Users\turbou\Desktop\CSVDLTool_work\common\CSVDLTool_1.8.4.exe
-sign4j.exe java -jar jsign-2.0.jar --alias 1 --keystore C:\Users\turbou\Desktop\CSVDLTool_work\contrast-code.pfx --storepass [ƒpƒXƒ[ƒh] C:\Users\turbou\Desktop\CSVDLTool_work\common\CSVDLTool_1.8.4_auditlog.exe
+sign4j.exe java -jar jsign-2.0.jar --alias 1 --keystore C:\Users\turbou\Desktop\CSVDLTool_work\contrast-code.pfx --storepass [ï¿½pï¿½Xï¿½ï¿½ï¿½[ï¿½h] C:\Users\turbou\Desktop\CSVDLTool_work\common\CSVDLTool_1.8.5.exe
+sign4j.exe java -jar jsign-2.0.jar --alias 1 --keystore C:\Users\turbou\Desktop\CSVDLTool_work\contrast-code.pfx --storepass [ï¿½pï¿½Xï¿½ï¿½ï¿½[ï¿½h] C:\Users\turbou\Desktop\CSVDLTool_work\common\CSVDLTool_1.8.5_auditlog.exe

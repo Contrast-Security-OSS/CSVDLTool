@@ -76,6 +76,8 @@ public class BasePreferencePage extends PreferencePage {
     private List<Integer> selectedIdxes = new ArrayList<Integer>();
     private Table table;
     private Button addBtn;
+    private Button bulkOnBtn;
+    private Button bulkOffBtn;
     private CSVDLToolShell shell;
     private AuthType authType;
 
@@ -453,6 +455,39 @@ public class BasePreferencePage extends PreferencePage {
                             selectedIdxes.add(checkBoxList.indexOf(button));
                         }
                     }
+                }
+            }
+        });
+
+        bulkOnBtn = new Button(buttonGrp, SWT.NULL);
+        bulkOnBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        bulkOnBtn.setText("全てOn");
+        bulkOnBtn.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                for (Organization org : orgList) {
+                    org.setValid(true);
+                }
+                selectedIdxes.clear();
+                for (Button button : checkBoxList) {
+                    button.setSelection(true);
+                    selectedIdxes.add(checkBoxList.indexOf(button));
+                }
+            }
+        });
+
+        bulkOffBtn = new Button(buttonGrp, SWT.NULL);
+        bulkOffBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        bulkOffBtn.setText("全てOff");
+        bulkOffBtn.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                for (Organization org : orgList) {
+                    org.setValid(false);
+                }
+                selectedIdxes.clear();
+                for (Button button : checkBoxList) {
+                    button.setSelection(false);
                 }
             }
         });

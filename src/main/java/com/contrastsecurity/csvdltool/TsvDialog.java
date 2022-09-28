@@ -65,6 +65,7 @@ public class TsvDialog extends Dialog {
         new Label(composite, SWT.LEFT).setText("6桁の認証コード：");
         codeTxt = new Text(composite, SWT.BORDER);
         codeTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        codeTxt.setTextLimit(6);
         codeTxt.addListener(SWT.FocusIn, new Listener() {
             public void handleEvent(Event e) {
                 codeTxt.selectAll();

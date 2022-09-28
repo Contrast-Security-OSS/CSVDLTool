@@ -51,10 +51,12 @@ public class TsvDialog extends Dialog {
 
     private Text codeTxt;
     private String code;
+    private int retryCnt;
     private PropertyChangeSupport support = new PropertyChangeSupport(this);
 
-    public TsvDialog(Shell parentShell) {
+    public TsvDialog(Shell parentShell, int retryCnt) {
         super(parentShell);
+        this.retryCnt = retryCnt;
     }
 
     @Override
@@ -95,7 +97,16 @@ public class TsvDialog extends Dialog {
                 }
             }
         });
+
+        new Label(composite, SWT.LEFT);
+        Label messageLbl = new Label(composite, SWT.LEFT);
+        messageLbl.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        if (retryCnt > 0) {
+            messageLbl.setText("認証に失敗しました。");
+            messageLbl.setForeground(getShell().getDisplay().getSystemColor(SWT.COLOR_RED));
+        }
         codeTxt.setFocus();
+
         return composite;
     }
 

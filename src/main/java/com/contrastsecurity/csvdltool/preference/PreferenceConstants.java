@@ -33,6 +33,7 @@ public class PreferenceConstants {
     public static final String XSRF_TOKEN = new String("com.contrastsecurity.csvdltool.xsrf_token");
     public static final String TARGET_ORGS = new String("com.contrastsecurity.csvdltool.target_orgs");
     public static final String TSV_STATUS = new String("com.contrastsecurity.csvdltool.tsv_status");
+    public static final String AUTH_RETRY_MAX = new String("com.contrastsecurity.csvdltool.auth_retry_max");
 
     public static final String PROXY_YUKO = new String("com.contrastsecurity.csvdltool.proxy_yuko");
     public static final String PROXY_HOST = new String("com.contrastsecurity.csvdltool.proxy_host");

@@ -33,6 +33,7 @@ import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -66,7 +67,9 @@ import com.contrastsecurity.csvdltool.exception.BasicAuthCancelException;
 import com.contrastsecurity.csvdltool.exception.BasicAuthException;
 import com.contrastsecurity.csvdltool.exception.BasicAuthFailureException;
 import com.contrastsecurity.csvdltool.exception.NonApiException;
+import com.contrastsecurity.csvdltool.exception.TsvCancelException;
 import com.contrastsecurity.csvdltool.exception.TsvException;
+import com.contrastsecurity.csvdltool.exception.TsvFailureException;
 import com.contrastsecurity.csvdltool.json.ContrastJson;
 import com.contrastsecurity.csvdltool.model.Organization;
 import com.contrastsecurity.csvdltool.model.TsvSettings;
@@ -105,9 +108,11 @@ public abstract class Api {
     protected String serviceKey;
     protected boolean success;
     protected int totalCount;
+    private List<Integer> ignoreStatusCodes;
     private String pass;
     private String code;
     private boolean jsonResponseFlg;
+    private int authRetryMax;
 
     public Api(Shell shell, IPreferenceStore ps, Organization org) {
         this.shell = shell;
@@ -119,15 +124,22 @@ public abstract class Api {
         if (((CSVDLToolShell) this.shell).getMain().getCookieJar() == null) {
             ((CSVDLToolShell) this.shell).getMain().setCookieJar(new MyCookieJar(this.contrastUrl));
         }
+        this.ignoreStatusCodes = new ArrayList<Integer>();
         this.jsonResponseFlg = true;
+        this.authRetryMax = this.ps.getInt(PreferenceConstants.AUTH_RETRY_MAX);
     }
 
     public Api(Shell shell, IPreferenceStore ps, Organization org, boolean jsonResponseFlg) {
         this(shell, ps, org);
+        this.ignoreStatusCodes = new ArrayList<Integer>();
         this.jsonResponseFlg = jsonResponseFlg;
     }
 
-    private void basicAuth() throws Exception {
+    public void setIgnoreStatusCodes(List<Integer> ignoreStatusCodes) {
+        this.ignoreStatusCodes = ignoreStatusCodes;
+    }
+
+    private void basicAuth(int retryCnt) throws Exception {
         BasicAuthStatusEnum basicAuthStatusEnum = BasicAuthStatusEnum.NONE;
         String basicAuthStatusEnumStr = this.ps.getString(PreferenceConstants.BASIC_AUTH_STATUS);
         if (basicAuthStatusEnumStr != null && !basicAuthStatusEnumStr.isEmpty()) {
@@ -153,7 +165,7 @@ public abstract class Api {
             }
         }
         if (isNeedPassInput) {
-            PasswordDialog passwordDialog = new PasswordDialog(shell);
+            PasswordDialog passwordDialog = new PasswordDialog(shell, retryCnt);
             shell.getDisplay().syncExec(new Runnable() {
                 @Override
                 public void run() {
@@ -243,7 +255,8 @@ public abstract class Api {
         return null;
     }
 
-    private void tsvCheck() throws Exception {
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    private void tsvCheck(int retryCnt) throws Exception {
         TsvStatusEnum tsvStatusEnum = TsvStatusEnum.NONE;
         String tsvStatusEnumStr = this.ps.getString(PreferenceConstants.TSV_STATUS);
         if (tsvStatusEnumStr != null && !tsvStatusEnumStr.isEmpty()) {
@@ -269,7 +282,7 @@ public abstract class Api {
                         throw new TsvException("二段階認証コードのメール送信要求に失敗しました。");
                     }
                 }
-                TsvDialog tsvDialog = new TsvDialog(shell);
+                TsvDialog tsvDialog = new TsvDialog(shell, retryCnt);
                 shell.getDisplay().syncExec(new Runnable() {
                     @Override
                     public void run() {
@@ -285,12 +298,13 @@ public abstract class Api {
                 });
                 if (!code.isEmpty()) {
                     Api tsvAuthorizeApi = new TsvAuthorizeApi(this.shell, this.ps, this.org, this.contrastUrl, this.userName, this.serviceKey, code);
+                    tsvAuthorizeApi.setIgnoreStatusCodes(new ArrayList(Arrays.asList(400)));
                     try {
                         String rtnMsg = (String) tsvAuthorizeApi.postWithoutCheckTsv();
                         if (rtnMsg.equals("true")) {
                             this.ps.setValue(PreferenceConstants.TSV_STATUS, TsvStatusEnum.AUTH.name());
                         } else {
-                            throw new TsvException("二段階認証に失敗しました。");
+                            throw new TsvFailureException("二段階認証に失敗しました。");
                         }
                     } catch (NonApiException nae) {
                         if (nae.getMessage().equals("400")) {
@@ -298,7 +312,7 @@ public abstract class Api {
                         }
                     }
                 } else {
-                    throw new TsvException("二段階認証をキャンセルしました。");
+                    throw new TsvCancelException("二段階認証をキャンセルしました。");
                 }
             }
         }
@@ -311,9 +325,23 @@ public abstract class Api {
 
     public Object get() throws Exception {
         if (((CSVDLToolShell) this.shell).getMain().getAuthType() == AuthType.PASSWORD) {
-            basicAuth();
+            for (int cnt = 0; cnt < this.authRetryMax; cnt++) {
+                try {
+                    basicAuth(cnt);
+                    break;
+                } catch (BasicAuthFailureException bafe) {
+                    continue;
+                }
+            }
             try {
-                tsvCheck();
+                for (int cnt = 0; cnt < this.authRetryMax; cnt++) {
+                    try {
+                        tsvCheck(cnt);
+                        break;
+                    } catch (TsvFailureException tfe) {
+                        continue;
+                    }
+                }
             } catch (TsvException tsve) {
                 shell.getDisplay().syncExec(new Runnable() {
                     @Override
@@ -324,7 +352,14 @@ public abstract class Api {
                 throw tsve;
             }
         } else {
-            tsvCheck();
+            for (int cnt = 0; cnt < this.authRetryMax; cnt++) {
+                try {
+                    tsvCheck(cnt);
+                    break;
+                } catch (TsvFailureException tfe) {
+                    continue;
+                }
+            }
         }
         String response = this.getResponse(HttpMethod.GET);
         return this.convert(response);
@@ -337,9 +372,23 @@ public abstract class Api {
 
     public Object post() throws Exception {
         if (((CSVDLToolShell) this.shell).getMain().getAuthType() == AuthType.PASSWORD) {
-            basicAuth();
+            for (int cnt = 0; cnt < this.authRetryMax; cnt++) {
+                try {
+                    basicAuth(cnt);
+                    break;
+                } catch (BasicAuthFailureException bafe) {
+                    continue;
+                }
+            }
             try {
-                tsvCheck();
+                for (int cnt = 0; cnt < this.authRetryMax; cnt++) {
+                    try {
+                        tsvCheck(cnt);
+                        break;
+                    } catch (TsvFailureException tfe) {
+                        continue;
+                    }
+                }
             } catch (TsvException tsve) {
                 shell.getDisplay().syncExec(new Runnable() {
                     @Override
@@ -350,7 +399,14 @@ public abstract class Api {
                 throw tsve;
             }
         } else {
-            tsvCheck();
+            for (int cnt = 0; cnt < this.authRetryMax; cnt++) {
+                try {
+                    tsvCheck(cnt);
+                    break;
+                } catch (TsvFailureException tfe) {
+                    continue;
+                }
+            }
         }
         String response = this.getResponse(HttpMethod.POST);
         return this.convert(response);
@@ -483,7 +539,7 @@ public abstract class Api {
             httpClient = clientBuilder.build();
             try {
                 response = httpClient.newCall(request).execute();
-                if (response.code() == 200) {
+                if (response.code() == 200 || this.ignoreStatusCodes.contains(response.code())) {
                     String res = response.body().string();
                     if (jsonResponseFlg) {
                         try {

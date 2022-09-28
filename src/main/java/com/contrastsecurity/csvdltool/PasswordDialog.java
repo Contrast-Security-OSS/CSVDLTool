@@ -47,10 +47,12 @@ public class PasswordDialog extends Dialog {
 
     private Text passTxt;
     private String pass;
+    private int retryCnt;
     private PropertyChangeSupport support = new PropertyChangeSupport(this);
 
-    public PasswordDialog(Shell parentShell) {
+    public PasswordDialog(Shell parentShell, int retryCnt) {
         super(parentShell);
+        this.retryCnt = retryCnt;
     }
 
     @Override
@@ -78,6 +80,14 @@ public class PasswordDialog extends Dialog {
                 }
             }
         });
+        new Label(composite, SWT.LEFT);
+        Label messageLbl = new Label(composite, SWT.LEFT);
+        messageLbl.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        if (retryCnt > 0) {
+            messageLbl.setText("認証に失敗しました。");
+            messageLbl.setForeground(getShell().getDisplay().getSystemColor(SWT.COLOR_RED));
+        }
+
         passTxt.setFocus();
         return composite;
     }

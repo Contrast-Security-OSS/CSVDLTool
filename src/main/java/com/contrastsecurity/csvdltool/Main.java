@@ -287,6 +287,7 @@ public class Main implements PropertyChangeListener {
             this.ps.setDefault(PreferenceConstants.CONNECTION_TIMEOUT, 3000);
             this.ps.setDefault(PreferenceConstants.SOCKET_TIMEOUT, 3000);
             this.ps.setDefault(PreferenceConstants.AUTO_RELOGIN_INTERVAL, 105);
+            this.ps.setDefault(PreferenceConstants.AUTH_RETRY_MAX, 3);
 
             this.ps.setDefault(PreferenceConstants.CSV_COLUMN_VUL, VulCSVColmunEnum.defaultValuesStr());
             this.ps.setDefault(PreferenceConstants.SLEEP_VUL, 300);

@@ -62,7 +62,9 @@ import com.contrastsecurity.csvdltool.PasswordDialog;
 import com.contrastsecurity.csvdltool.TsvDialog;
 import com.contrastsecurity.csvdltool.TsvStatusEnum;
 import com.contrastsecurity.csvdltool.exception.ApiException;
+import com.contrastsecurity.csvdltool.exception.BasicAuthCancelException;
 import com.contrastsecurity.csvdltool.exception.BasicAuthException;
+import com.contrastsecurity.csvdltool.exception.BasicAuthFailureException;
 import com.contrastsecurity.csvdltool.exception.NonApiException;
 import com.contrastsecurity.csvdltool.exception.TsvException;
 import com.contrastsecurity.csvdltool.json.ContrastJson;
@@ -167,14 +169,14 @@ public abstract class Api {
             });
         }
         if (this.pass.isEmpty()) {
-            throw new BasicAuthException("認証をキャンセルしました。");
+            throw new BasicAuthCancelException("認証をキャンセルしました。");
         }
 
         try {
             Api passwordAuthApi = new PasswordAuthApi(this.shell, this.ps, this.org, this.contrastUrl, this.userName, this.pass);
             String success = (String) passwordAuthApi.postWithoutCheckTsv();
             if (!Boolean.valueOf(success)) {
-                throw new BasicAuthException("認証に失敗しました。\r\nUsername, Passwordが正しいか再度ご確認ください。");
+                throw new BasicAuthFailureException("認証に失敗しました。\r\nUsername, Passwordが正しいか再度ご確認ください。");
             }
             CookieJar cookieJar = ((CSVDLToolShell) this.shell).getMain().getCookieJar();
             List<Cookie> cookies = cookieJar.loadForRequest(HttpUrl.parse(ps.getString(PreferenceConstants.CONTRAST_URL)));
@@ -195,6 +197,9 @@ public abstract class Api {
                 }
             });
         } catch (Exception e) {
+            if (e instanceof BasicAuthFailureException) {
+                throw e;
+            }
             StringWriter stringWriter = new StringWriter();
             PrintWriter printWriter = new PrintWriter(stringWriter);
             e.printStackTrace(printWriter);
@@ -523,7 +528,7 @@ public abstract class Api {
                                 // ps.setValue(PreferenceConstants.XSRF_TOKEN, "");
                                 throw new ApiException("認証が必要です。もう一度実行してください。");
                             } else {
-                                throw new BasicAuthException("認証に失敗しました。\r\nUsername, Passwordが正しいか再度ご確認ください。");
+                                throw new BasicAuthFailureException("認証に失敗しました。\r\nUsername, Passwordが正しいか再度ご確認ください。");
                             }
                         }
                     }
@@ -537,7 +542,7 @@ public abstract class Api {
                 throw ioe;
             }
         } catch (Exception e) {
-            if (e instanceof TsvException) {
+            if (e instanceof TsvException || e instanceof BasicAuthException) {
                 throw e;
             }
             StringWriter stringWriter = new StringWriter();

@@ -506,9 +506,9 @@ public class Main implements PropertyChangeListener {
                     PrintWriter printWriter = new PrintWriter(stringWriter);
                     e.printStackTrace(printWriter);
                     String trace = stringWriter.toString();
-                    if (!(e.getTargetException() instanceof TsvException)) {
-                        logger.error(trace);
-                    }
+                    // if (!(e.getTargetException() instanceof TsvException)) {
+                    // logger.error(trace);
+                    // }
                     String errorMsg = e.getTargetException().getMessage();
                     if (e.getTargetException() instanceof ApiException) {
                         MessageDialog.openError(shell, "アプリケーション一覧の取得", String.format("TeamServerからエラーが返されました。\r\n%s", errorMsg));
@@ -521,6 +521,7 @@ public class Main implements PropertyChangeListener {
                         MessageDialog.openError(shell, "アプリケーション一覧の取得", errorMsg);
                         return;
                     } else {
+                        logger.error(trace);
                         MessageDialog.openError(shell, "アプリケーション一覧の取得", String.format("不明なエラーです。ログファイルをご確認ください。\r\n%s", errorMsg));
                     }
                     return;

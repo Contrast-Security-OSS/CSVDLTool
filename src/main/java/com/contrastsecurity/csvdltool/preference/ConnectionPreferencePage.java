@@ -347,7 +347,7 @@ public class ConnectionPreferencePage extends PreferencePage {
             new Label(sessionTimeoutPlanGrp, SWT.LEFT).setText("");
             Label connectionHint = new Label(sessionTimeoutPlanGrp, SWT.LEFT);
             connectionHint.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-            connectionHint.setText("時間のかかる処理中にセッションタイムアウトが発生してしまうのを防ぐため指定された間隔で自動再ログインを行います。\r\n自動再ログインが不要な場合は0を指定してください。");
+            connectionHint.setText("時間のかかる処理中にセッションタイムアウトが発生してしまうのを防ぐため指定された間隔で自動再ログインを行います。\r\n自動再ログインが不要な場合は0を指定してください。デフォルトは105分(1時間45分)です。");
         }
 
         Composite buttonGrp = new Composite(parent, SWT.NONE);

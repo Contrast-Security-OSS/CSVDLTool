@@ -583,6 +583,8 @@ public abstract class Api {
                                 // ps.setValue(PreferenceConstants.BASIC_AUTH_STATUS, BasicAuthStatusEnum.NONE.name());
                                 // ps.setValue(PreferenceConstants.XSRF_TOKEN, "");
                                 throw new ApiException("認証が必要です。もう一度実行してください。");
+                            } else if (contrastJson.getMessages().contains("Unable to sign in. Contact your administrator.")) {
+                                throw new ApiException("アカウントがロックされているかもしれません。管理者に問い合わせてください。");
                             } else {
                                 throw new BasicAuthFailureException("認証に失敗しました。\r\nUsername, Passwordが正しいか再度ご確認ください。");
                             }

@@ -446,7 +446,7 @@ public class ConnectionPreferencePage extends PreferencePage {
             errors.add("・ConnetionTimeoutを指定してください。");
         } else {
             if (!StringUtils.isNumeric(this.connectionTimeoutTxt.getText())) {
-                errors.add("・ConnetionTimeoutは数値を指定してください。");
+                errors.add("・ConnetionTimeoutは整数値を指定してください。");
             } else {
                 ps.setValue(PreferenceConstants.CONNECTION_TIMEOUT, this.connectionTimeoutTxt.getText());
             }
@@ -456,17 +456,17 @@ public class ConnectionPreferencePage extends PreferencePage {
             errors.add("・SocketTimeoutを指定してください。");
         } else {
             if (!StringUtils.isNumeric(this.socketTimeoutTxt.getText())) {
-                errors.add("・SocketTimeoutは数値を指定してください。");
+                errors.add("・SocketTimeoutは整数値を指定してください。");
             } else {
                 ps.setValue(PreferenceConstants.SOCKET_TIMEOUT, this.socketTimeoutTxt.getText());
             }
         }
         if (authType == AuthType.PASSWORD) {
             if (this.autoReLogInIntervalTxt.getText().isEmpty()) {
-                errors.add("・SocketTimeoutを指定してください。");
+                errors.add("・自動再ログイン間隔（分）を指定してください。");
             } else {
                 if (!StringUtils.isNumeric(this.autoReLogInIntervalTxt.getText())) {
-                    errors.add("・SocketTimeoutは数値を指定してください。");
+                    errors.add("・自動再ログイン間隔（分）は整数値を指定してください。");
                 } else {
                     ps.setValue(PreferenceConstants.AUTO_RELOGIN_INTERVAL, this.autoReLogInIntervalTxt.getText());
                 }

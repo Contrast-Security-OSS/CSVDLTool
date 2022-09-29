@@ -514,6 +514,7 @@ public class Main implements PropertyChangeListener {
                     if (e.getTargetException() instanceof ApiException) {
                         MessageDialog.openError(shell, "アプリケーション一覧の取得", String.format("TeamServerからエラーが返されました。\r\n%s", errorMsg));
                     } else if (e.getTargetException() instanceof NonApiException) {
+                        logger.error(trace);
                         MessageDialog.openError(shell, "アプリケーション一覧の取得", String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", errorMsg));
                     } else if (e.getTargetException() instanceof TsvException) {
                         MessageDialog.openError(shell, "アプリケーション一覧の取得", errorMsg);
@@ -961,17 +962,25 @@ public class Main implements PropertyChangeListener {
                     PrintWriter printWriter = new PrintWriter(stringWriter);
                     e.printStackTrace(printWriter);
                     String trace = stringWriter.toString();
-                    if (!(e.getTargetException() instanceof TsvException)) {
-                        logger.error(trace);
-                    }
+                    // if (!(e.getTargetException() instanceof TsvException)) {
+                    // logger.error(trace);
+                    // }
                     String exceptionMsg = e.getTargetException().getMessage();
                     if (e.getTargetException() instanceof ApiException) {
                         MessageDialog.openError(shell, "脆弱性情報の取得", String.format("TeamServerからエラーが返されました。\r\n%s", exceptionMsg));
                     } else if (e.getTargetException() instanceof NonApiException) {
+                        logger.error(trace);
                         MessageDialog.openError(shell, "脆弱性情報の取得", String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", exceptionMsg));
                     } else if (e.getTargetException() instanceof InterruptedException) {
+                        MessageDialog.openInformation(shell, trace, exceptionMsg);
+                    } else if (e.getTargetException() instanceof TsvException) {
                         MessageDialog.openError(shell, "脆弱性情報の取得", exceptionMsg);
+                        return;
+                    } else if (e.getTargetException() instanceof BasicAuthException) {
+                        MessageDialog.openError(shell, "脆弱性情報の取得", exceptionMsg);
+                        return;
                     } else {
+                        logger.error(trace);
                         MessageDialog.openError(shell, "脆弱性情報の取得", String.format("不明なエラーです。ログファイルをご確認ください。\r\n%s", exceptionMsg));
                     }
                 } catch (InterruptedException e) {
@@ -1057,17 +1066,25 @@ public class Main implements PropertyChangeListener {
                     PrintWriter printWriter = new PrintWriter(stringWriter);
                     e.printStackTrace(printWriter);
                     String trace = stringWriter.toString();
-                    if (!(e.getTargetException() instanceof TsvException)) {
-                        logger.error(trace);
-                    }
+                    // if (!(e.getTargetException() instanceof TsvException)) {
+                    // logger.error(trace);
+                    // }
                     String exceptionMsg = e.getTargetException().getMessage();
                     if (e.getTargetException() instanceof ApiException) {
                         MessageDialog.openError(shell, "ライブラリ情報の取得", String.format("TeamServerからエラーが返されました。\r\n%s", exceptionMsg));
                     } else if (e.getTargetException() instanceof NonApiException) {
+                        logger.error(trace);
                         MessageDialog.openError(shell, "ライブラリ情報の取得", String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", exceptionMsg));
                     } else if (e.getTargetException() instanceof InterruptedException) {
+                        MessageDialog.openInformation(shell, trace, exceptionMsg);
+                    } else if (e.getTargetException() instanceof TsvException) {
                         MessageDialog.openError(shell, "ライブラリ情報の取得", exceptionMsg);
+                        return;
+                    } else if (e.getTargetException() instanceof BasicAuthException) {
+                        MessageDialog.openError(shell, "ライブラリ情報の取得", exceptionMsg);
+                        return;
                     } else {
+                        logger.error(trace);
                         MessageDialog.openError(shell, "ライブラリ情報の取得", String.format("不明なエラーです。ログファイルをご確認ください。\r\n%s", exceptionMsg));
                     }
                 } catch (InterruptedException e) {

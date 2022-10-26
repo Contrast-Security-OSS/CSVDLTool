@@ -70,7 +70,7 @@ public class AppsGetWithProgress implements IRunnableWithProgress {
         this.orgs = orgs;
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
         fullAppMap = new TreeMap<String, AppInfo>();
@@ -109,6 +109,7 @@ public class AppsGetWithProgress implements IRunnableWithProgress {
                 monitor.subTask("アプリケーショングループの情報を取得...");
                 Map<String, List<String>> appGroupMap = new HashMap<String, List<String>>();
                 Api groupsApi = new GroupsApi(this.shell, this.ps, org);
+                groupsApi.setIgnoreStatusCodes(new ArrayList(Arrays.asList(403)));
                 try {
                     List<CustomGroup> customGroups = (List<CustomGroup>) groupsApi.get();
                     SubProgressMonitor sub2Monitor = new SubProgressMonitor(monitor, 10);

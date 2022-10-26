@@ -140,7 +140,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
         this.isIncludeStackTrace = isIncludeStackTrace;
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
         int auto_login_interval = this.ps.getInt(PreferenceConstants.AUTO_RELOGIN_INTERVAL);
@@ -210,6 +210,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                 monitor.setTaskName(org.getName());
                 monitor.subTask("アプリケーショングループの情報を取得...");
                 Api groupsApi = new GroupsApi(this.shell, this.ps, org);
+                groupsApi.setIgnoreStatusCodes(new ArrayList(Arrays.asList(403)));
                 try {
                     List<CustomGroup> customGroups = (List<CustomGroup>) groupsApi.get();
                     SubProgressMonitor sub1_1Monitor = new SubProgressMonitor(sub1Monitor, 1);

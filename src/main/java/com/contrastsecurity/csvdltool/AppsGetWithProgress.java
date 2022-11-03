@@ -148,16 +148,16 @@ public class AppsGetWithProgress implements IRunnableWithProgress {
                     if (appGroupMap.containsKey(app.getName())) {
                         if (prefix_org_flg) {
                             fullAppMap.put(String.format("[%s] %s - %s", org.getName(), app.getName(), String.join(", ", appGroupMap.get(app.getName()))),
-                                    new AppInfo(org, app.getName(), app.getApp_id()));
+                                    new AppInfo(org, app.getName(), app.getApp_id(), app.getLanguage()));
                         } else {
                             fullAppMap.put(String.format("%s - %s", app.getName(), String.join(", ", appGroupMap.get(app.getName()))),
-                                    new AppInfo(org, app.getName(), app.getApp_id()));
+                                    new AppInfo(org, app.getName(), app.getApp_id(), app.getLanguage()));
                         }
                     } else {
                         if (prefix_org_flg) {
-                            fullAppMap.put(String.format("[%s] %s", org.getName(), app.getName()), new AppInfo(org, app.getName(), app.getApp_id()));
+                            fullAppMap.put(String.format("[%s] %s", org.getName(), app.getName()), new AppInfo(org, app.getName(), app.getApp_id(), app.getLanguage()));
                         } else {
-                            fullAppMap.put(String.format("%s", app.getName()), new AppInfo(org, app.getName(), app.getApp_id()));
+                            fullAppMap.put(String.format("%s", app.getName()), new AppInfo(org, app.getName(), app.getApp_id(), app.getLanguage()));
                         }
                     }
                     sub3Monitor.worked(1);

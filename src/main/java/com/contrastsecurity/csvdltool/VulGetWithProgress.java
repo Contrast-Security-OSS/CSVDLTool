@@ -71,6 +71,7 @@ import com.contrastsecurity.csvdltool.api.GroupsApi;
 import com.contrastsecurity.csvdltool.api.HowToFixApi;
 import com.contrastsecurity.csvdltool.api.HttpRequestApi;
 import com.contrastsecurity.csvdltool.api.RoutesApi;
+import com.contrastsecurity.csvdltool.api.SessionMetadataApi;
 import com.contrastsecurity.csvdltool.api.StoryApi;
 import com.contrastsecurity.csvdltool.api.TraceApi;
 import com.contrastsecurity.csvdltool.api.TraceTagsApi;
@@ -94,6 +95,7 @@ import com.contrastsecurity.csvdltool.model.Recommendation;
 import com.contrastsecurity.csvdltool.model.Risk;
 import com.contrastsecurity.csvdltool.model.Route;
 import com.contrastsecurity.csvdltool.model.Server;
+import com.contrastsecurity.csvdltool.model.SessionMetadata;
 import com.contrastsecurity.csvdltool.model.Story;
 import com.contrastsecurity.csvdltool.model.Trace;
 import com.contrastsecurity.csvdltool.model.VulCSVColumn;
@@ -419,6 +421,16 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                                     urlList.addAll(route.getObservations().stream().map(Observation::getUrl).collect(Collectors.toList()));
                                 }
                                 csvLineList.add(String.join(csvColumn.getSeparateStr().replace("\\r", "\r").replace("\\n", "\n"), urlList));
+                                break;
+                            case VUL_25:
+                                // ==================== 25. セッションメタデータ ====================
+                                SessionMetadataApi sessionMetadataApi = new SessionMetadataApi(this.shell, this.ps, org, appId, trace_id);
+                                List<SessionMetadata> metadatas = (List<SessionMetadata>) sessionMetadataApi.get();
+                                List<String> smList = new ArrayList<String>();
+                                for (SessionMetadata sm : metadatas) {
+                                    smList.add(String.format("%s: %s", sm.getDisplay_label(), sm.getValue()));
+                                }
+                                csvLineList.add(String.join(csvColumn.getSeparateStr().replace("\\r", "\r").replace("\\n", "\n"), smList));
                                 break;
                             default:
                                 continue;

@@ -67,6 +67,7 @@ import com.contrastsecurity.csvdltool.api.Api;
 import com.contrastsecurity.csvdltool.api.ApplicationTagsApi;
 import com.contrastsecurity.csvdltool.api.EventDetailApi;
 import com.contrastsecurity.csvdltool.api.EventSummaryApi;
+import com.contrastsecurity.csvdltool.api.FilterSecurityStandardApi;
 import com.contrastsecurity.csvdltool.api.GroupsApi;
 import com.contrastsecurity.csvdltool.api.HowToFixApi;
 import com.contrastsecurity.csvdltool.api.HttpRequestApi;
@@ -76,6 +77,7 @@ import com.contrastsecurity.csvdltool.api.StoryApi;
 import com.contrastsecurity.csvdltool.api.TraceApi;
 import com.contrastsecurity.csvdltool.api.TraceTagsApi;
 import com.contrastsecurity.csvdltool.api.TracesApi;
+import com.contrastsecurity.csvdltool.api.TracesFilterBySecurityStandardApi;
 import com.contrastsecurity.csvdltool.exception.ApiException;
 import com.contrastsecurity.csvdltool.json.HowToFixJson;
 import com.contrastsecurity.csvdltool.model.Application;
@@ -99,6 +101,7 @@ import com.contrastsecurity.csvdltool.model.SessionMetadata;
 import com.contrastsecurity.csvdltool.model.Story;
 import com.contrastsecurity.csvdltool.model.Trace;
 import com.contrastsecurity.csvdltool.model.VulCSVColumn;
+import com.contrastsecurity.csvdltool.model.Vulnerability;
 import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -206,19 +209,19 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                 orgs.add(fullAppMap.get(appLabel).getOrganization());
             }
             SubProgressMonitor sub1Monitor = new SubProgressMonitor(monitor, 10);
-            sub1Monitor.beginTask("", orgs.size());
+            sub1Monitor.beginTask("", orgs.size() * 100);
             // アプリケーショングループの情報を取得
+            monitor.setTaskName("アプリケーショングループの情報を取得...");
             for (Organization org : orgs) {
-                monitor.setTaskName(org.getName());
-                monitor.subTask("アプリケーショングループの情報を取得...");
+                monitor.setTaskName(String.format("アプリケーショングループの情報を取得...%s", org.getName()));
                 Api groupsApi = new GroupsApi(this.shell, this.ps, org);
                 groupsApi.setIgnoreStatusCodes(new ArrayList(Arrays.asList(403)));
                 try {
                     List<CustomGroup> customGroups = (List<CustomGroup>) groupsApi.get();
-                    SubProgressMonitor sub1_1Monitor = new SubProgressMonitor(sub1Monitor, 1);
+                    SubProgressMonitor sub1_1Monitor = new SubProgressMonitor(sub1Monitor, 100);
                     sub1_1Monitor.beginTask("", customGroups.size());
                     for (CustomGroup customGroup : customGroups) {
-                        monitor.subTask(String.format("アプリケーショングループの情報を取得...%s", customGroup.getName()));
+                        monitor.subTask(customGroup.getName());
                         List<ApplicationInCustomGroup> apps = customGroup.getApplications();
                         if (apps != null) {
                             for (ApplicationInCustomGroup app : apps) {
@@ -233,26 +236,72 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                         sub1_1Monitor.worked(1);
                     }
                     sub1_1Monitor.done();
-                    Thread.sleep(1000);
+                    Thread.sleep(500);
                 } catch (ApiException ae) {
                 }
             }
             monitor.subTask("");
             sub1Monitor.done();
 
+            // コンプライアンスポリシーの情報を取得するか判定
+            boolean validCompliancePolicy = false;
+            for (VulCSVColumn csvColumn : columnList) {
+                if (csvColumn.getColumn() == VulCSVColmunEnum.VUL_26) {
+                    if (csvColumn.isValid()) {
+                        validCompliancePolicy = true;
+                    }
+                }
+            }
+
             // 選択済みアプリの脆弱性情報を取得
-            SubProgressMonitor sub2Monitor = new SubProgressMonitor(monitor, 70);
-            sub2Monitor.beginTask("", dstApps.size());
+            monitor.setTaskName("脆弱性の情報を取得...");
+            SubProgressMonitor sub2Monitor = new SubProgressMonitor(monitor, 80);
+            sub2Monitor.beginTask("", dstApps.size() * 100);
             int appIdx = 1;
             for (String appLabel : dstApps) {
                 Organization org = fullAppMap.get(appLabel).getOrganization();
                 String appName = fullAppMap.get(appLabel).getAppName();
                 String appId = fullAppMap.get(appLabel).getAppId();
-                monitor.setTaskName(String.format("[%s] %s (%d/%d)", org.getName(), appName, appIdx, dstApps.size()));
+                monitor.setTaskName(String.format("脆弱性の情報を取得...[%s] %s (%d/%d)", org.getName(), appName, appIdx, dstApps.size()));
+                // コンプライアンスポリシーの情報を取得
+                Map<String, List<Vulnerability>> securityStandardVulnMap = new HashMap<String, List<Vulnerability>>();
+                if (validCompliancePolicy) {
+                    SubProgressMonitor sub2_1Monitor = new SubProgressMonitor(sub2Monitor, 20);
+                    Api filterSecurityStandardApi = new FilterSecurityStandardApi(this.shell, this.ps, org);
+                    List<Filter> filterSecurityStandards = (List<Filter>) filterSecurityStandardApi.get();
+                    sub2_1Monitor.beginTask("", filterSecurityStandards.size());
+                    for (Filter ssFilter : filterSecurityStandards) {
+                        monitor.subTask(String.format("コンプライアンスポリシー: %s", ssFilter.getLabel()));
+                        if (monitor.isCanceled()) {
+                            if (this.timer != null) {
+                                timer.cancel();
+                            }
+                            throw new InterruptedException("キャンセルされました。");
+                        }
+                        List<Vulnerability> allVuls = new ArrayList<Vulnerability>();
+                        Api tracesFilterBySecurityStandardApi = new TracesFilterBySecurityStandardApi(this.shell, this.ps, org, appId, ssFilter.getKeycode(), 0);
+                        List<Vulnerability> tmpVuls = (List<Vulnerability>) tracesFilterBySecurityStandardApi.post();
+                        int totalTraceByFilterCount = tracesFilterBySecurityStandardApi.getTotalCount();
+                        allVuls.addAll(tmpVuls);
+                        boolean traceByFilterIncompleteFlg = false;
+                        traceByFilterIncompleteFlg = totalTraceByFilterCount > allVuls.size();
+                        while (traceByFilterIncompleteFlg) {
+                            Thread.sleep(100);
+                            tracesFilterBySecurityStandardApi = new TracesFilterBySecurityStandardApi(this.shell, this.ps, org, appId, ssFilter.getKeycode(), allVuls.size());
+                            tmpVuls = (List<Vulnerability>) tracesFilterBySecurityStandardApi.post();
+                            allVuls.addAll(tmpVuls);
+                            traceByFilterIncompleteFlg = totalTraceByFilterCount > allVuls.size();
+                        }
+                        securityStandardVulnMap.put(ssFilter.getLabel(), allVuls);
+                        sub2_1Monitor.worked(1);
+                    }
+                }
+                Thread.sleep(500);
                 Api tracesApi = new TracesApi(this.shell, this.ps, org, appId, filterMap, frLastDetectedDate, toLastDetectedDate);
                 List<String> traces = (List<String>) tracesApi.get();
-                SubProgressMonitor sub2_1Monitor = new SubProgressMonitor(sub2Monitor, 1);
-                sub2_1Monitor.beginTask("", traces.size());
+                SubProgressMonitor sub2_2Monitor = new SubProgressMonitor(sub2Monitor, 80);
+                sub2_2Monitor.beginTask("", traces.size());
+                int traceIdx = 1;
                 for (String trace_id : traces) {
                     if (monitor.isCanceled()) {
                         if (this.timer != null) {
@@ -263,11 +312,11 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                     List<String> csvLineList = new ArrayList<String>();
                     Api traceApi = new TraceApi(this.shell, this.ps, org, appId, trace_id);
                     Trace trace = (Trace) traceApi.get();
-                    monitor.subTask(trace.getTitle());
+                    monitor.subTask(String.format("脆弱性: %s (%d/%d)", trace.getTitle(), traceIdx, traces.size()));
                     Application realApp = trace.getApplication();
                     if (isOnlyParentApp) {
                         if (!appName.equals(realApp.getName())) {
-                            sub2_1Monitor.worked(1);
+                            sub2_2Monitor.worked(1);
                             continue;
                         }
                     }
@@ -431,6 +480,22 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                                     smList.add(String.format("%s: %s", sm.getDisplay_label(), sm.getValue()));
                                 }
                                 csvLineList.add(String.join(csvColumn.getSeparateStr().replace("\\r", "\r").replace("\\n", "\n"), smList));
+                                break;
+                            case VUL_26:
+                                // ==================== 25. セッションメタデータ ====================
+                                List<String> ssNameList = new ArrayList<String>();
+                                securityStandardVulnMap.forEach((k, v) -> {
+                                    boolean matchFlg = false;
+                                    for (Vulnerability vul : v) {
+                                        if (trace_id.equals(vul.getUuid())) {
+                                            matchFlg |= true;
+                                        }
+                                    }
+                                    if (matchFlg) {
+                                        ssNameList.add(k);
+                                    }
+                                });
+                                csvLineList.add(String.join(csvColumn.getSeparateStr().replace("\\r", "\r").replace("\\n", "\n"), ssNameList));
                                 break;
                             default:
                                 continue;
@@ -610,7 +675,8 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                     }
 
                     csvList.add(csvLineList);
-                    sub2_1Monitor.worked(1);
+                    traceIdx++;
+                    sub2_2Monitor.worked(1);
                     Thread.sleep(sleepTrace);
                 }
                 appIdx++;
@@ -628,7 +694,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
         // ========== CSV出力 ==========
         monitor.setTaskName("CSV出力");
         Thread.sleep(500);
-        SubProgressMonitor sub3Monitor = new SubProgressMonitor(monitor, 20);
+        SubProgressMonitor sub3Monitor = new SubProgressMonitor(monitor, 10);
         sub3Monitor.beginTask("", csvList.size());
         String filePath = timestamp + ".csv";
         if (OS.isFamilyMac()) {

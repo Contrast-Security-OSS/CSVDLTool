@@ -24,33 +24,61 @@
 package com.contrastsecurity.csvdltool.api;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Shell;
 
-import com.contrastsecurity.csvdltool.json.ApplicationsJson;
+import com.contrastsecurity.csvdltool.json.TraceFilterBySecurityStandardJson;
+import com.contrastsecurity.csvdltool.model.ItemForVulnerability;
 import com.contrastsecurity.csvdltool.model.Organization;
+import com.contrastsecurity.csvdltool.model.Vulnerability;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-public class ApplicationsApi extends Api {
-    public ApplicationsApi(Shell shell, IPreferenceStore ps, Organization org) {
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
+
+public class TracesFilterBySecurityStandardApi extends Api {
+
+    private final static int LIMIT = 15;
+    private String appId;
+    private String securityStandardName;
+    private int offset;
+
+    public TracesFilterBySecurityStandardApi(Shell shell, IPreferenceStore ps, Organization org, String appId, String securityStandardName, int offset) {
         super(shell, ps, org);
+        this.appId = appId;
+        this.securityStandardName = securityStandardName;
+        this.offset = offset;
     }
 
     @Override
     protected String getUrl() {
         String orgId = this.org.getOrganization_uuid();
-        return String.format("%s/api/ng/%s/applications?expand=modules,license,compliance_policy,skip_links", this.contrastUrl, orgId);
+        return String.format("%s/api/ng/organizations/%s/orgtraces/ui?expand=limit=%d&offset=%d", this.contrastUrl, orgId, LIMIT, this.offset);
+    }
+
+    @Override
+    protected RequestBody getBody() throws Exception {
+        MediaType mediaTypeJson = MediaType.parse("application/json; charset=UTF-8");
+        String json = String.format("{\"quickFilter\":\"ALL\",\"modules\":[\"%s\"],\"securityStandards\":[\"%s\"]}", this.appId, this.securityStandardName);
+        return RequestBody.create(json, mediaTypeJson);
     }
 
     @Override
     protected Object convert(String response) {
         Gson gson = new Gson();
-        Type contType = new TypeToken<ApplicationsJson>() {
+        Type type = new TypeToken<TraceFilterBySecurityStandardJson>() {
         }.getType();
-        ApplicationsJson applicationsJson = gson.fromJson(response, contType);
-        return applicationsJson.getApplications();
+        TraceFilterBySecurityStandardJson json = gson.fromJson(response, type);
+        this.totalCount = json.getCount();
+        List<Vulnerability> vulns = new ArrayList<Vulnerability>();
+        for (ItemForVulnerability item : json.getItems()) {
+            vulns.add(item.getVulnerability());
+        }
+        return vulns;
     }
 
 }

@@ -28,29 +28,30 @@ import java.lang.reflect.Type;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Shell;
 
-import com.contrastsecurity.csvdltool.json.ApplicationsJson;
+import com.contrastsecurity.csvdltool.json.FilterJson;
 import com.contrastsecurity.csvdltool.model.Organization;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-public class ApplicationsApi extends Api {
-    public ApplicationsApi(Shell shell, IPreferenceStore ps, Organization org) {
+public class FilterSecurityStandardApi extends Api {
+
+    public FilterSecurityStandardApi(Shell shell, IPreferenceStore ps, Organization org) {
         super(shell, ps, org);
     }
 
     @Override
     protected String getUrl() {
         String orgId = this.org.getOrganization_uuid();
-        return String.format("%s/api/ng/%s/applications?expand=modules,license,compliance_policy,skip_links", this.contrastUrl, orgId);
+        return String.format("%s/api/ng/%s/orgtraces/filter/security-standard/listing?expand=skip_links", this.contrastUrl, orgId);
     }
 
     @Override
     protected Object convert(String response) {
         Gson gson = new Gson();
-        Type contType = new TypeToken<ApplicationsJson>() {
+        Type filterSeverityJsonType = new TypeToken<FilterJson>() {
         }.getType();
-        ApplicationsJson applicationsJson = gson.fromJson(response, contType);
-        return applicationsJson.getApplications();
+        FilterJson filterSeverityJson = gson.fromJson(response, filterSeverityJsonType);
+        return filterSeverityJson.getFilters();
     }
 
 }

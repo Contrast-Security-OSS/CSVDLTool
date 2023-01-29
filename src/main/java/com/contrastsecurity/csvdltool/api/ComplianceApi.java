@@ -24,33 +24,42 @@
 package com.contrastsecurity.csvdltool.api;
 
 import java.lang.reflect.Type;
+import java.util.List;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Shell;
 
-import com.contrastsecurity.csvdltool.json.ApplicationsJson;
+import com.contrastsecurity.csvdltool.json.ComplianceJson;
 import com.contrastsecurity.csvdltool.model.Organization;
+import com.contrastsecurity.csvdltool.model.Policy;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-public class ApplicationsApi extends Api {
-    public ApplicationsApi(Shell shell, IPreferenceStore ps, Organization org) {
+public class ComplianceApi extends Api {
+
+    private final static int LIMIT = 10;
+    private int offset;
+
+    public ComplianceApi(Shell shell, IPreferenceStore ps, Organization org, int offset) {
         super(shell, ps, org);
+        this.offset = offset;
     }
 
     @Override
     protected String getUrl() {
         String orgId = this.org.getOrganization_uuid();
-        return String.format("%s/api/ng/%s/applications?expand=modules,license,compliance_policy,skip_links", this.contrastUrl, orgId);
+        return String.format("%s/api/ng/%s/policy/compliance?expand=skip_links&limit=%d&offset=%d", this.contrastUrl, orgId, LIMIT, this.offset);
     }
 
     @Override
     protected Object convert(String response) {
         Gson gson = new Gson();
-        Type contType = new TypeToken<ApplicationsJson>() {
+        Type type = new TypeToken<ComplianceJson>() {
         }.getType();
-        ApplicationsJson applicationsJson = gson.fromJson(response, contType);
-        return applicationsJson.getApplications();
+        ComplianceJson complianceJson = gson.fromJson(response, type);
+        this.totalCount = complianceJson.getCount();
+        List<Policy> policies = complianceJson.getPolicies();
+        return policies;
     }
 
 }

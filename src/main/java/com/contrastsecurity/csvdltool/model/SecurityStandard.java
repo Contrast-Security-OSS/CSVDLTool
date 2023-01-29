@@ -21,36 +21,44 @@
  * 
  */
 
-package com.contrastsecurity.csvdltool.api;
+package com.contrastsecurity.csvdltool.model;
 
-import java.lang.reflect.Type;
+public class SecurityStandard {
+    private String name;
+    private String type;
+    private String description;
+    private String short_name;
 
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.swt.widgets.Shell;
-
-import com.contrastsecurity.csvdltool.json.ApplicationsJson;
-import com.contrastsecurity.csvdltool.model.Organization;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-public class ApplicationsApi extends Api {
-    public ApplicationsApi(Shell shell, IPreferenceStore ps, Organization org) {
-        super(shell, ps, org);
+    public String getName() {
+        return name;
     }
 
-    @Override
-    protected String getUrl() {
-        String orgId = this.org.getOrganization_uuid();
-        return String.format("%s/api/ng/%s/applications?expand=modules,license,compliance_policy,skip_links", this.contrastUrl, orgId);
+    public void setName(String name) {
+        this.name = name;
     }
 
-    @Override
-    protected Object convert(String response) {
-        Gson gson = new Gson();
-        Type contType = new TypeToken<ApplicationsJson>() {
-        }.getType();
-        ApplicationsJson applicationsJson = gson.fromJson(response, contType);
-        return applicationsJson.getApplications();
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getShort_name() {
+        return short_name;
+    }
+
+    public void setShort_name(String short_name) {
+        this.short_name = short_name;
     }
 
 }

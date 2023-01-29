@@ -32,6 +32,7 @@ public class Application {
     private String context_path;
     private String language;
     private License license;
+    private List<Policy> policies;
 
     public String getName() {
         return name;
@@ -73,12 +74,29 @@ public class Application {
         this.license = license;
     }
 
+    public List<Policy> getPolicies() {
+        return policies;
+    }
+
+    public void setPolicies(List<Policy> policies) {
+        this.policies = policies;
+    }
+
     @Override
     public String toString() {
         List<String> strList = new ArrayList<String>();
         strList.add("app_id: " + this.app_id);
         strList.add("name: " + this.name);
         return String.join(", ", strList);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Application) {
+            Application other = (Application) obj;
+            return other.app_id == this.app_id;
+        }
+        return false;
     }
 
 }

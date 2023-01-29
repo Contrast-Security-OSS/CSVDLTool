@@ -149,7 +149,8 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                 Path dir = Paths.get(dirPath);
                 Files.createDirectory(dir);
             }
-            // 選択済みアプリの脆弱性情報を取得
+            // 選択済みアプリのライブラリ情報を取得
+            monitor.setTaskName("ライブラリの情報を取得...");
             SubProgressMonitor sub1Monitor = new SubProgressMonitor(monitor, 80);
             sub1Monitor.beginTask("", dstApps.size());
             int appIdx = 1;
@@ -157,7 +158,7 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                 Organization org = fullAppMap.get(appLabel).getOrganization();
                 String appName = fullAppMap.get(appLabel).getAppName();
                 String appId = fullAppMap.get(appLabel).getAppId();
-                monitor.setTaskName(String.format("[%s] %s (%d/%d)", org.getName(), appName, appIdx, dstApps.size()));
+                monitor.setTaskName(String.format("ライブラリの情報を取得...[%s] %s (%d/%d)", org.getName(), appName, appIdx, dstApps.size()));
                 List<Library> allLibraries = new ArrayList<Library>();
                 Api librariesApi = new LibrariesApi(this.shell, this.ps, org, appId, filter, allLibraries.size());
                 allLibraries.addAll((List<Library>) librariesApi.get());
@@ -178,6 +179,7 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                 }
                 SubProgressMonitor sub1_1Monitor = new SubProgressMonitor(sub1Monitor, 1);
                 sub1_1Monitor.beginTask("", allLibraries.size());
+                int libIdx = 1;
                 for (Library library : allLibraries) {
                     if (monitor.isCanceled()) {
                         if (this.timer != null) {
@@ -187,6 +189,7 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                     }
                     List<String> csvLineList = new ArrayList<String>();
                     monitor.subTask(library.getFile_name());
+                    monitor.subTask(String.format("ライブラリ: %s (%d/%d)", library.getFile_name(), libIdx, allLibraries.size()));
                     for (LibCSVColumn csvColumn : columnList) {
                         if (!csvColumn.isValid()) {
                             continue;
@@ -381,6 +384,7 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                     }
 
                     csvList.add(csvLineList);
+                    libIdx++;
                     sub1_1Monitor.worked(1);
                     Thread.sleep(sleepTrace);
                 }

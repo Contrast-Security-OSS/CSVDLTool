@@ -21,36 +21,44 @@
  * 
  */
 
-package com.contrastsecurity.csvdltool.api;
+package com.contrastsecurity.csvdltool.model;
 
-import java.lang.reflect.Type;
+public class Rule {
+    private String description;
+    private String title;
+    private String name;
 
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.swt.widgets.Shell;
+    public String getDescription() {
+        return description;
+    }
 
-import com.contrastsecurity.csvdltool.json.ApplicationsJson;
-import com.contrastsecurity.csvdltool.model.Organization;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-public class ApplicationsApi extends Api {
-    public ApplicationsApi(Shell shell, IPreferenceStore ps, Organization org) {
-        super(shell, ps, org);
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     @Override
-    protected String getUrl() {
-        String orgId = this.org.getOrganization_uuid();
-        return String.format("%s/api/ng/%s/applications?expand=modules,license,compliance_policy,skip_links", this.contrastUrl, orgId);
-    }
-
-    @Override
-    protected Object convert(String response) {
-        Gson gson = new Gson();
-        Type contType = new TypeToken<ApplicationsJson>() {
-        }.getType();
-        ApplicationsJson applicationsJson = gson.fromJson(response, contType);
-        return applicationsJson.getApplications();
+    public boolean equals(Object obj) {
+        if (obj instanceof Rule) {
+            Rule other = (Rule) obj;
+            return other.name == this.name;
+        }
+        return false;
     }
 
 }

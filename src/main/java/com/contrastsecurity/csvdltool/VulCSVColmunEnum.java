@@ -52,13 +52,13 @@ public enum VulCSVColmunEnum {
     VUL_17("モジュール", 18, false, null, false, null, null, true, ""),
     VUL_18("脆弱性タグ", 19, true, ",", false, null, null, true, ""),
     VUL_19("保留中ステータス", 10, false, null, false, null, null, false, ""),
-    VUL_20("組織名", 20, false, null, false, null, null, false, ""),
-    VUL_21("組織ID", 21, false, null, false, null, null, false, ""),
-    VUL_22("リンク", 22, false, null, false, null, null, false, "TeamServerへのリンクです。"),
-    VUL_23("リンク(ハイパーリンク)", 23, false, null, false, null, null, false, "TeamServerへのリンク（ハイパーリンク）です。"),
-    VUL_24("ルートURL", 24, true, ",", false, null, null, false, "ルートカバレッジのURLです。"),
-    VUL_25("セッションメタデータ", 25, true, ",", false, null, null, false, ""),
-    VUL_26("コンプライアンスポリシー", 26, true, ",", false, null, null, false, "");
+    VUL_20("組織名", 22, false, null, false, null, null, false, ""),
+    VUL_21("組織ID", 23, false, null, false, null, null, false, ""),
+    VUL_22("リンク", 24, false, null, false, null, null, false, "TeamServerへのリンクです。"),
+    VUL_23("リンク(ハイパーリンク)", 25, false, null, false, null, null, false, "TeamServerへのリンク（ハイパーリンク）です。"),
+    VUL_24("ルートURL", 26, true, ",", false, null, null, false, "ルートカバレッジのURLです。"),
+    VUL_25("セッションメタデータ", 20, true, ",", false, null, null, false, ""),
+    VUL_26("コンプライアンスポリシー", 21, true, ",", false, null, null, false, "");
 
     private String culumn;
     private int order;

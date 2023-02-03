@@ -47,18 +47,19 @@ public enum VulCSVColmunEnum {
     VUL_12("脆弱性のタイトル", 13, false, null, false, null, null, true, ""),
     VUL_13("最初の検出", 14, false, null, false, null, null, true, ""),
     VUL_14("最後の検出", 15, false, null, false, null, null, true, ""),
-    VUL_15("ビルド番号", 16, true, ",", false, null, null, true, ""),
-    VUL_16("次のサーバにより報告", 17, true, ",", false, null, null, true, ""),
-    VUL_17("モジュール", 18, false, null, false, null, null, true, ""),
-    VUL_18("脆弱性タグ", 19, true, ",", false, null, null, true, ""),
+    VUL_15("ビルド番号", 17, true, ",", false, null, null, true, ""),
+    VUL_16("次のサーバにより報告", 18, true, ",", false, null, null, true, ""),
+    VUL_17("モジュール", 19, false, null, false, null, null, true, ""),
+    VUL_18("脆弱性タグ", 20, true, ",", false, null, null, true, ""),
     VUL_19("保留中ステータス", 10, false, null, false, null, null, false, ""),
-    VUL_20("組織名", 22, false, null, false, null, null, false, ""),
-    VUL_21("組織ID", 23, false, null, false, null, null, false, ""),
-    VUL_22("リンク", 24, false, null, false, null, null, false, "TeamServerへのリンクです。"),
-    VUL_23("リンク(ハイパーリンク)", 25, false, null, false, null, null, false, "TeamServerへのリンク（ハイパーリンク）です。"),
-    VUL_24("ルートURL", 26, true, ",", false, null, null, false, "ルートカバレッジのURLです。"),
-    VUL_25("セッションメタデータ", 20, true, ",", false, null, null, false, ""),
-    VUL_26("コンプライアンスポリシー", 21, true, ",", false, null, null, false, "");
+    VUL_20("組織名", 23, false, null, false, null, null, false, ""),
+    VUL_21("組織ID", 24, false, null, false, null, null, false, ""),
+    VUL_22("リンク", 25, false, null, false, null, null, false, "TeamServerへのリンクです。"),
+    VUL_23("リンク(ハイパーリンク)", 26, false, null, false, null, null, false, "TeamServerへのリンク（ハイパーリンク）です。"),
+    VUL_24("ルートURL", 27, true, ",", false, null, null, false, "ルートカバレッジのURLです。"),
+    VUL_25("セッションメタデータ", 21, true, ",", false, null, null, false, ""),
+    VUL_26("コンプライアンスポリシー", 22, true, ",", false, null, null, false, ""),
+    VUL_27("検出日時", 16, false, null, false, null, null, false, "");
 
     private String culumn;
     private int order;

@@ -73,6 +73,7 @@ public class PreferenceConstants {
     public static final String CSV_FILE_FORMAT_SERVER = new String("com.contrastsecurity.csvdltool.csv_file_format_server");
 
     public static final String VUL_ONLY_PARENT_APP = new String("com.contrastsecurity.csvdltool.only_parent_app_check");
+    public static final String VUL_ONLY_CURVUL_EXP = new String("com.contrastsecurity.csvdltool.only_curvul_exp_check");
     public static final String INCLUDE_DESCRIPTION = new String("com.contrastsecurity.csvdltool.include_description");
     public static final String INCLUDE_STACKTRACE = new String("com.contrastsecurity.csvdltool.include_stacktrace");
 

@@ -172,6 +172,7 @@ public class Main implements PropertyChangeListener {
 
     private Button vulExecuteBtn;
     private Button vulOnlyParentAppChk;
+    private Button vulOnlyCurVulExpChk;
     private Button includeDescChk;
     private Button includeStackTraceChk;
 
@@ -290,6 +291,8 @@ public class Main implements PropertyChangeListener {
             this.ps.setDefault(PreferenceConstants.AUTO_RELOGIN_INTERVAL, 105);
             this.ps.setDefault(PreferenceConstants.AUTH_RETRY_MAX, 3);
 
+            this.ps.setDefault(PreferenceConstants.VUL_ONLY_CURVUL_EXP, true);
+
             this.ps.setDefault(PreferenceConstants.CSV_COLUMN_VUL, VulCSVColmunEnum.defaultValuesStr());
             this.ps.setDefault(PreferenceConstants.SLEEP_VUL, 300);
             this.ps.setDefault(PreferenceConstants.CSV_OUT_HEADER_VUL, true);
@@ -367,6 +370,7 @@ public class Main implements PropertyChangeListener {
                 ps.setValue(PreferenceConstants.MEM_WIDTH, shell.getSize().x);
                 ps.setValue(PreferenceConstants.MEM_HEIGHT, shell.getSize().y);
                 ps.setValue(PreferenceConstants.VUL_ONLY_PARENT_APP, vulOnlyParentAppChk.getSelection());
+                ps.setValue(PreferenceConstants.VUL_ONLY_CURVUL_EXP, vulOnlyCurVulExpChk.getSelection());
                 ps.setValue(PreferenceConstants.INCLUDE_DESCRIPTION, includeDescChk.getSelection());
                 ps.setValue(PreferenceConstants.INCLUDE_STACKTRACE, includeStackTraceChk.getSelection());
                 ps.setValue(PreferenceConstants.ONLY_HAS_CVE, onlyHasCVEChk.getSelection());
@@ -945,7 +949,7 @@ public class Main implements PropertyChangeListener {
                     return;
                 }
                 VulGetWithProgress progress = new VulGetWithProgress(shell, ps, dstApps, fullAppMap, assessFilterMap, frLastDetectedDate, toLastDetectedDate,
-                        vulOnlyParentAppChk.getSelection(), includeDescChk.getSelection(), includeStackTraceChk.getSelection());
+                        vulOnlyParentAppChk.getSelection(), vulOnlyCurVulExpChk.getSelection(), includeDescChk.getSelection(), includeStackTraceChk.getSelection());
                 ProgressMonitorDialog progDialog = new VulGetProgressMonitorDialog(shell);
                 try {
                     progDialog.run(true, true, progress);
@@ -985,6 +989,12 @@ public class Main implements PropertyChangeListener {
         vulOnlyParentAppChk.setText("マージされたアプリの場合、親アプリの脆弱性だけを出力する。");
         if (this.ps.getBoolean(PreferenceConstants.VUL_ONLY_PARENT_APP)) {
             vulOnlyParentAppChk.setSelection(true);
+        }
+
+        vulOnlyCurVulExpChk = new Button(vulButtonGrp, SWT.CHECK);
+        vulOnlyCurVulExpChk.setText("最新の脆弱性のみ出力する。（以前のセッションのものは出力しない）");
+        if (this.ps.getBoolean(PreferenceConstants.VUL_ONLY_CURVUL_EXP)) {
+            vulOnlyCurVulExpChk.setSelection(true);
         }
 
         includeDescChk = new Button(vulButtonGrp, SWT.CHECK);

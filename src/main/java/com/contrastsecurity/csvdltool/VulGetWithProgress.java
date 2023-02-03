@@ -38,6 +38,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -75,6 +76,7 @@ import com.contrastsecurity.csvdltool.api.RoutesApi;
 import com.contrastsecurity.csvdltool.api.SessionMetadataApi;
 import com.contrastsecurity.csvdltool.api.StoryApi;
 import com.contrastsecurity.csvdltool.api.TraceApi;
+import com.contrastsecurity.csvdltool.api.TraceInstancesApi;
 import com.contrastsecurity.csvdltool.api.TraceTagsApi;
 import com.contrastsecurity.csvdltool.api.TracesApi;
 import com.contrastsecurity.csvdltool.api.TracesFilterBySecurityStandardApi;
@@ -89,6 +91,7 @@ import com.contrastsecurity.csvdltool.model.EventDetail;
 import com.contrastsecurity.csvdltool.model.EventSummary;
 import com.contrastsecurity.csvdltool.model.Filter;
 import com.contrastsecurity.csvdltool.model.HttpRequest;
+import com.contrastsecurity.csvdltool.model.Instance;
 import com.contrastsecurity.csvdltool.model.Note;
 import com.contrastsecurity.csvdltool.model.Observation;
 import com.contrastsecurity.csvdltool.model.Organization;
@@ -125,6 +128,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
     private Date frLastDetectedDate;
     private Date toLastDetectedDate;
     private boolean isOnlyParentApp;
+    private boolean isOnlyCurVulExp;
     private boolean isIncludeDesc;
     private boolean isIncludeStackTrace;
     private Timer timer;
@@ -132,7 +136,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
     Logger logger = LogManager.getLogger("csvdltool");
 
     public VulGetWithProgress(Shell shell, PreferenceStore ps, List<String> dstApps, Map<String, AppInfo> fullAppMap, Map<FilterEnum, Set<Filter>> filterMap, Date frDate,
-            Date toDate, boolean isOnlyParentApp, boolean isIncludeDesc, boolean isIncludeStackTrace) {
+            Date toDate, boolean isOnlyParentApp, boolean isOnlyCurVulExp, boolean isIncludeDesc, boolean isIncludeStackTrace) {
         this.shell = shell;
         this.ps = ps;
         this.dstApps = dstApps;
@@ -141,6 +145,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
         this.frLastDetectedDate = frDate;
         this.toLastDetectedDate = toDate;
         this.isOnlyParentApp = isOnlyParentApp;
+        this.isOnlyCurVulExp = isOnlyCurVulExp;
         this.isIncludeDesc = isIncludeDesc;
         this.isIncludeStackTrace = isIncludeStackTrace;
     }
@@ -299,6 +304,21 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                 Thread.sleep(500);
                 Api tracesApi = new TracesApi(this.shell, this.ps, org, appId, filterMap, frLastDetectedDate, toLastDetectedDate);
                 List<String> traces = (List<String>) tracesApi.get();
+                if (!isOnlyCurVulExp) {
+                    List<String> copyTraces = new ArrayList<String>(traces);
+                    Collections.reverse(copyTraces);
+                    for (String trace_id : copyTraces) {
+                        int insertIdx = traces.indexOf(trace_id);
+                        Api traceInstancesApi = new TraceInstancesApi(shell, ps, org, appId, trace_id);
+                        List<Instance> instances = (List<Instance>) traceInstancesApi.get();
+                        for (Instance instance : instances) {
+                            if (trace_id.equals(instance.getUuid())) {
+                                continue;
+                            }
+                            traces.add(insertIdx, instance.getUuid());
+                        }
+                    }
+                }
                 SubProgressMonitor sub2_2Monitor = new SubProgressMonitor(sub2Monitor, 80);
                 sub2_2Monitor.beginTask("", traces.size());
                 int traceIdx = 1;
@@ -482,7 +502,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                                 csvLineList.add(String.join(csvColumn.getSeparateStr().replace("\\r", "\r").replace("\\n", "\n"), smList));
                                 break;
                             case VUL_26:
-                                // ==================== 25. セッションメタデータ ====================
+                                // ==================== 26. コンプライアンスポリシー ====================
                                 List<String> ssNameList = new ArrayList<String>();
                                 securityStandardVulnMap.forEach((k, v) -> {
                                     boolean matchFlg = false;
@@ -496,6 +516,10 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                                     }
                                 });
                                 csvLineList.add(String.join(csvColumn.getSeparateStr().replace("\\r", "\r").replace("\\n", "\n"), ssNameList));
+                                break;
+                            case VUL_27:
+                                // ==================== 27. 検出日時 ====================
+                                csvLineList.add(trace.getDiscovered());
                                 break;
                             default:
                                 continue;

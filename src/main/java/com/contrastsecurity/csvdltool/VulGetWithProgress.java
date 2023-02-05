@@ -269,7 +269,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                 String appId = fullAppMap.get(appLabel).getAppId();
                 monitor.setTaskName(String.format("脆弱性の情報を取得...[%s] %s (%d/%d)", org.getName(), appName, appIdx, dstApps.size()));
                 // コンプライアンスポリシーの情報を取得
-                Map<String, List<Vulnerability>> securityStandardVulnMap = new HashMap<String, List<Vulnerability>>();
+                Map<String, List<String>> securityStandardVulnUuidMap = new HashMap<String, List<String>>();
                 if (validCompliancePolicy) {
                     SubProgressMonitor sub2_1Monitor = new SubProgressMonitor(sub2Monitor, 20);
                     Api filterSecurityStandardApi = new FilterSecurityStandardApi(this.shell, this.ps, org);
@@ -297,7 +297,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                             allVuls.addAll(tmpVuls);
                             traceByFilterIncompleteFlg = totalTraceByFilterCount > allVuls.size();
                         }
-                        securityStandardVulnMap.put(ssFilter.getLabel(), allVuls);
+                        securityStandardVulnUuidMap.put(ssFilter.getLabel(), allVuls.stream().map(Vulnerability::getUuid).collect(Collectors.toList()));
                         sub2_1Monitor.worked(1);
                     }
                 }
@@ -316,6 +316,11 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                                 continue;
                             }
                             traces.add(insertIdx, instance.getUuid());
+                            securityStandardVulnUuidMap.forEach((k, v) -> {
+                                if (v.contains(trace_id)) {
+                                    v.add(instance.getUuid());
+                                }
+                            });
                         }
                     }
                 }
@@ -504,14 +509,8 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                             case VUL_26:
                                 // ==================== 26. コンプライアンスポリシー ====================
                                 List<String> ssNameList = new ArrayList<String>();
-                                securityStandardVulnMap.forEach((k, v) -> {
-                                    boolean matchFlg = false;
-                                    for (Vulnerability vul : v) {
-                                        if (trace_id.equals(vul.getUuid())) {
-                                            matchFlg |= true;
-                                        }
-                                    }
-                                    if (matchFlg) {
+                                securityStandardVulnUuidMap.forEach((k, v) -> {
+                                    if (v.contains(trace_id)) {
                                         ssNameList.add(k);
                                     }
                                 });

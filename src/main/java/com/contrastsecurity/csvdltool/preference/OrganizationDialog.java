@@ -141,6 +141,8 @@ public class OrganizationDialog extends Dialog {
 
     @Override
     protected void okPressed() {
+        orgIdTxt.setEditable(false);
+        apiKeyTxt.setEnabled(false);
         Organization org = new Organization();
         org.setApikey(apiKeyTxt.getText().trim());
         org.setOrganization_uuid(orgIdTxt.getText().trim());
@@ -152,7 +154,7 @@ public class OrganizationDialog extends Dialog {
             orgApi = new OrganizationApi(this.shell, this.ps, org, url, usr, svc);
         }
         try {
-            Organization rtnOrg = (Organization) orgApi.get();
+            Organization rtnOrg = (Organization) orgApi.getWithoutCheckTsv();
             if (rtnOrg == null) {
                 MessageDialog.openError(getShell(), "組織情報の確認", "組織が見つかりません。");
             } else {

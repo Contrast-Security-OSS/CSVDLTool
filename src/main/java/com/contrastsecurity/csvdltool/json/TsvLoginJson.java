@@ -23,22 +23,43 @@
 
 package com.contrastsecurity.csvdltool.json;
 
-import com.contrastsecurity.csvdltool.model.TsvSettings;
+public class TsvLoginJson extends ContrastJson {
 
-public class TsvSettingsJson extends ContrastJson {
-    private TsvSettings tsv;
+    private boolean tsv_login;
+    private boolean tsv_setup;
+    private boolean tsv_setup_optional;
+    private boolean tsv_trusted_device;
 
-    public TsvSettings getTsv() {
-        return tsv;
+    public boolean isTsv_login() {
+        return tsv_login;
     }
 
-    public void setTsv(TsvSettings tsv) {
-        this.tsv = tsv;
+    public void setTsv_login(boolean tsv_login) {
+        this.tsv_login = tsv_login;
     }
 
-    @Override
-    public String toString() {
-        return this.tsv.toString();
+    public boolean isTsv_setup() {
+        return tsv_setup;
+    }
+
+    public void setTsv_setup(boolean tsv_setup) {
+        this.tsv_setup = tsv_setup;
+    }
+
+    public boolean isTsv_setup_optional() {
+        return tsv_setup_optional;
+    }
+
+    public void setTsv_setup_optional(boolean tsv_setup_optional) {
+        this.tsv_setup_optional = tsv_setup_optional;
+    }
+
+    public boolean isTsv_trusted_device() {
+        return tsv_trusted_device;
+    }
+
+    public void setTsv_trusted_device(boolean tsv_trusted_device) {
+        this.tsv_trusted_device = tsv_trusted_device;
     }
 
 }

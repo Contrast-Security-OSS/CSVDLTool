@@ -157,6 +157,7 @@ public class Main implements PropertyChangeListener {
     public static final int MINIMUM_SIZE_HEIGHT = 640;
 
     private CSVDLToolShell shell;
+    private String validOrganizationsOldStr;
 
     // ASSESS
     private Button appLoadBtn;
@@ -359,6 +360,7 @@ public class Main implements PropertyChangeListener {
 
             @Override
             public void shellDeactivated(ShellEvent event) {
+                setValidOrganizationsOldStr(new Gson().toJson(getValidOrganizations()));
             }
 
             @Override
@@ -416,6 +418,11 @@ public class Main implements PropertyChangeListener {
                     settingBtn.setText("このボタンから基本設定を行ってください。");
                     uiReset();
                 } else {
+                    String validOrganizationsNewStr = new Gson().toJson(orgs);
+                    if (!validOrganizationsNewStr.equals(getValidOrganizationsOldStr())) {
+                        ps.setValue(PreferenceConstants.TSV_STATUS, TsvStatusEnum.NONE.name());
+                        uiReset();
+                    }
                     appLoadBtn.setEnabled(true);
                     vulExecuteBtn.setEnabled(true);
                     attackLoadBtn.setEnabled(true);
@@ -2160,6 +2167,14 @@ public class Main implements PropertyChangeListener {
             }
         }
         return orgs;
+    }
+
+    public String getValidOrganizationsOldStr() {
+        return validOrganizationsOldStr;
+    }
+
+    public void setValidOrganizationsOldStr(String validOrganizationsOldStr) {
+        this.validOrganizationsOldStr = validOrganizationsOldStr;
     }
 
     private void updateProtectOption() {

@@ -28,22 +28,21 @@ import java.lang.reflect.Type;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Shell;
 
-import com.contrastsecurity.csvdltool.json.TsvSettingJson;
+import com.contrastsecurity.csvdltool.json.TsvLoginJson;
 import com.contrastsecurity.csvdltool.model.Organization;
-import com.contrastsecurity.csvdltool.model.TsvSetting;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-public class TsvSettingsApi extends Api {
+public class TsvLoginApi extends Api {
 
-    public TsvSettingsApi(Shell shell, IPreferenceStore ps, Organization org, String contrastUrl, String userName, String seviceKey) {
+    public TsvLoginApi(Shell shell, IPreferenceStore ps, Organization org, String contrastUrl, String userName, String seviceKey) {
         super(shell, ps, org);
         this.contrastUrl = contrastUrl;
         this.userName = userName;
         this.serviceKey = seviceKey;
     }
 
-    public TsvSettingsApi(Shell shell, IPreferenceStore ps, Organization org, String contrastUrl, String userName) {
+    public TsvLoginApi(Shell shell, IPreferenceStore ps, Organization org, String contrastUrl, String userName) {
         super(shell, ps, org);
         this.contrastUrl = contrastUrl;
         this.userName = userName;
@@ -52,17 +51,16 @@ public class TsvSettingsApi extends Api {
     @Override
     protected String getUrl() {
         String orgId = this.org.getOrganization_uuid();
-        return String.format("%s/api/ng/%s/tsv/user?expand=skip_links", this.contrastUrl, orgId);
+        return String.format("%s/api/ng/%s/tsv/login?expand=skip_links", this.contrastUrl, orgId);
     }
 
     @Override
     protected Object convert(String response) {
         Gson gson = new Gson();
-        Type contType = new TypeToken<TsvSettingJson>() {
+        Type type = new TypeToken<TsvLoginJson>() {
         }.getType();
-        TsvSettingJson tsvSettingsJson = gson.fromJson(response, contType);
-        TsvSetting tsvSettings = tsvSettingsJson.getTsv();
-        return tsvSettings;
+        TsvLoginJson json = gson.fromJson(response, type);
+        return json;
     }
 
 }

@@ -71,8 +71,9 @@ import com.contrastsecurity.csvdltool.exception.TsvCancelException;
 import com.contrastsecurity.csvdltool.exception.TsvException;
 import com.contrastsecurity.csvdltool.exception.TsvFailureException;
 import com.contrastsecurity.csvdltool.json.ContrastJson;
+import com.contrastsecurity.csvdltool.json.TsvLoginJson;
 import com.contrastsecurity.csvdltool.model.Organization;
-import com.contrastsecurity.csvdltool.model.TsvSettings;
+import com.contrastsecurity.csvdltool.model.TsvSetting;
 import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -224,7 +225,28 @@ public abstract class Api {
         }
     }
 
-    protected TsvSettings checkTsv() throws Exception {
+    protected TsvSetting getTsvSetting() throws Exception {
+        // Api globalPropertiesApi = new GlobalPropertiesApi(shell, ps, org);
+        // GlobalPropertiesJson globalProperties = (GlobalPropertiesJson) globalPropertiesApi.getWithoutCheckTsv();
+        // if (globalProperties.compareVersion("3.10.0") == VersionDiff.GREATER_EQUAL) {
+        // System.out.println("3.10.0 above");
+        // } else {
+        // System.out.println("3.10.0 earlier");
+        // }
+        boolean isExistTsvOrg = false;
+        for (Organization tsvLoginChkOrg : ((CSVDLToolShell) this.shell).getMain().getValidOrganizations()) {
+            Api tsvLoginApi = null;
+            if (((CSVDLToolShell) this.shell).getMain().getAuthType() == AuthType.PASSWORD) {
+                tsvLoginApi = new TsvLoginApi(shell, ps, tsvLoginChkOrg, this.contrastUrl, this.userName);
+            } else {
+                tsvLoginApi = new TsvLoginApi(shell, ps, tsvLoginChkOrg, this.contrastUrl, this.userName, this.serviceKey);
+            }
+            TsvLoginJson tsvJson = (TsvLoginJson) tsvLoginApi.getWithoutCheckTsv();
+            isExistTsvOrg |= tsvJson.isTsv_login();
+        }
+        if (!isExistTsvOrg) {
+            return null;
+        }
         Api tsvSettingsApi = null;
         if (((CSVDLToolShell) this.shell).getMain().getAuthType() == AuthType.PASSWORD) {
             tsvSettingsApi = new TsvSettingsApi(shell, ps, org, this.contrastUrl, this.userName);
@@ -232,15 +254,15 @@ public abstract class Api {
             tsvSettingsApi = new TsvSettingsApi(shell, ps, org, this.contrastUrl, this.userName, this.serviceKey);
         }
         try {
-            TsvSettings tsvSettings = (TsvSettings) tsvSettingsApi.getWithoutCheckTsv();
-            return tsvSettings;
+            TsvSetting tsvSetting = (TsvSetting) tsvSettingsApi.getWithoutCheckTsv();
+            return tsvSetting;
         } catch (TsvException e) {
             Gson gson = new Gson();
             Type contrastType = new TypeToken<ContrastJson>() {
             }.getType();
             ContrastJson contrastJson = gson.fromJson(e.getMessage(), contrastType);
             if (contrastJson.getSuccess().equals("false") && contrastJson.getMessages().contains("TSV code required")) {
-                TsvSettings ts = new TsvSettings();
+                TsvSetting ts = new TsvSetting();
                 ts.setTsv_enabled(true);
                 ts.setTsv_type("EMAIL");
                 return ts;
@@ -263,14 +285,14 @@ public abstract class Api {
             tsvStatusEnum = TsvStatusEnum.valueOf(this.ps.getString(PreferenceConstants.TSV_STATUS));
         }
         if (TsvStatusEnum.NONE == tsvStatusEnum) {
-            TsvSettings tsvSettings = checkTsv();
-            if (!tsvSettings.isTsv_enabled()) {
+            TsvSetting tsvSetting = getTsvSetting();
+            if (tsvSetting == null || !tsvSetting.isTsv_enabled()) {
                 this.ps.setValue(PreferenceConstants.TSV_STATUS, TsvStatusEnum.SKIP.name());
             } else {
-                if (tsvSettings.getTsv_type() == null) {
+                if (tsvSetting.getTsv_type() == null) {
                     throw new TsvException("二段階認証コードの通知方法の取得に失敗しました。\r\n二段階認証の設定に問題がないかご確認ください。");
                 }
-                if (tsvSettings.getTsv_type().equals("EMAIL")) {
+                if (tsvSetting.getTsv_type().equals("EMAIL")) {
                     Api tsvInitializeApi = null;
                     if (((CSVDLToolShell) this.shell).getMain().getAuthType() == AuthType.PASSWORD) {
                         tsvInitializeApi = new TsvInitializeApi(this.shell, this.ps, this.org, this.contrastUrl, this.userName);

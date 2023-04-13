@@ -21,45 +21,24 @@
  * 
  */
 
-package com.contrastsecurity.csvdltool.model;
+package com.contrastsecurity.csvdltool.json;
 
-public class TsvSettings {
+import com.contrastsecurity.csvdltool.model.TsvSetting;
 
-    private boolean tsv_enabled;
-    private String tsv_type;
-    private String tsv_device;
-    private String google_configured;
+public class TsvSettingJson extends ContrastJson {
+    private TsvSetting tsv;
 
-    public boolean isTsv_enabled() {
-        return tsv_enabled;
+    public TsvSetting getTsv() {
+        return tsv;
     }
 
-    public void setTsv_enabled(boolean tsv_enabled) {
-        this.tsv_enabled = tsv_enabled;
+    public void setTsv(TsvSetting tsv) {
+        this.tsv = tsv;
     }
 
-    public String getTsv_type() {
-        return tsv_type;
-    }
-
-    public void setTsv_type(String tsv_type) {
-        this.tsv_type = tsv_type;
-    }
-
-    public String getTsv_device() {
-        return tsv_device;
-    }
-
-    public void setTsv_device(String tsv_device) {
-        this.tsv_device = tsv_device;
-    }
-
-    public String getGoogle_configured() {
-        return google_configured;
-    }
-
-    public void setGoogle_configured(String google_configured) {
-        this.google_configured = google_configured;
+    @Override
+    public String toString() {
+        return this.tsv.toString();
     }
 
 }

@@ -450,6 +450,7 @@ public class BasePreferencePage extends PreferencePage {
                 if (checkBoxList.isEmpty()) {
                     selectedIdxes.clear();
                 } else {
+                    selectedIdxes.clear();
                     for (Button button : checkBoxList) {
                         if (button.getSelection()) {
                             selectedIdxes.add(checkBoxList.indexOf(button));

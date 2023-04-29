@@ -844,9 +844,9 @@ public class Main implements PropertyChangeListener {
         vulFilterGrp.setLayout(vulFilterGrpLt);
         GridData vulFilterGrpGrDt = new GridData(GridData.FILL_BOTH);
         vulFilterGrp.setLayoutData(vulFilterGrpGrDt);
-        vulFilterGrp.setText("フィルタ条件");
+        vulFilterGrp.setText(Messages.getString("main.vul.filter.condition.group.title")); //$NON-NLS-1$
 
-        new Label(vulFilterGrp, SWT.LEFT).setText("重大度：");
+        new Label(vulFilterGrp, SWT.LEFT).setText(Messages.getString("main.vul.filter.condition.severity.label.title")); //$NON-NLS-1$
         vulSeverityFilterTxt = new Text(vulFilterGrp, SWT.BORDER);
         vulSeverityFilterTxt.setText("アプリケーション一覧を読み込んでください。");
         vulSeverityFilterTxt.setEditable(false);
@@ -878,7 +878,7 @@ public class Main implements PropertyChangeListener {
             }
         });
 
-        new Label(vulFilterGrp, SWT.LEFT).setText("脆弱性タイプ：");
+        new Label(vulFilterGrp, SWT.LEFT).setText(Messages.getString("main.vul.filter.condition.vulntype.label.title")); //$NON-NLS-1$
         vulVulnTypeFilterTxt = new Text(vulFilterGrp, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL);
         vulVulnTypeFilterTxt.setText("アプリケーション一覧を読み込んでください。");
         vulVulnTypeFilterTxt.setEditable(false);
@@ -912,7 +912,7 @@ public class Main implements PropertyChangeListener {
             }
         });
 
-        new Label(vulFilterGrp, SWT.LEFT).setText("最終検出日：");
+        new Label(vulFilterGrp, SWT.LEFT).setText(Messages.getString("main.vul.filter.condition.lastdetected.label.title")); //$NON-NLS-1$
         vulLastDetectedFilterTxt = new Text(vulFilterGrp, SWT.BORDER);
         vulLastDetectedFilterTxt.setText("すべて");
         vulLastDetectedFilterTxt.setEditable(false);

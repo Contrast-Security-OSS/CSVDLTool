@@ -53,7 +53,7 @@ public class FilterLastDetectedDialog extends Dialog {
     private Text toDateText;
     private Date frDate;
     private Date toDate;
-    private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd(E)");
+    private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd(E)"); //$NON-NLS-1$
     private Calendar cal = Calendar.getInstance();
 
     public FilterLastDetectedDialog(Shell parentShell, Date frDate, Date toDate) {
@@ -87,7 +87,7 @@ public class FilterLastDetectedDialog extends Dialog {
             }
         });
 
-        new Label(composite, SWT.NULL).setText("～");
+        new Label(composite, SWT.NULL).setText("～"); //$NON-NLS-1$
 
         toCalendar = new DateTime(composite, SWT.CALENDAR);
         GridData toCalendarGrDt = new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1);
@@ -105,10 +105,10 @@ public class FilterLastDetectedDialog extends Dialog {
         Button frBtn = new Button(composite, SWT.NULL);
         GridData frBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
         frBtn.setLayoutData(frBtnGrDt);
-        frBtn.setText("From削除");
+        frBtn.setText(Messages.getString("filterLastdetecteddialog.clear.date.filter.from")); //$NON-NLS-1$
         frBtn.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
-                frDateText.setText("");
+                frDateText.setText(""); //$NON-NLS-1$
                 frDate = null;
             }
         });
@@ -125,7 +125,7 @@ public class FilterLastDetectedDialog extends Dialog {
             cal.set(frCalendar.getYear(), frCalendar.getMonth(), frCalendar.getDay(), 0, 0, 0);
             // frDateText.setText(sdf.format(cal.getTime()));
         }
-        new Label(composite, SWT.NULL).setText("～");
+        new Label(composite, SWT.NULL).setText("～"); //$NON-NLS-1$
         toDateText = new Text(composite, SWT.BORDER);
         GridData toDateTextGrDt = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
         toDateTextGrDt.widthHint = 100;
@@ -142,10 +142,10 @@ public class FilterLastDetectedDialog extends Dialog {
         Button toBtn = new Button(composite, SWT.NULL);
         GridData toBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
         toBtn.setLayoutData(toBtnGrDt);
-        toBtn.setText("To削除");
+        toBtn.setText(Messages.getString("filterLastdetecteddialog.clear.date.filter.to")); //$NON-NLS-1$
         toBtn.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
-                toDateText.setText("");
+                toDateText.setText(""); //$NON-NLS-1$
                 toDate = null;
             }
         });
@@ -155,7 +155,7 @@ public class FilterLastDetectedDialog extends Dialog {
     @Override
     protected void createButtonsForButtonBar(Composite parent) {
         Button okButton = createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL, true);
-        Button deSelectButton = createButton(parent, IDialogConstants.DESELECT_ALL_ID, "フィルタ解除", false);
+        Button deSelectButton = createButton(parent, IDialogConstants.DESELECT_ALL_ID, Messages.getString("filterLastdetecteddialog.clear.date.filter.both"), false); //$NON-NLS-1$
         okButton.setEnabled(true);
         deSelectButton.setEnabled(true);
         createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
@@ -178,7 +178,7 @@ public class FilterLastDetectedDialog extends Dialog {
 
     @Override
     protected Point getInitialSize() {
-        return new Point(525, 300);
+        return new Point(600, 300);
     }
 
     @Override
@@ -189,7 +189,7 @@ public class FilterLastDetectedDialog extends Dialog {
     @Override
     protected void configureShell(Shell newShell) {
         super.configureShell(newShell);
-        newShell.setText("最終検出日の指定");
+        newShell.setText(Messages.getString("filterLastdetecteddialog.dialog.title")); //$NON-NLS-1$
     }
 
     public Date getFrDate() {

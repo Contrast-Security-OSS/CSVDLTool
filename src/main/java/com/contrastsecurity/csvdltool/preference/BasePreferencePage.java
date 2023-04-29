@@ -269,7 +269,7 @@ public class BasePreferencePage extends PreferencePage {
             serviceKeyTxt = new Text(baseGrp, SWT.BORDER);
             serviceKeyTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             serviceKeyTxt.setText(ps.getString(PreferenceConstants.SERVICE_KEY));
-            serviceKeyTxt.setMessage("個人のサービスキー");
+            serviceKeyTxt.setMessage(Messages.getString("basepreferencepage.servicekey.text.message")); //$NON-NLS-1$
             serviceKeyTxt.addListener(SWT.FocusIn, new Listener() {
                 public void handleEvent(Event e) {
                     serviceKeyTxt.selectAll();

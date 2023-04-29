@@ -8,6 +8,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
+import com.contrastsecurity.csvdltool.Messages;
+
 public class MyPreferenceDialog extends PreferenceDialog {
 
     public MyPreferenceDialog(Shell parentShell, PreferenceManager manager) {
@@ -18,7 +20,7 @@ public class MyPreferenceDialog extends PreferenceDialog {
     @Override
     protected void configureShell(Shell newShell) {
         super.configureShell(newShell);
-        newShell.setText("CSVDLTool設定");
+        newShell.setText(Messages.getString("mypreferencedialog.csvdltool.settings.title")); //$NON-NLS-1$
     }
 
     @Override

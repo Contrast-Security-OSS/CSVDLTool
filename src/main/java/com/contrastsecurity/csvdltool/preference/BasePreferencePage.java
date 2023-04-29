@@ -56,6 +56,7 @@ import org.jasypt.util.text.BasicTextEncryptor;
 
 import com.contrastsecurity.csvdltool.CSVDLToolShell;
 import com.contrastsecurity.csvdltool.Main;
+import com.contrastsecurity.csvdltool.Messages;
 import com.contrastsecurity.csvdltool.Main.AuthType;
 import com.contrastsecurity.csvdltool.ProxyAuthDialog;
 import com.contrastsecurity.csvdltool.model.Organization;
@@ -81,10 +82,10 @@ public class BasePreferencePage extends PreferencePage {
     private CSVDLToolShell shell;
     private AuthType authType;
 
-    Logger logger = LogManager.getLogger("csvdltool");
+    Logger logger = LogManager.getLogger("csvdltool"); //$NON-NLS-1$
 
     public BasePreferencePage(CSVDLToolShell shell, AuthType authType) {
-        super("基本設定");
+        super(Messages.getString("basepreferencepage.title")); //$NON-NLS-1$
         this.shell = shell;
         this.authType = authType;
     }
@@ -298,7 +299,7 @@ public class BasePreferencePage extends PreferencePage {
         GridData orgTableGrpGrDt = new GridData(GridData.FILL_BOTH);
         orgTableGrpGrDt.horizontalSpan = 3;
         orgTableGrp.setLayoutData(orgTableGrpGrDt);
-        orgTableGrp.setText("組織一覧");
+        orgTableGrp.setText(Messages.getString("basepreferencepage.organizations.table.title")); //$NON-NLS-1$
 
         String orgJsonStr = ps.getString(PreferenceConstants.TARGET_ORGS);
         if (orgJsonStr.trim().length() > 0) {

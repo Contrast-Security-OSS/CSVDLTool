@@ -154,7 +154,7 @@ public class Main implements PropertyChangeListener {
 
     public static final int MINIMUM_SIZE_WIDTH = 720;
     public static final int MINIMUM_SIZE_WIDTH_MAC = 720;
-    public static final int MINIMUM_SIZE_HEIGHT = 640;
+    public static final int MINIMUM_SIZE_HEIGHT = 670;
 
     private CSVDLToolShell shell;
     private String validOrganizationsOldStr;
@@ -427,7 +427,7 @@ public class Main implements PropertyChangeListener {
                     vulExecuteBtn.setEnabled(true);
                     attackLoadBtn.setEnabled(true);
                     serverLoadBtn.setEnabled(true);
-                    settingBtn.setText("設定");
+                    settingBtn.setText(Messages.getString("main.settings.button.title")); //$NON-NLS-1$
                 }
                 updateProtectOption();
                 setWindowTitle();
@@ -503,7 +503,7 @@ public class Main implements PropertyChangeListener {
         GridData appLoadBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
         appLoadBtnGrDt.horizontalSpan = 3;
         appLoadBtn.setLayoutData(appLoadBtnGrDt);
-        appLoadBtn.setText("アプリケーション一覧の読み込み");
+        appLoadBtn.setText(Messages.getString("main.application.load.button.title")); //$NON-NLS-1$
         appLoadBtn.setToolTipText("TeamServerにオンボードされているアプリケーションを読み込みます。");
         appLoadBtn.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -571,7 +571,7 @@ public class Main implements PropertyChangeListener {
 
         srcListFilter = new Text(srcGrp, SWT.BORDER);
         srcListFilter.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        srcListFilter.setMessage("Filter...");
+        srcListFilter.setMessage(Messages.getString("main.src.apps.filter.name.message")); //$NON-NLS-1$
         srcListFilter.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent event) {
@@ -583,7 +583,7 @@ public class Main implements PropertyChangeListener {
         GridData srcListLanguagesFilterGrDt = new GridData();
         srcListLanguagesFilterGrDt.widthHint = 40;
         srcListLanguagesFilter.setLayoutData(srcListLanguagesFilterGrDt);
-        srcListLanguagesFilter.setMessage("言語...");
+        srcListLanguagesFilter.setMessage(Messages.getString("main.src.apps.filter.language.message")); //$NON-NLS-1$
         srcListLanguagesFilter.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent event) {
@@ -736,7 +736,7 @@ public class Main implements PropertyChangeListener {
 
         dstListFilter = new Text(dstGrp, SWT.BORDER);
         dstListFilter.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        dstListFilter.setMessage("Filter...");
+        dstListFilter.setMessage(Messages.getString("main.dst.apps.filter.name.message")); //$NON-NLS-1$
         dstListFilter.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent event) {
@@ -822,7 +822,7 @@ public class Main implements PropertyChangeListener {
 
         // #################### 脆弱性 #################### //
         CTabItem vulTabItem = new CTabItem(subTabFolder, SWT.NONE);
-        vulTabItem.setText("脆弱性");
+        vulTabItem.setText(Messages.getString("main.vul.tab.title")); //$NON-NLS-1$
 
         // ========== グループ ==========
         Composite vulButtonGrp = new Composite(subTabFolder, SWT.NULL);
@@ -945,7 +945,7 @@ public class Main implements PropertyChangeListener {
         GridData executeBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
         executeBtnGrDt.heightHint = 50;
         vulExecuteBtn.setLayoutData(executeBtnGrDt);
-        vulExecuteBtn.setText("取得");
+        vulExecuteBtn.setText(Messages.getString("main.vul.export")); //$NON-NLS-1$
         vulExecuteBtn.setToolTipText("脆弱性情報を取得し、CSV形式で出力します。");
         vulExecuteBtn.setFont(new Font(display, "ＭＳ ゴシック", 20, SWT.NORMAL));
         vulExecuteBtn.addSelectionListener(new SelectionAdapter() {
@@ -1038,7 +1038,7 @@ public class Main implements PropertyChangeListener {
 
         // #################### ライブラリ #################### //
         CTabItem libTabItem = new CTabItem(subTabFolder, SWT.NONE);
-        libTabItem.setText("ライブラリ");
+        libTabItem.setText(Messages.getString("main.lib.tab.title")); //$NON-NLS-1$
 
         // ========== グループ ==========
         Composite libButtonGrp = new Composite(subTabFolder, SWT.NULL);
@@ -1056,7 +1056,7 @@ public class Main implements PropertyChangeListener {
         GridData libExecuteBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
         libExecuteBtnGrDt.heightHint = 50;
         libExecuteBtn.setLayoutData(libExecuteBtnGrDt);
-        libExecuteBtn.setText("取得");
+        libExecuteBtn.setText(Messages.getString("main.lib.export")); //$NON-NLS-1$
         libExecuteBtn.setToolTipText("ライブラリ情報を取得し、CSV形式で出力します。");
         libExecuteBtn.setFont(new Font(display, "ＭＳ ゴシック", 20, SWT.NORMAL));
         libExecuteBtn.addSelectionListener(new SelectionAdapter() {
@@ -1916,7 +1916,7 @@ public class Main implements PropertyChangeListener {
         // ========== 設定ボタン ==========
         settingBtn = new Button(bottomBtnGrp, SWT.PUSH);
         settingBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        settingBtn.setText("設定");
+        settingBtn.setText(Messages.getString("main.settings.button.title")); //$NON-NLS-1$
         settingBtn.setToolTipText("動作に必要な設定を行います。");
         settingBtn.addSelectionListener(new SelectionAdapter() {
             @Override

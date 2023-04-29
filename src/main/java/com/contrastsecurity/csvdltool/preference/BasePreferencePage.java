@@ -110,12 +110,12 @@ public class BasePreferencePage extends PreferencePage {
         GridData baseGrpLtGrDt = new GridData(GridData.FILL_BOTH);
         baseGrp.setLayoutData(baseGrpLtGrDt);
 
-        new Label(baseGrp, SWT.LEFT).setText("Contrast URL：");
-        new Label(baseGrp, SWT.LEFT).setText("");
+        new Label(baseGrp, SWT.LEFT).setText(Messages.getString("basepreferencepage.contrast.url.text.label.title")); //$NON-NLS-1$
+        new Label(baseGrp, SWT.LEFT).setText(""); //$NON-NLS-1$
         contrastUrlTxt = new Text(baseGrp, SWT.BORDER);
         contrastUrlTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         contrastUrlTxt.setText(ps.getString(PreferenceConstants.CONTRAST_URL));
-        contrastUrlTxt.setMessage("http://xxx.xxx.xxx.xxx/Contrast");
+        contrastUrlTxt.setMessage(Messages.getString("basepreferencepage.contrast.url.text.message")); //$NON-NLS-1$
         contrastUrlTxt.addListener(SWT.FocusIn, new Listener() {
             public void handleEvent(Event e) {
                 contrastUrlTxt.selectAll();
@@ -143,15 +143,15 @@ public class BasePreferencePage extends PreferencePage {
             }
         });
 
-        new Label(baseGrp, SWT.LEFT).setText("Username：");
+        new Label(baseGrp, SWT.LEFT).setText(Messages.getString("basepreferencepage.username.text.label.title")); //$NON-NLS-1$
         Label icon = new Label(baseGrp, SWT.NONE);
-        Image iconImg = new Image(parent.getDisplay(), Main.class.getClassLoader().getResourceAsStream("help.png"));
+        Image iconImg = new Image(parent.getDisplay(), Main.class.getClassLoader().getResourceAsStream("help.png")); //$NON-NLS-1$
         icon.setImage(iconImg);
         icon.setToolTipText("設定するユーザーの権限について\r\n・組織ロールはView権限以上が必要です。\r\n・Admin権限を持つユーザーの場合、アプリケーショングループの情報も取得できます。\r\n・アプリケーションアクセスグループはView権限以上が必要です。");
         userNameTxt = new Text(baseGrp, SWT.BORDER);
         userNameTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         userNameTxt.setText(ps.getString(PreferenceConstants.USERNAME));
-        userNameTxt.setMessage("メールアドレス");
+        userNameTxt.setMessage(Messages.getString("basepreferencepage.username.text.message")); //$NON-NLS-1$
         userNameTxt.addListener(SWT.FocusIn, new Listener() {
             public void handleEvent(Event e) {
                 userNameTxt.selectAll();
@@ -184,8 +184,8 @@ public class BasePreferencePage extends PreferencePage {
             GridData passwordLblGrDt = new GridData();
             passwordLblGrDt.verticalAlignment = SWT.TOP;
             passwordLbl.setLayoutData(passwordLblGrDt);
-            passwordLbl.setText("Password：");
-            new Label(baseGrp, SWT.LEFT).setText("");
+            passwordLbl.setText(Messages.getString("basepreferencepage.password.text.label.title")); //$NON-NLS-1$
+            new Label(baseGrp, SWT.LEFT).setText(""); //$NON-NLS-1$
             Group passwordGrp = new Group(baseGrp, SWT.NONE);
             GridLayout passwordGrpLt = new GridLayout(2, false);
             passwordGrpLt.marginWidth = 15;
@@ -211,7 +211,7 @@ public class BasePreferencePage extends PreferencePage {
                 public void widgetSelected(SelectionEvent e) {
                     Button source = (Button) e.getSource();
                     if (source.getSelection()) {
-                        passTxt.setText("");
+                        passTxt.setText(""); //$NON-NLS-1$
                         passTxt.setEnabled(false);
                     }
                 }
@@ -248,11 +248,11 @@ public class BasePreferencePage extends PreferencePage {
                 }
             });
 
-            if (ps.getString(PreferenceConstants.PASS_TYPE).equals("input")) {
+            if (ps.getString(PreferenceConstants.PASS_TYPE).equals("input")) { //$NON-NLS-1$
                 passInput.setSelection(true);
-                passTxt.setText("");
+                passTxt.setText(""); //$NON-NLS-1$
                 passTxt.setEnabled(false);
-            } else if (ps.getString(PreferenceConstants.PASS_TYPE).equals("save")) {
+            } else if (ps.getString(PreferenceConstants.PASS_TYPE).equals("save")) { //$NON-NLS-1$
                 passSave.setSelection(true);
                 BasicTextEncryptor encryptor = new BasicTextEncryptor();
                 encryptor.setPassword(Main.MASTER_PASSWORD);
@@ -260,12 +260,12 @@ public class BasePreferencePage extends PreferencePage {
                     passTxt.setText(encryptor.decrypt(ps.getString(PreferenceConstants.PASSWORD)));
                 } catch (Exception e) {
                     MessageDialog.openError(getShell(), "接続設定", "パスワードの復号化に失敗しました。\r\nパスワードの設定をやり直してください。");
-                    passTxt.setText("");
+                    passTxt.setText(""); //$NON-NLS-1$
                 }
             }
         } else {
-            new Label(baseGrp, SWT.LEFT).setText("Service Key：");
-            new Label(baseGrp, SWT.LEFT).setText("");
+            new Label(baseGrp, SWT.LEFT).setText(Messages.getString("basepreferencepage.servicekey.text.label.title")); //$NON-NLS-1$
+            new Label(baseGrp, SWT.LEFT).setText(""); //$NON-NLS-1$
             serviceKeyTxt = new Text(baseGrp, SWT.BORDER);
             serviceKeyTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             serviceKeyTxt.setText(ps.getString(PreferenceConstants.SERVICE_KEY));
@@ -338,16 +338,16 @@ public class BasePreferencePage extends PreferencePage {
         column0.setResizable(false);
         TableColumn column1 = new TableColumn(table, SWT.CENTER);
         column1.setWidth(50);
-        column1.setText("有効");
+        column1.setText(Messages.getString("basepreferencepage.org.table.column0.title")); //$NON-NLS-1$
         TableColumn column2 = new TableColumn(table, SWT.LEFT);
         column2.setWidth(150);
-        column2.setText("組織名");
+        column2.setText(Messages.getString("basepreferencepage.org.table.column1.title")); //$NON-NLS-1$
         TableColumn column3 = new TableColumn(table, SWT.CENTER);
         column3.setWidth(250);
-        column3.setText("組織ID");
+        column3.setText(Messages.getString("basepreferencepage.org.table.column2.title")); //$NON-NLS-1$
         TableColumn column4 = new TableColumn(table, SWT.CENTER);
         column4.setWidth(250);
-        column4.setText("API Key");
+        column4.setText(Messages.getString("basepreferencepage.org.table.column3.title")); //$NON-NLS-1$
 
         for (Organization org : orgList) {
             this.addOrgToTable(org);
@@ -364,7 +364,7 @@ public class BasePreferencePage extends PreferencePage {
 
         addBtn = new Button(buttonGrp, SWT.NULL);
         addBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        addBtn.setText("追加");
+        addBtn.setText(Messages.getString("basepreferencepage.org.add.button.title")); //$NON-NLS-1$
         if (this.authType == AuthType.PASSWORD) {
             if (contrastUrlTxt.getText().trim().isEmpty() || userNameTxt.getText().trim().isEmpty()) {
                 addBtn.setEnabled(false);
@@ -381,14 +381,14 @@ public class BasePreferencePage extends PreferencePage {
         addBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                if (ps.getBoolean(PreferenceConstants.PROXY_YUKO) && ps.getString(PreferenceConstants.PROXY_AUTH).equals("input")) {
+                if (ps.getBoolean(PreferenceConstants.PROXY_YUKO) && ps.getString(PreferenceConstants.PROXY_AUTH).equals("input")) { //$NON-NLS-1$
                     String usr = ps.getString(PreferenceConstants.PROXY_TMP_USER);
                     String pwd = ps.getString(PreferenceConstants.PROXY_TMP_PASS);
                     if (usr == null || usr.isEmpty() || pwd == null || pwd.isEmpty()) {
                         ProxyAuthDialog proxyAuthDialog = new ProxyAuthDialog(getShell());
                         int result = proxyAuthDialog.open();
                         if (IDialogConstants.CANCEL_ID == result) {
-                            ps.setValue(PreferenceConstants.PROXY_AUTH, "none");
+                            ps.setValue(PreferenceConstants.PROXY_AUTH, "none"); //$NON-NLS-1$
                         } else {
                             ps.setValue(PreferenceConstants.PROXY_TMP_USER, proxyAuthDialog.getUsername());
                             ps.setValue(PreferenceConstants.PROXY_TMP_PASS, proxyAuthDialog.getPassword());
@@ -430,7 +430,7 @@ public class BasePreferencePage extends PreferencePage {
 
         final Button rmvBtn = new Button(buttonGrp, SWT.NULL);
         rmvBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        rmvBtn.setText("削除");
+        rmvBtn.setText(Messages.getString("basepreferencepage.org.rmv.button.title")); //$NON-NLS-1$
         rmvBtn.setEnabled(false);
         rmvBtn.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -463,7 +463,7 @@ public class BasePreferencePage extends PreferencePage {
 
         bulkOnBtn = new Button(buttonGrp, SWT.NULL);
         bulkOnBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        bulkOnBtn.setText("全てOn");
+        bulkOnBtn.setText(Messages.getString("basepreferencepage.org.all.on.button.title")); //$NON-NLS-1$
         bulkOnBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -480,7 +480,7 @@ public class BasePreferencePage extends PreferencePage {
 
         bulkOffBtn = new Button(buttonGrp, SWT.NULL);
         bulkOffBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        bulkOffBtn.setText("全てOff");
+        bulkOffBtn.setText(Messages.getString("basepreferencepage.org.all.off.button.title")); //$NON-NLS-1$
         bulkOffBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -515,7 +515,7 @@ public class BasePreferencePage extends PreferencePage {
         applyBtnGrDt.widthHint = 90;
         applyBtnGrDt.horizontalSpan = 2;
         applyBtn.setLayoutData(applyBtnGrDt);
-        applyBtn.setText("適用");
+        applyBtn.setText(Messages.getString("basepreferencepage.apply.button.title")); //$NON-NLS-1$
         applyBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -567,10 +567,10 @@ public class BasePreferencePage extends PreferencePage {
         }
         if (this.authType == AuthType.PASSWORD) {
             if (passInput.getSelection()) {
-                ps.setValue(PreferenceConstants.PASS_TYPE, "input");
-                ps.setValue(PreferenceConstants.PASSWORD, "");
+                ps.setValue(PreferenceConstants.PASS_TYPE, "input"); //$NON-NLS-1$
+                ps.setValue(PreferenceConstants.PASSWORD, ""); //$NON-NLS-1$
             } else if (passSave.getSelection()) {
-                ps.setValue(PreferenceConstants.PASS_TYPE, "save");
+                ps.setValue(PreferenceConstants.PASS_TYPE, "save"); //$NON-NLS-1$
                 if (this.passTxt.getText().isEmpty()) {
                     errors.add("・パスワードを設定してください。");
                 } else {
@@ -586,7 +586,7 @@ public class BasePreferencePage extends PreferencePage {
 
         ps.setValue(PreferenceConstants.TARGET_ORGS, new Gson().toJson(this.orgList));
         if (!errors.isEmpty()) {
-            MessageDialog.openError(getShell(), "基本設定", String.join("\r\n", errors));
+            MessageDialog.openError(getShell(), Messages.getString("basepreferencepage.title"), String.join("\r\n", errors));  //$NON-NLS-1$//$NON-NLS-2$
             return false;
         }
         return true;

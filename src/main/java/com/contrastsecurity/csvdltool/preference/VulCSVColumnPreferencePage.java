@@ -181,7 +181,7 @@ public class VulCSVColumnPreferencePage extends PreferencePage {
         column5.setText("false"); //$NON-NLS-1$
         TableColumn column6 = new TableColumn(table, SWT.LEFT);
         column6.setWidth(350);
-        column6.setText("備考");
+        column6.setText(Messages.getString("vulcsvcolumnpreferencepage.table.column3.title")); //$NON-NLS-1$
 
         for (VulCSVColumn col : columnList) {
             this.addColToTable(col, -1);

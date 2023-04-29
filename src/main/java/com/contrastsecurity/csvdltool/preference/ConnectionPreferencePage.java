@@ -48,6 +48,7 @@ import org.eclipse.swt.widgets.Text;
 import org.jasypt.util.text.BasicTextEncryptor;
 
 import com.contrastsecurity.csvdltool.Main;
+import com.contrastsecurity.csvdltool.Messages;
 import com.contrastsecurity.csvdltool.Main.AuthType;
 
 public class ConnectionPreferencePage extends PreferencePage {
@@ -67,7 +68,7 @@ public class ConnectionPreferencePage extends PreferencePage {
     private AuthType authType;
 
     public ConnectionPreferencePage(AuthType authType) {
-        super("接続設定");
+        super(Messages.getString("connectionpreferencepage.title")); //$NON-NLS-1$
         this.authType = authType;
     }
 
@@ -78,14 +79,14 @@ public class ConnectionPreferencePage extends PreferencePage {
             @Override
             public void propertyChange(PropertyChangeEvent event) {
                 if (event.getProperty().equals(PreferenceConstants.PROXY_AUTH)) {
-                    if (event.getNewValue().equals("none")) {
+                    if (event.getNewValue().equals("none")) { //$NON-NLS-1$
                         if (!authNone.isDisposed()) {
                             authNone.setSelection(true);
                             authInput.setSelection(false);
                             authSave.setSelection(false);
-                            userTxt.setText("");
+                            userTxt.setText(""); //$NON-NLS-1$
                             userTxt.setEnabled(false);
-                            passTxt.setText("");
+                            passTxt.setText(""); //$NON-NLS-1$
                             passTxt.setEnabled(false);
                         }
                     }
@@ -109,13 +110,13 @@ public class ConnectionPreferencePage extends PreferencePage {
         proxyGrp.setLayout(proxyGrpLt);
         GridData proxyGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
         proxyGrp.setLayoutData(proxyGrpGrDt);
-        proxyGrp.setText("プロキシ設定");
+        proxyGrp.setText(Messages.getString("connectionpreferencepage.proxy.settings.group.title")); //$NON-NLS-1$
 
         validFlg = new Button(proxyGrp, SWT.CHECK);
         // GridData validFlgGrDt = new GridData();
         // validFlgGrDt.horizontalSpan = 4;
         // validFlg.setLayoutData(validFlgGrDt);
-        validFlg.setText("プロキシ経由");
+        validFlg.setText(Messages.getString("connectionpreferencepage.valid.proxy")); //$NON-NLS-1$
         if (ps.getBoolean(PreferenceConstants.PROXY_YUKO)) {
             validFlg.setSelection(true);
         }
@@ -130,7 +131,7 @@ public class ConnectionPreferencePage extends PreferencePage {
         proxyHostGrp.setLayoutData(proxyHostGrpGrDt);
 
         // ========== ホスト ========== //
-        new Label(proxyHostGrp, SWT.LEFT).setText("ホスト：");
+        new Label(proxyHostGrp, SWT.LEFT).setText(Messages.getString("connectionpreferencepage.proxy.host")); //$NON-NLS-1$
         hostTxt = new Text(proxyHostGrp, SWT.BORDER);
         hostTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         hostTxt.setText(ps.getString(PreferenceConstants.PROXY_HOST));
@@ -141,7 +142,7 @@ public class ConnectionPreferencePage extends PreferencePage {
         });
 
         // ========== ポート ========== //
-        new Label(proxyHostGrp, SWT.LEFT).setText("ポート：");
+        new Label(proxyHostGrp, SWT.LEFT).setText(Messages.getString("connectionpreferencepage.proxy.port")); //$NON-NLS-1$
         portTxt = new Text(proxyHostGrp, SWT.BORDER);
         GridData portTxtGrDt = new GridData();
         portTxtGrDt.widthHint = 100;
@@ -162,7 +163,7 @@ public class ConnectionPreferencePage extends PreferencePage {
         GridData proxyAuthGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
         // dirGrpGrDt.horizontalSpan = 4;
         proxyAuthGrp.setLayoutData(proxyAuthGrpGrDt);
-        proxyAuthGrp.setText("認証");
+        proxyAuthGrp.setText(Messages.getString("connectionpreferencepage.proxy.settings.group.auth.group.title")); //$NON-NLS-1$
 
         // ========== Save or Input ========== //
         Composite authInputTypeGrp = new Composite(proxyAuthGrp, SWT.NONE);
@@ -176,37 +177,37 @@ public class ConnectionPreferencePage extends PreferencePage {
         authInputTypeGrp.setLayoutData(authInputTypeGrpGrDt);
 
         authNone = new Button(authInputTypeGrp, SWT.RADIO);
-        authNone.setText("認証なし");
+        authNone.setText(Messages.getString("connectionpreferencepage.proxy.settings.group.auth.without.auth")); //$NON-NLS-1$
         authNone.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 Button source = (Button) e.getSource();
                 if (source.getSelection()) {
-                    userTxt.setText("");
+                    userTxt.setText(""); //$NON-NLS-1$
                     userTxt.setEnabled(false);
-                    passTxt.setText("");
+                    passTxt.setText(""); //$NON-NLS-1$
                     passTxt.setEnabled(false);
                 }
             }
         });
 
         authInput = new Button(authInputTypeGrp, SWT.RADIO);
-        authInput.setText("都度、認証情報を入力する（ツールを終了すると消えます）");
+        authInput.setText(Messages.getString("connectionpreferencepage.proxy.settings.group.auth.with.auth.input")); //$NON-NLS-1$
         authInput.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 Button source = (Button) e.getSource();
                 if (source.getSelection()) {
-                    userTxt.setText("");
+                    userTxt.setText(""); //$NON-NLS-1$
                     userTxt.setEnabled(false);
-                    passTxt.setText("");
+                    passTxt.setText(""); //$NON-NLS-1$
                     passTxt.setEnabled(false);
                 }
             }
         });
 
         authSave = new Button(authInputTypeGrp, SWT.RADIO);
-        authSave.setText("認証情報を保存する（パスワードは暗号化されます）");
+        authSave.setText(Messages.getString("connectionpreferencepage.proxy.settings.group.auth.with.auth.save")); //$NON-NLS-1$
         authSave.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -227,7 +228,7 @@ public class ConnectionPreferencePage extends PreferencePage {
         GridData authGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
         authGrp.setLayoutData(authGrpGrDt);
         // ========== ユーザー ========== //
-        new Label(authGrp, SWT.LEFT).setText("ユーザー：");
+        new Label(authGrp, SWT.LEFT).setText(Messages.getString("connectionpreferencepage.proxy.settings.group.auth.user")); //$NON-NLS-1$
         userTxt = new Text(authGrp, SWT.BORDER);
         userTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         userTxt.setText(ps.getString(PreferenceConstants.PROXY_USER));
@@ -238,7 +239,7 @@ public class ConnectionPreferencePage extends PreferencePage {
         });
 
         // ========== パスワード ========== //
-        new Label(authGrp, SWT.LEFT).setText("パスワード：");
+        new Label(authGrp, SWT.LEFT).setText(Messages.getString("connectionpreferencepage.proxy.settings.group.auth.password")); //$NON-NLS-1$
         passTxt = new Text(authGrp, SWT.BORDER);
         passTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         passTxt.setEchoChar('*');
@@ -248,13 +249,13 @@ public class ConnectionPreferencePage extends PreferencePage {
             }
         });
 
-        if (ps.getString(PreferenceConstants.PROXY_AUTH).equals("input")) {
+        if (ps.getString(PreferenceConstants.PROXY_AUTH).equals("input")) { //$NON-NLS-1$
             authInput.setSelection(true);
-            userTxt.setText("");
+            userTxt.setText(""); //$NON-NLS-1$
             userTxt.setEnabled(false);
-            passTxt.setText("");
+            passTxt.setText(""); //$NON-NLS-1$
             passTxt.setEnabled(false);
-        } else if (ps.getString(PreferenceConstants.PROXY_AUTH).equals("save")) {
+        } else if (ps.getString(PreferenceConstants.PROXY_AUTH).equals("save")) { //$NON-NLS-1$
             authSave.setSelection(true);
             userTxt.setEnabled(true);
             passTxt.setEnabled(true);
@@ -263,14 +264,14 @@ public class ConnectionPreferencePage extends PreferencePage {
             try {
                 passTxt.setText(encryptor.decrypt(ps.getString(PreferenceConstants.PROXY_PASS)));
             } catch (Exception e) {
-                MessageDialog.openError(getShell(), "接続設定", "プロキシパスワードの復号化に失敗しました。\r\nパスワードの設定をやり直してください。");
-                passTxt.setText("");
+                MessageDialog.openError(getShell(), Messages.getString("connectionpreferencepage.dialog.title"), "プロキシパスワードの復号化に失敗しました。\r\nパスワードの設定をやり直してください。"); //$NON-NLS-1$
+                passTxt.setText(""); //$NON-NLS-1$
             }
         } else {
             authNone.setSelection(true);
-            userTxt.setText("");
+            userTxt.setText(""); //$NON-NLS-1$
             userTxt.setEnabled(false);
-            passTxt.setText("");
+            passTxt.setText(""); //$NON-NLS-1$
             passTxt.setEnabled(false);
         }
 
@@ -344,7 +345,7 @@ public class ConnectionPreferencePage extends PreferencePage {
                     autoReLogInIntervalTxt.selectAll();
                 }
             });
-            new Label(sessionTimeoutPlanGrp, SWT.LEFT).setText("");
+            new Label(sessionTimeoutPlanGrp, SWT.LEFT).setText(""); //$NON-NLS-1$
             Label connectionHint = new Label(sessionTimeoutPlanGrp, SWT.LEFT);
             connectionHint.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             connectionHint.setText("時間のかかる処理中にセッションタイムアウトが発生してしまうのを防ぐため指定された間隔で自動再ログインを行います。\r\n自動再ログインが不要な場合は0を指定してください。デフォルトは105分(1時間45分)です。");
@@ -365,7 +366,7 @@ public class ConnectionPreferencePage extends PreferencePage {
         GridData defaultBtnGrDt = new GridData(SWT.RIGHT, SWT.BOTTOM, true, true, 1, 1);
         defaultBtnGrDt.widthHint = 100;
         defaultBtn.setLayoutData(defaultBtnGrDt);
-        defaultBtn.setText("デフォルトに戻す");
+        defaultBtn.setText(Messages.getString("connectionpreferencepage.restoredefaults.button.title")); //$NON-NLS-1$
         defaultBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -381,7 +382,7 @@ public class ConnectionPreferencePage extends PreferencePage {
         GridData applyBtnGrDt = new GridData(SWT.RIGHT, SWT.BOTTOM, true, true, 1, 1);
         applyBtnGrDt.widthHint = 90;
         applyBtn.setLayoutData(applyBtnGrDt);
-        applyBtn.setText("適用");
+        applyBtn.setText(Messages.getString("connectionpreferencepage.apply.button.title")); //$NON-NLS-1$
         applyBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -418,11 +419,11 @@ public class ConnectionPreferencePage extends PreferencePage {
         }
         ps.setValue(PreferenceConstants.PROXY_PORT, this.portTxt.getText());
         if (authInput.getSelection()) {
-            ps.setValue(PreferenceConstants.PROXY_AUTH, "input");
-            ps.setValue(PreferenceConstants.PROXY_USER, "");
-            ps.setValue(PreferenceConstants.PROXY_PASS, "");
+            ps.setValue(PreferenceConstants.PROXY_AUTH, "input"); //$NON-NLS-1$
+            ps.setValue(PreferenceConstants.PROXY_USER, ""); //$NON-NLS-1$
+            ps.setValue(PreferenceConstants.PROXY_PASS, ""); //$NON-NLS-1$
         } else if (authSave.getSelection()) {
-            ps.setValue(PreferenceConstants.PROXY_AUTH, "save");
+            ps.setValue(PreferenceConstants.PROXY_AUTH, "save"); //$NON-NLS-1$
             if (this.userTxt.getText().isEmpty() || this.passTxt.getText().isEmpty()) {
                 errors.add("・プロキシ認証のユーザー、パスワードを設定してください。");
             } else {
@@ -430,15 +431,15 @@ public class ConnectionPreferencePage extends PreferencePage {
                 BasicTextEncryptor encryptor = new BasicTextEncryptor();
                 encryptor.setPassword(Main.MASTER_PASSWORD);
                 ps.setValue(PreferenceConstants.PROXY_PASS, encryptor.encrypt(this.passTxt.getText()));
-                ps.setValue(PreferenceConstants.PROXY_TMP_USER, "");
-                ps.setValue(PreferenceConstants.PROXY_TMP_PASS, "");
+                ps.setValue(PreferenceConstants.PROXY_TMP_USER, ""); //$NON-NLS-1$
+                ps.setValue(PreferenceConstants.PROXY_TMP_PASS, ""); //$NON-NLS-1$
             }
         } else {
-            ps.setValue(PreferenceConstants.PROXY_AUTH, "none");
-            ps.setValue(PreferenceConstants.PROXY_USER, "");
-            ps.setValue(PreferenceConstants.PROXY_PASS, "");
-            ps.setValue(PreferenceConstants.PROXY_TMP_USER, "");
-            ps.setValue(PreferenceConstants.PROXY_TMP_PASS, "");
+            ps.setValue(PreferenceConstants.PROXY_AUTH, "none"); //$NON-NLS-1$
+            ps.setValue(PreferenceConstants.PROXY_USER, ""); //$NON-NLS-1$
+            ps.setValue(PreferenceConstants.PROXY_PASS, ""); //$NON-NLS-1$
+            ps.setValue(PreferenceConstants.PROXY_TMP_USER, ""); //$NON-NLS-1$
+            ps.setValue(PreferenceConstants.PROXY_TMP_PASS, ""); //$NON-NLS-1$
         }
         ps.setValue(PreferenceConstants.IGNORE_SSLCERT_CHECK, this.ignoreSSLCertCheckFlg.getSelection());
 
@@ -473,7 +474,7 @@ public class ConnectionPreferencePage extends PreferencePage {
             }
         }
         if (!errors.isEmpty()) {
-            MessageDialog.openError(getShell(), "接続設定", String.join("\r\n", errors));
+            MessageDialog.openError(getShell(), Messages.getString("connectionpreferencepage.dialog.title"), String.join("\r\n", errors)); //$NON-NLS-1$ //$NON-NLS-2$
             return false;
         }
         return true;

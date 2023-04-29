@@ -45,16 +45,18 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 
+import com.contrastsecurity.csvdltool.Messages;
+
 public class OtherPreferencePage extends PreferencePage {
 
     private Text dayTimeTxt;
     private Text nightTimeTxt;
-    Pattern ptn = Pattern.compile("^[0-9]{4}-[0-9]{4}$");
-    private static String[] WEEKDAYS = { "日曜日", "月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日" };
+    Pattern ptn = Pattern.compile("^[0-9]{4}-[0-9]{4}$"); //$NON-NLS-1$
+    private static String[] WEEKDAYS = { Messages.getString("otherpreferencepage.first.day.of.week.group.sunday"), Messages.getString("otherpreferencepage.first.day.of.week.group.monday"), Messages.getString("otherpreferencepage.first.day.of.week.group.tuesday"), Messages.getString("otherpreferencepage.first.day.of.week.group.wednesday"), Messages.getString("otherpreferencepage.first.day.of.week.group.thursday"), Messages.getString("otherpreferencepage.first.day.of.week.group.friday"), Messages.getString("otherpreferencepage.first.day.of.week.group.saturday") }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
     private List<Button> weekDayBtns = new ArrayList<Button>();
 
     public OtherPreferencePage() {
-        super("その他設定");
+        super(Messages.getString("otherpreferencepage.title")); //$NON-NLS-1$
     }
 
     @Override
@@ -76,14 +78,14 @@ public class OtherPreferencePage extends PreferencePage {
         protectGrp.setLayout(protectGrpLt);
         GridData protectGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
         protectGrp.setLayoutData(protectGrpGrDt);
-        protectGrp.setText("PROTECT向け設定");
+        protectGrp.setText(Messages.getString("otherpreferencepage.protect.group.title")); //$NON-NLS-1$
 
         // ========== 日中時間帯 ========== //
         new Label(protectGrp, SWT.LEFT).setText("日中時間帯：");
         dayTimeTxt = new Text(protectGrp, SWT.BORDER);
         dayTimeTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         dayTimeTxt.setText(ps.getString(PreferenceConstants.ATTACK_RANGE_DAYTIME));
-        dayTimeTxt.setMessage("0900-1800");
+        dayTimeTxt.setMessage("0900-1800"); //$NON-NLS-1$
         dayTimeTxt.addListener(SWT.FocusIn, new Listener() {
             public void handleEvent(Event e) {
                 dayTimeTxt.selectAll();
@@ -94,7 +96,7 @@ public class OtherPreferencePage extends PreferencePage {
         nightTimeTxt = new Text(protectGrp, SWT.BORDER);
         nightTimeTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         nightTimeTxt.setText(ps.getString(PreferenceConstants.ATTACK_RANGE_NIGHTTIME));
-        nightTimeTxt.setMessage("1800-0100");
+        nightTimeTxt.setMessage("1800-0100"); //$NON-NLS-1$
         nightTimeTxt.addListener(SWT.FocusIn, new Listener() {
             public void handleEvent(Event e) {
                 nightTimeTxt.selectAll();
@@ -105,7 +107,7 @@ public class OtherPreferencePage extends PreferencePage {
         List<String> descLabelList = new ArrayList<String>();
         descLabelList.add("・ HHmm-HHmm 形式で指定してください。");
         descLabelList.add("・ 日中時間帯、夜間時間帯のどちらにも含まれない時間帯は「その他時間帯」としてフィルタに表示されます。");
-        descLabel.setText(String.join("\r\n", descLabelList));
+        descLabel.setText(String.join("\r\n", descLabelList)); //$NON-NLS-1$
         GridData descLabelGrDt = new GridData(GridData.FILL_HORIZONTAL);
         descLabelGrDt.horizontalSpan = 3;
         descLabel.setLayoutData(descLabelGrDt);
@@ -117,7 +119,7 @@ public class OtherPreferencePage extends PreferencePage {
         GridData weekDayGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
         weekDayGrpGrDt.horizontalSpan = 2;
         weekDayGrp.setLayoutData(weekDayGrpGrDt);
-        weekDayGrp.setText("週の開始");
+        weekDayGrp.setText(Messages.getString("otherpreferencepage.first.day.of.week.group.title")); //$NON-NLS-1$
         int weekDayIdx = 0;
         for (String weekDay : WEEKDAYS) {
             Button weekDayBtn = new Button(weekDayGrp, SWT.RADIO);
@@ -146,7 +148,7 @@ public class OtherPreferencePage extends PreferencePage {
         GridData defaultBtnGrDt = new GridData(SWT.RIGHT, SWT.BOTTOM, true, true, 1, 1);
         defaultBtnGrDt.widthHint = 90;
         defaultBtn.setLayoutData(defaultBtnGrDt);
-        defaultBtn.setText("デフォルトに戻す");
+        defaultBtn.setText(Messages.getString("otherpreferencepage.restoredefaults.button.title")); //$NON-NLS-1$
         defaultBtn.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
                 for (Button btn : weekDayBtns) {
@@ -161,7 +163,7 @@ public class OtherPreferencePage extends PreferencePage {
         GridData applyBtnGrDt = new GridData(SWT.RIGHT, SWT.BOTTOM, true, true, 1, 1);
         applyBtnGrDt.widthHint = 90;
         applyBtn.setLayoutData(applyBtnGrDt);
-        applyBtn.setText("適用");
+        applyBtn.setText(Messages.getString("otherpreferencepage.apply.button.title")); //$NON-NLS-1$
         applyBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -196,7 +198,7 @@ public class OtherPreferencePage extends PreferencePage {
         }
 
         if (!errors.isEmpty()) {
-            MessageDialog.openError(getShell(), "その他設定", String.join("\r\n", errors));
+            MessageDialog.openError(getShell(), Messages.getString("otherpreferencepage.title"), String.join("\r\n", errors)); //$NON-NLS-1$ //$NON-NLS-2$
             return false;
         } else {
             ps.setValue(PreferenceConstants.ATTACK_RANGE_DAYTIME, this.dayTimeTxt.getText());

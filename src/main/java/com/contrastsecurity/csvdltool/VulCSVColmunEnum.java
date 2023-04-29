@@ -33,33 +33,33 @@ import com.contrastsecurity.csvdltool.model.VulCSVColumn;
 import com.google.gson.Gson;
 
 public enum VulCSVColmunEnum {
-    VUL_01("アプリケーション名", 1, false, null, false, null, null, true, ""),
-    VUL_02("マージしたときの各アプリ名称", 2, false, null, false, null, null, true, ""),
-    VUL_03("アプリケーションID", 3, false, null, false, null, null, false, ""),
-    VUL_04("アプリケーションタグ", 4, true, ",", false, null, null, true, ""),
-    VUL_05("カテゴリ", 5, false, null, false, null, null, true, ""),
-    VUL_06("ルール", 6, false, null, false, null, null, true, ""),
-    VUL_07("深刻度", 7, false, null, false, null, null, true, ""),
-    VUL_08("CWE", 8, true, ",", false, null, null, true, ""),
-    VUL_09("ステータス", 9, false, null, false, null, null, true, ""),
-    VUL_10("言語", 11, false, null, false, null, null, true, ""),
-    VUL_11("アプリケーションのグループ", 12, true, ",", false, null, null, true, "Admin権限のユーザーが設定されている場合、取得可能です。"),
-    VUL_12("脆弱性のタイトル", 13, false, null, false, null, null, true, ""),
-    VUL_13("最初の検出", 14, false, null, false, null, null, true, ""),
-    VUL_14("最後の検出", 15, false, null, false, null, null, true, ""),
-    VUL_15("ビルド番号", 17, true, ",", false, null, null, true, ""),
-    VUL_16("次のサーバにより報告", 18, true, ",", false, null, null, true, ""),
-    VUL_17("モジュール", 19, false, null, false, null, null, true, ""),
-    VUL_18("脆弱性タグ", 20, true, ",", false, null, null, true, ""),
-    VUL_19("保留中ステータス", 10, false, null, false, null, null, false, ""),
-    VUL_20("組織名", 23, false, null, false, null, null, false, ""),
-    VUL_21("組織ID", 24, false, null, false, null, null, false, ""),
-    VUL_22("リンク", 25, false, null, false, null, null, false, "TeamServerへのリンクです。"),
-    VUL_23("リンク(ハイパーリンク)", 26, false, null, false, null, null, false, "TeamServerへのリンク（ハイパーリンク）です。"),
-    VUL_24("ルートURL", 27, true, ",", false, null, null, false, "ルートカバレッジのURLです。"),
-    VUL_25("セッションメタデータ", 21, true, ",", false, null, null, false, ""),
-    VUL_26("コンプライアンスポリシー", 22, true, ",", false, null, null, false, ""),
-    VUL_27("検出日時", 16, false, null, false, null, null, false, "");
+    VUL_01(Messages.getString("vulcsvcolmunenum.column.application.name"), 1, false, null, false, null, null, true, Messages.getString("vulcsvcolmunenum.remarks.application.name")), //$NON-NLS-1$ //$NON-NLS-2$
+    VUL_02(Messages.getString("vulcsvcolmunenum.column.merged.application.name"), 2, false, null, false, null, null, true, Messages.getString("vulcsvcolmunenum.remarks.merged.application.name")), //$NON-NLS-1$ //$NON-NLS-2$
+    VUL_03(Messages.getString("vulcsvcolmunenum.column.application.id"), 3, false, null, false, null, null, false, Messages.getString("vulcsvcolmunenum.remarks.application.id")), //$NON-NLS-1$ //$NON-NLS-2$
+    VUL_04(Messages.getString("vulcsvcolmunenum.column.application.tag"), 4, true, ",", false, null, null, true, Messages.getString("vulcsvcolmunenum.remarks.application.tag")), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    VUL_05(Messages.getString("vulcsvcolmunenum.column.category"), 5, false, null, false, null, null, true, Messages.getString("vulcsvcolmunenum.remarks.category")), //$NON-NLS-1$ //$NON-NLS-2$
+    VUL_06(Messages.getString("vulcsvcolmunenum.column.rule"), 6, false, null, false, null, null, true, Messages.getString("vulcsvcolmunenum.remarks.rule")), //$NON-NLS-1$ //$NON-NLS-2$
+    VUL_07(Messages.getString("vulcsvcolmunenum.column.vuln.severity"), 7, false, null, false, null, null, true, Messages.getString("vulcsvcolmunenum.remarks.vuln.severity")), //$NON-NLS-1$ //$NON-NLS-2$
+    VUL_08(Messages.getString("vulcsvcolmunenum.column.cwe"), 8, true, ",", false, null, null, true, Messages.getString("vulcsvcolmunenum.remarks.cwe")), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    VUL_09(Messages.getString("vulcsvcolmunenum.column.status"), 9, false, null, false, null, null, true, Messages.getString("vulcsvcolmunenum.remarks.status")), //$NON-NLS-1$ //$NON-NLS-2$
+    VUL_10(Messages.getString("vulcsvcolmunenum.column.language"), 11, false, null, false, null, null, true, Messages.getString("vulcsvcolmunenum.remarks.language")), //$NON-NLS-1$ //$NON-NLS-2$
+    VUL_11(Messages.getString("vulcsvcolmunenum.column.group"), 12, true, ",", false, null, null, true, Messages.getString("vulcsvcolmunenum.remarks.group")), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    VUL_12(Messages.getString("vulcsvcolmunenum.column.vuln.title"), 13, false, null, false, null, null, true, Messages.getString("vulcsvcolmunenum.remarks.vuln.title")), //$NON-NLS-1$ //$NON-NLS-2$
+    VUL_13(Messages.getString("vulcsvcolmunenum.column.vuln.first.detected"), 14, false, null, false, null, null, true, Messages.getString("vulcsvcolmunenum.remarks.vuln.first.detected")), //$NON-NLS-1$ //$NON-NLS-2$
+    VUL_14(Messages.getString("vulcsvcolmunenum.column.vuln.last.detected"), 15, false, null, false, null, null, true, Messages.getString("vulcsvcolmunenum.remarks.vuln.last.detected")), //$NON-NLS-1$ //$NON-NLS-2$
+    VUL_15(Messages.getString("vulcsvcolmunenum.column.buildno"), 17, true, ",", false, null, null, true, Messages.getString("vulcsvcolmunenum.remarks.buildno")), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    VUL_16(Messages.getString("vulcsvcolmunenum.column.reported.server"), 18, true, ",", false, null, null, true, Messages.getString("vulcsvcolmunenum.remarks.reported.server")), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    VUL_17(Messages.getString("vulcsvcolmunenum.column.module"), 19, false, null, false, null, null, true, Messages.getString("vulcsvcolmunenum.remarks.module")), //$NON-NLS-1$ //$NON-NLS-2$
+    VUL_18(Messages.getString("vulcsvcolmunenum.column.vuln.tag"), 20, true, ",", false, null, null, true, Messages.getString("vulcsvcolmunenum.remarks.vuln.tag")), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    VUL_19(Messages.getString("vulcsvcolmunenum.column.vuln.pending.status"), 10, false, null, false, null, null, false, Messages.getString("vulcsvcolmunenum.remarks.vuln.pending.status")), //$NON-NLS-1$ //$NON-NLS-2$
+    VUL_20(Messages.getString("vulcsvcolmunenum.column.organization.name"), 23, false, null, false, null, null, false, Messages.getString("vulcsvcolmunenum.remarks.organization.name")), //$NON-NLS-1$ //$NON-NLS-2$
+    VUL_21(Messages.getString("vulcsvcolmunenum.column.organization.id"), 24, false, null, false, null, null, false, Messages.getString("vulcsvcolmunenum.remarks.organization.id")), //$NON-NLS-1$ //$NON-NLS-2$
+    VUL_22(Messages.getString("vulcsvcolmunenum.column.vuln.link"), 25, false, null, false, null, null, false, Messages.getString("vulcsvcolmunenum.remarks.vuln.link")), //$NON-NLS-1$ //$NON-NLS-2$
+    VUL_23(Messages.getString("vulcsvcolmunenum.column.vuln.hyperlink"), 26, false, null, false, null, null, false, Messages.getString("vulcsvcolmunenum.remarks.vuln.hyperlink")), //$NON-NLS-1$ //$NON-NLS-2$
+    VUL_24(Messages.getString("vulcsvcolmunenum.column.vuln.route.url"), 27, true, ",", false, null, null, false, Messages.getString("vulcsvcolmunenum.remarks.vuln.route.url")), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    VUL_25(Messages.getString("vulcsvcolmunenum.column.vuln.session.metadata"), 21, true, ",", false, null, null, false, Messages.getString("vulcsvcolmunenum.remarks.vuln.session.metadata")), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    VUL_26(Messages.getString("vulcsvcolmunenum.column.vuln.compliance.policy"), 22, true, ",", false, null, null, false, Messages.getString("vulcsvcolmunenum.remarks.vuln.compliance.policy")), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    VUL_27(Messages.getString("vulcsvcolmunenum.column.vuln.detected"), 16, false, null, false, null, null, false, Messages.getString("vulcsvcolmunenum.remarks.vuln.detected")); //$NON-NLS-1$ //$NON-NLS-2$
 
     private String culumn;
     private int order;

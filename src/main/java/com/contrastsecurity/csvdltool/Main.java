@@ -559,8 +559,8 @@ public class Main implements PropertyChangeListener {
                 }
                 srcCount.setText(String.valueOf(srcList.getItemCount()));
                 assessFilterMap = progress.getFilterMap();
-                vulSeverityFilterTxt.setText("すべて");
-                vulVulnTypeFilterTxt.setText("すべて");
+                vulSeverityFilterTxt.setText(Messages.getString("main.vul.filter.condition.severity.all")); //$NON-NLS-1$
+                vulVulnTypeFilterTxt.setText(Messages.getString("main.vul.filter.condition.vulntype.all")); //$NON-NLS-1$
             }
         });
 
@@ -869,7 +869,7 @@ public class Main implements PropertyChangeListener {
                         }
                     }
                     if (labels.isEmpty()) {
-                        vulSeverityFilterTxt.setText("すべて");
+                        vulSeverityFilterTxt.setText(Messages.getString("main.vul.filter.condition.severity.all")); //$NON-NLS-1$
                     } else {
                         vulSeverityFilterTxt.setText(String.join(", ", labels)); //$NON-NLS-1$
                     }
@@ -903,7 +903,7 @@ public class Main implements PropertyChangeListener {
                         }
                     }
                     if (labels.isEmpty()) {
-                        vulVulnTypeFilterTxt.setText("すべて");
+                        vulVulnTypeFilterTxt.setText(Messages.getString("main.vul.filter.condition.vulntype.all")); //$NON-NLS-1$
                     } else {
                         vulVulnTypeFilterTxt.setText(String.join(", ", labels)); //$NON-NLS-1$
                     }
@@ -914,7 +914,7 @@ public class Main implements PropertyChangeListener {
 
         new Label(vulFilterGrp, SWT.LEFT).setText(Messages.getString("main.vul.filter.condition.lastdetected.label.title")); //$NON-NLS-1$
         vulLastDetectedFilterTxt = new Text(vulFilterGrp, SWT.BORDER);
-        vulLastDetectedFilterTxt.setText("すべて");
+        vulLastDetectedFilterTxt.setText(Messages.getString("main.vul.filter.condition.lastdetected.all")); //$NON-NLS-1$
         vulLastDetectedFilterTxt.setEditable(false);
         vulLastDetectedFilterTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         vulLastDetectedFilterTxt.addListener(SWT.MouseUp, new Listener() {
@@ -934,7 +934,7 @@ public class Main implements PropertyChangeListener {
                 } else if (toLastDetectedDate != null) {
                     vulLastDetectedFilterTxt.setText(String.format("～ %s", sdf.format(toLastDetectedDate))); //$NON-NLS-1$
                 } else {
-                    vulLastDetectedFilterTxt.setText("すべて");
+                    vulLastDetectedFilterTxt.setText(Messages.getString("main.vul.filter.condition.lastdetected.all")); //$NON-NLS-1$
                 }
                 vulExecuteBtn.setFocus();
             }

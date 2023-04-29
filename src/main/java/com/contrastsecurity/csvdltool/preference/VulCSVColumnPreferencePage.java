@@ -56,6 +56,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
+import com.contrastsecurity.csvdltool.Messages;
 import com.contrastsecurity.csvdltool.VulCSVColmunEnum;
 import com.contrastsecurity.csvdltool.model.VulCSVColumn;
 import com.google.gson.Gson;
@@ -73,7 +74,7 @@ public class VulCSVColumnPreferencePage extends PreferencePage {
     private Table table;
 
     public VulCSVColumnPreferencePage() {
-        super("脆弱性の出力項目");
+        super(Messages.getString("vulcsvcolumnpreferencepage.title")); //$NON-NLS-1$
     }
 
     @Override
@@ -165,19 +166,19 @@ public class VulCSVColumnPreferencePage extends PreferencePage {
         column0.setResizable(false);
         TableColumn column1 = new TableColumn(table, SWT.CENTER);
         column1.setWidth(50);
-        column1.setText("出力");
+        column1.setText(Messages.getString("vulcsvcolumnpreferencepage.table.column0.title")); //$NON-NLS-1$
         TableColumn column2 = new TableColumn(table, SWT.LEFT);
         column2.setWidth(200);
-        column2.setText("項目名");
+        column2.setText(Messages.getString("vulcsvcolumnpreferencepage.table.column1.title")); //$NON-NLS-1$
         TableColumn column3 = new TableColumn(table, SWT.CENTER);
         column3.setWidth(75);
-        column3.setText("区切り文字");
+        column3.setText(Messages.getString("vulcsvcolumnpreferencepage.table.column2.title")); //$NON-NLS-1$
         TableColumn column4 = new TableColumn(table, SWT.CENTER);
         column4.setWidth(75);
-        column4.setText("true");
+        column4.setText("true"); //$NON-NLS-1$
         TableColumn column5 = new TableColumn(table, SWT.CENTER);
         column5.setWidth(75);
-        column5.setText("false");
+        column5.setText("false"); //$NON-NLS-1$
         TableColumn column6 = new TableColumn(table, SWT.LEFT);
         column6.setWidth(350);
         column6.setText("備考");
@@ -265,7 +266,7 @@ public class VulCSVColumnPreferencePage extends PreferencePage {
 
         final Button allOnBtn = new Button(chkButtonGrp, SWT.NULL);
         allOnBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        allOnBtn.setText("すべてオン");
+        allOnBtn.setText(Messages.getString("vulcsvcolumnpreferencepage.all.on.button.title")); //$NON-NLS-1$
         allOnBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -280,7 +281,7 @@ public class VulCSVColumnPreferencePage extends PreferencePage {
 
         final Button allOffBtn = new Button(chkButtonGrp, SWT.NULL);
         allOffBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        allOffBtn.setText("すべてオフ");
+        allOffBtn.setText(Messages.getString("vulcsvcolumnpreferencepage.all.off.button.title")); //$NON-NLS-1$
         allOffBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -298,7 +299,7 @@ public class VulCSVColumnPreferencePage extends PreferencePage {
         descLabelList.add("・ ドラッグアンドドロップで項目の並び替えが可能です。");
         descLabelList.add("・ 複数の値が出力される項目については、区切り文字の変更が可能です。改行させる場合は\\r\\nをご指定してください。");
         descLabelList.add("・ 真偽の値が出力される項目については、Yes/No文字の変更が可能です。例) Y/N、○/");
-        descLabel.setText(String.join("\r\n", descLabelList));
+        descLabel.setText(String.join("\r\n", descLabelList)); //$NON-NLS-1$
         GridData descLabelGrDt = new GridData(GridData.FILL_HORIZONTAL);
         descLabelGrDt.horizontalSpan = 3;
         descLabel.setLayoutData(descLabelGrDt);
@@ -318,7 +319,7 @@ public class VulCSVColumnPreferencePage extends PreferencePage {
         GridData defaultBtnGrDt = new GridData(SWT.RIGHT, SWT.BOTTOM, true, true, 1, 1);
         defaultBtnGrDt.widthHint = 100;
         defaultBtn.setLayoutData(defaultBtnGrDt);
-        defaultBtn.setText("デフォルトに戻す");
+        defaultBtn.setText(Messages.getString("vulcsvcolumnpreferencepage.restoredefaults.button.title")); //$NON-NLS-1$
         defaultBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -355,7 +356,7 @@ public class VulCSVColumnPreferencePage extends PreferencePage {
         GridData applyBtnGrDt = new GridData(SWT.RIGHT, SWT.BOTTOM, true, true, 1, 1);
         applyBtnGrDt.widthHint = 90;
         applyBtn.setLayoutData(applyBtnGrDt);
-        applyBtn.setText("適用");
+        applyBtn.setText(Messages.getString("vulcsvcolumnpreferencepage.apply.button.title")); //$NON-NLS-1$
         applyBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -377,7 +378,7 @@ public class VulCSVColumnPreferencePage extends PreferencePage {
         ps.setValue(PreferenceConstants.CSV_OUT_HEADER_VUL, this.outCsvHeaderFlg.getSelection());
         ps.setValue(PreferenceConstants.CSV_COLUMN_VUL, new Gson().toJson(this.columnList));
         if (!errors.isEmpty()) {
-            MessageDialog.openError(getShell(), "脆弱性の出力設定", String.join("\r\n", errors));
+            MessageDialog.openError(getShell(), Messages.getString("vulcsvcolumnpreferencepage.dialog.title"), String.join("\r\n", errors)); //$NON-NLS-1$ //$NON-NLS-2$
             return false;
         }
         return true;
@@ -436,7 +437,7 @@ public class VulCSVColumnPreferencePage extends PreferencePage {
             editor2.setEditor(text, item, 3);
             separateTextList.add(text);
         } else {
-            item.setText(3, "");
+            item.setText(3, ""); //$NON-NLS-1$
             separateTextList.add(new Text(table, SWT.NONE));
         }
         if (col.isBoolean()) {
@@ -483,8 +484,8 @@ public class VulCSVColumnPreferencePage extends PreferencePage {
             editor4.setEditor(falseText, item, 5);
             falseTextList.add(falseText);
         } else {
-            item.setText(4, "");
-            item.setText(5, "");
+            item.setText(4, ""); //$NON-NLS-1$
+            item.setText(5, ""); //$NON-NLS-1$
             trueTextList.add(new Text(table, SWT.NONE));
             falseTextList.add(new Text(table, SWT.NONE));
         }

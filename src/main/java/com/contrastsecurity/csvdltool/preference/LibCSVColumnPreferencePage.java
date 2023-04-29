@@ -316,7 +316,7 @@ public class LibCSVColumnPreferencePage extends PreferencePage {
 
         Button defaultBtn = new Button(buttonGrp, SWT.NULL);
         GridData defaultBtnGrDt = new GridData(SWT.RIGHT, SWT.BOTTOM, true, true, 1, 1);
-        defaultBtnGrDt.widthHint = 90;
+        defaultBtnGrDt.widthHint = 100;
         defaultBtn.setLayoutData(defaultBtnGrDt);
         defaultBtn.setText("デフォルトに戻す");
         defaultBtn.addSelectionListener(new SelectionAdapter() {

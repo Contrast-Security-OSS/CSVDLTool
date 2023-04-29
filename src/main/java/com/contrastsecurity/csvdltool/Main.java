@@ -483,7 +483,7 @@ public class Main implements PropertyChangeListener {
 
         // #################### ASSESS #################### //
         CTabItem assessTabItem = new CTabItem(mainTabFolder, SWT.NONE);
-        assessTabItem.setText("ASSESS");
+        assessTabItem.setText(Messages.getString("main.tab.assess.title")); //$NON-NLS-1$
         assessTabItem.setImage(new Image(shell.getDisplay(), getClass().getClassLoader().getResourceAsStream("assess16.png"))); //$NON-NLS-1$
 
         Composite assessShell = new Composite(mainTabFolder, SWT.NONE);
@@ -595,7 +595,7 @@ public class Main implements PropertyChangeListener {
         GridData srcListGrDt = new GridData(GridData.FILL_BOTH);
         srcListGrDt.horizontalSpan = 2;
         this.srcList.setLayoutData(srcListGrDt);
-        this.srcList.setToolTipText("選択可能なアプリケーション一覧");
+        this.srcList.setToolTipText(Messages.getString("main.available.app.list.tooltip")); //$NON-NLS-1$
         this.srcList.addListener(SWT.MouseDoubleClick, new Listener() {
             @Override
             public void handleEvent(Event event) {
@@ -628,7 +628,7 @@ public class Main implements PropertyChangeListener {
         srcListDescLblGrDt.heightHint = 12;
         srcListDescLbl.setLayoutData(srcListDescLblGrDt);
         srcListDescLbl.setFont(new Font(display, "ＭＳ ゴシック", 8, SWT.NORMAL));
-        srcListDescLbl.setText("選択可能なアプリケーション一覧");
+        srcListDescLbl.setText(Messages.getString("main.available.app.list.count.label")); //$NON-NLS-1$
         srcListDescLbl.setForeground(shell.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
         this.srcCount = new Label(srcListLblComp, SWT.RIGHT);
         GridData srcCountGrDt = new GridData(GridData.FILL_HORIZONTAL);
@@ -772,7 +772,7 @@ public class Main implements PropertyChangeListener {
 
         this.dstList = new org.eclipse.swt.widgets.List(dstGrp, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL);
         this.dstList.setLayoutData(new GridData(GridData.FILL_BOTH));
-        this.dstList.setToolTipText("選択済みのアプリケーション一覧");
+        this.dstList.setToolTipText(Messages.getString("main.selected.app.list.tooltip")); //$NON-NLS-1$
         this.dstList.addListener(SWT.MouseDoubleClick, new Listener() {
             @Override
             public void handleEvent(Event event) {
@@ -803,7 +803,7 @@ public class Main implements PropertyChangeListener {
         dstListDescLblGrDt.heightHint = 12;
         dstListDescLbl.setLayoutData(dstListDescLblGrDt);
         dstListDescLbl.setFont(new Font(display, "ＭＳ ゴシック", 8, SWT.NORMAL));
-        dstListDescLbl.setText("選択済みのアプリケーション一覧");
+        dstListDescLbl.setText(Messages.getString("main.selected.app.list.count.label")); //$NON-NLS-1$
         dstListDescLbl.setForeground(shell.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
         this.dstCount = new Label(dstListLblComp, SWT.RIGHT);
         GridData dstCountGrDt = new GridData(GridData.FILL_HORIZONTAL);
@@ -1122,7 +1122,7 @@ public class Main implements PropertyChangeListener {
 
         // #################### PROTECT #################### //
         CTabItem protectTabItem = new CTabItem(mainTabFolder, SWT.NONE);
-        protectTabItem.setText("PROTECT");
+        protectTabItem.setText(Messages.getString("main.tab.protect.title")); //$NON-NLS-1$
         protectTabItem.setImage(new Image(shell.getDisplay(), getClass().getClassLoader().getResourceAsStream("protect16.png"))); //$NON-NLS-1$
 
         Composite protectShell = new Composite(mainTabFolder, SWT.NONE);
@@ -1679,7 +1679,7 @@ public class Main implements PropertyChangeListener {
 
         // #################### SERVER #################### //
         CTabItem serverTabItem = new CTabItem(mainTabFolder, SWT.NONE);
-        serverTabItem.setText("SERVER(β版)");
+        serverTabItem.setText(Messages.getString("main.tab.server.title")); //$NON-NLS-1$
         serverTabItem.setImage(new Image(shell.getDisplay(), getClass().getClassLoader().getResourceAsStream("server16.png"))); //$NON-NLS-1$
 
         Composite serverShell = new Composite(mainTabFolder, SWT.NONE);

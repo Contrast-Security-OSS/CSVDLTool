@@ -97,7 +97,7 @@ public class FilterVulnTypeDialog extends Dialog {
 
         final Button bulkBtn = new Button(composite, SWT.CHECK);
         bulkBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        bulkBtn.setText("すべて");
+        bulkBtn.setText(Messages.getString("filtervulntypedialog.check.all")); //$NON-NLS-1$
         bulkBtn.setSelection(true);
         bulkBtn.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -147,7 +147,7 @@ public class FilterVulnTypeDialog extends Dialog {
     @Override
     protected void configureShell(Shell newShell) {
         super.configureShell(newShell);
-        newShell.setText("脆弱性タイプの選択");
+        newShell.setText(Messages.getString("filtervulntypedialog.dialog.title")); //$NON-NLS-1$
     }
 
     public List<String> getLabels() {

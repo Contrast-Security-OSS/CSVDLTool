@@ -97,7 +97,7 @@ public class FilterSeverityDialog extends Dialog {
 
         final Button bulkBtn = new Button(composite, SWT.CHECK);
         bulkBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        bulkBtn.setText("すべて");
+        bulkBtn.setText(Messages.getString("filterseveritydialog.check.all")); //$NON-NLS-1$
         bulkBtn.setSelection(true);
         bulkBtn.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -147,7 +147,7 @@ public class FilterSeverityDialog extends Dialog {
     @Override
     protected void configureShell(Shell newShell) {
         super.configureShell(newShell);
-        newShell.setText("重大度の選択");
+        newShell.setText(Messages.getString("filterseveritydialog.dialog.title")); //$NON-NLS-1$
     }
 
     public List<String> getLabels() {

@@ -282,14 +282,14 @@ public class ConnectionPreferencePage extends PreferencePage {
         sslCertGrp.setLayout(sslCertGrpLt);
         GridData sslCertGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
         sslCertGrp.setLayoutData(sslCertGrpGrDt);
-        sslCertGrp.setText("SSL証明書検証");
+        sslCertGrp.setText(Messages.getString("connectionpreferencepage.bypass.ssl.certificate.group.title")); //$NON-NLS-1$
 
         // ========== 証明書検証回避 ========== //
         ignoreSSLCertCheckFlg = new Button(sslCertGrp, SWT.CHECK);
         // GridData ignoreSSLCertCheckFlgGrDt = new GridData();
         // ignoreSSLCertCheckFlgGrDt.horizontalSpan = 4;
         // ignoreSSLCertCheckFlg.setLayoutData(ignoreSSLCertCheckFlgGrDt);
-        ignoreSSLCertCheckFlg.setText("検証を無効にする");
+        ignoreSSLCertCheckFlg.setText(Messages.getString("connectionpreferencepage.bypass.ssl.certificate.valid")); //$NON-NLS-1$
         if (ps.getBoolean(PreferenceConstants.IGNORE_SSLCERT_CHECK)) {
             ignoreSSLCertCheckFlg.setSelection(true);
         }
@@ -301,10 +301,10 @@ public class ConnectionPreferencePage extends PreferencePage {
         timeoutGrp.setLayout(timeoutGrpLt);
         GridData timeoutGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
         timeoutGrp.setLayoutData(timeoutGrpGrDt);
-        timeoutGrp.setText("タイムアウト（ミリ秒）");
+        timeoutGrp.setText(Messages.getString("connectionpreferencepage.timeout.group.title")); //$NON-NLS-1$
 
         // ========== ConnetionTimeout ========== //
-        new Label(timeoutGrp, SWT.LEFT).setText("ConnetionTimeout：");
+        new Label(timeoutGrp, SWT.LEFT).setText(Messages.getString("connectionpreferencepage.timeout.connection.timeout.label.title")); //$NON-NLS-1$
         connectionTimeoutTxt = new Text(timeoutGrp, SWT.BORDER);
         connectionTimeoutTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         connectionTimeoutTxt.setText(ps.getString(PreferenceConstants.CONNECTION_TIMEOUT));
@@ -315,7 +315,7 @@ public class ConnectionPreferencePage extends PreferencePage {
         });
 
         // ========== SocketTimeout ========== //
-        new Label(timeoutGrp, SWT.LEFT).setText("SocketTimeout：");
+        new Label(timeoutGrp, SWT.LEFT).setText(Messages.getString("connectionpreferencepage.timeout.socket.timeout.label.title")); //$NON-NLS-1$
         socketTimeoutTxt = new Text(timeoutGrp, SWT.BORDER);
         socketTimeoutTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         socketTimeoutTxt.setText(ps.getString(PreferenceConstants.SOCKET_TIMEOUT));

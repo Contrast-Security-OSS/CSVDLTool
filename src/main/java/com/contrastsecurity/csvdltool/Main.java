@@ -145,12 +145,12 @@ public class Main implements PropertyChangeListener {
     public static final String WINDOW_TITLE = "CSVDLTool - %s";
     // 以下のMASTER_PASSWORDはプロキシパスワードを保存する際に暗号化で使用するパスワードです。
     // 本ツールをリリース用にコンパイルする際はchangemeを別の文字列に置き換えてください。
-    public static final String MASTER_PASSWORD = "changeme!";
+    public static final String MASTER_PASSWORD = "changeme!"; //$NON-NLS-1$
 
     // 各出力ファイルの文字コード
-    public static final String CSV_WIN_ENCODING = "Shift_JIS";
-    public static final String CSV_MAC_ENCODING = "UTF-8";
-    public static final String FILE_ENCODING = "UTF-8";
+    public static final String CSV_WIN_ENCODING = "Shift_JIS"; //$NON-NLS-1$
+    public static final String CSV_MAC_ENCODING = "UTF-8"; //$NON-NLS-1$
+    public static final String FILE_ENCODING = "UTF-8"; //$NON-NLS-1$
 
     public static final int MINIMUM_SIZE_WIDTH = 720;
     public static final int MINIMUM_SIZE_WIDTH_MAC = 720;
@@ -190,7 +190,7 @@ public class Main implements PropertyChangeListener {
 
     private Label statusBar;
 
-    private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd(E)");
+    private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd(E)"); //$NON-NLS-1$
     private Text vulSeverityFilterTxt;
     private Text vulVulnTypeFilterTxt;
     private Text vulLastDetectedFilterTxt;
@@ -236,7 +236,7 @@ public class Main implements PropertyChangeListener {
         PASSWORD
     }
 
-    Logger logger = LogManager.getLogger("csvdltool");
+    Logger logger = LogManager.getLogger("csvdltool"); //$NON-NLS-1$
 
     private AuthType authType;
 
@@ -246,7 +246,7 @@ public class Main implements PropertyChangeListener {
     public static void main(String[] args) {
         Main main = new Main();
         main.authType = AuthType.TOKEN;
-        if (System.getProperty("auth") != null && System.getProperty("auth").equals("password")) {
+        if (System.getProperty("auth") != null && System.getProperty("auth").equals("password")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             main.authType = AuthType.PASSWORD;
         }
         main.initialize();
@@ -267,15 +267,15 @@ public class Main implements PropertyChangeListener {
 
     private void initialize() {
         try {
-            String homeDir = System.getProperty("user.home");
-            this.ps = new PreferenceStore(homeDir + "\\csvdltool.properties");
+            String homeDir = System.getProperty("user.home"); //$NON-NLS-1$
+            this.ps = new PreferenceStore(homeDir + "\\csvdltool.properties"); //$NON-NLS-1$
             if (OS.isFamilyMac()) {
-                this.ps = new PreferenceStore(homeDir + "/csvdltool.properties");
+                this.ps = new PreferenceStore(homeDir + "/csvdltool.properties"); //$NON-NLS-1$
             }
             try {
                 this.ps.load();
             } catch (FileNotFoundException fnfe) {
-                this.ps = new PreferenceStore("csvdltool.properties");
+                this.ps = new PreferenceStore("csvdltool.properties"); //$NON-NLS-1$
                 this.ps.load();
             }
         } catch (FileNotFoundException fnfe) {
@@ -284,9 +284,9 @@ public class Main implements PropertyChangeListener {
         }
         try {
             this.ps.setDefault(PreferenceConstants.BASIC_AUTH_STATUS, BasicAuthStatusEnum.NONE.name());
-            this.ps.setDefault(PreferenceConstants.PASS_TYPE, "input");
+            this.ps.setDefault(PreferenceConstants.PASS_TYPE, "input"); //$NON-NLS-1$
             this.ps.setDefault(PreferenceConstants.TSV_STATUS, TsvStatusEnum.NONE.name());
-            this.ps.setDefault(PreferenceConstants.PROXY_AUTH, "none");
+            this.ps.setDefault(PreferenceConstants.PROXY_AUTH, "none"); //$NON-NLS-1$
             this.ps.setDefault(PreferenceConstants.CONNECTION_TIMEOUT, 3000);
             this.ps.setDefault(PreferenceConstants.SOCKET_TIMEOUT, 3000);
             this.ps.setDefault(PreferenceConstants.AUTO_RELOGIN_INTERVAL, 105);
@@ -297,35 +297,35 @@ public class Main implements PropertyChangeListener {
             this.ps.setDefault(PreferenceConstants.CSV_COLUMN_VUL, VulCSVColmunEnum.defaultValuesStr());
             this.ps.setDefault(PreferenceConstants.SLEEP_VUL, 300);
             this.ps.setDefault(PreferenceConstants.CSV_OUT_HEADER_VUL, true);
-            this.ps.setDefault(PreferenceConstants.CSV_FILE_FORMAT_VUL, "'vul'_yyyy-MM-dd_HHmmss");
+            this.ps.setDefault(PreferenceConstants.CSV_FILE_FORMAT_VUL, "'vul'_yyyy-MM-dd_HHmmss"); //$NON-NLS-1$
 
             this.ps.setDefault(PreferenceConstants.CSV_COLUMN_LIB, LibCSVColmunEnum.defaultValuesStr());
             this.ps.setDefault(PreferenceConstants.SLEEP_LIB, 300);
             this.ps.setDefault(PreferenceConstants.CSV_OUT_HEADER_LIB, true);
-            this.ps.setDefault(PreferenceConstants.CSV_FILE_FORMAT_LIB, "'lib'_yyyy-MM-dd_HHmmss");
+            this.ps.setDefault(PreferenceConstants.CSV_FILE_FORMAT_LIB, "'lib'_yyyy-MM-dd_HHmmss"); //$NON-NLS-1$
 
             this.ps.setDefault(PreferenceConstants.ATTACK_START_WEEKDAY, 1); // 月曜日
             this.ps.setDefault(PreferenceConstants.ATTACK_DETECTED_DATE_FILTER, 0);
             this.ps.setDefault(PreferenceConstants.CSV_COLUMN_ATTACKEVENT, AttackEventCSVColmunEnum.defaultValuesStr());
             this.ps.setDefault(PreferenceConstants.CSV_OUT_HEADER_ATTACKEVENT, true);
-            this.ps.setDefault(PreferenceConstants.CSV_FILE_FORMAT_ATTACKEVENT, "'attackevent'_yyyy-MM-dd_HHmmss");
+            this.ps.setDefault(PreferenceConstants.CSV_FILE_FORMAT_ATTACKEVENT, "'attackevent'_yyyy-MM-dd_HHmmss"); //$NON-NLS-1$
 
             this.ps.setDefault(PreferenceConstants.CSV_COLUMN_SERVER, ServerCSVColmunEnum.defaultValuesStr());
             this.ps.setDefault(PreferenceConstants.CSV_OUT_HEADER_SERVER, true);
-            this.ps.setDefault(PreferenceConstants.CSV_FILE_FORMAT_SERVER, "'server'_yyyy-MM-dd_HHmmss");
+            this.ps.setDefault(PreferenceConstants.CSV_FILE_FORMAT_SERVER, "'server'_yyyy-MM-dd_HHmmss"); //$NON-NLS-1$
 
             this.ps.setDefault(PreferenceConstants.OPENED_MAIN_TAB_IDX, 0);
             this.ps.setDefault(PreferenceConstants.OPENED_SUB_TAB_IDX, 0);
 
             Yaml yaml = new Yaml();
-            InputStream is = new FileInputStream("contrast_security.yaml");
+            InputStream is = new FileInputStream("contrast_security.yaml"); //$NON-NLS-1$
             ContrastSecurityYaml contrastSecurityYaml = yaml.loadAs(is, ContrastSecurityYaml.class);
             is.close();
             this.ps.setDefault(PreferenceConstants.CONTRAST_URL, contrastSecurityYaml.getUrl());
             this.ps.setDefault(PreferenceConstants.USERNAME, contrastSecurityYaml.getUserName());
             this.ps.setDefault(PreferenceConstants.SERVICE_KEY, contrastSecurityYaml.getServiceKey());
             if (this.authType == AuthType.PASSWORD) {
-                this.ps.setValue(PreferenceConstants.SERVICE_KEY, "");
+                this.ps.setValue(PreferenceConstants.SERVICE_KEY, ""); //$NON-NLS-1$
             }
         } catch (Exception e) {
             // e.printStackTrace();
@@ -341,11 +341,11 @@ public class Main implements PropertyChangeListener {
             shell.setMinimumSize(MINIMUM_SIZE_WIDTH, MINIMUM_SIZE_HEIGHT);
         }
         Image[] imageArray = new Image[5];
-        imageArray[0] = new Image(display, Main.class.getClassLoader().getResourceAsStream("icon16.png"));
-        imageArray[1] = new Image(display, Main.class.getClassLoader().getResourceAsStream("icon24.png"));
-        imageArray[2] = new Image(display, Main.class.getClassLoader().getResourceAsStream("icon32.png"));
-        imageArray[3] = new Image(display, Main.class.getClassLoader().getResourceAsStream("icon48.png"));
-        imageArray[4] = new Image(display, Main.class.getClassLoader().getResourceAsStream("icon128.png"));
+        imageArray[0] = new Image(display, Main.class.getClassLoader().getResourceAsStream("icon16.png")); //$NON-NLS-1$
+        imageArray[1] = new Image(display, Main.class.getClassLoader().getResourceAsStream("icon24.png")); //$NON-NLS-1$
+        imageArray[2] = new Image(display, Main.class.getClassLoader().getResourceAsStream("icon32.png")); //$NON-NLS-1$
+        imageArray[3] = new Image(display, Main.class.getClassLoader().getResourceAsStream("icon48.png")); //$NON-NLS-1$
+        imageArray[4] = new Image(display, Main.class.getClassLoader().getResourceAsStream("icon128.png")); //$NON-NLS-1$
         shell.setImages(imageArray);
         Window.setDefaultImages(imageArray);
         setWindowTitle();
@@ -377,11 +377,11 @@ public class Main implements PropertyChangeListener {
                 ps.setValue(PreferenceConstants.INCLUDE_STACKTRACE, includeStackTraceChk.getSelection());
                 ps.setValue(PreferenceConstants.ONLY_HAS_CVE, onlyHasCVEChk.getSelection());
                 ps.setValue(PreferenceConstants.INCLUDE_CVE_DETAIL, includeCVEDetailChk.getSelection());
-                ps.setValue(PreferenceConstants.BASIC_AUTH_STATUS, "");
-                ps.setValue(PreferenceConstants.XSRF_TOKEN, "");
-                ps.setValue(PreferenceConstants.PROXY_TMP_USER, "");
-                ps.setValue(PreferenceConstants.PROXY_TMP_PASS, "");
-                ps.setValue(PreferenceConstants.TSV_STATUS, "");
+                ps.setValue(PreferenceConstants.BASIC_AUTH_STATUS, ""); //$NON-NLS-1$
+                ps.setValue(PreferenceConstants.XSRF_TOKEN, ""); //$NON-NLS-1$
+                ps.setValue(PreferenceConstants.PROXY_TMP_USER, ""); //$NON-NLS-1$
+                ps.setValue(PreferenceConstants.PROXY_TMP_PASS, ""); //$NON-NLS-1$
+                ps.setValue(PreferenceConstants.TSV_STATUS, ""); //$NON-NLS-1$
                 for (Button termBtn : attackTermRadios) {
                     if (termBtn.getSelection()) {
                         ps.setValue(PreferenceConstants.ATTACK_DETECTED_DATE_FILTER, attackTermRadios.indexOf(termBtn));
@@ -431,14 +431,14 @@ public class Main implements PropertyChangeListener {
                 }
                 updateProtectOption();
                 setWindowTitle();
-                if (ps.getBoolean(PreferenceConstants.PROXY_YUKO) && ps.getString(PreferenceConstants.PROXY_AUTH).equals("input")) {
+                if (ps.getBoolean(PreferenceConstants.PROXY_YUKO) && ps.getString(PreferenceConstants.PROXY_AUTH).equals("input")) { //$NON-NLS-1$
                     String proxy_usr = ps.getString(PreferenceConstants.PROXY_TMP_USER);
                     String proxy_pwd = ps.getString(PreferenceConstants.PROXY_TMP_PASS);
                     if (proxy_usr == null || proxy_usr.isEmpty() || proxy_pwd == null || proxy_pwd.isEmpty()) {
                         ProxyAuthDialog proxyAuthDialog = new ProxyAuthDialog(shell);
                         int result = proxyAuthDialog.open();
                         if (IDialogConstants.CANCEL_ID == result) {
-                            ps.setValue(PreferenceConstants.PROXY_AUTH, "none");
+                            ps.setValue(PreferenceConstants.PROXY_AUTH, "none"); //$NON-NLS-1$
                         } else {
                             ps.setValue(PreferenceConstants.PROXY_TMP_USER, proxyAuthDialog.getUsername());
                             ps.setValue(PreferenceConstants.PROXY_TMP_PASS, proxyAuthDialog.getPassword());
@@ -454,7 +454,7 @@ public class Main implements PropertyChangeListener {
                 if (event.stateMask == SWT.CTRL) {
                     int num = Character.getNumericValue(event.character);
                     if (num > -1) {
-                        support.firePropertyChange("userswitch", 0, num);
+                        support.firePropertyChange("userswitch", 0, num); //$NON-NLS-1$
                     }
                 }
             }
@@ -484,7 +484,7 @@ public class Main implements PropertyChangeListener {
         // #################### ASSESS #################### //
         CTabItem assessTabItem = new CTabItem(mainTabFolder, SWT.NONE);
         assessTabItem.setText("ASSESS");
-        assessTabItem.setImage(new Image(shell.getDisplay(), getClass().getClassLoader().getResourceAsStream("assess16.png")));
+        assessTabItem.setImage(new Image(shell.getDisplay(), getClass().getClassLoader().getResourceAsStream("assess16.png"))); //$NON-NLS-1$
 
         Composite assessShell = new Composite(mainTabFolder, SWT.NONE);
         assessShell.setLayout(new GridLayout(1, false));
@@ -545,10 +545,10 @@ public class Main implements PropertyChangeListener {
                 fullAppMap = progress.getFullAppMap();
                 if (fullAppMap.isEmpty()) {
                     String userName = ps.getString(PreferenceConstants.USERNAME);
-                    StringJoiner sj = new StringJoiner("\r\n");
+                    StringJoiner sj = new StringJoiner("\r\n"); //$NON-NLS-1$
                     sj.add("アプリケーションの取得件数が０件です。考えられる原因としては以下となります。");
                     sj.add("・下記ユーザーのアプリケーションアクセスグループにView権限が設定されていない。");
-                    sj.add(String.format("　%s", userName));
+                    sj.add(String.format("　%s", userName)); //$NON-NLS-1$
                     sj.add("・Assessライセンスが付与されているアプリケーションがない。");
                     sj.add("・接続設定が正しくない。プロキシの設定がされていない。など");
                     MessageDialog.openInformation(shell, "アプリケーション一覧の取得", sj.toString());
@@ -636,7 +636,7 @@ public class Main implements PropertyChangeListener {
         srcCountGrDt.heightHint = 12;
         this.srcCount.setLayoutData(srcCountGrDt);
         this.srcCount.setFont(new Font(display, "ＭＳ ゴシック", 8, SWT.NORMAL));
-        this.srcCount.setText("0");
+        this.srcCount.setText("0"); //$NON-NLS-1$
         this.srcCount.setForeground(shell.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
 
         Composite btnGrp = new Composite(appListGrp, SWT.NONE);
@@ -647,7 +647,7 @@ public class Main implements PropertyChangeListener {
 
         Button allRightBtn = new Button(btnGrp, SWT.PUSH);
         allRightBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        allRightBtn.setText(">>");
+        allRightBtn.setText(">>"); //$NON-NLS-1$
         allRightBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -664,7 +664,7 @@ public class Main implements PropertyChangeListener {
 
         Button rightBtn = new Button(btnGrp, SWT.PUSH);
         rightBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        rightBtn.setText(">");
+        rightBtn.setText(">"); //$NON-NLS-1$
         rightBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -689,7 +689,7 @@ public class Main implements PropertyChangeListener {
 
         Button leftBtn = new Button(btnGrp, SWT.PUSH);
         leftBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        leftBtn.setText("<");
+        leftBtn.setText("<"); //$NON-NLS-1$
         leftBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -714,7 +714,7 @@ public class Main implements PropertyChangeListener {
 
         Button allLeftBtn = new Button(btnGrp, SWT.PUSH);
         allLeftBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        allLeftBtn.setText("<<");
+        allLeftBtn.setText("<<"); //$NON-NLS-1$
         allLeftBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -811,7 +811,7 @@ public class Main implements PropertyChangeListener {
         dstCountGrDt.heightHint = 12;
         this.dstCount.setLayoutData(dstCountGrDt);
         this.dstCount.setFont(new Font(display, "ＭＳ ゴシック", 8, SWT.NORMAL));
-        this.dstCount.setText("0");
+        this.dstCount.setText("0"); //$NON-NLS-1$
         this.dstCount.setForeground(shell.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
 
         subTabFolder = new CTabFolder(assessShell, SWT.NONE);
@@ -871,7 +871,7 @@ public class Main implements PropertyChangeListener {
                     if (labels.isEmpty()) {
                         vulSeverityFilterTxt.setText("すべて");
                     } else {
-                        vulSeverityFilterTxt.setText(String.join(", ", labels));
+                        vulSeverityFilterTxt.setText(String.join(", ", labels)); //$NON-NLS-1$
                     }
                     vulExecuteBtn.setFocus();
                 }
@@ -905,7 +905,7 @@ public class Main implements PropertyChangeListener {
                     if (labels.isEmpty()) {
                         vulVulnTypeFilterTxt.setText("すべて");
                     } else {
-                        vulVulnTypeFilterTxt.setText(String.join(", ", labels));
+                        vulVulnTypeFilterTxt.setText(String.join(", ", labels)); //$NON-NLS-1$
                     }
                     vulExecuteBtn.setFocus();
                 }
@@ -928,11 +928,11 @@ public class Main implements PropertyChangeListener {
                 frLastDetectedDate = filterDialog.getFrDate();
                 toLastDetectedDate = filterDialog.getToDate();
                 if (frLastDetectedDate != null && toLastDetectedDate != null) {
-                    vulLastDetectedFilterTxt.setText(String.format("%s ～ %s", sdf.format(frLastDetectedDate), sdf.format(toLastDetectedDate)));
+                    vulLastDetectedFilterTxt.setText(String.format("%s ～ %s", sdf.format(frLastDetectedDate), sdf.format(toLastDetectedDate))); //$NON-NLS-1$
                 } else if (frLastDetectedDate != null) {
-                    vulLastDetectedFilterTxt.setText(String.format("%s ～", sdf.format(frLastDetectedDate)));
+                    vulLastDetectedFilterTxt.setText(String.format("%s ～", sdf.format(frLastDetectedDate))); //$NON-NLS-1$
                 } else if (toLastDetectedDate != null) {
-                    vulLastDetectedFilterTxt.setText(String.format("～ %s", sdf.format(toLastDetectedDate)));
+                    vulLastDetectedFilterTxt.setText(String.format("～ %s", sdf.format(toLastDetectedDate))); //$NON-NLS-1$
                 } else {
                     vulLastDetectedFilterTxt.setText("すべて");
                 }
@@ -1123,7 +1123,7 @@ public class Main implements PropertyChangeListener {
         // #################### PROTECT #################### //
         CTabItem protectTabItem = new CTabItem(mainTabFolder, SWT.NONE);
         protectTabItem.setText("PROTECT");
-        protectTabItem.setImage(new Image(shell.getDisplay(), getClass().getClassLoader().getResourceAsStream("protect16.png")));
+        protectTabItem.setImage(new Image(shell.getDisplay(), getClass().getClassLoader().getResourceAsStream("protect16.png"))); //$NON-NLS-1$
 
         Composite protectShell = new Composite(mainTabFolder, SWT.NONE);
         protectShell.setLayout(new GridLayout(1, false));
@@ -1157,7 +1157,7 @@ public class Main implements PropertyChangeListener {
         attackTermPeriod.setText("任意");
         attackTermRadios.add(attackTermPeriod);
         attackDetectedFilterTxt = new Text(attackTermGrp, SWT.BORDER);
-        attackDetectedFilterTxt.setText("");
+        attackDetectedFilterTxt.setText(""); //$NON-NLS-1$
         attackDetectedFilterTxt.setEditable(false);
         attackDetectedFilterTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         attackDetectedFilterTxt.addListener(SWT.MouseUp, new Listener() {
@@ -1171,13 +1171,13 @@ public class Main implements PropertyChangeListener {
                 frDetectedDate = filterDialog.getFrDate();
                 toDetectedDate = filterDialog.getToDate();
                 if (frDetectedDate != null && toDetectedDate != null) {
-                    attackDetectedFilterTxt.setText(String.format("%s ～ %s", sdf.format(frDetectedDate), sdf.format(toDetectedDate)));
+                    attackDetectedFilterTxt.setText(String.format("%s ～ %s", sdf.format(frDetectedDate), sdf.format(toDetectedDate))); //$NON-NLS-1$
                 } else if (frDetectedDate != null) {
-                    attackDetectedFilterTxt.setText(String.format("%s ～", sdf.format(frDetectedDate)));
+                    attackDetectedFilterTxt.setText(String.format("%s ～", sdf.format(frDetectedDate))); //$NON-NLS-1$
                 } else if (toDetectedDate != null) {
-                    attackDetectedFilterTxt.setText(String.format("～ %s", sdf.format(toDetectedDate)));
+                    attackDetectedFilterTxt.setText(String.format("～ %s", sdf.format(toDetectedDate))); //$NON-NLS-1$
                 } else {
-                    attackDetectedFilterTxt.setText("");
+                    attackDetectedFilterTxt.setText(""); //$NON-NLS-1$
                 }
                 if (!attackDetectedFilterTxt.getText().isEmpty()) {
                     for (Button rdo : attackTermRadios) {
@@ -1225,7 +1225,7 @@ public class Main implements PropertyChangeListener {
                         addColToAttackTable(attackEvent, -1);
                     }
                     protectFilterMap = progress.getFilterMap();
-                    attackEventCount.setText(String.format("%d/%d", filteredAttackEvents.size(), attackEvents.size()));
+                    attackEventCount.setText(String.format("%d/%d", filteredAttackEvents.size(), attackEvents.size())); //$NON-NLS-1$
                 } catch (InvocationTargetException e) {
                     StringWriter stringWriter = new StringWriter();
                     PrintWriter printWriter = new PrintWriter(stringWriter);
@@ -1262,7 +1262,7 @@ public class Main implements PropertyChangeListener {
         attackEventCountGrDt.widthHint = 30;
         this.attackEventCount.setLayoutData(attackEventCountGrDt);
         this.attackEventCount.setFont(new Font(display, "ＭＳ ゴシック", 10, SWT.NORMAL));
-        this.attackEventCount.setText("0/0");
+        this.attackEventCount.setText("0/0"); //$NON-NLS-1$
 
         attackTable = new Table(attackListGrp, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
         GridData tableGrDt = new GridData(GridData.FILL_BOTH);
@@ -1344,11 +1344,11 @@ public class Main implements PropertyChangeListener {
                     csvFileFormat = ps.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT_ATTACKEVENT);
                 }
                 String timestamp = new SimpleDateFormat(csvFileFormat).format(new Date());
-                String currentPath = System.getProperty("user.dir");
-                String filePath = timestamp + ".csv";
+                String currentPath = System.getProperty("user.dir"); //$NON-NLS-1$
+                String filePath = timestamp + ".csv"; //$NON-NLS-1$
                 if (OS.isFamilyMac()) {
-                    if (currentPath.contains(".app/Contents/Java")) {
-                        filePath = "../../../" + timestamp + ".csv";
+                    if (currentPath.contains(".app/Contents/Java")) { //$NON-NLS-1$
+                        filePath = "../../../" + timestamp + ".csv"; //$NON-NLS-1$ //$NON-NLS-2$
                     }
                 }
                 String csv_encoding = Main.CSV_WIN_ENCODING;
@@ -1417,7 +1417,7 @@ public class Main implements PropertyChangeListener {
                                 break;
                             case ATTACK_EVENT_10:
                                 // ==================== 10. タグ ====================
-                                csvLineList.add(String.join(csvColumn.getSeparateStr().replace("\\r", "\r").replace("\\n", "\n"), attackEvent.getTags()));
+                                csvLineList.add(String.join(csvColumn.getSeparateStr().replace("\\r", "\r").replace("\\n", "\n"), attackEvent.getTags())); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
                                 break;
                             case ATTACK_EVENT_11:
                                 // ==================== 11. 組織名 ====================
@@ -1429,14 +1429,14 @@ public class Main implements PropertyChangeListener {
                                 break;
                             case ATTACK_EVENT_13: {
                                 // ==================== 13. 攻撃イベントへのリンク ====================
-                                String link = String.format("%s/static/ng/index.html#/%s/attacks/events/%s", ps.getString(PreferenceConstants.CONTRAST_URL),
+                                String link = String.format("%s/static/ng/index.html#/%s/attacks/events/%s", ps.getString(PreferenceConstants.CONTRAST_URL), //$NON-NLS-1$
                                         attackEvent.getOrganization().getOrganization_uuid().trim(), attackEvent.getEvent_uuid());
                                 csvLineList.add(link);
                                 break;
                             }
                             case ATTACK_EVENT_14: {
                                 // ==================== 14. 攻撃イベントへのリンク（ハイパーリンク） ====================
-                                String link = String.format("%s/static/ng/index.html#/%s/attacks/events/%s", ps.getString(PreferenceConstants.CONTRAST_URL),
+                                String link = String.format("%s/static/ng/index.html#/%s/attacks/events/%s", ps.getString(PreferenceConstants.CONTRAST_URL), //$NON-NLS-1$
                                         attackEvent.getOrganization().getOrganization_uuid().trim(), attackEvent.getEvent_uuid());
                                 csvLineList.add(String.format("=HYPERLINK(\"%s\",\"TeamServerへ\")", link));
                                 break;
@@ -1494,12 +1494,12 @@ public class Main implements PropertyChangeListener {
                     int cnt = srcIpMap.get(srcIp).get(rule).intValue();
                     srcIpMap.get(srcIp).put(rule, ++cnt);
                 }
-                String timestamp = new SimpleDateFormat("'protect_report'_yyyy-MM-dd_HHmmss").format(new Date());
-                String currentPath = System.getProperty("user.dir");
-                String filePath = timestamp + ".txt";
+                String timestamp = new SimpleDateFormat("'protect_report'_yyyy-MM-dd_HHmmss").format(new Date()); //$NON-NLS-1$
+                String currentPath = System.getProperty("user.dir"); //$NON-NLS-1$
+                String filePath = timestamp + ".txt"; //$NON-NLS-1$
                 if (OS.isFamilyMac()) {
-                    if (currentPath.contains(".app/Contents/Java")) {
-                        filePath = "../../../" + timestamp + ".txt";
+                    if (currentPath.contains(".app/Contents/Java")) { //$NON-NLS-1$
+                        filePath = "../../../" + timestamp + ".txt"; //$NON-NLS-1$ //$NON-NLS-2$
                     }
                 }
                 String txt_encoding = Main.CSV_WIN_ENCODING;
@@ -1509,12 +1509,12 @@ public class Main implements PropertyChangeListener {
                 File f = new File(filePath);
                 try (PrintWriter printWriter = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(f), txt_encoding)))) {
                     for (String srcIp : srcIpMap.keySet()) {
-                        printWriter.println(String.format("- %s", srcIp));
+                        printWriter.println(String.format("- %s", srcIp)); //$NON-NLS-1$
                         Map<String, Integer> ruleMap = srcIpMap.get(srcIp);
                         for (String rule : ruleMap.keySet()) {
                             int cnt = ruleMap.get(rule).intValue();
                             if (cnt > 0) {
-                                printWriter.println(String.format("  - %s: %d", rule, cnt));
+                                printWriter.println(String.format("  - %s: %d", rule, cnt)); //$NON-NLS-1$
                             }
                         }
                     }
@@ -1547,7 +1547,7 @@ public class Main implements PropertyChangeListener {
                         String contrastUrl = ps.getString(PreferenceConstants.CONTRAST_URL);
                         String orgUuid = attackEvent.getOrganization().getOrganization_uuid();
                         String eventUuid = attackEvent.getEvent_uuid();
-                        desktop.browse(new URI(String.format("%s/static/ng/index.html#/%s/attacks/events/%s", contrastUrl, orgUuid.trim(), eventUuid)));
+                        desktop.browse(new URI(String.format("%s/static/ng/index.html#/%s/attacks/events/%s", contrastUrl, orgUuid.trim(), eventUuid))); //$NON-NLS-1$
                     }
                 } catch (IOException ioe) {
                     ioe.printStackTrace();
@@ -1568,7 +1568,7 @@ public class Main implements PropertyChangeListener {
                 String orgUuid = attackEvent.getOrganization().getOrganization_uuid();
                 String eventUuid = attackEvent.getEvent_uuid();
                 Clipboard clipboard = java.awt.Toolkit.getDefaultToolkit().getSystemClipboard();
-                StringSelection selection = new StringSelection(String.format("%s/static/ng/index.html#/%s/attacks/events/%s", contrastUrl, orgUuid.trim(), eventUuid));
+                StringSelection selection = new StringSelection(String.format("%s/static/ng/index.html#/%s/attacks/events/%s", contrastUrl, orgUuid.trim(), eventUuid)); //$NON-NLS-1$
                 clipboard.setContents(selection, null);
             }
         });
@@ -1680,7 +1680,7 @@ public class Main implements PropertyChangeListener {
         // #################### SERVER #################### //
         CTabItem serverTabItem = new CTabItem(mainTabFolder, SWT.NONE);
         serverTabItem.setText("SERVER(β版)");
-        serverTabItem.setImage(new Image(shell.getDisplay(), getClass().getClassLoader().getResourceAsStream("server16.png")));
+        serverTabItem.setImage(new Image(shell.getDisplay(), getClass().getClassLoader().getResourceAsStream("server16.png"))); //$NON-NLS-1$
 
         Composite serverShell = new Composite(mainTabFolder, SWT.NONE);
         serverShell.setLayout(new GridLayout(1, false));
@@ -1764,11 +1764,11 @@ public class Main implements PropertyChangeListener {
                     csvFileFormat = ps.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT_SERVER);
                 }
                 String timestamp = new SimpleDateFormat(csvFileFormat).format(new Date());
-                String currentPath = System.getProperty("user.dir");
-                String filePath = timestamp + ".csv";
+                String currentPath = System.getProperty("user.dir"); //$NON-NLS-1$
+                String filePath = timestamp + ".csv"; //$NON-NLS-1$
                 if (OS.isFamilyMac()) {
-                    if (currentPath.contains(".app/Contents/Java")) {
-                        filePath = "../../../" + timestamp + ".csv";
+                    if (currentPath.contains(".app/Contents/Java")) { //$NON-NLS-1$
+                        filePath = "../../../" + timestamp + ".csv"; //$NON-NLS-1$ //$NON-NLS-2$
                     }
                 }
                 String csv_encoding = Main.CSV_WIN_ENCODING;
@@ -1922,14 +1922,14 @@ public class Main implements PropertyChangeListener {
             @Override
             public void widgetSelected(SelectionEvent event) {
                 PreferenceManager mgr = new PreferenceManager();
-                PreferenceNode baseNode = new PreferenceNode("base", new BasePreferencePage(shell, authType));
-                PreferenceNode connectionNode = new PreferenceNode("connection", new ConnectionPreferencePage(authType));
-                PreferenceNode otherNode = new PreferenceNode("other", new OtherPreferencePage());
-                PreferenceNode csvNode = new PreferenceNode("csv", new CSVPreferencePage());
-                PreferenceNode vulCsvColumnNode = new PreferenceNode("vulcsvcolumn", new VulCSVColumnPreferencePage());
-                PreferenceNode libCsvColumnNode = new PreferenceNode("libcsvcolumn", new LibCSVColumnPreferencePage());
-                PreferenceNode evtCsvColumnNode = new PreferenceNode("evtcsvcolumn", new AttackEventCSVColumnPreferencePage());
-                PreferenceNode svrCsvColumnNode = new PreferenceNode("svrcsvcolumn", new ServerCSVColumnPreferencePage());
+                PreferenceNode baseNode = new PreferenceNode("base", new BasePreferencePage(shell, authType)); //$NON-NLS-1$
+                PreferenceNode connectionNode = new PreferenceNode("connection", new ConnectionPreferencePage(authType)); //$NON-NLS-1$
+                PreferenceNode otherNode = new PreferenceNode("other", new OtherPreferencePage()); //$NON-NLS-1$
+                PreferenceNode csvNode = new PreferenceNode("csv", new CSVPreferencePage()); //$NON-NLS-1$
+                PreferenceNode vulCsvColumnNode = new PreferenceNode("vulcsvcolumn", new VulCSVColumnPreferencePage()); //$NON-NLS-1$
+                PreferenceNode libCsvColumnNode = new PreferenceNode("libcsvcolumn", new LibCSVColumnPreferencePage()); //$NON-NLS-1$
+                PreferenceNode evtCsvColumnNode = new PreferenceNode("evtcsvcolumn", new AttackEventCSVColumnPreferencePage()); //$NON-NLS-1$
+                PreferenceNode svrCsvColumnNode = new PreferenceNode("svrcsvcolumn", new ServerCSVColumnPreferencePage()); //$NON-NLS-1$
                 mgr.addToRoot(baseNode);
                 mgr.addToRoot(connectionNode);
                 mgr.addToRoot(otherNode);
@@ -1938,7 +1938,7 @@ public class Main implements PropertyChangeListener {
                 mgr.addTo(csvNode.getId(), libCsvColumnNode);
                 mgr.addTo(csvNode.getId(), evtCsvColumnNode);
                 mgr.addTo(csvNode.getId(), svrCsvColumnNode);
-                PreferenceNode aboutNode = new PreferenceNode("about", new AboutPage());
+                PreferenceNode aboutNode = new PreferenceNode("about", new AboutPage()); //$NON-NLS-1$
                 mgr.addToRoot(aboutNode);
                 PreferenceDialog dialog = new MyPreferenceDialog(shell, mgr);
                 dialog.setPreferenceStore(ps);
@@ -2001,7 +2001,7 @@ public class Main implements PropertyChangeListener {
     }
 
     public void loggedIn() {
-        String timestamp = new SimpleDateFormat("yyyy/MM/dd HH:mm").format(new Date());
+        String timestamp = new SimpleDateFormat("yyyy/MM/dd HH:mm").format(new Date()); //$NON-NLS-1$
         String userName = ps.getString(PreferenceConstants.USERNAME);
         this.statusBar.setText(String.format("%s %s successfully logged in", userName, timestamp));
         this.logOutBtn.setEnabled(true);
@@ -2019,8 +2019,8 @@ public class Main implements PropertyChangeListener {
 
     public void loggedOut() {
         this.cookieJar = null;
-        this.statusBar.setText("");
-        ps.setValue(PreferenceConstants.XSRF_TOKEN, "");
+        this.statusBar.setText(""); //$NON-NLS-1$
+        ps.setValue(PreferenceConstants.XSRF_TOKEN, ""); //$NON-NLS-1$
         ps.setValue(PreferenceConstants.BASIC_AUTH_STATUS, BasicAuthStatusEnum.NONE.name());
         ps.setValue(PreferenceConstants.TSV_STATUS, TsvStatusEnum.NONE.name());
         logOutBtn.setEnabled(false);
@@ -2045,7 +2045,7 @@ public class Main implements PropertyChangeListener {
         item.setText(7, attackEvent.getFormatReceived());
         item.setText(8, attackEvent.getUrl());
         item.setText(9, attackEvent.getUser_input().getValue());
-        String tags = String.join(",", attackEvent.getTags());
+        String tags = String.join(",", attackEvent.getTags()); //$NON-NLS-1$
         item.setText(10, tags);
         item.setText(11, attackEvent.getOrganization().getName());
     }
@@ -2068,11 +2068,11 @@ public class Main implements PropertyChangeListener {
 
     private void uiReset() {
         // src
-        srcListFilter.setText("");
+        srcListFilter.setText(""); //$NON-NLS-1$
         srcList.removeAll();
         srcApps.clear();
         // dst
-        dstListFilter.setText("");
+        dstListFilter.setText(""); //$NON-NLS-1$
         dstList.removeAll();
         dstApps.clear();
         // full
@@ -2179,17 +2179,17 @@ public class Main implements PropertyChangeListener {
 
     private void updateProtectOption() {
         this.attackEventDetectedFilterMap = getAttackEventDetectedDateMap();
-        attackTermToday.setToolTipText(this.attackEventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.TODAY).format(DateTimeFormatter.ofPattern("yyyy/MM/dd(E)")));
-        attackTermYesterday.setToolTipText(this.attackEventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.YESTERDAY).format(DateTimeFormatter.ofPattern("yyyy/MM/dd(E)")));
-        attackTerm30days.setToolTipText(String.format("%s ～ %s",
-                this.attackEventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.BEFORE_30_DAYS).format(DateTimeFormatter.ofPattern("yyyy/MM/dd(E)")),
-                this.attackEventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.TODAY).format(DateTimeFormatter.ofPattern("yyyy/MM/dd(E)"))));
-        attackTermLastWeek.setToolTipText(String.format("%s ～ %s",
-                this.attackEventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.LAST_WEEK_START).format(DateTimeFormatter.ofPattern("yyyy/MM/dd(E)")),
-                this.attackEventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.LAST_WEEK_END).format(DateTimeFormatter.ofPattern("yyyy/MM/dd(E)"))));
-        attackTermThisWeek.setToolTipText(String.format("%s ～ %s",
-                this.attackEventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.THIS_WEEK_START).format(DateTimeFormatter.ofPattern("yyyy/MM/dd(E)")),
-                this.attackEventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.THIS_WEEK_END).format(DateTimeFormatter.ofPattern("yyyy/MM/dd(E)"))));
+        attackTermToday.setToolTipText(this.attackEventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.TODAY).format(DateTimeFormatter.ofPattern("yyyy/MM/dd(E)"))); //$NON-NLS-1$
+        attackTermYesterday.setToolTipText(this.attackEventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.YESTERDAY).format(DateTimeFormatter.ofPattern("yyyy/MM/dd(E)"))); //$NON-NLS-1$
+        attackTerm30days.setToolTipText(String.format("%s ～ %s", //$NON-NLS-1$
+                this.attackEventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.BEFORE_30_DAYS).format(DateTimeFormatter.ofPattern("yyyy/MM/dd(E)")), //$NON-NLS-1$
+                this.attackEventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.TODAY).format(DateTimeFormatter.ofPattern("yyyy/MM/dd(E)")))); //$NON-NLS-1$
+        attackTermLastWeek.setToolTipText(String.format("%s ～ %s", //$NON-NLS-1$
+                this.attackEventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.LAST_WEEK_START).format(DateTimeFormatter.ofPattern("yyyy/MM/dd(E)")), //$NON-NLS-1$
+                this.attackEventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.LAST_WEEK_END).format(DateTimeFormatter.ofPattern("yyyy/MM/dd(E)")))); //$NON-NLS-1$
+        attackTermThisWeek.setToolTipText(String.format("%s ～ %s", //$NON-NLS-1$
+                this.attackEventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.THIS_WEEK_START).format(DateTimeFormatter.ofPattern("yyyy/MM/dd(E)")), //$NON-NLS-1$
+                this.attackEventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.THIS_WEEK_END).format(DateTimeFormatter.ofPattern("yyyy/MM/dd(E)")))); //$NON-NLS-1$
     }
 
     private Date[] getFrToDetectedDate() {
@@ -2268,7 +2268,7 @@ public class Main implements PropertyChangeListener {
             for (Organization validOrg : validOrgs) {
                 orgNameList.add(validOrg.getName());
             }
-            text = String.join(", ", orgNameList);
+            text = String.join(", ", orgNameList); //$NON-NLS-1$
         }
         if (text == null || text.isEmpty()) {
             this.shell.setText(String.format(WINDOW_TITLE, "組織未設定"));
@@ -2280,7 +2280,7 @@ public class Main implements PropertyChangeListener {
     @SuppressWarnings("unchecked")
     @Override
     public void propertyChange(PropertyChangeEvent event) {
-        if ("attackEventFilter".equals(event.getPropertyName())) {
+        if ("attackEventFilter".equals(event.getPropertyName())) { //$NON-NLS-1$
             Map<FilterEnum, Set<Filter>> filterMap = (Map<FilterEnum, Set<Filter>>) event.getNewValue();
             attackTable.clearAll();
             attackTable.removeAll();
@@ -2316,7 +2316,7 @@ public class Main implements PropertyChangeListener {
                     }
                 }
                 for (Filter filter : filterMap.get(FilterEnum.TAG)) {
-                    if (filter.getLabel().equals("")) {
+                    if (filter.getLabel().equals("")) { //$NON-NLS-1$
                         if (attackEvent.getTags().isEmpty()) {
                             if (!filter.isValid()) {
                                 lostFlg |= true;
@@ -2341,8 +2341,8 @@ public class Main implements PropertyChangeListener {
                         }
                         if (filter.getLabel().equals("日中時間帯")) {
                             if (!termDayTime.isEmpty()) {
-                                String frDtStr = termDayTime.split("-")[0];
-                                String toDtStr = termDayTime.split("-")[1];
+                                String frDtStr = termDayTime.split("-")[0]; //$NON-NLS-1$
+                                String toDtStr = termDayTime.split("-")[1]; //$NON-NLS-1$
                                 int frDt = Integer.parseInt(frDtStr);
                                 int toDt = Integer.parseInt(toDtStr);
                                 if (toDt < frDt) {
@@ -2358,8 +2358,8 @@ public class Main implements PropertyChangeListener {
                         }
                         if (filter.getLabel().equals("夜間時間帯")) {
                             if (!termNightTime.isEmpty()) {
-                                String frNtStr = termNightTime.split("-")[0];
-                                String toNtStr = termNightTime.split("-")[1];
+                                String frNtStr = termNightTime.split("-")[0]; //$NON-NLS-1$
+                                String toNtStr = termNightTime.split("-")[1]; //$NON-NLS-1$
                                 int frNt = Integer.parseInt(frNtStr);
                                 int toNt = Integer.parseInt(toNtStr);
                                 if (toNt < frNt) {
@@ -2376,8 +2376,8 @@ public class Main implements PropertyChangeListener {
                         if (filter.getLabel().equals("その他時間帯")) {
                             boolean hitFlg = false;
                             if (!termDayTime.isEmpty()) {
-                                String frDtStr = termDayTime.split("-")[0];
-                                String toDtStr = termDayTime.split("-")[1];
+                                String frDtStr = termDayTime.split("-")[0]; //$NON-NLS-1$
+                                String toDtStr = termDayTime.split("-")[1]; //$NON-NLS-1$
                                 int frDt = Integer.parseInt(frDtStr);
                                 int toDt = Integer.parseInt(toDtStr);
                                 if (toDt < frDt) {
@@ -2391,8 +2391,8 @@ public class Main implements PropertyChangeListener {
                                 }
                             }
                             if (!termNightTime.isEmpty()) {
-                                String frNtStr = termNightTime.split("-")[0];
-                                String toNtStr = termNightTime.split("-")[1];
+                                String frNtStr = termNightTime.split("-")[0]; //$NON-NLS-1$
+                                String toNtStr = termNightTime.split("-")[1]; //$NON-NLS-1$
                                 int frNt = Integer.parseInt(frNtStr);
                                 int toNt = Integer.parseInt(toNtStr);
                                 if (toNt < frNt) {
@@ -2416,8 +2416,8 @@ public class Main implements PropertyChangeListener {
                     filteredAttackEvents.add(attackEvent);
                 }
             }
-            attackEventCount.setText(String.format("%d/%d", filteredAttackEvents.size(), attackEvents.size()));
-        } else if ("serverFilter".equals(event.getPropertyName())) {
+            attackEventCount.setText(String.format("%d/%d", filteredAttackEvents.size(), attackEvents.size())); //$NON-NLS-1$
+        } else if ("serverFilter".equals(event.getPropertyName())) { //$NON-NLS-1$
             Map<FilterEnum, Set<Filter>> filterMap = (Map<FilterEnum, Set<Filter>>) event.getNewValue();
             serverTable.clearAll();
             serverTable.removeAll();
@@ -2443,8 +2443,8 @@ public class Main implements PropertyChangeListener {
                     filteredServers.add(server);
                 }
             }
-        } else if ("tsv".equals(event.getPropertyName())) {
-            System.out.println("tsv main");
+        } else if ("tsv".equals(event.getPropertyName())) { //$NON-NLS-1$
+            System.out.println("tsv main"); //$NON-NLS-1$
         }
 
     }

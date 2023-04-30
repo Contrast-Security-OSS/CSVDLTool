@@ -33,27 +33,27 @@ import com.contrastsecurity.csvdltool.model.LibCSVColumn;
 import com.google.gson.Gson;
 
 public enum LibCSVColmunEnum {
-    LIB_01("ライブラリ名", 1, false, null, false, null, null, true, ""),
-    LIB_02("言語", 2, false, null, false, null, null, true, ""),
-    LIB_03("現在バージョン", 3, false, null, false, null, null, true, ""),
-    LIB_04("現在バージョンリリース日", 4, false, null, false, null, null, true, ""),
-    LIB_05("最新バージョン", 5, false, null, false, null, null, true, ""),
-    LIB_06("最新バージョンリリース日", 6, false, null, false, null, null, true, ""),
-    LIB_07("スコア", 7, false, null, false, null, null, true, ""),
-    LIB_08("使用クラス数", 8, false, null, false, null, null, true, ""),
-    LIB_09("全体クラス数", 9, false, null, false, null, null, true, ""),
-    LIB_10("ライセンス", 10, true, ",", false, null, null, true, ""),
-    LIB_11("関連アプリケーション", 11, true, ",", false, null, null, true, ""),
-    LIB_12("関連サーバ", 12, true, ",", false, null, null, true, ""),
-    LIB_13("CVE", 14, true, ",", false, null, null, true, ""),
-    LIB_14("ライブラリタグ", 13, true, ",", false, null, null, true, ""),
-    LIB_15("組織名", 18, false, null, false, null, null, false, ""),
-    LIB_16("組織ID", 19, false, null, false, null, null, false, ""),
-    LIB_17("リンク", 20, false, null, false, null, null, false, "TeamServerへのリンクです。"),
-    LIB_18("リンク(ハイパーリンク)", 21, false, null, false, null, null, false, "TeamServerへのリンク（ハイパーリンク）です。"),
-    LIB_19("ライブラリ制限に抵触", 15, false, null, true, "Yes", "No", false, "ライブラリ・コンプライアンス"),
-    LIB_20("バージョン要件に抵触", 16, false, null, true, "Yes", "No", false, "ライブラリ・コンプライアンス"),
-    LIB_21("ライセンス制限に抵触", 17, false, null, true, "Yes", "No", false, "ライブラリ・コンプライアンス");
+    LIB_01(Messages.getString("libcsvcolmunenum.column.name"), 1, false, null, false, null, null, true, Messages.getString("libcsvcolmunenum.remarks.name")), //$NON-NLS-1$ //$NON-NLS-2$
+    LIB_02(Messages.getString("libcsvcolmunenum.column.language"), 2, false, null, false, null, null, true, Messages.getString("libcsvcolmunenum.remarks.language")), //$NON-NLS-1$ //$NON-NLS-2$
+    LIB_03(Messages.getString("libcsvcolmunenum.column.current.version"), 3, false, null, false, null, null, true, Messages.getString("libcsvcolmunenum.remarks.current.version")), //$NON-NLS-1$ //$NON-NLS-2$
+    LIB_04(Messages.getString("libcsvcolmunenum.column.current.release.date"), 4, false, null, false, null, null, true, Messages.getString("libcsvcolmunenum.remarks.current.release.date")), //$NON-NLS-1$ //$NON-NLS-2$
+    LIB_05(Messages.getString("libcsvcolmunenum.column.latest.version"), 5, false, null, false, null, null, true, Messages.getString("libcsvcolmunenum.remarks.latest.version")), //$NON-NLS-1$ //$NON-NLS-2$
+    LIB_06(Messages.getString("libcsvcolmunenum.column.latest.release.date"), 6, false, null, false, null, null, true, Messages.getString("libcsvcolmunenum.remarks.latest.release.date")), //$NON-NLS-1$ //$NON-NLS-2$
+    LIB_07(Messages.getString("libcsvcolmunenum.column.score"), 7, false, null, false, null, null, true, Messages.getString("libcsvcolmunenum.remarks.score")), //$NON-NLS-1$ //$NON-NLS-2$
+    LIB_08(Messages.getString("libcsvcolmunenum.column.used.class.count"), 8, false, null, false, null, null, true, Messages.getString("libcsvcolmunenum.remarks.used.class.count")), //$NON-NLS-1$ //$NON-NLS-2$
+    LIB_09(Messages.getString("libcsvcolmunenum.column.total.class.count"), 9, false, null, false, null, null, true, Messages.getString("libcsvcolmunenum.remarks.total.class.count")), //$NON-NLS-1$ //$NON-NLS-2$
+    LIB_10(Messages.getString("libcsvcolmunenum.column.license"), 10, true, ",", false, null, null, true, Messages.getString("libcsvcolmunenum.remarks.license")), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    LIB_11(Messages.getString("libcsvcolmunenum.column.related.application"), 11, true, ",", false, null, null, true, Messages.getString("libcsvcolmunenum.remarks.related.application")), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    LIB_12(Messages.getString("libcsvcolmunenum.column.related.server"), 12, true, ",", false, null, null, true, Messages.getString("libcsvcolmunenum.remarks.related.server")), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    LIB_13(Messages.getString("libcsvcolmunenum.column.cve"), 14, true, ",", false, null, null, true, Messages.getString("libcsvcolmunenum.remarks.cve")), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    LIB_14(Messages.getString("libcsvcolmunenum.column.library.tag"), 13, true, ",", false, null, null, true, Messages.getString("libcsvcolmunenum.remarks.library.tag")), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    LIB_15(Messages.getString("libcsvcolmunenum.column.organization.name"), 18, false, null, false, null, null, false, Messages.getString("libcsvcolmunenum.remarks.organization.name")), //$NON-NLS-1$ //$NON-NLS-2$
+    LIB_16(Messages.getString("libcsvcolmunenum.column.organization.id"), 19, false, null, false, null, null, false, Messages.getString("libcsvcolmunenum.remarks.organization.id")), //$NON-NLS-1$ //$NON-NLS-2$
+    LIB_17(Messages.getString("libcsvcolmunenum.column.link"), 20, false, null, false, null, null, false, Messages.getString("libcsvcolmunenum.remarks.link")), //$NON-NLS-1$ //$NON-NLS-2$
+    LIB_18(Messages.getString("libcsvcolmunenum.column.hyperlink"), 21, false, null, false, null, null, false, Messages.getString("libcsvcolmunenum.remarks.hyperlink")), //$NON-NLS-1$ //$NON-NLS-2$
+    LIB_19(Messages.getString("libcsvcolmunenum.column.constraint.library"), 15, false, null, true, Messages.getString("libcsvcolmunenum.truestr.constraint.library"), Messages.getString("libcsvcolmunenum.falsestr.constraint.library"), false, Messages.getString("libcsvcolmunenum.remarks.constraint.library")), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+    LIB_20(Messages.getString("libcsvcolmunenum.column.constraint.version"), 16, false, null, true, Messages.getString("libcsvcolmunenum.truestr.constraint.version"), Messages.getString("libcsvcolmunenum.falsestr.constraint.version"), false, Messages.getString("libcsvcolmunenum.remarks.constraint.version")), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+    LIB_21(Messages.getString("libcsvcolmunenum.column.constraint.license"), 17, false, null, true, Messages.getString("libcsvcolmunenum.truestr.constraint.license"), Messages.getString("libcsvcolmunenum.falsestr.constraint.license"), false, Messages.getString("libcsvcolmunenum.remarks.constraint.license")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
     private String culumn;
     private int order;

@@ -47,7 +47,7 @@ import org.eclipse.swt.widgets.Text;
 
 public class TsvDialog extends Dialog {
 
-    public static String ACCEPTABLE_CODE_CHAR = "0123456789";
+    public static String ACCEPTABLE_CODE_CHAR = "0123456789"; //$NON-NLS-1$
 
     private Text codeTxt;
     private String code;
@@ -64,7 +64,7 @@ public class TsvDialog extends Dialog {
         Composite composite = (Composite) super.createDialogArea(parent);
         composite.setLayout(new GridLayout(2, false));
 
-        new Label(composite, SWT.LEFT).setText("6桁の認証コード：");
+        new Label(composite, SWT.LEFT).setText(Messages.getString("tsvdialog.verification.code.label")); //$NON-NLS-1$
         codeTxt = new Text(composite, SWT.BORDER);
         codeTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         codeTxt.setTextLimit(6);
@@ -102,7 +102,7 @@ public class TsvDialog extends Dialog {
         Label messageLbl = new Label(composite, SWT.LEFT);
         messageLbl.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         if (retryCnt > 0) {
-            messageLbl.setText("認証に失敗しました。");
+            messageLbl.setText(Messages.getString("tsvdialog.authentication.fail.message")); //$NON-NLS-1$
             messageLbl.setForeground(getShell().getDisplay().getSystemColor(SWT.COLOR_RED));
         }
         codeTxt.setFocus();
@@ -114,7 +114,7 @@ public class TsvDialog extends Dialog {
     protected void createButtonsForButtonBar(Composite parent) {
         Button okButton = createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL, true);
         okButton.setEnabled(false);
-        createButton(parent, IDialogConstants.CANCEL_ID, "キャンセル", false);
+        createButton(parent, IDialogConstants.CANCEL_ID, Messages.getString("tsvdialog.cancel.button.title"), false); //$NON-NLS-1$
     }
 
     @Override
@@ -140,7 +140,7 @@ public class TsvDialog extends Dialog {
     @Override
     protected void configureShell(Shell newShell) {
         super.configureShell(newShell);
-        newShell.setText("二段階認証");
+        newShell.setText(Messages.getString("tsvdialog.title")); //$NON-NLS-1$
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {

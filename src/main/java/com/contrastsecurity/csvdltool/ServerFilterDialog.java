@@ -75,7 +75,7 @@ public class ServerFilterDialog extends Dialog {
         GridData compositeGrDt = new GridData(GridData.FILL_BOTH);
         composite.setLayoutData(compositeGrDt);
 
-        // #################### ソースIP #################### //
+        // #################### 言語 #################### //
         Group srcIpGrp = new Group(composite, SWT.NONE);
         GridLayout srcIpGrpLt = new GridLayout(1, false);
         srcIpGrpLt.marginWidth = 10;
@@ -83,7 +83,7 @@ public class ServerFilterDialog extends Dialog {
         srcIpGrp.setLayout(srcIpGrpLt);
         GridData srcIpGrpGrDt = new GridData(GridData.FILL_BOTH);
         srcIpGrp.setLayoutData(srcIpGrpGrDt);
-        srcIpGrp.setText("ソースIP");
+        srcIpGrp.setText(Messages.getString("serverfilterdialog.filter.agent.language.group.title")); //$NON-NLS-1$
 
         final Table srcIpTable = new Table(srcIpGrp, SWT.CHECK | SWT.BORDER | SWT.V_SCROLL);
         GridData srcIpTableGrDt = new GridData(GridData.FILL_BOTH);
@@ -119,7 +119,7 @@ public class ServerFilterDialog extends Dialog {
 
         final Button srcIpBulkBtn = new Button(srcIpGrp, SWT.CHECK);
         srcIpBulkBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        srcIpBulkBtn.setText("すべて");
+        srcIpBulkBtn.setText(Messages.getString("serverfilterdialog.filter.checkbox.all.label")); //$NON-NLS-1$
         srcIpBulkBtn.setSelection(true);
         srcIpBulkBtn.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -136,7 +136,7 @@ public class ServerFilterDialog extends Dialog {
             }
         });
 
-        // #################### アプリケーション #################### //
+        // #################### エージェントバージョン #################### //
         Group appGrp = new Group(composite, SWT.NONE);
         GridLayout appGrpLt = new GridLayout(1, false);
         appGrpLt.marginWidth = 10;
@@ -144,7 +144,7 @@ public class ServerFilterDialog extends Dialog {
         appGrp.setLayout(appGrpLt);
         GridData appGrpGrDt = new GridData(GridData.FILL_BOTH);
         appGrp.setLayoutData(appGrpGrDt);
-        appGrp.setText("アプリケーション");
+        appGrp.setText(Messages.getString("serverfilterdialog.filter.agent.version.group.title")); //$NON-NLS-1$
 
         final Table appTable = new Table(appGrp, SWT.CHECK | SWT.BORDER | SWT.V_SCROLL);
         GridData appTableGrDt = new GridData(GridData.FILL_BOTH);
@@ -180,7 +180,7 @@ public class ServerFilterDialog extends Dialog {
 
         final Button appBulkBtn = new Button(appGrp, SWT.CHECK);
         appBulkBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        appBulkBtn.setText("すべて");
+        appBulkBtn.setText(Messages.getString("serverfilterdialog.filter.checkbox.all.label")); //$NON-NLS-1$
         appBulkBtn.setSelection(true);
         appBulkBtn.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -225,12 +225,12 @@ public class ServerFilterDialog extends Dialog {
                 filter.setValid(false);
             }
         }
-        support.firePropertyChange("serverFilter", null, filterMap);
+        support.firePropertyChange("serverFilter", null, filterMap); //$NON-NLS-1$
     }
 
     @Override
     protected void createButtonsForButtonBar(Composite parent) {
-        createButton(parent, IDialogConstants.CANCEL_ID, "閉じる", true);
+        createButton(parent, IDialogConstants.CANCEL_ID, Messages.getString("serverfilterdialog.close.button.title"), true); //$NON-NLS-1$
     }
 
     @Override
@@ -251,7 +251,7 @@ public class ServerFilterDialog extends Dialog {
     @Override
     protected void configureShell(Shell newShell) {
         super.configureShell(newShell);
-        newShell.setText("サーバフィルター");
+        newShell.setText(Messages.getString("serverfilterdialog.title")); //$NON-NLS-1$
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {

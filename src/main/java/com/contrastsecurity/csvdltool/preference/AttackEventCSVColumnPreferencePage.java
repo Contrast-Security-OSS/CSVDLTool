@@ -279,7 +279,10 @@ public class AttackEventCSVColumnPreferencePage extends PreferencePage {
         });
 
         Label descLabel = new Label(csvColumnGrp, SWT.LEFT);
-        descLabel.setText(Messages.getString("attackEventcsvcolumnpreferencepage.table.desc.draganddrop")); //$NON-NLS-1$
+        List<String> descLabelList = new ArrayList<String>();
+        descLabelList.add(Messages.getString("attackEventcsvcolumnpreferencepage.table.desc.draganddrop")); //$NON-NLS-1$
+        descLabelList.add(Messages.getString("attackEventcsvcolumnpreferencepage.table.desc.delimiter")); //$NON-NLS-1$
+        descLabel.setText(String.join("\r\n", descLabelList)); //$NON-NLS-1$
         GridData descLabelGrDt = new GridData(GridData.FILL_HORIZONTAL);
         descLabelGrDt.horizontalSpan = 3;
         descLabel.setLayoutData(descLabelGrDt);

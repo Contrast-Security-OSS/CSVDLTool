@@ -33,10 +33,10 @@ import com.contrastsecurity.csvdltool.model.ServerCSVColumn;
 import com.google.gson.Gson;
 
 public enum ServerCSVColmunEnum {
-    SERVER_01("サーバ名", 1, false, null, false, null, null, true, ""),
-    SERVER_02("パス", 2, false, null, false, null, null, true, ""),
-    SERVER_03("言語", 3, false, null, false, null, null, true, ""),
-    SERVER_04("エージェントバージョン", 4, false, null, false, null, null, true, "");
+    SERVER_01(Messages.getString("servercsvcolmunenum.column.server.name"), 1, false, null, false, null, null, true, Messages.getString("servercsvcolmunenum.remarks.server.name")), //$NON-NLS-1$ //$NON-NLS-2$
+    SERVER_02(Messages.getString("servercsvcolmunenum.column.agent.path"), 2, false, null, false, null, null, true, Messages.getString("servercsvcolmunenum.remarks.agent.path")), //$NON-NLS-1$ //$NON-NLS-2$
+    SERVER_03(Messages.getString("servercsvcolmunenum.column.agent.language"), 3, false, null, false, null, null, true, Messages.getString("servercsvcolmunenum.remarks.agent.language")), //$NON-NLS-1$ //$NON-NLS-2$
+    SERVER_04(Messages.getString("servercsvcolmunenum.column.agent.version"), 4, false, null, false, null, null, true, Messages.getString("servercsvcolmunenum.remarks.agent.version")); //$NON-NLS-1$ //$NON-NLS-2$
 
     private String culumn;
     private int order;

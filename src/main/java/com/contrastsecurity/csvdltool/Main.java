@@ -142,7 +142,7 @@ import okhttp3.CookieJar;
 
 public class Main implements PropertyChangeListener {
 
-    public static final String WINDOW_TITLE = "CSVDLTool - %s";
+    public static final String WINDOW_TITLE = "CSVDLTool - %s"; //$NON-NLS-1$
     // 以下のMASTER_PASSWORDはプロキシパスワードを保存する際に暗号化で使用するパスワードです。
     // 本ツールをリリース用にコンパイルする際はchangemeを別の文字列に置き換えてください。
     public static final String MASTER_PASSWORD = "changeme!"; //$NON-NLS-1$
@@ -1696,7 +1696,7 @@ public class Main implements PropertyChangeListener {
         serverLoadBtnGrDt.horizontalSpan = 3;
         serverLoadBtnGrDt.heightHint = 50;
         serverLoadBtn.setLayoutData(serverLoadBtnGrDt);
-        serverLoadBtn.setText("取得");
+        serverLoadBtn.setText(Messages.getString("main.server.load.button.title")); //$NON-NLS-1$
         serverLoadBtn.setToolTipText("サーバ一覧を読み込みます。");
         serverLoadBtn.setFont(new Font(display, "ＭＳ ゴシック", 20, SWT.NORMAL));
         serverLoadBtn.addSelectionListener(new SelectionAdapter() {
@@ -1863,23 +1863,23 @@ public class Main implements PropertyChangeListener {
         serverColumn1.setResizable(false);
         TableColumn serverColumn2 = new TableColumn(serverTable, SWT.LEFT);
         serverColumn2.setWidth(150);
-        serverColumn2.setText("サーバ名");
+        serverColumn2.setText(Messages.getString("main.server.table.column0.title")); //$NON-NLS-1$
         TableColumn serverColumn3 = new TableColumn(serverTable, SWT.LEFT);
         serverColumn3.setWidth(360);
-        serverColumn3.setText("パス");
+        serverColumn3.setText(Messages.getString("main.server.table.column1.title")); //$NON-NLS-1$
         TableColumn serverColumn4 = new TableColumn(serverTable, SWT.LEFT);
         serverColumn4.setWidth(100);
-        serverColumn4.setText("言語");
+        serverColumn4.setText(Messages.getString("main.server.table.column2.title")); //$NON-NLS-1$
         TableColumn serverColumn5 = new TableColumn(serverTable, SWT.LEFT);
         serverColumn5.setWidth(200);
-        serverColumn5.setText("エージェントバージョン");
+        serverColumn5.setText(Messages.getString("main.server.table.column3.title")); //$NON-NLS-1$
         serverTabItem.setControl(serverShell);
 
         Button serverFilterBtn = new Button(serverListGrp, SWT.PUSH);
         GridData serverFilterBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
         serverFilterBtnGrDt.horizontalSpan = 3;
         serverFilterBtn.setLayoutData(serverFilterBtnGrDt);
-        serverFilterBtn.setText("フィルター");
+        serverFilterBtn.setText(Messages.getString("main.server.filter.button.title")); //$NON-NLS-1$
         serverFilterBtn.setToolTipText("サーバのフィルタリングを行います。");
         serverFilterBtn.addSelectionListener(new SelectionAdapter() {
             @Override

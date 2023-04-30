@@ -296,9 +296,9 @@ public class ServerCSVColumnPreferencePage extends PreferencePage {
 
         Label descLabel = new Label(csvColumnGrp, SWT.LEFT);
         List<String> descLabelList = new ArrayList<String>();
-        descLabelList.add("・ ドラッグアンドドロップで項目の並び替えが可能です。");
-        descLabelList.add("・ 複数の値が出力される項目については、区切り文字の変更が可能です。改行させる場合は\\r\\nをご指定してください。");
-        descLabelList.add("・ 真偽の値が出力される項目については、Yes/No文字の変更が可能です。例) Y/N、○/");
+        descLabelList.add(Messages.getString("servercsvcolumnpreferencepage.table.desc.draganddrop")); //$NON-NLS-1$
+        descLabelList.add(Messages.getString("servercsvcolumnpreferencepage.table.desc.delimiter")); //$NON-NLS-1$
+        descLabelList.add(Messages.getString("servercsvcolumnpreferencepage.table.desc.truefalsestr")); //$NON-NLS-1$
         descLabel.setText(String.join("\r\n", descLabelList)); //$NON-NLS-1$
         GridData descLabelGrDt = new GridData(GridData.FILL_HORIZONTAL);
         descLabelGrDt.horizontalSpan = 3;

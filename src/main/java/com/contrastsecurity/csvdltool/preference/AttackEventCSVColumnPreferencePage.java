@@ -279,7 +279,7 @@ public class AttackEventCSVColumnPreferencePage extends PreferencePage {
         });
 
         Label descLabel = new Label(csvColumnGrp, SWT.LEFT);
-        descLabel.setText("・ ドラッグアンドドロップで項目の並び替えが可能です。\r\n・ 複数の値が出力される項目については、区切り文字の変更が可能です。改行させる場合は\\r\\nをご指定してください。");
+        descLabel.setText(Messages.getString("attackEventcsvcolumnpreferencepage.table.desc.draganddrop")); //$NON-NLS-1$
         GridData descLabelGrDt = new GridData(GridData.FILL_HORIZONTAL);
         descLabelGrDt.horizontalSpan = 3;
         descLabel.setLayoutData(descLabelGrDt);

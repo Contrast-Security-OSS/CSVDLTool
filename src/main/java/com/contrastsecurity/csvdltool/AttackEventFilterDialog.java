@@ -88,7 +88,7 @@ public class AttackEventFilterDialog extends Dialog {
         GridData srcNameGrpGrDt = new GridData(GridData.FILL_BOTH);
         srcNameGrpGrDt.minimumWidth = 200;
         srcNameGrp.setLayoutData(srcNameGrpGrDt);
-        srcNameGrp.setText("ソース名");
+        srcNameGrp.setText(Messages.getString("attackeventfilterdialog.filter.source.name.group.title")); //$NON-NLS-1$
 
         final Table srcNameTable = new Table(srcNameGrp, SWT.CHECK | SWT.BORDER | SWT.V_SCROLL);
         GridData srcNameTableGrDt = new GridData(GridData.FILL_BOTH);
@@ -124,7 +124,7 @@ public class AttackEventFilterDialog extends Dialog {
 
         final Button srcNameBulkBtn = new Button(srcNameGrp, SWT.CHECK);
         srcNameBulkBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        srcNameBulkBtn.setText("すべて");
+        srcNameBulkBtn.setText(Messages.getString("attackeventfilterdialog.filter.checkbox.all.label")); //$NON-NLS-1$
         srcNameBulkBtn.setSelection(true);
         srcNameBulkBtn.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -150,7 +150,7 @@ public class AttackEventFilterDialog extends Dialog {
         GridData srcIpGrpGrDt = new GridData(GridData.FILL_BOTH);
         srcIpGrpGrDt.minimumWidth = 200;
         srcIpGrp.setLayoutData(srcIpGrpGrDt);
-        srcIpGrp.setText("ソースIP");
+        srcIpGrp.setText(Messages.getString("attackeventfilterdialog.filter.source.ip.group.title")); //$NON-NLS-1$
 
         final Table srcIpTable = new Table(srcIpGrp, SWT.CHECK | SWT.BORDER | SWT.V_SCROLL);
         GridData srcIpTableGrDt = new GridData(GridData.FILL_BOTH);
@@ -186,7 +186,7 @@ public class AttackEventFilterDialog extends Dialog {
 
         final Button srcIpBulkBtn = new Button(srcIpGrp, SWT.CHECK);
         srcIpBulkBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        srcIpBulkBtn.setText("すべて");
+        srcIpBulkBtn.setText(Messages.getString("attackeventfilterdialog.filter.checkbox.all.label")); //$NON-NLS-1$
         srcIpBulkBtn.setSelection(true);
         srcIpBulkBtn.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -212,7 +212,7 @@ public class AttackEventFilterDialog extends Dialog {
         GridData appGrpGrDt = new GridData(GridData.FILL_BOTH);
         appGrpGrDt.minimumWidth = 200;
         appGrp.setLayoutData(appGrpGrDt);
-        appGrp.setText("アプリケーション");
+        appGrp.setText(Messages.getString("attackeventfilterdialog.filter.application.name.group.title")); //$NON-NLS-1$
 
         final Table appTable = new Table(appGrp, SWT.CHECK | SWT.BORDER | SWT.V_SCROLL);
         GridData appTableGrDt = new GridData(GridData.FILL_BOTH);
@@ -248,7 +248,7 @@ public class AttackEventFilterDialog extends Dialog {
 
         final Button appBulkBtn = new Button(appGrp, SWT.CHECK);
         appBulkBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        appBulkBtn.setText("すべて");
+        appBulkBtn.setText(Messages.getString("attackeventfilterdialog.filter.checkbox.all.label")); //$NON-NLS-1$
         appBulkBtn.setSelection(true);
         appBulkBtn.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -274,7 +274,7 @@ public class AttackEventFilterDialog extends Dialog {
         GridData ruleGrpGrDt = new GridData(GridData.FILL_BOTH);
         ruleGrpGrDt.minimumWidth = 200;
         ruleGrp.setLayoutData(ruleGrpGrDt);
-        ruleGrp.setText("ルール");
+        ruleGrp.setText(Messages.getString("attackeventfilterdialog.filter.rule.title.group.title")); //$NON-NLS-1$
 
         final Table ruleTable = new Table(ruleGrp, SWT.CHECK | SWT.BORDER | SWT.V_SCROLL);
         GridData ruleTableGrDt = new GridData(GridData.FILL_BOTH);
@@ -310,7 +310,7 @@ public class AttackEventFilterDialog extends Dialog {
 
         final Button ruleBulkBtn = new Button(ruleGrp, SWT.CHECK);
         ruleBulkBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        ruleBulkBtn.setText("すべて");
+        ruleBulkBtn.setText(Messages.getString("attackeventfilterdialog.filter.checkbox.all.label")); //$NON-NLS-1$
         ruleBulkBtn.setSelection(true);
         ruleBulkBtn.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -336,7 +336,7 @@ public class AttackEventFilterDialog extends Dialog {
         GridData tagGrpGrDt = new GridData(GridData.FILL_BOTH);
         tagGrpGrDt.minimumWidth = 200;
         tagGrp.setLayoutData(tagGrpGrDt);
-        tagGrp.setText("タグ");
+        tagGrp.setText(Messages.getString("attackeventfilterdialog.filter.tag.group.title")); //$NON-NLS-1$
 
         final Table tagTable = new Table(tagGrp, SWT.CHECK | SWT.BORDER | SWT.V_SCROLL);
         GridData tagTableGrDt = new GridData(GridData.FILL_BOTH);
@@ -372,7 +372,7 @@ public class AttackEventFilterDialog extends Dialog {
 
         final Button tagBulkBtn = new Button(tagGrp, SWT.CHECK);
         tagBulkBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        tagBulkBtn.setText("すべて");
+        tagBulkBtn.setText(Messages.getString("attackeventfilterdialog.filter.checkbox.all.label")); //$NON-NLS-1$
         tagBulkBtn.setSelection(true);
         tagBulkBtn.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -399,7 +399,7 @@ public class AttackEventFilterDialog extends Dialog {
             GridData termGrpGrDt = new GridData(GridData.FILL_BOTH);
             termGrpGrDt.minimumWidth = 200;
             termGrp.setLayoutData(termGrpGrDt);
-            termGrp.setText("時間帯");
+            termGrp.setText(Messages.getString("attackeventfilterdialog.filter.date.range.group.title")); //$NON-NLS-1$
 
             final Table termTable = new Table(termGrp, SWT.CHECK | SWT.BORDER | SWT.V_SCROLL);
             GridData termTableGrDt = new GridData(GridData.FILL_BOTH);
@@ -435,7 +435,7 @@ public class AttackEventFilterDialog extends Dialog {
 
             final Button termBulkBtn = new Button(termGrp, SWT.CHECK);
             termBulkBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-            termBulkBtn.setText("すべて");
+            termBulkBtn.setText(Messages.getString("attackeventfilterdialog.filter.checkbox.all.label")); //$NON-NLS-1$
             termBulkBtn.setSelection(true);
             termBulkBtn.addSelectionListener(new SelectionAdapter() {
                 @Override
@@ -536,12 +536,12 @@ public class AttackEventFilterDialog extends Dialog {
                 }
             }
         }
-        support.firePropertyChange("attackEventFilter", null, filterMap);
+        support.firePropertyChange("attackEventFilter", null, filterMap); //$NON-NLS-1$
     }
 
     @Override
     protected void createButtonsForButtonBar(Composite parent) {
-        createButton(parent, IDialogConstants.CANCEL_ID, "閉じる", true);
+        createButton(parent, IDialogConstants.CANCEL_ID, Messages.getString("attackeventfilterdialog.close.button.title"), true); //$NON-NLS-1$
     }
 
     @Override
@@ -562,7 +562,7 @@ public class AttackEventFilterDialog extends Dialog {
     @Override
     protected void configureShell(Shell newShell) {
         super.configureShell(newShell);
-        newShell.setText("攻撃イベントフィルター");
+        newShell.setText(Messages.getString("attackeventfilterdialog.title")); //$NON-NLS-1$
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {

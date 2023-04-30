@@ -33,20 +33,20 @@ import com.contrastsecurity.csvdltool.model.AttackEventCSVColumn;
 import com.google.gson.Gson;
 
 public enum AttackEventCSVColmunEnum {
-    ATTACK_EVENT_01("ソース名", 1, false, null, true, ""),
-    ATTACK_EVENT_02("ソースIP", 2, false, null, true, ""),
-    ATTACK_EVENT_03("結果", 3, false, null, true, ""),
-    ATTACK_EVENT_04("アプリケーション", 4, false, null, true, ""),
-    ATTACK_EVENT_05("サーバ", 5, false, null, true, ""),
-    ATTACK_EVENT_06("ルール", 6, false, null, true, ""),
-    ATTACK_EVENT_07("時間", 7, false, null, true, ""),
-    ATTACK_EVENT_08("URL", 8, false, null, true, ""),
-    ATTACK_EVENT_09("攻撃値", 9, false, null, true, ""),
-    ATTACK_EVENT_10("タグ", 10, true, ",", true, ""),
-    ATTACK_EVENT_11("組織名", 11, false, null, false, ""),
-    ATTACK_EVENT_12("組織ID", 12, false, null, false, ""),
-    ATTACK_EVENT_13("リンク", 13, false, null, false, "TeamServerへのリンクです。"),
-    ATTACK_EVENT_14("リンク(ハイパーリンク)", 14, false, null, false, "TeamServerへのリンク（ハイパーリンク）です。");
+    ATTACK_EVENT_01(Messages.getString("attackeventcsvcolmunenum.column.source.name"), 1, false, null, true, Messages.getString("attackeventcsvcolmunenum.remarks.source.name")), //$NON-NLS-1$ //$NON-NLS-2$
+    ATTACK_EVENT_02(Messages.getString("attackeventcsvcolmunenum.column.source.ip"), 2, false, null, true, Messages.getString("attackeventcsvcolmunenum.remarks.source.ip")), //$NON-NLS-1$ //$NON-NLS-2$
+    ATTACK_EVENT_03(Messages.getString("attackeventcsvcolmunenum.column.result"), 3, false, null, true, Messages.getString("attackeventcsvcolmunenum.remarks.result")), //$NON-NLS-1$ //$NON-NLS-2$
+    ATTACK_EVENT_04(Messages.getString("attackeventcsvcolmunenum.column.application.name"), 4, false, null, true, Messages.getString("attackeventcsvcolmunenum.remarks.application.name")), //$NON-NLS-1$ //$NON-NLS-2$
+    ATTACK_EVENT_05(Messages.getString("attackeventcsvcolmunenum.column.server.name"), 5, false, null, true, Messages.getString("attackeventcsvcolmunenum.remarks.server.name")), //$NON-NLS-1$ //$NON-NLS-2$
+    ATTACK_EVENT_06(Messages.getString("attackeventcsvcolmunenum.column.rule.title"), 6, false, null, true, Messages.getString("attackeventcsvcolmunenum.remarks.rule.title")), //$NON-NLS-1$ //$NON-NLS-2$
+    ATTACK_EVENT_07(Messages.getString("attackeventcsvcolmunenum.column.attack.detected"), 7, false, null, true, Messages.getString("attackeventcsvcolmunenum.remarks.attack.detected")), //$NON-NLS-1$ //$NON-NLS-2$
+    ATTACK_EVENT_08(Messages.getString("attackeventcsvcolmunenum.column.attack.url"), 8, false, null, true, Messages.getString("attackeventcsvcolmunenum.remarks.attack.url")), //$NON-NLS-1$ //$NON-NLS-2$
+    ATTACK_EVENT_09(Messages.getString("attackeventcsvcolmunenum.column.attack.value"), 9, false, null, true, Messages.getString("attackeventcsvcolmunenum.remarks.attack.value")), //$NON-NLS-1$ //$NON-NLS-2$
+    ATTACK_EVENT_10(Messages.getString("attackeventcsvcolmunenum.column.attack.tag"), 10, true, ",", true, Messages.getString("attackeventcsvcolmunenum.remarks.attack.tag")), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    ATTACK_EVENT_11(Messages.getString("attackeventcsvcolmunenum.column.organization.name"), 11, false, null, false, Messages.getString("attackeventcsvcolmunenum.remarks.organization.name")), //$NON-NLS-1$ //$NON-NLS-2$
+    ATTACK_EVENT_12(Messages.getString("attackeventcsvcolmunenum.column.organization.id"), 12, false, null, false, Messages.getString("attackeventcsvcolmunenum.remarks.organization.id")), //$NON-NLS-1$ //$NON-NLS-2$
+    ATTACK_EVENT_13(Messages.getString("attackeventcsvcolmunenum.column.attack.link"), 13, false, null, false, Messages.getString("attackeventcsvcolmunenum.remarks.attack.link")), //$NON-NLS-1$ //$NON-NLS-2$
+    ATTACK_EVENT_14(Messages.getString("attackeventcsvcolmunenum.column.attack.hyperlink"), 14, false, null, false, Messages.getString("attackeventcsvcolmunenum.remarks.attack.hyperlink")); //$NON-NLS-1$ //$NON-NLS-2$
 
     private String culumn;
     private int order;

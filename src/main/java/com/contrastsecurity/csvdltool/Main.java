@@ -1139,22 +1139,22 @@ public class Main implements PropertyChangeListener {
         GridData attackTermGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
         attackTermGrp.setLayoutData(attackTermGrpGrDt);
         attackTerm30days = new Button(attackTermGrp, SWT.RADIO);
-        attackTerm30days.setText("すべて（30日間）");
+        attackTerm30days.setText(Messages.getString("main.attackevent.data.range.radio.all")); //$NON-NLS-1$
         attackTermRadios.add(attackTerm30days);
         attackTermYesterday = new Button(attackTermGrp, SWT.RADIO);
-        attackTermYesterday.setText("昨日");
+        attackTermYesterday.setText(Messages.getString("main.attackevent.data.range.radio.yesterday")); //$NON-NLS-1$
         attackTermRadios.add(attackTermYesterday);
         attackTermToday = new Button(attackTermGrp, SWT.RADIO);
-        attackTermToday.setText("今日");
+        attackTermToday.setText(Messages.getString("main.attackevent.data.range.radio.today")); //$NON-NLS-1$
         attackTermRadios.add(attackTermToday);
         attackTermLastWeek = new Button(attackTermGrp, SWT.RADIO);
-        attackTermLastWeek.setText("先週");
+        attackTermLastWeek.setText(Messages.getString("main.attackevent.data.range.radio.lastweek")); //$NON-NLS-1$
         attackTermRadios.add(attackTermLastWeek);
         attackTermThisWeek = new Button(attackTermGrp, SWT.RADIO);
-        attackTermThisWeek.setText("今週");
+        attackTermThisWeek.setText(Messages.getString("main.attackevent.data.range.radio.thisweek")); //$NON-NLS-1$
         attackTermRadios.add(attackTermThisWeek);
         attackTermPeriod = new Button(attackTermGrp, SWT.RADIO);
-        attackTermPeriod.setText("任意");
+        attackTermPeriod.setText(Messages.getString("main.attackevent.data.range.radio.custom")); //$NON-NLS-1$
         attackTermRadios.add(attackTermPeriod);
         attackDetectedFilterTxt = new Text(attackTermGrp, SWT.BORDER);
         attackDetectedFilterTxt.setText(""); //$NON-NLS-1$
@@ -1200,7 +1200,7 @@ public class Main implements PropertyChangeListener {
         attackLoadBtnGrDt.horizontalSpan = 3;
         attackLoadBtnGrDt.heightHint = 50;
         attackLoadBtn.setLayoutData(attackLoadBtnGrDt);
-        attackLoadBtn.setText("取得");
+        attackLoadBtn.setText(Messages.getString("main.attackevent.load.button.title")); //$NON-NLS-1$
         attackLoadBtn.setToolTipText("攻撃イベント一覧を読み込みます。");
         attackLoadBtn.setFont(new Font(display, "ＭＳ ゴシック", 20, SWT.NORMAL));
         attackLoadBtn.addSelectionListener(new SelectionAdapter() {
@@ -1608,43 +1608,43 @@ public class Main implements PropertyChangeListener {
         column0.setResizable(false);
         TableColumn column1 = new TableColumn(attackTable, SWT.LEFT);
         column1.setWidth(120);
-        column1.setText("ソース名");
+        column1.setText(Messages.getString("main.attackevent.table.column0.title")); //$NON-NLS-1$
         TableColumn column2 = new TableColumn(attackTable, SWT.LEFT);
         column2.setWidth(120);
-        column2.setText("ソースIP");
+        column2.setText(Messages.getString("main.attackevent.table.column1.title")); //$NON-NLS-1$
         TableColumn column3 = new TableColumn(attackTable, SWT.CENTER);
         column3.setWidth(100);
-        column3.setText("結果");
+        column3.setText(Messages.getString("main.attackevent.table.column2.title")); //$NON-NLS-1$
         TableColumn column4 = new TableColumn(attackTable, SWT.LEFT);
         column4.setWidth(250);
-        column4.setText("アプリケーション");
+        column4.setText(Messages.getString("main.attackevent.table.column3.title")); //$NON-NLS-1$
         TableColumn column5 = new TableColumn(attackTable, SWT.LEFT);
         column5.setWidth(200);
-        column5.setText("サーバ");
+        column5.setText(Messages.getString("main.attackevent.table.column4.title")); //$NON-NLS-1$
         TableColumn column6 = new TableColumn(attackTable, SWT.LEFT);
         column6.setWidth(200);
-        column6.setText("ルール");
+        column6.setText(Messages.getString("main.attackevent.table.column5.title")); //$NON-NLS-1$
         TableColumn column7 = new TableColumn(attackTable, SWT.LEFT);
         column7.setWidth(150);
-        column7.setText("時間");
+        column7.setText(Messages.getString("main.attackevent.table.column6.title")); //$NON-NLS-1$
         TableColumn column8 = new TableColumn(attackTable, SWT.LEFT);
         column8.setWidth(150);
-        column8.setText("URL");
+        column8.setText(Messages.getString("main.attackevent.table.column7.title")); //$NON-NLS-1$
         TableColumn column9 = new TableColumn(attackTable, SWT.LEFT);
         column9.setWidth(250);
-        column9.setText("攻撃値");
+        column9.setText(Messages.getString("main.attackevent.table.column8.title")); //$NON-NLS-1$
         TableColumn column10 = new TableColumn(attackTable, SWT.LEFT);
         column10.setWidth(250);
-        column10.setText("タグ");
+        column10.setText(Messages.getString("main.attackevent.table.column9.title")); //$NON-NLS-1$
         TableColumn column11 = new TableColumn(attackTable, SWT.LEFT);
         column11.setWidth(150);
-        column11.setText("組織名");
+        column11.setText(Messages.getString("main.attackevent.table.column10.title")); //$NON-NLS-1$
 
         Button attackEventFilterBtn = new Button(attackListGrp, SWT.PUSH);
         GridData attackEventFilterBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
         attackEventFilterBtnGrDt.horizontalSpan = 3;
         attackEventFilterBtn.setLayoutData(attackEventFilterBtnGrDt);
-        attackEventFilterBtn.setText("フィルター");
+        attackEventFilterBtn.setText(Messages.getString("main.attackevent.filter.button.title")); //$NON-NLS-1$
         attackEventFilterBtn.setToolTipText("攻撃イベントのフィルタリングを行います。");
         attackEventFilterBtn.addSelectionListener(new SelectionAdapter() {
             @Override

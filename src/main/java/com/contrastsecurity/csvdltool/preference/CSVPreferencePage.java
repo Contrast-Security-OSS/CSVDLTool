@@ -44,6 +44,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 
+import com.contrastsecurity.csvdltool.Messages;
+
 public class CSVPreferencePage extends PreferencePage {
 
     private Text vulCSVFileFmtTxt;
@@ -54,7 +56,7 @@ public class CSVPreferencePage extends PreferencePage {
     private Text libSleepTxt;
 
     public CSVPreferencePage() {
-        super("CSV出力設定");
+        super(Messages.getString("csvpreferencepage.title")); //$NON-NLS-1$
     }
 
     @Override
@@ -90,7 +92,7 @@ public class CSVPreferencePage extends PreferencePage {
         GridData vulCSVFileFmtGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
         // vulCSVFileFmtGrpGrDt.horizontalSpan = 2;
         vulCSVFileFmtGrp.setLayoutData(vulCSVFileFmtGrpGrDt);
-        vulCSVFileFmtGrp.setText("脆弱性");
+        vulCSVFileFmtGrp.setText(Messages.getString("csvpreferencepage.vulnerability.group.title")); //$NON-NLS-1$
 
         vulCSVFileFmtTxt = new Text(vulCSVFileFmtGrp, SWT.BORDER);
         vulCSVFileFmtTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -106,7 +108,7 @@ public class CSVPreferencePage extends PreferencePage {
         GridData libCSVFileFmtGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
         // libCSVFileFmtGrpGrDt.horizontalSpan = 2;
         libCSVFileFmtGrp.setLayoutData(libCSVFileFmtGrpGrDt);
-        libCSVFileFmtGrp.setText("ライブラリ");
+        libCSVFileFmtGrp.setText(Messages.getString("csvpreferencepage.libary.group.title")); //$NON-NLS-1$
 
         libCSVFileFmtTxt = new Text(libCSVFileFmtGrp, SWT.BORDER);
         libCSVFileFmtTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -122,7 +124,7 @@ public class CSVPreferencePage extends PreferencePage {
         GridData evtCSVFileFmtGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
         // evtCSVFileFmtGrpGrDt.horizontalSpan = 2;
         evtCSVFileFmtGrp.setLayoutData(evtCSVFileFmtGrpGrDt);
-        evtCSVFileFmtGrp.setText("攻撃イベント");
+        evtCSVFileFmtGrp.setText(Messages.getString("csvpreferencepage.attackevent.group.title")); //$NON-NLS-1$
 
         evtCSVFileFmtTxt = new Text(evtCSVFileFmtGrp, SWT.BORDER);
         evtCSVFileFmtTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -138,7 +140,7 @@ public class CSVPreferencePage extends PreferencePage {
         GridData svrCSVFileFmtGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
         // svrCSVFileFmtGrpGrDt.horizontalSpan = 2;
         svrCSVFileFmtGrp.setLayoutData(svrCSVFileFmtGrpGrDt);
-        svrCSVFileFmtGrp.setText("サーバ");
+        svrCSVFileFmtGrp.setText(Messages.getString("csvpreferencepage.server.group.title")); //$NON-NLS-1$
 
         svrCSVFileFmtTxt = new Text(svrCSVFileFmtGrp, SWT.BORDER);
         svrCSVFileFmtTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -197,7 +199,7 @@ public class CSVPreferencePage extends PreferencePage {
         GridData defaultBtnGrDt = new GridData(SWT.RIGHT, SWT.BOTTOM, true, true, 1, 1);
         defaultBtnGrDt.widthHint = 100;
         defaultBtn.setLayoutData(defaultBtnGrDt);
-        defaultBtn.setText("デフォルトに戻す");
+        defaultBtn.setText(Messages.getString("csvpreferencepage.restoredefaults.button.title")); //$NON-NLS-1$
         defaultBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -214,7 +216,7 @@ public class CSVPreferencePage extends PreferencePage {
         GridData applyBtnGrDt = new GridData(SWT.RIGHT, SWT.BOTTOM, true, true, 1, 1);
         applyBtnGrDt.widthHint = 90;
         applyBtn.setLayoutData(applyBtnGrDt);
-        applyBtn.setText("適用");
+        applyBtn.setText(Messages.getString("csvpreferencepage.apply.button.title")); //$NON-NLS-1$
         applyBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -254,7 +256,7 @@ public class CSVPreferencePage extends PreferencePage {
         ps.setValue(PreferenceConstants.CSV_FILE_FORMAT_ATTACKEVENT, this.evtCSVFileFmtTxt.getText());
         ps.setValue(PreferenceConstants.CSV_FILE_FORMAT_SERVER, this.svrCSVFileFmtTxt.getText());
         if (!errors.isEmpty()) {
-            MessageDialog.openError(getShell(), "その他設定", String.join("\r\n", errors));
+            MessageDialog.openError(getShell(), Messages.getString("csvpreferencepage.dialog.title"), String.join("\r\n", errors)); //$NON-NLS-1$ //$NON-NLS-2$
             return false;
         }
         return true;

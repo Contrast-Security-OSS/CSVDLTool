@@ -99,13 +99,13 @@ public class VulCSVColumnPreferencePage extends PreferencePage {
         GridData csvGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
         // csvGrpGrDt.horizontalSpan = 2;
         csvColumnGrp.setLayoutData(csvGrpGrDt);
-        csvColumnGrp.setText("CSV出力内容の設定");
+        csvColumnGrp.setText(Messages.getString("vulcsvcolumnpreferencepage.output.settings.group.title")); //$NON-NLS-1$
 
         outCsvHeaderFlg = new Button(csvColumnGrp, SWT.CHECK);
         GridData outCsvHeaderFlgGrDt = new GridData(GridData.FILL_HORIZONTAL);
         outCsvHeaderFlgGrDt.horizontalSpan = 3;
         outCsvHeaderFlg.setLayoutData(outCsvHeaderFlgGrDt);
-        outCsvHeaderFlg.setText("カラムヘッダ（項目名）を出力");
+        outCsvHeaderFlg.setText(Messages.getString("vulcsvcolumnpreferencepage.column.header.print.checkbox.label")); //$NON-NLS-1$
         if (ps.getBoolean(PreferenceConstants.CSV_OUT_HEADER_VUL)) {
             outCsvHeaderFlg.setSelection(true);
         }

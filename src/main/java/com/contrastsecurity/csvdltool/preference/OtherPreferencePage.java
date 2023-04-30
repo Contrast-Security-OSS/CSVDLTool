@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
@@ -52,8 +53,13 @@ public class OtherPreferencePage extends PreferencePage {
     private Text dayTimeTxt;
     private Text nightTimeTxt;
     Pattern ptn = Pattern.compile("^[0-9]{4}-[0-9]{4}$"); //$NON-NLS-1$
-    private static String[] WEEKDAYS = { Messages.getString("otherpreferencepage.first.day.of.week.group.sunday"), Messages.getString("otherpreferencepage.first.day.of.week.group.monday"), Messages.getString("otherpreferencepage.first.day.of.week.group.tuesday"), Messages.getString("otherpreferencepage.first.day.of.week.group.wednesday"), Messages.getString("otherpreferencepage.first.day.of.week.group.thursday"), Messages.getString("otherpreferencepage.first.day.of.week.group.friday"), Messages.getString("otherpreferencepage.first.day.of.week.group.saturday") }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
+    private static String[] WEEKDAYS = { Messages.getString("otherpreferencepage.first.day.of.week.group.sunday"), //$NON-NLS-1$
+            Messages.getString("otherpreferencepage.first.day.of.week.group.monday"), Messages.getString("otherpreferencepage.first.day.of.week.group.tuesday"), //$NON-NLS-1$ //$NON-NLS-2$
+            Messages.getString("otherpreferencepage.first.day.of.week.group.wednesday"), Messages.getString("otherpreferencepage.first.day.of.week.group.thursday"), //$NON-NLS-1$ //$NON-NLS-2$
+            Messages.getString("otherpreferencepage.first.day.of.week.group.friday"), Messages.getString("otherpreferencepage.first.day.of.week.group.saturday") }; //$NON-NLS-1$ //$NON-NLS-2$
     private List<Button> weekDayBtns = new ArrayList<Button>();
+    private Text vulSleepTxt;
+    private Text libSleepTxt;
 
     public OtherPreferencePage() {
         super(Messages.getString("otherpreferencepage.title")); //$NON-NLS-1$
@@ -133,6 +139,38 @@ public class OtherPreferencePage extends PreferencePage {
             weekDayIdx++;
         }
 
+        Group ctrlGrp = new Group(composite, SWT.NONE);
+        GridLayout proxyGrpLt = new GridLayout(2, false);
+        proxyGrpLt.marginWidth = 15;
+        proxyGrpLt.horizontalSpacing = 10;
+        ctrlGrp.setLayout(proxyGrpLt);
+        GridData proxyGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        // proxyGrpGrDt.horizontalSpan = 4;
+        ctrlGrp.setLayoutData(proxyGrpGrDt);
+        ctrlGrp.setText("スリープ制御");
+
+        // ========== 脆弱性取得ごとスリープ ========== //
+        new Label(ctrlGrp, SWT.LEFT).setText("脆弱性取得間隔スリープ（ミリ秒）：");
+        vulSleepTxt = new Text(ctrlGrp, SWT.BORDER);
+        vulSleepTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        vulSleepTxt.setText(ps.getString(PreferenceConstants.SLEEP_VUL));
+        vulSleepTxt.addListener(SWT.FocusIn, new Listener() {
+            public void handleEvent(Event e) {
+                vulSleepTxt.selectAll();
+            }
+        });
+
+        // ========== ライブラリ取得ごとスリープ ========== //
+        new Label(ctrlGrp, SWT.LEFT).setText("ライブラリ取得間隔スリープ（ミリ秒）：");
+        libSleepTxt = new Text(ctrlGrp, SWT.BORDER);
+        libSleepTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        libSleepTxt.setText(ps.getString(PreferenceConstants.SLEEP_LIB));
+        libSleepTxt.addListener(SWT.FocusIn, new Listener() {
+            public void handleEvent(Event e) {
+                libSleepTxt.selectAll();
+            }
+        });
+
         Composite buttonGrp = new Composite(parent, SWT.NONE);
         GridLayout buttonGrpLt = new GridLayout(2, false);
         buttonGrpLt.marginHeight = 15;
@@ -156,6 +194,8 @@ public class OtherPreferencePage extends PreferencePage {
                 }
                 Button btn = weekDayBtns.get(ps.getDefaultInt(PreferenceConstants.ATTACK_START_WEEKDAY));
                 btn.setSelection(true);
+                vulSleepTxt.setText(ps.getDefaultString(PreferenceConstants.SLEEP_VUL));
+                libSleepTxt.setText(ps.getDefaultString(PreferenceConstants.SLEEP_LIB));
             }
         });
 
@@ -196,6 +236,20 @@ public class OtherPreferencePage extends PreferencePage {
                 errors.add("・夜間時間帯はHHmm-HHmm形式で指定してください。");
             }
         }
+        if (this.vulSleepTxt.getText().isEmpty()) {
+            errors.add("・脆弱性取得間隔スリープを指定してください。");
+        } else {
+            if (!StringUtils.isNumeric(this.vulSleepTxt.getText())) {
+                errors.add("・脆弱性取得間隔スリープは数値を指定してください。");
+            }
+        }
+        if (this.libSleepTxt.getText().isEmpty()) {
+            errors.add("・ライブラリ取得間隔スリープを指定してください。");
+        } else {
+            if (!StringUtils.isNumeric(this.libSleepTxt.getText())) {
+                errors.add("・ライブラリ取得間隔スリープは数値を指定してください。");
+            }
+        }
 
         if (!errors.isEmpty()) {
             MessageDialog.openError(getShell(), Messages.getString("otherpreferencepage.title"), String.join("\r\n", errors)); //$NON-NLS-1$ //$NON-NLS-2$
@@ -211,6 +265,8 @@ public class OtherPreferencePage extends PreferencePage {
                 weekDaySelection++;
             }
             ps.setValue(PreferenceConstants.ATTACK_START_WEEKDAY, weekDaySelection);
+            ps.setValue(PreferenceConstants.SLEEP_VUL, this.vulSleepTxt.getText());
+            ps.setValue(PreferenceConstants.SLEEP_LIB, this.libSleepTxt.getText());
         }
         return true;
     }

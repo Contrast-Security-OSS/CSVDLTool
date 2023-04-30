@@ -26,7 +26,6 @@ package com.contrastsecurity.csvdltool.preference;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
@@ -38,10 +37,8 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 
 import com.contrastsecurity.csvdltool.Messages;
@@ -52,8 +49,6 @@ public class CSVPreferencePage extends PreferencePage {
     private Text libCSVFileFmtTxt;
     private Text evtCSVFileFmtTxt;
     private Text svrCSVFileFmtTxt;
-    private Text vulSleepTxt;
-    private Text libSleepTxt;
 
     public CSVPreferencePage() {
         super(Messages.getString("csvpreferencepage.title")); //$NON-NLS-1$
@@ -152,38 +147,6 @@ public class CSVPreferencePage extends PreferencePage {
         csvFileFormatHint.setLayoutData(csvFileFormatHintGrDt);
         csvFileFormatHint.setText("※ java.text.SimpleDateFormatの書式としてください。\r\n例) 'vul_'yyyy-MM-dd_HHmmss、'lib_'yyyy-MM-dd_HHmmss");
 
-        Group ctrlGrp = new Group(composite, SWT.NONE);
-        GridLayout proxyGrpLt = new GridLayout(2, false);
-        proxyGrpLt.marginWidth = 15;
-        proxyGrpLt.horizontalSpacing = 10;
-        ctrlGrp.setLayout(proxyGrpLt);
-        GridData proxyGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
-        // proxyGrpGrDt.horizontalSpan = 4;
-        ctrlGrp.setLayoutData(proxyGrpGrDt);
-        ctrlGrp.setText("スリープ制御");
-
-        // ========== 脆弱性取得ごとスリープ ========== //
-        new Label(ctrlGrp, SWT.LEFT).setText("脆弱性取得間隔スリープ（ミリ秒）：");
-        vulSleepTxt = new Text(ctrlGrp, SWT.BORDER);
-        vulSleepTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        vulSleepTxt.setText(ps.getString(PreferenceConstants.SLEEP_VUL));
-        vulSleepTxt.addListener(SWT.FocusIn, new Listener() {
-            public void handleEvent(Event e) {
-                vulSleepTxt.selectAll();
-            }
-        });
-
-        // ========== ライブラリ取得ごとスリープ ========== //
-        new Label(ctrlGrp, SWT.LEFT).setText("ライブラリ取得間隔スリープ（ミリ秒）：");
-        libSleepTxt = new Text(ctrlGrp, SWT.BORDER);
-        libSleepTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        libSleepTxt.setText(ps.getString(PreferenceConstants.SLEEP_LIB));
-        libSleepTxt.addListener(SWT.FocusIn, new Listener() {
-            public void handleEvent(Event e) {
-                libSleepTxt.selectAll();
-            }
-        });
-
         Composite buttonGrp = new Composite(parent, SWT.NONE);
         GridLayout buttonGrpLt = new GridLayout(2, false);
         buttonGrpLt.marginHeight = 15;
@@ -207,8 +170,6 @@ public class CSVPreferencePage extends PreferencePage {
                 libCSVFileFmtTxt.setText(ps.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT_LIB));
                 evtCSVFileFmtTxt.setText(ps.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT_ATTACKEVENT));
                 svrCSVFileFmtTxt.setText(ps.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT_SERVER));
-                vulSleepTxt.setText(ps.getDefaultString(PreferenceConstants.SLEEP_VUL));
-                libSleepTxt.setText(ps.getDefaultString(PreferenceConstants.SLEEP_LIB));
             }
         });
 
@@ -235,29 +196,14 @@ public class CSVPreferencePage extends PreferencePage {
             return true;
         }
         List<String> errors = new ArrayList<String>();
-        if (this.vulSleepTxt.getText().isEmpty()) {
-            errors.add("・脆弱性取得間隔スリープを指定してください。");
-        } else {
-            if (!StringUtils.isNumeric(this.vulSleepTxt.getText())) {
-                errors.add("・脆弱性取得間隔スリープは数値を指定してください。");
-            }
-        }
-        if (this.libSleepTxt.getText().isEmpty()) {
-            errors.add("・ライブラリ取得間隔スリープを指定してください。");
-        } else {
-            if (!StringUtils.isNumeric(this.libSleepTxt.getText())) {
-                errors.add("・ライブラリ取得間隔スリープは数値を指定してください。");
-            }
-        }
-        ps.setValue(PreferenceConstants.SLEEP_VUL, this.vulSleepTxt.getText());
-        ps.setValue(PreferenceConstants.SLEEP_LIB, this.libSleepTxt.getText());
-        ps.setValue(PreferenceConstants.CSV_FILE_FORMAT_VUL, this.vulCSVFileFmtTxt.getText());
-        ps.setValue(PreferenceConstants.CSV_FILE_FORMAT_LIB, this.libCSVFileFmtTxt.getText());
-        ps.setValue(PreferenceConstants.CSV_FILE_FORMAT_ATTACKEVENT, this.evtCSVFileFmtTxt.getText());
-        ps.setValue(PreferenceConstants.CSV_FILE_FORMAT_SERVER, this.svrCSVFileFmtTxt.getText());
         if (!errors.isEmpty()) {
             MessageDialog.openError(getShell(), Messages.getString("csvpreferencepage.dialog.title"), String.join("\r\n", errors)); //$NON-NLS-1$ //$NON-NLS-2$
             return false;
+        } else {
+            ps.setValue(PreferenceConstants.CSV_FILE_FORMAT_VUL, this.vulCSVFileFmtTxt.getText());
+            ps.setValue(PreferenceConstants.CSV_FILE_FORMAT_LIB, this.libCSVFileFmtTxt.getText());
+            ps.setValue(PreferenceConstants.CSV_FILE_FORMAT_ATTACKEVENT, this.evtCSVFileFmtTxt.getText());
+            ps.setValue(PreferenceConstants.CSV_FILE_FORMAT_SERVER, this.svrCSVFileFmtTxt.getText());
         }
         return true;
     }

@@ -848,7 +848,7 @@ public class Main implements PropertyChangeListener {
 
         new Label(vulFilterGrp, SWT.LEFT).setText(Messages.getString("main.vul.filter.condition.severity.label.title")); //$NON-NLS-1$
         vulSeverityFilterTxt = new Text(vulFilterGrp, SWT.BORDER);
-        vulSeverityFilterTxt.setText("アプリケーション一覧を読み込んでください。");
+        vulSeverityFilterTxt.setText(Messages.getString("main.load.application.message")); //$NON-NLS-1$
         vulSeverityFilterTxt.setEditable(false);
         vulSeverityFilterTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         vulSeverityFilterTxt.addListener(SWT.MouseUp, new Listener() {
@@ -880,7 +880,7 @@ public class Main implements PropertyChangeListener {
 
         new Label(vulFilterGrp, SWT.LEFT).setText(Messages.getString("main.vul.filter.condition.vulntype.label.title")); //$NON-NLS-1$
         vulVulnTypeFilterTxt = new Text(vulFilterGrp, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL);
-        vulVulnTypeFilterTxt.setText("アプリケーション一覧を読み込んでください。");
+        vulVulnTypeFilterTxt.setText(Messages.getString("main.load.application.message")); //$NON-NLS-1$
         vulVulnTypeFilterTxt.setEditable(false);
         GridData vulVulnTypeFilterTxtGrDt = new GridData(GridData.FILL_HORIZONTAL);
         vulVulnTypeFilterTxtGrDt.heightHint = 2 * vulVulnTypeFilterTxt.getLineHeight();

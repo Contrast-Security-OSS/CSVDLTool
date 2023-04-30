@@ -76,7 +76,7 @@ public class CSVPreferencePage extends PreferencePage {
         GridData csvFileFmtGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
         // csvFileFmtGrpGrDt.horizontalSpan = 2;
         csvFileFmtGrp.setLayoutData(csvFileFmtGrpGrDt);
-        csvFileFmtGrp.setText("CSV出力ファイルフォーマット（フォルダ名にも適用されます）");
+        csvFileFmtGrp.setText(Messages.getString("csvpreferencepage.csv.file.format.group.title")); //$NON-NLS-1$
 
         Group vulCSVFileFmtGrp = new Group(csvFileFmtGrp, SWT.NONE);
         GridLayout vulCSVFileFmtGrpLt = new GridLayout(1, false);
@@ -145,7 +145,7 @@ public class CSVPreferencePage extends PreferencePage {
         Label csvFileFormatHint = new Label(csvFileFmtGrp, SWT.LEFT);
         GridData csvFileFormatHintGrDt = new GridData(GridData.FILL_HORIZONTAL);
         csvFileFormatHint.setLayoutData(csvFileFormatHintGrDt);
-        csvFileFormatHint.setText("※ java.text.SimpleDateFormatの書式としてください。\r\n例) 'vul_'yyyy-MM-dd_HHmmss、'lib_'yyyy-MM-dd_HHmmss");
+        csvFileFormatHint.setText(Messages.getString("csvpreferencepage.csv.file.format.desc")); //$NON-NLS-1$
 
         Composite buttonGrp = new Composite(parent, SWT.NONE);
         GridLayout buttonGrpLt = new GridLayout(2, false);

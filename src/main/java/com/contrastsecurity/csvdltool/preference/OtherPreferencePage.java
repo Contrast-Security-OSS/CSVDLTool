@@ -87,7 +87,7 @@ public class OtherPreferencePage extends PreferencePage {
         protectGrp.setText(Messages.getString("otherpreferencepage.protect.group.title")); //$NON-NLS-1$
 
         // ========== 日中時間帯 ========== //
-        new Label(protectGrp, SWT.LEFT).setText("日中時間帯：");
+        new Label(protectGrp, SWT.LEFT).setText(Messages.getString("otherpreferencepage.daytime.label")); //$NON-NLS-1$
         dayTimeTxt = new Text(protectGrp, SWT.BORDER);
         dayTimeTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         dayTimeTxt.setText(ps.getString(PreferenceConstants.ATTACK_RANGE_DAYTIME));
@@ -98,7 +98,7 @@ public class OtherPreferencePage extends PreferencePage {
             }
         });
         // ========== 夜間時間帯 ========== //
-        new Label(protectGrp, SWT.LEFT).setText("夜間時間帯：");
+        new Label(protectGrp, SWT.LEFT).setText(Messages.getString("otherpreferencepage.nighttime.label")); //$NON-NLS-1$
         nightTimeTxt = new Text(protectGrp, SWT.BORDER);
         nightTimeTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         nightTimeTxt.setText(ps.getString(PreferenceConstants.ATTACK_RANGE_NIGHTTIME));
@@ -111,7 +111,7 @@ public class OtherPreferencePage extends PreferencePage {
 
         Label descLabel = new Label(protectGrp, SWT.LEFT);
         List<String> descLabelList = new ArrayList<String>();
-        descLabelList.add("・ HHmm-HHmm 形式で指定してください。");
+        descLabelList.add(Messages.getString("otherpreferencepage.time.slot.desc.format.label")); //$NON-NLS-1$
         descLabelList.add("・ 日中時間帯、夜間時間帯のどちらにも含まれない時間帯は「その他時間帯」としてフィルタに表示されます。");
         descLabel.setText(String.join("\r\n", descLabelList)); //$NON-NLS-1$
         GridData descLabelGrDt = new GridData(GridData.FILL_HORIZONTAL);
@@ -147,10 +147,10 @@ public class OtherPreferencePage extends PreferencePage {
         GridData proxyGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
         // proxyGrpGrDt.horizontalSpan = 4;
         ctrlGrp.setLayoutData(proxyGrpGrDt);
-        ctrlGrp.setText("スリープ制御");
+        ctrlGrp.setText(Messages.getString("otherpreferencepage.interval.group.title")); //$NON-NLS-1$
 
         // ========== 脆弱性取得ごとスリープ ========== //
-        new Label(ctrlGrp, SWT.LEFT).setText("脆弱性取得間隔スリープ（ミリ秒）：");
+        new Label(ctrlGrp, SWT.LEFT).setText(Messages.getString("otherpreferencepage.interval.vulnerability.label")); //$NON-NLS-1$
         vulSleepTxt = new Text(ctrlGrp, SWT.BORDER);
         vulSleepTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         vulSleepTxt.setText(ps.getString(PreferenceConstants.SLEEP_VUL));
@@ -161,7 +161,7 @@ public class OtherPreferencePage extends PreferencePage {
         });
 
         // ========== ライブラリ取得ごとスリープ ========== //
-        new Label(ctrlGrp, SWT.LEFT).setText("ライブラリ取得間隔スリープ（ミリ秒）：");
+        new Label(ctrlGrp, SWT.LEFT).setText(Messages.getString("otherpreferencepage.interval.library.label")); //$NON-NLS-1$
         libSleepTxt = new Text(ctrlGrp, SWT.BORDER);
         libSleepTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         libSleepTxt.setText(ps.getString(PreferenceConstants.SLEEP_LIB));

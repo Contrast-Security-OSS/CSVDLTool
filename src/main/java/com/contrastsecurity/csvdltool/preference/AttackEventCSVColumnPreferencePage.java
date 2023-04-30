@@ -57,6 +57,7 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
 import com.contrastsecurity.csvdltool.AttackEventCSVColmunEnum;
+import com.contrastsecurity.csvdltool.Messages;
 import com.contrastsecurity.csvdltool.model.AttackEventCSVColumn;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -71,7 +72,7 @@ public class AttackEventCSVColumnPreferencePage extends PreferencePage {
     private Table table;
 
     public AttackEventCSVColumnPreferencePage() {
-        super("攻撃イベントの出力項目");
+        super(Messages.getString("attackeventcsvcolumnpreferencepage.title")); //$NON-NLS-1$
     }
 
     @Override
@@ -96,13 +97,13 @@ public class AttackEventCSVColumnPreferencePage extends PreferencePage {
         GridData csvGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
         // csvGrpGrDt.horizontalSpan = 2;
         csvColumnGrp.setLayoutData(csvGrpGrDt);
-        csvColumnGrp.setText("CSV出力内容の設定");
+        csvColumnGrp.setText(Messages.getString("attackeventcsvcolumnpreferencepage.output.settings.group.title")); //$NON-NLS-1$
 
         outCsvHeaderFlg = new Button(csvColumnGrp, SWT.CHECK);
         GridData outCsvHeaderFlgGrDt = new GridData(GridData.FILL_HORIZONTAL);
         outCsvHeaderFlgGrDt.horizontalSpan = 3;
         outCsvHeaderFlg.setLayoutData(outCsvHeaderFlgGrDt);
-        outCsvHeaderFlg.setText("カラムヘッダ（項目名）を出力");
+        outCsvHeaderFlg.setText(Messages.getString("attackeventcsvcolumnpreferencepage.column.header.print.checkbox.label")); //$NON-NLS-1$
         if (ps.getBoolean(PreferenceConstants.CSV_OUT_HEADER_ATTACKEVENT)) {
             outCsvHeaderFlg.setSelection(true);
         }
@@ -163,16 +164,16 @@ public class AttackEventCSVColumnPreferencePage extends PreferencePage {
         column0.setResizable(false);
         TableColumn column1 = new TableColumn(table, SWT.CENTER);
         column1.setWidth(50);
-        column1.setText("出力");
+        column1.setText(Messages.getString("attackeventcsvcolumnpreferencepage.table.column0.title")); //$NON-NLS-1$
         TableColumn column2 = new TableColumn(table, SWT.LEFT);
         column2.setWidth(200);
-        column2.setText("項目名");
+        column2.setText(Messages.getString("attackeventcsvcolumnpreferencepage.table.column1.title")); //$NON-NLS-1$
         TableColumn column3 = new TableColumn(table, SWT.CENTER);
         column3.setWidth(75);
-        column3.setText("区切り文字");
+        column3.setText(Messages.getString("attackeventcsvcolumnpreferencepage.table.column2.title")); //$NON-NLS-1$
         TableColumn column4 = new TableColumn(table, SWT.LEFT);
         column4.setWidth(350);
-        column4.setText("備考");
+        column4.setText(Messages.getString("attackeventcsvcolumnpreferencepage.table.column3.title")); //$NON-NLS-1$
 
         for (AttackEventCSVColumn col : columnList) {
             this.addColToTable(col, -1);
@@ -249,7 +250,7 @@ public class AttackEventCSVColumnPreferencePage extends PreferencePage {
 
         final Button allOnBtn = new Button(chkButtonGrp, SWT.NULL);
         allOnBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        allOnBtn.setText("すべてオン");
+        allOnBtn.setText(Messages.getString("attackeventcsvcolumnpreferencepage.all.on.button.title")); //$NON-NLS-1$
         allOnBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -264,7 +265,7 @@ public class AttackEventCSVColumnPreferencePage extends PreferencePage {
 
         final Button allOffBtn = new Button(chkButtonGrp, SWT.NULL);
         allOffBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        allOffBtn.setText("すべてオフ");
+        allOffBtn.setText(Messages.getString("attackeventcsvcolumnpreferencepage.all.off.button.title")); //$NON-NLS-1$
         allOffBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -298,7 +299,7 @@ public class AttackEventCSVColumnPreferencePage extends PreferencePage {
         GridData defaultBtnGrDt = new GridData(SWT.RIGHT, SWT.BOTTOM, true, true, 1, 1);
         defaultBtnGrDt.widthHint = 100;
         defaultBtn.setLayoutData(defaultBtnGrDt);
-        defaultBtn.setText("デフォルトに戻す");
+        defaultBtn.setText(Messages.getString("attackeventcsvcolumnpreferencepage.restoredefaults.button.title")); //$NON-NLS-1$
         defaultBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -327,7 +328,7 @@ public class AttackEventCSVColumnPreferencePage extends PreferencePage {
         GridData applyBtnGrDt = new GridData(SWT.RIGHT, SWT.BOTTOM, true, true, 1, 1);
         applyBtnGrDt.widthHint = 90;
         applyBtn.setLayoutData(applyBtnGrDt);
-        applyBtn.setText("適用");
+        applyBtn.setText(Messages.getString("attackeventcsvcolumnpreferencepage.apply.button.title")); //$NON-NLS-1$
         applyBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -349,7 +350,7 @@ public class AttackEventCSVColumnPreferencePage extends PreferencePage {
         ps.setValue(PreferenceConstants.CSV_OUT_HEADER_ATTACKEVENT, this.outCsvHeaderFlg.getSelection());
         ps.setValue(PreferenceConstants.CSV_COLUMN_ATTACKEVENT, new Gson().toJson(this.columnList));
         if (!errors.isEmpty()) {
-            MessageDialog.openError(getShell(), "攻撃イベントの出力設定", String.join("\r\n", errors));
+            MessageDialog.openError(getShell(), Messages.getString("attackeventcsvcolumnpreferencepage.dialog.title"), String.join("\r\n", errors)); //$NON-NLS-1$ //$NON-NLS-2$
             return false;
         }
         return true;
@@ -408,7 +409,7 @@ public class AttackEventCSVColumnPreferencePage extends PreferencePage {
             editor2.setEditor(text, item, 3);
             separateTextList.add(text);
         } else {
-            item.setText(3, "");
+            item.setText(3, ""); //$NON-NLS-1$
             separateTextList.add(new Text(table, SWT.NONE));
         }
         item.setText(4, col.getColumn().getRemarks());

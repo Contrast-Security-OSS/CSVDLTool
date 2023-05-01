@@ -505,7 +505,7 @@ public class Main implements PropertyChangeListener {
         appLoadBtnGrDt.horizontalSpan = 3;
         appLoadBtn.setLayoutData(appLoadBtnGrDt);
         appLoadBtn.setText(Messages.getString("main.application.load.button.title")); //$NON-NLS-1$
-        appLoadBtn.setToolTipText("TeamServerにオンボードされているアプリケーションを読み込みます。");
+        appLoadBtn.setToolTipText(Messages.getString("main.application.load.button.tooltip")); //$NON-NLS-1$
         appLoadBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -946,8 +946,8 @@ public class Main implements PropertyChangeListener {
         GridData executeBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
         executeBtnGrDt.heightHint = 50;
         vulExecuteBtn.setLayoutData(executeBtnGrDt);
-        vulExecuteBtn.setText(Messages.getString("main.vul.export")); //$NON-NLS-1$
-        vulExecuteBtn.setToolTipText("脆弱性情報を取得し、CSV形式で出力します。");
+        vulExecuteBtn.setText(Messages.getString("main.vul.export.button.title")); //$NON-NLS-1$
+        vulExecuteBtn.setToolTipText(Messages.getString("main.vul.export.button.tooltip")); //$NON-NLS-1$
         vulExecuteBtn.setFont(new Font(display, "ＭＳ ゴシック", 20, SWT.NORMAL));
         vulExecuteBtn.addSelectionListener(new SelectionAdapter() {
             @Override

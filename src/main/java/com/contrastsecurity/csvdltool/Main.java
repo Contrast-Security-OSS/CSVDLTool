@@ -1664,12 +1664,12 @@ public class Main implements PropertyChangeListener {
                 if (!dayTimeHours.isEmpty() || !nightTimeHours.isEmpty()) {
                     Set<Filter> businessHoursFilterSet = new LinkedHashSet<Filter>();
                     if (!dayTimeHours.isEmpty()) {
-                        businessHoursFilterSet.add(new Filter("日中時間帯"));
+                        businessHoursFilterSet.add(new Filter(Messages.getString("main.attackevent.filter.time.slot.daytime"))); //$NON-NLS-1$
                     }
                     if (!nightTimeHours.isEmpty()) {
-                        businessHoursFilterSet.add(new Filter("夜間時間帯"));
+                        businessHoursFilterSet.add(new Filter(Messages.getString("main.attackevent.filter.time.slot.nighttime"))); //$NON-NLS-1$
                     }
-                    businessHoursFilterSet.add(new Filter("その他時間帯"));
+                    businessHoursFilterSet.add(new Filter(Messages.getString("main.attackevent.filter.time.slot.othertime"))); //$NON-NLS-1$
                     protectFilterMap.put(FilterEnum.BUSINESS_HOURS, businessHoursFilterSet);
                 }
                 AttackEventFilterDialog filterDialog = new AttackEventFilterDialog(shell, protectFilterMap);
@@ -2349,7 +2349,7 @@ public class Main implements PropertyChangeListener {
                         if (filter.isValid()) {
                             continue;
                         }
-                        if (filter.getLabel().equals("日中時間帯")) {
+                        if (filter.getLabel().equals(Messages.getString("main.attackevent.filter.time.slot.daytime"))) { //$NON-NLS-1$
                             if (!termDayTime.isEmpty()) {
                                 String frDtStr = termDayTime.split("-")[0]; //$NON-NLS-1$
                                 String toDtStr = termDayTime.split("-")[1]; //$NON-NLS-1$
@@ -2366,7 +2366,7 @@ public class Main implements PropertyChangeListener {
                                 }
                             }
                         }
-                        if (filter.getLabel().equals("夜間時間帯")) {
+                        if (filter.getLabel().equals(Messages.getString("main.attackevent.filter.time.slot.nighttime"))) { //$NON-NLS-1$
                             if (!termNightTime.isEmpty()) {
                                 String frNtStr = termNightTime.split("-")[0]; //$NON-NLS-1$
                                 String toNtStr = termNightTime.split("-")[1]; //$NON-NLS-1$
@@ -2383,7 +2383,7 @@ public class Main implements PropertyChangeListener {
                                 }
                             }
                         }
-                        if (filter.getLabel().equals("その他時間帯")) {
+                        if (filter.getLabel().equals(Messages.getString("main.attackevent.filter.time.slot.othertime"))) { //$NON-NLS-1$
                             boolean hitFlg = false;
                             if (!termDayTime.isEmpty()) {
                                 String frDtStr = termDayTime.split("-")[0]; //$NON-NLS-1$

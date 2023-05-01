@@ -112,7 +112,7 @@ public class OtherPreferencePage extends PreferencePage {
         Label descLabel = new Label(protectGrp, SWT.LEFT);
         List<String> descLabelList = new ArrayList<String>();
         descLabelList.add(Messages.getString("otherpreferencepage.time.slot.desc.format.label")); //$NON-NLS-1$
-        descLabelList.add("・ 日中時間帯、夜間時間帯のどちらにも含まれない時間帯は「その他時間帯」としてフィルタに表示されます。");
+        descLabelList.add(Messages.getString("otherpreferencepage.time.slot.desc.hint")); //$NON-NLS-1$
         descLabel.setText(String.join("\r\n", descLabelList)); //$NON-NLS-1$
         GridData descLabelGrDt = new GridData(GridData.FILL_HORIZONTAL);
         descLabelGrDt.horizontalSpan = 3;
@@ -226,14 +226,14 @@ public class OtherPreferencePage extends PreferencePage {
         if (!this.dayTimeTxt.getText().isEmpty()) {
             Matcher m = ptn.matcher(this.dayTimeTxt.getText());
             if (!m.matches()) {
-                errors.add("・日中時間帯はHHmm-HHmm形式で指定してください。");
+                errors.add(Messages.getString("otherpreferencepage.daytime.format.error.message")); //$NON-NLS-1$
             }
         }
 
         if (!this.nightTimeTxt.getText().isEmpty()) {
             Matcher m = ptn.matcher(this.nightTimeTxt.getText());
             if (!m.matches()) {
-                errors.add("・夜間時間帯はHHmm-HHmm形式で指定してください。");
+                errors.add(Messages.getString("otherpreferencepage.nighttime.format.error.message")); //$NON-NLS-1$
             }
         }
         if (this.vulSleepTxt.getText().isEmpty()) {

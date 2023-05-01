@@ -525,19 +525,19 @@ public class Main implements PropertyChangeListener {
                     // }
                     String errorMsg = e.getTargetException().getMessage();
                     if (e.getTargetException() instanceof ApiException) {
-                        MessageDialog.openError(shell, "アプリケーション一覧の取得", String.format("TeamServerからエラーが返されました。\r\n%s", errorMsg));
+                        MessageDialog.openError(shell, Messages.getString("main.main.application.load.message.dialog.title"), String.format("TeamServerからエラーが返されました。\r\n%s", errorMsg)); //$NON-NLS-1$
                     } else if (e.getTargetException() instanceof NonApiException) {
                         logger.error(trace);
-                        MessageDialog.openError(shell, "アプリケーション一覧の取得", String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", errorMsg));
+                        MessageDialog.openError(shell, Messages.getString("main.main.application.load.message.dialog.title"), String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", errorMsg)); //$NON-NLS-1$
                     } else if (e.getTargetException() instanceof TsvException) {
-                        MessageDialog.openError(shell, "アプリケーション一覧の取得", errorMsg);
+                        MessageDialog.openError(shell, Messages.getString("main.main.application.load.message.dialog.title"), errorMsg); //$NON-NLS-1$
                         return;
                     } else if (e.getTargetException() instanceof BasicAuthException) {
-                        MessageDialog.openError(shell, "アプリケーション一覧の取得", errorMsg);
+                        MessageDialog.openError(shell, Messages.getString("main.main.application.load.message.dialog.title"), errorMsg); //$NON-NLS-1$
                         return;
                     } else {
                         logger.error(trace);
-                        MessageDialog.openError(shell, "アプリケーション一覧の取得", String.format("不明なエラーです。ログファイルをご確認ください。\r\n%s", errorMsg));
+                        MessageDialog.openError(shell, Messages.getString("main.main.application.load.message.dialog.title"), String.format("不明なエラーです。ログファイルをご確認ください。\r\n%s", errorMsg)); //$NON-NLS-1$
                     }
                     return;
                 } catch (InterruptedException e) {
@@ -552,7 +552,7 @@ public class Main implements PropertyChangeListener {
                     sj.add(String.format("　%s", userName)); //$NON-NLS-1$
                     sj.add("・Assessライセンスが付与されているアプリケーションがない。");
                     sj.add("・接続設定が正しくない。プロキシの設定がされていない。など");
-                    MessageDialog.openInformation(shell, "アプリケーション一覧の取得", sj.toString());
+                    MessageDialog.openInformation(shell, Messages.getString("main.main.application.load.message.dialog.title"), sj.toString()); //$NON-NLS-1$
                 }
                 for (String appLabel : fullAppMap.keySet()) {
                     srcList.add(appLabel); // UI list
@@ -1918,7 +1918,7 @@ public class Main implements PropertyChangeListener {
         settingBtn = new Button(bottomBtnGrp, SWT.PUSH);
         settingBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         settingBtn.setText(Messages.getString("main.settings.button.title")); //$NON-NLS-1$
-        settingBtn.setToolTipText("動作に必要な設定を行います。");
+        settingBtn.setToolTipText(Messages.getString("main.main.settings.button.tooltip")); //$NON-NLS-1$
         settingBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -2276,7 +2276,7 @@ public class Main implements PropertyChangeListener {
             text = String.join(", ", orgNameList); //$NON-NLS-1$
         }
         if (text == null || text.isEmpty()) {
-            this.shell.setText(String.format(WINDOW_TITLE, "組織未設定"));
+            this.shell.setText(String.format(WINDOW_TITLE, Messages.getString("main.window.title.organization.undefined"))); //$NON-NLS-1$
         } else {
             this.shell.setText(String.format(WINDOW_TITLE, text));
         }

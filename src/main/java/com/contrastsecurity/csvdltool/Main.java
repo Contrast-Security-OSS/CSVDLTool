@@ -953,7 +953,7 @@ public class Main implements PropertyChangeListener {
             @Override
             public void widgetSelected(SelectionEvent event) {
                 if (dstApps.isEmpty()) {
-                    MessageDialog.openInformation(shell, Messages.getString("main.vul.export.message.dialog.title"), "取得対象のアプリケーションを選択してください。"); //$NON-NLS-1$
+                    MessageDialog.openInformation(shell, Messages.getString("main.vul.export.message.dialog.title"), Messages.getString("main.vul.export.application.unselected.error.message")); //$NON-NLS-1$ //$NON-NLS-2$
                     return;
                 }
                 VulGetWithProgress progress = new VulGetWithProgress(shell, ps, dstApps, fullAppMap, assessFilterMap, frLastDetectedDate, toLastDetectedDate,

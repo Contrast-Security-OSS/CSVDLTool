@@ -525,19 +525,19 @@ public class Main implements PropertyChangeListener {
                     // }
                     String errorMsg = e.getTargetException().getMessage();
                     if (e.getTargetException() instanceof ApiException) {
-                        MessageDialog.openError(shell, Messages.getString("main.main.application.load.message.dialog.title"), String.format("TeamServerからエラーが返されました。\r\n%s", errorMsg)); //$NON-NLS-1$
+                        MessageDialog.openError(shell, Messages.getString("main.application.load.message.dialog.title"), String.format("TeamServerからエラーが返されました。\r\n%s", errorMsg)); //$NON-NLS-1$
                     } else if (e.getTargetException() instanceof NonApiException) {
                         logger.error(trace);
-                        MessageDialog.openError(shell, Messages.getString("main.main.application.load.message.dialog.title"), String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", errorMsg)); //$NON-NLS-1$
+                        MessageDialog.openError(shell, Messages.getString("main.application.load.message.dialog.title"), String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", errorMsg)); //$NON-NLS-1$
                     } else if (e.getTargetException() instanceof TsvException) {
-                        MessageDialog.openError(shell, Messages.getString("main.main.application.load.message.dialog.title"), errorMsg); //$NON-NLS-1$
+                        MessageDialog.openError(shell, Messages.getString("main.application.load.message.dialog.title"), errorMsg); //$NON-NLS-1$
                         return;
                     } else if (e.getTargetException() instanceof BasicAuthException) {
-                        MessageDialog.openError(shell, Messages.getString("main.main.application.load.message.dialog.title"), errorMsg); //$NON-NLS-1$
+                        MessageDialog.openError(shell, Messages.getString("main.application.load.message.dialog.title"), errorMsg); //$NON-NLS-1$
                         return;
                     } else {
                         logger.error(trace);
-                        MessageDialog.openError(shell, Messages.getString("main.main.application.load.message.dialog.title"), String.format("不明なエラーです。ログファイルをご確認ください。\r\n%s", errorMsg)); //$NON-NLS-1$
+                        MessageDialog.openError(shell, Messages.getString("main.application.load.message.dialog.title"), String.format("不明なエラーです。ログファイルをご確認ください。\r\n%s", errorMsg)); //$NON-NLS-1$
                     }
                     return;
                 } catch (InterruptedException e) {
@@ -552,7 +552,7 @@ public class Main implements PropertyChangeListener {
                     sj.add(String.format("　%s", userName)); //$NON-NLS-1$
                     sj.add("・Assessライセンスが付与されているアプリケーションがない。");
                     sj.add("・接続設定が正しくない。プロキシの設定がされていない。など");
-                    MessageDialog.openInformation(shell, Messages.getString("main.main.application.load.message.dialog.title"), sj.toString()); //$NON-NLS-1$
+                    MessageDialog.openInformation(shell, Messages.getString("main.application.load.message.dialog.title"), sj.toString()); //$NON-NLS-1$
                 }
                 for (String appLabel : fullAppMap.keySet()) {
                     srcList.add(appLabel); // UI list
@@ -953,7 +953,7 @@ public class Main implements PropertyChangeListener {
             @Override
             public void widgetSelected(SelectionEvent event) {
                 if (dstApps.isEmpty()) {
-                    MessageDialog.openInformation(shell, "脆弱性情報取得", "取得対象のアプリケーションを選択してください。");
+                    MessageDialog.openInformation(shell, Messages.getString("main.vul.export.message.dialog.title"), "取得対象のアプリケーションを選択してください。"); //$NON-NLS-1$
                     return;
                 }
                 VulGetWithProgress progress = new VulGetWithProgress(shell, ps, dstApps, fullAppMap, assessFilterMap, frLastDetectedDate, toLastDetectedDate,
@@ -971,21 +971,21 @@ public class Main implements PropertyChangeListener {
                     // }
                     String exceptionMsg = e.getTargetException().getMessage();
                     if (e.getTargetException() instanceof ApiException) {
-                        MessageDialog.openError(shell, "脆弱性情報の取得", String.format("TeamServerからエラーが返されました。\r\n%s", exceptionMsg));
+                        MessageDialog.openError(shell, Messages.getString("main.vul.export.message.dialog.title"), String.format("TeamServerからエラーが返されました。\r\n%s", exceptionMsg)); //$NON-NLS-1$
                     } else if (e.getTargetException() instanceof NonApiException) {
                         logger.error(trace);
-                        MessageDialog.openError(shell, "脆弱性情報の取得", String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", exceptionMsg));
+                        MessageDialog.openError(shell, Messages.getString("main.vul.export.message.dialog.title"), String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", exceptionMsg)); //$NON-NLS-1$
                     } else if (e.getTargetException() instanceof InterruptedException) {
                         MessageDialog.openInformation(shell, trace, exceptionMsg);
                     } else if (e.getTargetException() instanceof TsvException) {
-                        MessageDialog.openError(shell, "脆弱性情報の取得", exceptionMsg);
+                        MessageDialog.openError(shell, Messages.getString("main.vul.export.message.dialog.title"), exceptionMsg); //$NON-NLS-1$
                         return;
                     } else if (e.getTargetException() instanceof BasicAuthException) {
-                        MessageDialog.openError(shell, "脆弱性情報の取得", exceptionMsg);
+                        MessageDialog.openError(shell, Messages.getString("main.vul.export.message.dialog.title"), exceptionMsg); //$NON-NLS-1$
                         return;
                     } else {
                         logger.error(trace);
-                        MessageDialog.openError(shell, "脆弱性情報の取得", String.format("不明なエラーです。ログファイルをご確認ください。\r\n%s", exceptionMsg));
+                        MessageDialog.openError(shell, Messages.getString("main.vul.export.message.dialog.title"), String.format("不明なエラーです。ログファイルをご確認ください。\r\n%s", exceptionMsg)); //$NON-NLS-1$
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -1918,7 +1918,7 @@ public class Main implements PropertyChangeListener {
         settingBtn = new Button(bottomBtnGrp, SWT.PUSH);
         settingBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         settingBtn.setText(Messages.getString("main.settings.button.title")); //$NON-NLS-1$
-        settingBtn.setToolTipText(Messages.getString("main.main.settings.button.tooltip")); //$NON-NLS-1$
+        settingBtn.setToolTipText(Messages.getString("main.settings.button.tooltip")); //$NON-NLS-1$
         settingBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -1956,8 +1956,8 @@ public class Main implements PropertyChangeListener {
         if (this.authType == AuthType.PASSWORD) {
             this.logOutBtn = new Button(bottomBtnGrp, SWT.PUSH);
             this.logOutBtn.setLayoutData(new GridData());
-            this.logOutBtn.setText("ログアウト");
-            this.logOutBtn.setToolTipText("認証済みセッションからログアウトします。");
+            this.logOutBtn.setText(Messages.getString("main.logout.button.title")); //$NON-NLS-1$
+            this.logOutBtn.setToolTipText(Messages.getString("main.logout.button.tooltip")); //$NON-NLS-1$
             this.logOutBtn.setEnabled(false);
             this.logOutBtn.addSelectionListener(new SelectionAdapter() {
                 @Override

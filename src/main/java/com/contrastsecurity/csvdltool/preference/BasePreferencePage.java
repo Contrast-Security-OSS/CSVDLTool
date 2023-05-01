@@ -30,8 +30,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.preference.IPreferenceNode;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.PreferenceDialog;
+import org.eclipse.jface.preference.PreferenceManager;
 import org.eclipse.jface.preference.PreferencePage;
+import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.TableEditor;
 import org.eclipse.swt.events.ModifyEvent;
@@ -47,6 +52,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -56,8 +62,8 @@ import org.jasypt.util.text.BasicTextEncryptor;
 
 import com.contrastsecurity.csvdltool.CSVDLToolShell;
 import com.contrastsecurity.csvdltool.Main;
-import com.contrastsecurity.csvdltool.Messages;
 import com.contrastsecurity.csvdltool.Main.AuthType;
+import com.contrastsecurity.csvdltool.Messages;
 import com.contrastsecurity.csvdltool.ProxyAuthDialog;
 import com.contrastsecurity.csvdltool.model.Organization;
 import com.google.gson.Gson;
@@ -411,7 +417,8 @@ public class BasePreferencePage extends PreferencePage {
                 }
                 // String path = pathDialog.getDirPath();
                 if (orgList.contains(rtnOrg)) {
-                    MessageDialog.openError(composite.getShell(), Messages.getString("basepreferencepage.add.organization.dialog"), Messages.getString("basepreferencepage.add.organization.dialog.already.exist.error.message")); //$NON-NLS-1$ //$NON-NLS-2$
+                    MessageDialog.openError(composite.getShell(), Messages.getString("basepreferencepage.add.organization.dialog"), //$NON-NLS-1$
+                            Messages.getString("basepreferencepage.add.organization.dialog.already.exist.error.message")); //$NON-NLS-1$
                     return;
                 }
                 orgList.add(rtnOrg);
@@ -506,9 +513,18 @@ public class BasePreferencePage extends PreferencePage {
             }
         });
 
-        Label connectionHint = new Label(orgTableGrp, SWT.LEFT);
+        Link connectionHint = new Link(orgTableGrp, SWT.NONE);
         connectionHint.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         connectionHint.setText(Messages.getString("basepreferencepage.use.proxy.desc")); //$NON-NLS-1$
+        connectionHint.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
+            public void widgetSelected(org.eclipse.swt.events.SelectionEvent event) {
+                PreferenceDialog preferenceDialog = shell.getMain().getPreferenceDialog();
+                PreferenceManager pm = preferenceDialog.getPreferenceManager();
+                IPreferenceNode node = pm.find("connection");
+                TreeViewer viewer = preferenceDialog.getTreeViewer();
+                viewer.setSelection(new StructuredSelection(node));
+            }
+        });
 
         Button applyBtn = new Button(composite, SWT.NULL);
         GridData applyBtnGrDt = new GridData(SWT.RIGHT, SWT.BOTTOM, true, true, 1, 1);
@@ -586,7 +602,7 @@ public class BasePreferencePage extends PreferencePage {
 
         ps.setValue(PreferenceConstants.TARGET_ORGS, new Gson().toJson(this.orgList));
         if (!errors.isEmpty()) {
-            MessageDialog.openError(getShell(), Messages.getString("basepreferencepage.title"), String.join("\r\n", errors));  //$NON-NLS-1$//$NON-NLS-2$
+            MessageDialog.openError(getShell(), Messages.getString("basepreferencepage.title"), String.join("\r\n", errors)); //$NON-NLS-1$//$NON-NLS-2$
             return false;
         }
         return true;

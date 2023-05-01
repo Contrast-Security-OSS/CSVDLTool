@@ -157,6 +157,7 @@ public class Main implements PropertyChangeListener {
     public static final int MINIMUM_SIZE_HEIGHT = 670;
 
     private CSVDLToolShell shell;
+    private PreferenceDialog preferenceDialog;
     private String validOrganizationsOldStr;
 
     // ASSESS
@@ -1940,9 +1941,9 @@ public class Main implements PropertyChangeListener {
                 mgr.addTo(csvNode.getId(), svrCsvColumnNode);
                 PreferenceNode aboutNode = new PreferenceNode("about", new AboutPage()); //$NON-NLS-1$
                 mgr.addToRoot(aboutNode);
-                PreferenceDialog dialog = new MyPreferenceDialog(shell, mgr);
-                dialog.setPreferenceStore(ps);
-                dialog.open();
+                preferenceDialog = new MyPreferenceDialog(shell, mgr);
+                preferenceDialog.setPreferenceStore(ps);
+                preferenceDialog.open();
                 try {
                     ps.save();
                 } catch (IOException ioe) {
@@ -2130,6 +2131,10 @@ public class Main implements PropertyChangeListener {
 
     public PreferenceStore getPreferenceStore() {
         return ps;
+    }
+
+    public PreferenceDialog getPreferenceDialog() {
+        return preferenceDialog;
     }
 
     public Organization getValidOrganization() {

@@ -411,7 +411,7 @@ public class BasePreferencePage extends PreferencePage {
                 }
                 // String path = pathDialog.getDirPath();
                 if (orgList.contains(rtnOrg)) {
-                    MessageDialog.openError(composite.getShell(), "組織", "すでに設定されている組織です。");
+                    MessageDialog.openError(composite.getShell(), Messages.getString("basepreferencepage.add.organization.dialog"), Messages.getString("basepreferencepage.add.organization.dialog.already.exist.error.message")); //$NON-NLS-1$ //$NON-NLS-2$
                     return;
                 }
                 orgList.add(rtnOrg);
@@ -508,7 +508,7 @@ public class BasePreferencePage extends PreferencePage {
 
         Label connectionHint = new Label(orgTableGrp, SWT.LEFT);
         connectionHint.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        connectionHint.setText("※ プロキシ経由など接続に関する設定が必要な場合は「接続設定」で事前に設定を済ませておいてください。");
+        connectionHint.setText(Messages.getString("basepreferencepage.use.proxy.desc")); //$NON-NLS-1$
 
         Button applyBtn = new Button(composite, SWT.NULL);
         GridData applyBtnGrDt = new GridData(SWT.RIGHT, SWT.BOTTOM, true, true, 1, 1);

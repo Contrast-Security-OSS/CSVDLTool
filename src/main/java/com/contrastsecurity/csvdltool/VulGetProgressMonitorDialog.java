@@ -12,7 +12,7 @@ public class VulGetProgressMonitorDialog extends ProgressMonitorDialog {
     @Override
     protected void configureShell(Shell newShell) {
         super.configureShell(newShell);
-        newShell.setText("脆弱性情報の取得");
+        newShell.setText(Messages.getString("vulgetprogressmonitordialog.title")); //$NON-NLS-1$
     }
 
 }

@@ -305,6 +305,8 @@ public class Main implements PropertyChangeListener {
             this.ps.setDefault(PreferenceConstants.CSV_OUT_HEADER_LIB, true);
             this.ps.setDefault(PreferenceConstants.CSV_FILE_FORMAT_LIB, "'lib'_yyyy-MM-dd_HHmmss"); //$NON-NLS-1$
 
+            this.ps.setDefault(PreferenceConstants.ATTACK_RANGE_DAYTIME, "0900-1800");
+            this.ps.setDefault(PreferenceConstants.ATTACK_RANGE_NIGHTTIME, "1800-0000");
             this.ps.setDefault(PreferenceConstants.ATTACK_START_WEEKDAY, 1); // 月曜日
             this.ps.setDefault(PreferenceConstants.ATTACK_DETECTED_DATE_FILTER, 0);
             this.ps.setDefault(PreferenceConstants.CSV_COLUMN_ATTACKEVENT, AttackEventCSVColmunEnum.defaultValuesStr());

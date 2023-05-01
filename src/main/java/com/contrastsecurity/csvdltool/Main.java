@@ -416,7 +416,7 @@ public class Main implements PropertyChangeListener {
                     vulExecuteBtn.setEnabled(false);
                     attackLoadBtn.setEnabled(false);
                     serverLoadBtn.setEnabled(false);
-                    settingBtn.setText("このボタンから基本設定を行ってください。");
+                    settingBtn.setText(Messages.getString("main.settings.initial.button.title")); //$NON-NLS-1$
                     uiReset();
                 } else {
                     String validOrganizationsNewStr = new Gson().toJson(orgs);
@@ -994,20 +994,20 @@ public class Main implements PropertyChangeListener {
         });
 
         vulOnlyParentAppChk = new Button(vulButtonGrp, SWT.CHECK);
-        vulOnlyParentAppChk.setText("マージされたアプリの場合、親アプリの脆弱性だけを出力する。");
+        vulOnlyParentAppChk.setText(Messages.getString("main.vul.export.option.only.parent.application")); //$NON-NLS-1$
         if (this.ps.getBoolean(PreferenceConstants.VUL_ONLY_PARENT_APP)) {
             vulOnlyParentAppChk.setSelection(true);
         }
 
         vulOnlyCurVulExpChk = new Button(vulButtonGrp, SWT.CHECK);
-        vulOnlyCurVulExpChk.setText("最新の脆弱性のみ出力する。（以前のセッションのものは出力しない）");
+        vulOnlyCurVulExpChk.setText(Messages.getString("main.vul.export.option.only.latest")); //$NON-NLS-1$
         if (this.ps.getBoolean(PreferenceConstants.VUL_ONLY_CURVUL_EXP)) {
             vulOnlyCurVulExpChk.setSelection(true);
         }
 
         includeDescChk = new Button(vulButtonGrp, SWT.CHECK);
-        includeDescChk.setText("改行を含む長文の項目（ルート、HTTP情報、修正方法、コメントなど）も添付ファイルで出力する。（フォルダ出力）");
-        includeDescChk.setToolTipText("ルート、HTTP情報、コメント、何が起こったか？、どんなリスクであるか？、修正方法の５つの項目が添付ファイルで出力されます。");
+        includeDescChk.setText(Messages.getString("main.vul.export.option.include.detail")); //$NON-NLS-1$
+        includeDescChk.setToolTipText(Messages.getString("main.vul.export.option.include.detail.hint")); //$NON-NLS-1$
         if (this.ps.getBoolean(PreferenceConstants.INCLUDE_DESCRIPTION)) {
             includeDescChk.setSelection(true);
         }
@@ -1022,7 +1022,7 @@ public class Main implements PropertyChangeListener {
         });
 
         includeStackTraceChk = new Button(vulButtonGrp, SWT.CHECK);
-        includeStackTraceChk.setText("脆弱性の詳細（スタックトレース）も添付ファイルで出力する。（フォルダ出力）");
+        includeStackTraceChk.setText(Messages.getString("main.vul.export.option.include.stacktrace")); //$NON-NLS-1$
         if (this.ps.getBoolean(PreferenceConstants.INCLUDE_STACKTRACE)) {
             includeStackTraceChk.setSelection(true);
         }
@@ -1104,12 +1104,12 @@ public class Main implements PropertyChangeListener {
         });
 
         onlyHasCVEChk = new Button(libButtonGrp, SWT.CHECK);
-        onlyHasCVEChk.setText("CVE（脆弱性）を含むライブラリのみ出力する。");
+        onlyHasCVEChk.setText(Messages.getString("main.lib.export.option.only.has.cve")); //$NON-NLS-1$
         if (this.ps.getBoolean(PreferenceConstants.ONLY_HAS_CVE)) {
             onlyHasCVEChk.setSelection(true);
         }
         includeCVEDetailChk = new Button(libButtonGrp, SWT.CHECK);
-        includeCVEDetailChk.setText("CVEの詳細情報も出力する。（フォルダ出力）");
+        includeCVEDetailChk.setText(Messages.getString("main.lib.export.option.include.detail")); //$NON-NLS-1$
         includeCVEDetailChk.setToolTipText("CVEの詳細情報が添付ファイルで出力されます。");
         if (this.ps.getBoolean(PreferenceConstants.INCLUDE_CVE_DETAIL)) {
             includeCVEDetailChk.setSelection(true);

@@ -953,7 +953,7 @@ public class Main implements PropertyChangeListener {
             @Override
             public void widgetSelected(SelectionEvent event) {
                 if (dstApps.isEmpty()) {
-                    MessageDialog.openInformation(shell, Messages.getString("main.vul.export.message.dialog.title"), Messages.getString("main.vul.export.application.unselected.error.message")); //$NON-NLS-1$ //$NON-NLS-2$
+                    MessageDialog.openInformation(shell, Messages.getString("main.vul.export.message.dialog.title"), Messages.getString("main.export.application.unselected.error.message")); //$NON-NLS-1$ //$NON-NLS-2$
                     return;
                 }
                 VulGetWithProgress progress = new VulGetWithProgress(shell, ps, dstApps, fullAppMap, assessFilterMap, frLastDetectedDate, toLastDetectedDate,
@@ -1057,14 +1057,14 @@ public class Main implements PropertyChangeListener {
         GridData libExecuteBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
         libExecuteBtnGrDt.heightHint = 50;
         libExecuteBtn.setLayoutData(libExecuteBtnGrDt);
-        libExecuteBtn.setText(Messages.getString("main.lib.export")); //$NON-NLS-1$
-        libExecuteBtn.setToolTipText("ライブラリ情報を取得し、CSV形式で出力します。");
+        libExecuteBtn.setText(Messages.getString("main.lib.export.button.title")); //$NON-NLS-1$
+        libExecuteBtn.setToolTipText(Messages.getString("main.lib.export.button.tooltip")); //$NON-NLS-1$
         libExecuteBtn.setFont(new Font(display, "ＭＳ ゴシック", 20, SWT.NORMAL));
         libExecuteBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
                 if (dstApps.isEmpty()) {
-                    MessageDialog.openInformation(shell, "ライブラリ情報取得", "取得対象のアプリケーションを選択してください。");
+                    MessageDialog.openInformation(shell, Messages.getString("main.lib.export.message.dialog.title"), Messages.getString("main.export.application.unselected.error.message")); //$NON-NLS-1$ //$NON-NLS-2$
                     return;
                 }
                 LibGetWithProgress progress = new LibGetWithProgress(shell, ps, dstApps, fullAppMap, onlyHasCVEChk.getSelection(), includeCVEDetailChk.getSelection());
@@ -1081,21 +1081,21 @@ public class Main implements PropertyChangeListener {
                     // }
                     String exceptionMsg = e.getTargetException().getMessage();
                     if (e.getTargetException() instanceof ApiException) {
-                        MessageDialog.openError(shell, "ライブラリ情報の取得", String.format("TeamServerからエラーが返されました。\r\n%s", exceptionMsg));
+                        MessageDialog.openError(shell, Messages.getString("main.lib.export.message.dialog.title"), String.format("TeamServerからエラーが返されました。\r\n%s", exceptionMsg)); //$NON-NLS-1$
                     } else if (e.getTargetException() instanceof NonApiException) {
                         logger.error(trace);
-                        MessageDialog.openError(shell, "ライブラリ情報の取得", String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", exceptionMsg));
+                        MessageDialog.openError(shell, Messages.getString("main.lib.export.message.dialog.title"), String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", exceptionMsg)); //$NON-NLS-1$
                     } else if (e.getTargetException() instanceof InterruptedException) {
                         MessageDialog.openInformation(shell, trace, exceptionMsg);
                     } else if (e.getTargetException() instanceof TsvException) {
-                        MessageDialog.openError(shell, "ライブラリ情報の取得", exceptionMsg);
+                        MessageDialog.openError(shell, Messages.getString("main.lib.export.message.dialog.title"), exceptionMsg); //$NON-NLS-1$
                         return;
                     } else if (e.getTargetException() instanceof BasicAuthException) {
-                        MessageDialog.openError(shell, "ライブラリ情報の取得", exceptionMsg);
+                        MessageDialog.openError(shell, Messages.getString("main.lib.export.message.dialog.title"), exceptionMsg); //$NON-NLS-1$
                         return;
                     } else {
                         logger.error(trace);
-                        MessageDialog.openError(shell, "ライブラリ情報の取得", String.format("不明なエラーです。ログファイルをご確認ください。\r\n%s", exceptionMsg));
+                        MessageDialog.openError(shell, Messages.getString("main.lib.export.message.dialog.title"), String.format("不明なエラーです。ログファイルをご確認ください。\r\n%s", exceptionMsg)); //$NON-NLS-1$
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();

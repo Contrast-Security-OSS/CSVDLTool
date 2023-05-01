@@ -41,7 +41,7 @@ public class ApplicationsApi extends Api {
     @Override
     protected String getUrl() {
         String orgId = this.org.getOrganization_uuid();
-        return String.format("%s/api/ng/%s/applications?expand=modules,license,compliance_policy,skip_links", this.contrastUrl, orgId);
+        return String.format("%s/api/ng/%s/applications?expand=modules,license,compliance_policy,skip_links", this.contrastUrl, orgId); //$NON-NLS-1$
     }
 
     @Override

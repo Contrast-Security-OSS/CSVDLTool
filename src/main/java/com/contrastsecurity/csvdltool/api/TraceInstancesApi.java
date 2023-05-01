@@ -47,7 +47,7 @@ public class TraceInstancesApi extends Api {
     @Override
     protected String getUrl() {
         String orgId = this.org.getOrganization_uuid();
-        return String.format("%s/api/ng/%s/applications/%s/vulnerabilities/%s/instances?expand=skip_links", this.contrastUrl, orgId, this.appId, this.traceId);
+        return String.format("%s/api/ng/%s/applications/%s/vulnerabilities/%s/instances?expand=skip_links", this.contrastUrl, orgId, this.appId, this.traceId); //$NON-NLS-1$
     }
 
     @Override

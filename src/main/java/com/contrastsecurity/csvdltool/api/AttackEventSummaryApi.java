@@ -46,7 +46,7 @@ public class AttackEventSummaryApi extends Api {
     @Override
     protected String getUrl() {
         String orgId = this.org.getOrganization_uuid();
-        return String.format("%s/api/ng/%s/rasp/events/summary/%s/?expand=event,drilldownDetails,skip_links", this.contrastUrl, orgId, this.uuid);
+        return String.format("%s/api/ng/%s/rasp/events/summary/%s/?expand=event,drilldownDetails,skip_links", this.contrastUrl, orgId, this.uuid); //$NON-NLS-1$
     }
 
     @Override

@@ -35,7 +35,7 @@ public class LogoutApi extends Api {
 
     @Override
     protected String getUrl() {
-        return String.format("%s/logout.html?target=/static/ng/index.html", this.contrastUrl);
+        return String.format("%s/logout.html?target=/static/ng/index.html", this.contrastUrl); //$NON-NLS-1$
     }
 
     @Override

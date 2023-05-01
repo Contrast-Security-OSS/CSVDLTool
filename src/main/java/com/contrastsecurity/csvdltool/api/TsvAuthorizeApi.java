@@ -50,13 +50,13 @@ public class TsvAuthorizeApi extends Api {
 
     @Override
     protected String getUrl() {
-        return String.format("%s/api/ng/tsv/authorize?expand=skip_links", this.contrastUrl);
+        return String.format("%s/api/ng/tsv/authorize?expand=skip_links", this.contrastUrl); //$NON-NLS-1$
     }
 
     @Override
     protected RequestBody getBody() throws Exception {
-        MediaType mediaTypeJson = MediaType.parse("application/json; charset=UTF-8");
-        String json = String.format("{\"code\":\"%s\"}", this.code);
+        MediaType mediaTypeJson = MediaType.parse("application/json; charset=UTF-8"); //$NON-NLS-1$
+        String json = String.format("{\"code\":\"%s\"}", this.code); //$NON-NLS-1$
         return RequestBody.create(json, mediaTypeJson);
     }
 

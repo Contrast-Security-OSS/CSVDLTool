@@ -45,7 +45,7 @@ public class HttpRequestApi extends Api {
     @Override
     protected String getUrl() {
         String orgId = this.org.getOrganization_uuid();
-        return String.format("%s/api/ng/%s/traces/%s/httprequest?expand=skip_links", this.contrastUrl, orgId, this.traceId);
+        return String.format("%s/api/ng/%s/traces/%s/httprequest?expand=skip_links", this.contrastUrl, orgId, this.traceId); //$NON-NLS-1$
     }
 
     @Override

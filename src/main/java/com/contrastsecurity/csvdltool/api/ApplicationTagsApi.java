@@ -45,7 +45,7 @@ public class ApplicationTagsApi extends Api {
     @Override
     protected String getUrl() {
         String orgId = this.org.getOrganization_uuid();
-        return String.format("%s/api/ng/%s/tags/application/list/%s", this.contrastUrl, orgId, this.appId);
+        return String.format("%s/api/ng/%s/tags/application/list/%s", this.contrastUrl, orgId, this.appId); //$NON-NLS-1$
     }
 
     @Override

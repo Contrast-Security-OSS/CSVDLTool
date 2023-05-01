@@ -47,7 +47,7 @@ public class ServersApi extends Api {
     @Override
     protected String getUrl() {
         String orgId = this.org.getOrganization_uuid();
-        return String.format("%s/api/ng/%s/servers/filter?limit=%d&offset=%d&expand=applications&server_license&inspect_app_instrumentation&sort=serverName", this.contrastUrl,
+        return String.format("%s/api/ng/%s/servers/filter?limit=%d&offset=%d&expand=applications&server_license&inspect_app_instrumentation&sort=serverName", this.contrastUrl, //$NON-NLS-1$
                 orgId, LIMIT, this.offset);
     }
 

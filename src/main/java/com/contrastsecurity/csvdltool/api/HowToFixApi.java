@@ -45,7 +45,7 @@ public class HowToFixApi extends Api {
     @Override
     protected String getUrl() {
         String orgId = this.org.getOrganization_uuid();
-        return String.format("%s/api/ng/%s/traces/%s/recommendation", this.contrastUrl, orgId, this.traceId);
+        return String.format("%s/api/ng/%s/traces/%s/recommendation", this.contrastUrl, orgId, this.traceId); //$NON-NLS-1$
     }
 
     @Override

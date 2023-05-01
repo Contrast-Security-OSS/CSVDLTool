@@ -58,14 +58,14 @@ public class AttackEventsByAttackUuidApi extends Api {
     @Override
     protected String getUrl() {
         String orgId = this.org.getOrganization_uuid();
-        return String.format("%s/api/ng/%s/rasp/events/new?expand=drilldownDetails,application_roles,tags,skip_links&limit=%d&offset=%d&sort=-timestamp", this.contrastUrl, orgId,
+        return String.format("%s/api/ng/%s/rasp/events/new?expand=drilldownDetails,application_roles,tags,skip_links&limit=%d&offset=%d&sort=-timestamp", this.contrastUrl, orgId, //$NON-NLS-1$
                 LIMIT, this.offset);
     }
 
     @Override
     protected RequestBody getBody() throws Exception {
-        MediaType mediaTypeJson = MediaType.parse("application/json; charset=UTF-8");
-        String json = String.format("{\"attackUuid\":\"%s\",\"quickFilter\":\"ALL\",\"startDate\":\"%s\",\"endDate\":\"%s\"}", this.attackUuid, this.startDate.getTime(),
+        MediaType mediaTypeJson = MediaType.parse("application/json; charset=UTF-8"); //$NON-NLS-1$
+        String json = String.format("{\"attackUuid\":\"%s\",\"quickFilter\":\"ALL\",\"startDate\":\"%s\",\"endDate\":\"%s\"}", this.attackUuid, this.startDate.getTime(), //$NON-NLS-1$
                 this.endDate.getTime());
         return RequestBody.create(json, mediaTypeJson);
     }

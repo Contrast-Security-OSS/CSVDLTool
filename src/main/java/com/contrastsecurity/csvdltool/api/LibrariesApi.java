@@ -51,7 +51,7 @@ public class LibrariesApi extends Api {
     @Override
     protected String getUrl() {
         String orgId = this.org.getOrganization_uuid();
-        return String.format("%s/api/ng/%s/applications/%s/libraries?limit=%d&offset=%d&expand=servers,vulns,apps,skip_links&quickFilter=%s&sort=fileName", this.contrastUrl, orgId,
+        return String.format("%s/api/ng/%s/applications/%s/libraries?limit=%d&offset=%d&expand=servers,vulns,apps,skip_links&quickFilter=%s&sort=fileName", this.contrastUrl, orgId, //$NON-NLS-1$
                 this.appId, LIMIT, this.offset, this.filter);
     }
 

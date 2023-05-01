@@ -47,7 +47,7 @@ public class RoutesApi extends Api {
     @Override
     protected String getUrl() {
         String orgId = this.org.getOrganization_uuid();
-        return String.format("%s/api/ng/%s/traces/%s/trace/%s/routes?expand=skip_links", this.contrastUrl, orgId, this.appId, this.traceId);
+        return String.format("%s/api/ng/%s/traces/%s/trace/%s/routes?expand=skip_links", this.contrastUrl, orgId, this.appId, this.traceId); //$NON-NLS-1$
     }
 
     @Override

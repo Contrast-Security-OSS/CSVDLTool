@@ -44,7 +44,7 @@ public class OrganizationApi extends Api {
     @Override
     protected String getUrl() {
         String orgId = this.org.getOrganization_uuid();
-        return String.format("%s/api/ng/profile/organizations/%s?expand=freemium,skip_links", this.contrastUrl, orgId);
+        return String.format("%s/api/ng/profile/organizations/%s?expand=freemium,skip_links", this.contrastUrl, orgId); //$NON-NLS-1$
     }
 
     @Override

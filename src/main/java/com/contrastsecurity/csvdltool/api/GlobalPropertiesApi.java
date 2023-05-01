@@ -41,7 +41,7 @@ public class GlobalPropertiesApi extends Api {
 
     @Override
     protected String getUrl() {
-        return String.format("%s/api/ng/global/properties?expand=skip_links", this.contrastUrl);
+        return String.format("%s/api/ng/global/properties?expand=skip_links", this.contrastUrl); //$NON-NLS-1$
     }
 
     @Override

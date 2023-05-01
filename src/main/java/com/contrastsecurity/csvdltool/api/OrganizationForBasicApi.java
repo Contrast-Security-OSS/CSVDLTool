@@ -42,7 +42,7 @@ public class OrganizationForBasicApi extends Api {
 
     @Override
     protected String getUrl() {
-        return String.format("%s/api/ng/profile/organizations?expand=skip_links", this.contrastUrl);
+        return String.format("%s/api/ng/profile/organizations?expand=skip_links", this.contrastUrl); //$NON-NLS-1$
     }
 
     @Override

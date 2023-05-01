@@ -46,7 +46,7 @@ public class AttackApi extends Api {
     @Override
     protected String getUrl() {
         String orgId = this.org.getOrganization_uuid();
-        return String.format("%s/api/ng/%s/attacks/%s?expand=source_name,skip_links", this.contrastUrl, orgId, this.uuid);
+        return String.format("%s/api/ng/%s/attacks/%s?expand=source_name,skip_links", this.contrastUrl, orgId, this.uuid); //$NON-NLS-1$
     }
 
     @Override

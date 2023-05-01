@@ -56,13 +56,13 @@ public class AttacksApi extends Api {
     @Override
     protected String getUrl() {
         String orgId = this.org.getOrganization_uuid();
-        return String.format("%s/api/ng/%s/attacks?expand=skip_links&limit=%d&offset=%d&sort=-startTime", this.contrastUrl, orgId, LIMIT, this.offset);
+        return String.format("%s/api/ng/%s/attacks?expand=skip_links&limit=%d&offset=%d&sort=-startTime", this.contrastUrl, orgId, LIMIT, this.offset); //$NON-NLS-1$
     }
 
     @Override
     protected RequestBody getBody() throws Exception {
-        MediaType mediaTypeJson = MediaType.parse("application/json; charset=UTF-8");
-        String json = String.format("{\"quickFilter\":\"ALL\",\"startDate\":\"%s\",\"endDate\":\"%s\"}", this.startDate.getTime(), this.endDate.getTime());
+        MediaType mediaTypeJson = MediaType.parse("application/json; charset=UTF-8"); //$NON-NLS-1$
+        String json = String.format("{\"quickFilter\":\"ALL\",\"startDate\":\"%s\",\"endDate\":\"%s\"}", this.startDate.getTime(), this.endDate.getTime()); //$NON-NLS-1$
         return RequestBody.create(json, mediaTypeJson);
     }
 

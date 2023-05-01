@@ -45,7 +45,7 @@ public class EventSummaryApi extends Api {
     @Override
     protected String getUrl() {
         String orgId = this.org.getOrganization_uuid();
-        return String.format("%s/api/ng/%s/traces/%s/events/summary?expand=skip_links&legacy=false", this.contrastUrl, orgId, this.traceId);
+        return String.format("%s/api/ng/%s/traces/%s/events/summary?expand=skip_links&legacy=false", this.contrastUrl, orgId, this.traceId); //$NON-NLS-1$
     }
 
     @Override

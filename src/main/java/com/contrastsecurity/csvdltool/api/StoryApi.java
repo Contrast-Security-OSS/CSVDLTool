@@ -45,7 +45,7 @@ public class StoryApi extends Api {
     @Override
     protected String getUrl() {
         String orgId = this.org.getOrganization_uuid();
-        return String.format("%s/api/ng/%s/traces/%s/story", this.contrastUrl, orgId, this.trace_id);
+        return String.format("%s/api/ng/%s/traces/%s/story", this.contrastUrl, orgId, this.trace_id); //$NON-NLS-1$
     }
 
     @Override

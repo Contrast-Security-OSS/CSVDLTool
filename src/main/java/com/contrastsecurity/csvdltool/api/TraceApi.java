@@ -47,7 +47,7 @@ public class TraceApi extends Api {
     @Override
     protected String getUrl() {
         String orgId = this.org.getOrganization_uuid();
-        return String.format("%s/api/ng/%s/traces/%s/trace/%s?expand=events,notes,request,application,servers,server_environments,skip_links", this.contrastUrl, orgId, this.appId,
+        return String.format("%s/api/ng/%s/traces/%s/trace/%s?expand=events,notes,request,application,servers,server_environments,skip_links", this.contrastUrl, orgId, this.appId, //$NON-NLS-1$
                 this.traceId);
     }
 

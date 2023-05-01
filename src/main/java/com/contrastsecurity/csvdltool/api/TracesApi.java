@@ -68,9 +68,9 @@ public class TracesApi extends Api {
                 inValidFoundFlg |= true;
             }
         }
-        String severityFilterQuery = "";
+        String severityFilterQuery = ""; //$NON-NLS-1$
         if (inValidFoundFlg && !severityFilters.isEmpty()) {
-            severityFilterQuery = String.format("severities=%s", String.join(",", severityFilters));
+            severityFilterQuery = String.format("severities=%s", String.join(",", severityFilters)); //$NON-NLS-1$ //$NON-NLS-2$
         }
         // 脆弱性タイプのクエリ文字列
         List<String> vulnTypeFilters = new ArrayList<String>();
@@ -82,36 +82,36 @@ public class TracesApi extends Api {
                 inValidFoundFlg |= true;
             }
         }
-        String vulnTypeFilterQuery = "";
+        String vulnTypeFilterQuery = ""; //$NON-NLS-1$
         if (inValidFoundFlg && !vulnTypeFilters.isEmpty()) {
             if (severityFilterQuery.isEmpty()) {
-                vulnTypeFilterQuery = String.format("vulnTypes=%s", String.join(",", vulnTypeFilters));
+                vulnTypeFilterQuery = String.format("vulnTypes=%s", String.join(",", vulnTypeFilters)); //$NON-NLS-1$ //$NON-NLS-2$
             } else {
-                vulnTypeFilterQuery = String.format("&vulnTypes=%s", String.join(",", vulnTypeFilters));
+                vulnTypeFilterQuery = String.format("&vulnTypes=%s", String.join(",", vulnTypeFilters)); //$NON-NLS-1$ //$NON-NLS-2$
             }
         }
         // 最終検出日のクエリ文字列
-        String lastDetectedFilterQuery = "";
+        String lastDetectedFilterQuery = ""; //$NON-NLS-1$
         if (frLastDetectedDate != null || toLastDetectedDate != null) {
-            String startDate = "";
+            String startDate = ""; //$NON-NLS-1$
             if (frLastDetectedDate != null) {
-                startDate = String.format("&startDate=%s", frLastDetectedDate.getTime());
+                startDate = String.format("&startDate=%s", frLastDetectedDate.getTime()); //$NON-NLS-1$
             }
-            String endDate = "";
+            String endDate = ""; //$NON-NLS-1$
             if (toLastDetectedDate != null) {
-                endDate = String.format("&endDate=%s", toLastDetectedDate.getTime());
+                endDate = String.format("&endDate=%s", toLastDetectedDate.getTime()); //$NON-NLS-1$
             }
             if (severityFilterQuery.isEmpty() && vulnTypeFilterQuery.isEmpty()) {
-                lastDetectedFilterQuery = String.format("timestampFilter=LAST%s%s", startDate, endDate);
+                lastDetectedFilterQuery = String.format("timestampFilter=LAST%s%s", startDate, endDate); //$NON-NLS-1$
             } else {
-                lastDetectedFilterQuery = String.format("&timestampFilter=LAST%s%s", startDate, endDate);
+                lastDetectedFilterQuery = String.format("&timestampFilter=LAST%s%s", startDate, endDate); //$NON-NLS-1$
             }
         }
 
         if (severityFilterQuery.isEmpty() && vulnTypeFilterQuery.isEmpty() && lastDetectedFilterQuery.isEmpty()) {
-            return String.format("%s/api/ng/%s/traces/%s/ids", this.contrastUrl, orgId, this.appId);
+            return String.format("%s/api/ng/%s/traces/%s/ids", this.contrastUrl, orgId, this.appId); //$NON-NLS-1$
         } else {
-            return String.format("%s/api/ng/%s/traces/%s/ids?%s%s%s", this.contrastUrl, orgId, this.appId, severityFilterQuery, vulnTypeFilterQuery, lastDetectedFilterQuery);
+            return String.format("%s/api/ng/%s/traces/%s/ids?%s%s%s", this.contrastUrl, orgId, this.appId, severityFilterQuery, vulnTypeFilterQuery, lastDetectedFilterQuery); //$NON-NLS-1$
         }
     }
 

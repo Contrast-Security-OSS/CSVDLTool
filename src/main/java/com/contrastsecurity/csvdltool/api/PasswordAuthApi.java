@@ -49,12 +49,12 @@ public class PasswordAuthApi extends Api {
 
     @Override
     protected String getUrl() {
-        return String.format("%s/authenticate.html", this.contrastUrl);
+        return String.format("%s/authenticate.html", this.contrastUrl); //$NON-NLS-1$
     }
 
     @Override
     protected RequestBody getBody() throws Exception {
-        return new FormBody.Builder().add("ui", "true").add("username", this.userName).add("password", this.password).add("sso", "").build();
+        return new FormBody.Builder().add("ui", "true").add("username", this.userName).add("password", this.password).add("sso", "").build(); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
     }
 
     @Override

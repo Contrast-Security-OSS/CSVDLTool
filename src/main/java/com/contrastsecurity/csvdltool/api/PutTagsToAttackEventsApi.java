@@ -55,19 +55,19 @@ public class PutTagsToAttackEventsApi extends Api {
     @Override
     protected String getUrl() {
         String orgId = this.org.getOrganization_uuid();
-        return String.format("%s/api/ng/%s/tags/attack/events/bulk?expand=skip_links", this.contrastUrl, orgId);
+        return String.format("%s/api/ng/%s/tags/attack/events/bulk?expand=skip_links", this.contrastUrl, orgId); //$NON-NLS-1$
     }
 
     @Override
     protected RequestBody getBody() throws Exception {
-        String addTag = "";
+        String addTag = ""; //$NON-NLS-1$
         if (!this.tag.isEmpty()) {
-            addTag = String.format("\"%s\"", this.tag);
+            addTag = String.format("\"%s\"", this.tag); //$NON-NLS-1$
         }
-        MediaType mediaTypeJson = MediaType.parse("application/json; charset=UTF-8");
-        String json = String.format("{\"attack_events_uuid\":[%s],\"tags\":[%s],\"tags_remove\":[%s]}",
-                this.attackEvents.stream().map(ae -> ae.getEvent_uuid()).collect(Collectors.joining("\",\"", "\"", "\"")), addTag,
-                this.removeTags.stream().map(tag -> tag).collect(Collectors.joining("\",\"", "\"", "\"")));
+        MediaType mediaTypeJson = MediaType.parse("application/json; charset=UTF-8"); //$NON-NLS-1$
+        String json = String.format("{\"attack_events_uuid\":[%s],\"tags\":[%s],\"tags_remove\":[%s]}", //$NON-NLS-1$
+                this.attackEvents.stream().map(ae -> ae.getEvent_uuid()).collect(Collectors.joining("\",\"", "\"", "\"")), addTag, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                this.removeTags.stream().map(tag -> tag).collect(Collectors.joining("\",\"", "\"", "\""))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         return RequestBody.create(json, mediaTypeJson);
     }
 

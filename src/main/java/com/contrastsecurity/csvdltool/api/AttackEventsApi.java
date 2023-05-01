@@ -48,7 +48,7 @@ public class AttackEventsApi extends Api {
     @Override
     protected String getUrl() {
         String orgId = this.org.getOrganization_uuid();
-        return String.format("%s/api/ng/%s/rasp/events/new?expand=drilldownDetails,application_roles,tags,skip_links&limit=%d&offset=%d&sort=timestamp", this.contrastUrl, orgId,
+        return String.format("%s/api/ng/%s/rasp/events/new?expand=drilldownDetails,application_roles,tags,skip_links&limit=%d&offset=%d&sort=timestamp", this.contrastUrl, orgId, //$NON-NLS-1$
                 LIMIT, this.offset);
     }
 

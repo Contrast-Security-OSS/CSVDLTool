@@ -48,7 +48,7 @@ public class ComplianceApi extends Api {
     @Override
     protected String getUrl() {
         String orgId = this.org.getOrganization_uuid();
-        return String.format("%s/api/ng/%s/policy/compliance?expand=skip_links&limit=%d&offset=%d", this.contrastUrl, orgId, LIMIT, this.offset);
+        return String.format("%s/api/ng/%s/policy/compliance?expand=skip_links&limit=%d&offset=%d", this.contrastUrl, orgId, LIMIT, this.offset); //$NON-NLS-1$
     }
 
     @Override

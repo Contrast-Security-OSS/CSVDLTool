@@ -44,7 +44,7 @@ import com.contrastsecurity.csvdltool.model.Filter;
 import com.contrastsecurity.csvdltool.model.Organization;
 import com.contrastsecurity.csvdltool.model.Server;
 
-public class ServersWithProgress implements IRunnableWithProgress {
+public class ServerWithProgress implements IRunnableWithProgress {
 
     private PreferenceStore ps;
     private Shell shell;
@@ -55,7 +55,7 @@ public class ServersWithProgress implements IRunnableWithProgress {
 
     Logger logger = Logger.getLogger("csvdltool");
 
-    public ServersWithProgress(Shell shell, PreferenceStore ps, List<Organization> orgs) {
+    public ServerWithProgress(Shell shell, PreferenceStore ps, List<Organization> orgs) {
         this.shell = shell;
         this.ps = ps;
         this.orgs = orgs;

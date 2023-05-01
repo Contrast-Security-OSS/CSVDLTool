@@ -528,7 +528,8 @@ public class Main implements PropertyChangeListener {
                         MessageDialog.openError(shell, Messages.getString("main.application.load.message.dialog.title"), String.format("TeamServerからエラーが返されました。\r\n%s", errorMsg)); //$NON-NLS-1$
                     } else if (e.getTargetException() instanceof NonApiException) {
                         logger.error(trace);
-                        MessageDialog.openError(shell, Messages.getString("main.application.load.message.dialog.title"), String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", errorMsg)); //$NON-NLS-1$
+                        MessageDialog.openError(shell, Messages.getString("main.application.load.message.dialog.title"), //$NON-NLS-1$
+                                String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", errorMsg));
                     } else if (e.getTargetException() instanceof TsvException) {
                         MessageDialog.openError(shell, Messages.getString("main.application.load.message.dialog.title"), errorMsg); //$NON-NLS-1$
                         return;
@@ -953,7 +954,8 @@ public class Main implements PropertyChangeListener {
             @Override
             public void widgetSelected(SelectionEvent event) {
                 if (dstApps.isEmpty()) {
-                    MessageDialog.openInformation(shell, Messages.getString("main.vul.export.message.dialog.title"), Messages.getString("main.export.application.unselected.error.message")); //$NON-NLS-1$ //$NON-NLS-2$
+                    MessageDialog.openInformation(shell, Messages.getString("main.vul.export.message.dialog.title"), //$NON-NLS-1$
+                            Messages.getString("main.export.application.unselected.error.message")); //$NON-NLS-1$
                     return;
                 }
                 VulGetWithProgress progress = new VulGetWithProgress(shell, ps, dstApps, fullAppMap, assessFilterMap, frLastDetectedDate, toLastDetectedDate,
@@ -974,7 +976,8 @@ public class Main implements PropertyChangeListener {
                         MessageDialog.openError(shell, Messages.getString("main.vul.export.message.dialog.title"), String.format("TeamServerからエラーが返されました。\r\n%s", exceptionMsg)); //$NON-NLS-1$
                     } else if (e.getTargetException() instanceof NonApiException) {
                         logger.error(trace);
-                        MessageDialog.openError(shell, Messages.getString("main.vul.export.message.dialog.title"), String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", exceptionMsg)); //$NON-NLS-1$
+                        MessageDialog.openError(shell, Messages.getString("main.vul.export.message.dialog.title"), //$NON-NLS-1$
+                                String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", exceptionMsg));
                     } else if (e.getTargetException() instanceof InterruptedException) {
                         MessageDialog.openInformation(shell, trace, exceptionMsg);
                     } else if (e.getTargetException() instanceof TsvException) {
@@ -1064,7 +1067,8 @@ public class Main implements PropertyChangeListener {
             @Override
             public void widgetSelected(SelectionEvent event) {
                 if (dstApps.isEmpty()) {
-                    MessageDialog.openInformation(shell, Messages.getString("main.lib.export.message.dialog.title"), Messages.getString("main.export.application.unselected.error.message")); //$NON-NLS-1$ //$NON-NLS-2$
+                    MessageDialog.openInformation(shell, Messages.getString("main.lib.export.message.dialog.title"), //$NON-NLS-1$
+                            Messages.getString("main.export.application.unselected.error.message")); //$NON-NLS-1$
                     return;
                 }
                 LibGetWithProgress progress = new LibGetWithProgress(shell, ps, dstApps, fullAppMap, onlyHasCVEChk.getSelection(), includeCVEDetailChk.getSelection());
@@ -1084,7 +1088,8 @@ public class Main implements PropertyChangeListener {
                         MessageDialog.openError(shell, Messages.getString("main.lib.export.message.dialog.title"), String.format("TeamServerからエラーが返されました。\r\n%s", exceptionMsg)); //$NON-NLS-1$
                     } else if (e.getTargetException() instanceof NonApiException) {
                         logger.error(trace);
-                        MessageDialog.openError(shell, Messages.getString("main.lib.export.message.dialog.title"), String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", exceptionMsg)); //$NON-NLS-1$
+                        MessageDialog.openError(shell, Messages.getString("main.lib.export.message.dialog.title"), //$NON-NLS-1$
+                                String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", exceptionMsg));
                     } else if (e.getTargetException() instanceof InterruptedException) {
                         MessageDialog.openInformation(shell, trace, exceptionMsg);
                     } else if (e.getTargetException() instanceof TsvException) {
@@ -1705,8 +1710,8 @@ public class Main implements PropertyChangeListener {
             public void widgetSelected(SelectionEvent event) {
                 serverTable.clearAll();
                 serverTable.removeAll();
-                ServersWithProgress progress = new ServersWithProgress(shell, ps, getValidOrganizations());
-                ProgressMonitorDialog progDialog = new AttackGetProgressMonitorDialog(shell);
+                ServerWithProgress progress = new ServerWithProgress(shell, ps, getValidOrganizations());
+                ProgressMonitorDialog progDialog = new ServerGetProgressMonitorDialog(shell);
                 try {
                     progDialog.run(true, true, progress);
                     servers = progress.getAllServers();

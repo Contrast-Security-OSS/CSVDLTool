@@ -127,7 +127,7 @@ public class ServerCSVColumnPreferencePage extends PreferencePage {
                     });
                 }
             } catch (JsonSyntaxException e) {
-                MessageDialog.openError(getShell(), "サーバ出力項目の読み込み", String.format("サーバ出力項目の内容に問題があります。\r\n%s", columnJsonStr));
+                MessageDialog.openError(getShell(), Messages.getString("servercsvcolumnpreferencepage.message.dialog.title"), String.format("%s\r\n%s", Messages.getString("servercsvcolumnpreferencepage.message.dialog.json.load.error.message"), columnJsonStr)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                 columnList = new ArrayList<ServerCSVColumn>();
             }
         } else {

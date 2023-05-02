@@ -1219,7 +1219,7 @@ public class Main implements PropertyChangeListener {
                 attackTable.removeAll();
                 Date[] frToDate = getFrToDetectedDate();
                 if (frToDate.length != 2) {
-                    MessageDialog.openError(shell, Messages.getString("main.attackevent.load.message.dialog.title"), "取得期間を設定してください。"); //$NON-NLS-1$
+                    MessageDialog.openError(shell, Messages.getString("main.attackevent.load.message.dialog.title"), Messages.getString("main.attackevent.load.message.dialog.undefined.term.error.message")); //$NON-NLS-1$ //$NON-NLS-2$
                     return;
                 }
                 AttackEventsGetWithProgress progress = new AttackEventsGetWithProgress(shell, ps, getValidOrganizations(), frToDate[0], frToDate[1]);
@@ -1653,12 +1653,12 @@ public class Main implements PropertyChangeListener {
         attackEventFilterBtnGrDt.horizontalSpan = 3;
         attackEventFilterBtn.setLayoutData(attackEventFilterBtnGrDt);
         attackEventFilterBtn.setText(Messages.getString("main.attackevent.filter.button.title")); //$NON-NLS-1$
-        attackEventFilterBtn.setToolTipText("攻撃イベントのフィルタリングを行います。");
+        attackEventFilterBtn.setToolTipText(Messages.getString("main.attackevent.filter.button.tooltip")); //$NON-NLS-1$
         attackEventFilterBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 if (protectFilterMap == null) {
-                    MessageDialog.openInformation(shell, "攻撃イベントフィルター", "攻撃イベント一覧を読み込んでください。");
+                    MessageDialog.openInformation(shell, Messages.getString("main.attackevent.filter.message.dialog.title"), Messages.getString("main.attackevent.filter.not.loaded.error.message")); //$NON-NLS-1$ //$NON-NLS-2$
                     return;
                 }
                 String dayTimeHours = ps.getString(PreferenceConstants.ATTACK_RANGE_DAYTIME);
@@ -1888,12 +1888,12 @@ public class Main implements PropertyChangeListener {
         serverFilterBtnGrDt.horizontalSpan = 3;
         serverFilterBtn.setLayoutData(serverFilterBtnGrDt);
         serverFilterBtn.setText(Messages.getString("main.server.filter.button.title")); //$NON-NLS-1$
-        serverFilterBtn.setToolTipText("サーバのフィルタリングを行います。");
+        serverFilterBtn.setToolTipText(Messages.getString("main.server.filter.button.tooltip")); //$NON-NLS-1$
         serverFilterBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 if (serverFilterMap == null) {
-                    MessageDialog.openInformation(shell, "サーバフィルター", "サーバ一覧を読み込んでください。");
+                    MessageDialog.openInformation(shell, Messages.getString("main.server.filter.message.dialog.title"), Messages.getString("main.server.filter.not.loaded.error.message")); //$NON-NLS-1$ //$NON-NLS-2$
                     return;
                 }
                 ServerFilterDialog filterDialog = new ServerFilterDialog(shell, serverFilterMap);

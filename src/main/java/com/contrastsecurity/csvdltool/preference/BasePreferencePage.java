@@ -211,7 +211,7 @@ public class BasePreferencePage extends PreferencePage {
             passInputTypeGrp.setLayoutData(passInputTypeGrpGrDt);
 
             passInput = new Button(passInputTypeGrp, SWT.RADIO);
-            passInput.setText("都度、パスワードを入力する（ツールを終了すると消えます）");
+            passInput.setText(Messages.getString("basepreferencepage.password.auth.group.auth.with.auth.input")); //$NON-NLS-1$
             passInput.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
@@ -225,7 +225,7 @@ public class BasePreferencePage extends PreferencePage {
             });
 
             passSave = new Button(passInputTypeGrp, SWT.RADIO);
-            passSave.setText("パスワードを保存する（パスワードは暗号化されます）");
+            passSave.setText(Messages.getString("basepreferencepage.password.auth.group.auth.with.auth.save")); //$NON-NLS-1$
             passSave.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
@@ -265,7 +265,7 @@ public class BasePreferencePage extends PreferencePage {
                 try {
                     passTxt.setText(encryptor.decrypt(ps.getString(PreferenceConstants.PASSWORD)));
                 } catch (Exception e) {
-                    MessageDialog.openError(getShell(), "接続設定", "パスワードの復号化に失敗しました。\r\nパスワードの設定をやり直してください。");
+                    MessageDialog.openError(getShell(), Messages.getString("basepreferencepage.dialog.title"), Messages.getString("basepreferencepage.password.decrypt.error.message")); //$NON-NLS-1$ //$NON-NLS-2$
                     passTxt.setText(""); //$NON-NLS-1$
                 }
             }
@@ -313,7 +313,7 @@ public class BasePreferencePage extends PreferencePage {
                 orgList = new Gson().fromJson(orgJsonStr, new TypeToken<List<Organization>>() {
                 }.getType());
             } catch (JsonSyntaxException e) {
-                MessageDialog.openError(getShell(), "組織設定の読み込み", String.format("%s\r\n%s", "組織設定の内容に問題があります。", orgJsonStr));
+                MessageDialog.openError(getShell(), Messages.getString("basepreferencepage.dialog.title"), String.format("%s\r\n%s", Messages.getString("basepreferencepage.message.dialog.organization.json.load.error.message"), orgJsonStr)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                 orgList = new ArrayList<Organization>();
             }
         } else {
@@ -520,7 +520,7 @@ public class BasePreferencePage extends PreferencePage {
             public void widgetSelected(org.eclipse.swt.events.SelectionEvent event) {
                 PreferenceDialog preferenceDialog = shell.getMain().getPreferenceDialog();
                 PreferenceManager pm = preferenceDialog.getPreferenceManager();
-                IPreferenceNode node = pm.find("connection");
+                IPreferenceNode node = pm.find("connection"); //$NON-NLS-1$
                 TreeViewer viewer = preferenceDialog.getTreeViewer();
                 viewer.setSelection(new StructuredSelection(node));
             }
@@ -554,7 +554,7 @@ public class BasePreferencePage extends PreferencePage {
         if (this.authType == AuthType.PASSWORD) {
             if (url.isEmpty() || usr.isEmpty()) {
                 if (!this.orgList.isEmpty()) {
-                    errors.add("・組織一覧に設定が残っている場合、Contrast URL, Usernameはブランクにできません。\r\nこれらをブランクにする場合は組織一覧の設定をすべて削除してください。");
+                    errors.add(Messages.getString("basepreferencepage.message.dialog.org.exist.password.required.field.empty.error.message")); //$NON-NLS-1$
                     contrastUrlTxt.setText(ps.getString(PreferenceConstants.CONTRAST_URL));
                     userNameTxt.setText(ps.getString(PreferenceConstants.USERNAME));
                 }
@@ -563,7 +563,7 @@ public class BasePreferencePage extends PreferencePage {
             String svc = this.serviceKeyTxt.getText().trim();
             if (url.isEmpty() || usr.isEmpty() || svc.isEmpty()) {
                 if (!this.orgList.isEmpty()) {
-                    errors.add("・組織一覧に設定が残っている場合、Contrast URL, Username, Service Keyはブランクにできません。\r\nこれらをブランクにする場合は組織一覧の設定をすべて削除してください。");
+                    errors.add(Messages.getString("basepreferencepage.message.dialog.org.exist.token.required.field.empty.error.message")); //$NON-NLS-1$
                     contrastUrlTxt.setText(ps.getString(PreferenceConstants.CONTRAST_URL));
                     serviceKeyTxt.setText(ps.getString(PreferenceConstants.SERVICE_KEY));
                     userNameTxt.setText(ps.getString(PreferenceConstants.USERNAME));
@@ -588,7 +588,7 @@ public class BasePreferencePage extends PreferencePage {
             } else if (passSave.getSelection()) {
                 ps.setValue(PreferenceConstants.PASS_TYPE, "save"); //$NON-NLS-1$
                 if (this.passTxt.getText().isEmpty()) {
-                    errors.add("・パスワードを設定してください。");
+                    errors.add(Messages.getString("basepreferencepage.message.dialog.password.empty.error.message")); //$NON-NLS-1$
                 } else {
                     BasicTextEncryptor encryptor = new BasicTextEncryptor();
                     encryptor.setPassword(Main.MASTER_PASSWORD);

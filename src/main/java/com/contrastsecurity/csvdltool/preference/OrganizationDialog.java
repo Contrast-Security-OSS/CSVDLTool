@@ -157,19 +157,23 @@ public class OrganizationDialog extends Dialog {
         try {
             Organization rtnOrg = (Organization) orgApi.getWithoutCheckTsv();
             if (rtnOrg == null) {
-                MessageDialog.openError(getShell(), "組織情報の確認", "組織が見つかりません。");
+                MessageDialog.openError(getShell(), Messages.getString("organizationdialog.message.dialog.title"), //$NON-NLS-1$
+                        Messages.getString("organizationdialog.message.dialog.organization.notfound.error.message")); //$NON-NLS-1$
             } else {
                 org.setName(rtnOrg.getName());
                 this.org = org;
             }
         } catch (ApiException e) {
-            MessageDialog.openWarning(getShell(), "組織情報の確認", String.format("TeamServerからエラーが返されました。\r\n%s", e.getMessage()));
+            MessageDialog.openWarning(getShell(), Messages.getString("organizationdialog.message.dialog.title"), //$NON-NLS-1$
+                    String.format("%s\r\n%s", Messages.getString("organizationdialog.message.dialog.teamserver.return.error.message"), e.getMessage())); //$NON-NLS-1$ //$NON-NLS-2$
         } catch (NonApiException e) {
-            MessageDialog.openError(getShell(), "組織情報の確認", String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", e.getMessage()));
+            MessageDialog.openError(getShell(), Messages.getString("organizationdialog.message.dialog.title"), //$NON-NLS-1$
+                    String.format("%s: %s\r\n%s", Messages.getString("organizationdialog.message.dialog.unexpected.status.code.error.message"), e.getMessage(), Messages.getString("organizationdialog.message.dialog.make.sure.logfile.message"))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         } catch (TsvException e) {
-            MessageDialog.openError(getShell(), "組織情報の確認", e.getMessage());
+            MessageDialog.openError(getShell(), Messages.getString("organizationdialog.message.dialog.title"), e.getMessage()); //$NON-NLS-1$
         } catch (Exception e) {
-            MessageDialog.openError(getShell(), "組織情報の確認", String.format("不明なエラーです。ログファイルをご確認ください。\r\n%s", e.getMessage()));
+            MessageDialog.openError(getShell(), Messages.getString("organizationdialog.message.dialog.title"), //$NON-NLS-1$
+                    String.format("%s\r\n%s", Messages.getString("organizationdialog.message.dialog.unknown.error.message"), e.getMessage())); //$NON-NLS-1$ //$NON-NLS-2$
         }
         super.okPressed();
     }

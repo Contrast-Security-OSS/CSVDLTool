@@ -305,8 +305,8 @@ public class Main implements PropertyChangeListener {
             this.ps.setDefault(PreferenceConstants.CSV_OUT_HEADER_LIB, true);
             this.ps.setDefault(PreferenceConstants.CSV_FILE_FORMAT_LIB, "'lib'_yyyy-MM-dd_HHmmss"); //$NON-NLS-1$
 
-            this.ps.setDefault(PreferenceConstants.ATTACK_RANGE_DAYTIME, "0900-1800");
-            this.ps.setDefault(PreferenceConstants.ATTACK_RANGE_NIGHTTIME, "1800-0000");
+            this.ps.setDefault(PreferenceConstants.ATTACK_RANGE_DAYTIME, "0900-1800"); //$NON-NLS-1$
+            this.ps.setDefault(PreferenceConstants.ATTACK_RANGE_NIGHTTIME, "1800-0000"); //$NON-NLS-1$
             this.ps.setDefault(PreferenceConstants.ATTACK_START_WEEKDAY, 1); // 月曜日
             this.ps.setDefault(PreferenceConstants.ATTACK_DETECTED_DATE_FILTER, 0);
             this.ps.setDefault(PreferenceConstants.CSV_COLUMN_ATTACKEVENT, AttackEventCSVColmunEnum.defaultValuesStr());
@@ -1209,7 +1209,7 @@ public class Main implements PropertyChangeListener {
         attackLoadBtnGrDt.heightHint = 50;
         attackLoadBtn.setLayoutData(attackLoadBtnGrDt);
         attackLoadBtn.setText(Messages.getString("main.attackevent.load.button.title")); //$NON-NLS-1$
-        attackLoadBtn.setToolTipText("攻撃イベント一覧を読み込みます。");
+        attackLoadBtn.setToolTipText(Messages.getString("main.attackevent.load.button.tooltip")); //$NON-NLS-1$
         attackLoadBtn.setFont(new Font(display, "ＭＳ ゴシック", 20, SWT.NORMAL));
         attackLoadBtn.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -1219,7 +1219,7 @@ public class Main implements PropertyChangeListener {
                 attackTable.removeAll();
                 Date[] frToDate = getFrToDetectedDate();
                 if (frToDate.length != 2) {
-                    MessageDialog.openError(shell, "攻撃一覧の取得", "取得期間を設定してください。");
+                    MessageDialog.openError(shell, Messages.getString("main.attackevent.load.message.dialog.title"), "取得期間を設定してください。"); //$NON-NLS-1$
                     return;
                 }
                 AttackEventsGetWithProgress progress = new AttackEventsGetWithProgress(shell, ps, getValidOrganizations(), frToDate[0], frToDate[1]);
@@ -1244,17 +1244,17 @@ public class Main implements PropertyChangeListener {
                     }
                     String errorMsg = e.getTargetException().getMessage();
                     if (e.getTargetException() instanceof ApiException) {
-                        MessageDialog.openError(shell, "攻撃イベント一覧の取得", String.format("TeamServerからエラーが返されました。\r\n%s", errorMsg));
+                        MessageDialog.openError(shell, Messages.getString("main.attackevent.load.message.dialog.title"), String.format("TeamServerからエラーが返されました。\r\n%s", errorMsg)); //$NON-NLS-1$
                     } else if (e.getTargetException() instanceof NonApiException) {
-                        MessageDialog.openError(shell, "攻撃イベント一覧の取得", String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", errorMsg));
+                        MessageDialog.openError(shell, Messages.getString("main.attackevent.load.message.dialog.title"), String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", errorMsg)); //$NON-NLS-1$
                     } else if (e.getTargetException() instanceof TsvException) {
-                        MessageDialog.openError(shell, "攻撃イベント一覧の取得", errorMsg);
+                        MessageDialog.openError(shell, Messages.getString("main.attackevent.load.message.dialog.title"), errorMsg); //$NON-NLS-1$
                         return;
                     } else if (e.getTargetException() instanceof BasicAuthException) {
-                        MessageDialog.openError(shell, "攻撃イベント一覧の取得", errorMsg);
+                        MessageDialog.openError(shell, Messages.getString("main.attackevent.load.message.dialog.title"), errorMsg); //$NON-NLS-1$
                         return;
                     } else {
-                        MessageDialog.openError(shell, "攻撃イベント一覧の取得", String.format("不明なエラーです。ログファイルをご確認ください。\r\n%s", errorMsg));
+                        MessageDialog.openError(shell, Messages.getString("main.attackevent.load.message.dialog.title"), String.format("不明なエラーです。ログファイルをご確認ください。\r\n%s", errorMsg)); //$NON-NLS-1$
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -1705,7 +1705,7 @@ public class Main implements PropertyChangeListener {
         serverLoadBtnGrDt.heightHint = 50;
         serverLoadBtn.setLayoutData(serverLoadBtnGrDt);
         serverLoadBtn.setText(Messages.getString("main.server.load.button.title")); //$NON-NLS-1$
-        serverLoadBtn.setToolTipText("サーバ一覧を読み込みます。");
+        serverLoadBtn.setToolTipText(Messages.getString("main.server.load.button.tooltip")); //$NON-NLS-1$
         serverLoadBtn.setFont(new Font(display, "ＭＳ ゴシック", 20, SWT.NORMAL));
         serverLoadBtn.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -1732,17 +1732,17 @@ public class Main implements PropertyChangeListener {
                     }
                     String errorMsg = e.getTargetException().getMessage();
                     if (e.getTargetException() instanceof ApiException) {
-                        MessageDialog.openError(shell, "サーバ一覧の取得", String.format("TeamServerからエラーが返されました。\r\n%s", errorMsg));
+                        MessageDialog.openError(shell, Messages.getString("main.server.load.message.dialog.title"), String.format("TeamServerからエラーが返されました。\r\n%s", errorMsg)); //$NON-NLS-1$
                     } else if (e.getTargetException() instanceof NonApiException) {
-                        MessageDialog.openError(shell, "サーバ一覧の取得", String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", errorMsg));
+                        MessageDialog.openError(shell, Messages.getString("main.server.load.message.dialog.title"), String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", errorMsg)); //$NON-NLS-1$
                     } else if (e.getTargetException() instanceof TsvException) {
-                        MessageDialog.openError(shell, "サーバ一覧の取得", errorMsg);
+                        MessageDialog.openError(shell, Messages.getString("main.server.load.message.dialog.title"), errorMsg); //$NON-NLS-1$
                         return;
                     } else if (e.getTargetException() instanceof BasicAuthException) {
-                        MessageDialog.openError(shell, "サーバ一覧の取得", errorMsg);
+                        MessageDialog.openError(shell, Messages.getString("main.server.load.message.dialog.title"), errorMsg); //$NON-NLS-1$
                         return;
                     } else {
-                        MessageDialog.openError(shell, "サーバ一覧の取得", String.format("不明なエラーです。ログファイルをご確認ください。\r\n%s", errorMsg));
+                        MessageDialog.openError(shell, Messages.getString("main.server.load.message.dialog.title"), String.format("不明なエラーです。ログファイルをご確認ください。\r\n%s", errorMsg)); //$NON-NLS-1$
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -2011,7 +2011,7 @@ public class Main implements PropertyChangeListener {
     public void loggedIn() {
         String timestamp = new SimpleDateFormat("yyyy/MM/dd HH:mm").format(new Date()); //$NON-NLS-1$
         String userName = ps.getString(PreferenceConstants.USERNAME);
-        this.statusBar.setText(String.format("%s %s successfully logged in", userName, timestamp));
+        this.statusBar.setText(String.format("%s %s successfully logged in", userName, timestamp)); //$NON-NLS-1$
         this.logOutBtn.setEnabled(true);
     }
 

@@ -237,17 +237,17 @@ public class OtherPreferencePage extends PreferencePage {
             }
         }
         if (this.vulSleepTxt.getText().isEmpty()) {
-            errors.add("・脆弱性取得間隔スリープを指定してください。");
+            errors.add(Messages.getString("otherpreferencepage.interval.vulnerability.empty.error.message")); //$NON-NLS-1$
         } else {
             if (!StringUtils.isNumeric(this.vulSleepTxt.getText())) {
-                errors.add("・脆弱性取得間隔スリープは数値を指定してください。");
+                errors.add(Messages.getString("otherpreferencepage.interval.vulnerability.nondigit.error.message")); //$NON-NLS-1$
             }
         }
         if (this.libSleepTxt.getText().isEmpty()) {
-            errors.add("・ライブラリ取得間隔スリープを指定してください。");
+            errors.add(Messages.getString("otherpreferencepage.interval.library.empty.error.message")); //$NON-NLS-1$
         } else {
             if (!StringUtils.isNumeric(this.libSleepTxt.getText())) {
-                errors.add("・ライブラリ取得間隔スリープは数値を指定してください。");
+                errors.add(Messages.getString("otherpreferencepage.interval.library.nondigit.error.message")); //$NON-NLS-1$
             }
         }
 

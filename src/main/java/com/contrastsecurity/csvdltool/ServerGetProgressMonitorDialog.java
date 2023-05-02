@@ -12,7 +12,7 @@ public class ServerGetProgressMonitorDialog extends ProgressMonitorDialog {
     @Override
     protected void configureShell(Shell newShell) {
         super.configureShell(newShell);
-        newShell.setText("サーバ一覧の読み込み");
+        newShell.setText(Messages.getString("servergetprogressmonitordialog.title")); //$NON-NLS-1$
     }
 
 }

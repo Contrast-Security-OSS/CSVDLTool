@@ -12,7 +12,7 @@ public class LibGetProgressMonitorDialog extends ProgressMonitorDialog {
     @Override
     protected void configureShell(Shell newShell) {
         super.configureShell(newShell);
-        newShell.setText("ライブラリ情報の取得");
+        newShell.setText(Messages.getString("libgetprogressmonitordialog.title")); //$NON-NLS-1$
     }
 
 }

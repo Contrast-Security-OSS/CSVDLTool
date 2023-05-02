@@ -12,7 +12,7 @@ public class AttackGetProgressMonitorDialog extends ProgressMonitorDialog {
     @Override
     protected void configureShell(Shell newShell) {
         super.configureShell(newShell);
-        newShell.setText("攻撃一覧の読み込み");
+        newShell.setText(Messages.getString("attackgetprogressmonitordialog.title")); //$NON-NLS-1$
     }
 
 }

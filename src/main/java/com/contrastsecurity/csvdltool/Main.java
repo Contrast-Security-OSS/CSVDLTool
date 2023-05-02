@@ -631,7 +631,7 @@ public class Main implements PropertyChangeListener {
         srcListDescLblGrDt.minimumHeight = 12;
         srcListDescLblGrDt.heightHint = 12;
         srcListDescLbl.setLayoutData(srcListDescLblGrDt);
-        srcListDescLbl.setFont(new Font(display, "ＭＳ ゴシック", 8, SWT.NORMAL));
+        srcListDescLbl.setFont(new Font(display, "Arial", 8, SWT.NORMAL));
         srcListDescLbl.setText(Messages.getString("main.available.app.list.count.label")); //$NON-NLS-1$
         srcListDescLbl.setForeground(shell.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
         this.srcCount = new Label(srcListLblComp, SWT.RIGHT);
@@ -639,7 +639,7 @@ public class Main implements PropertyChangeListener {
         srcCountGrDt.minimumHeight = 12;
         srcCountGrDt.heightHint = 12;
         this.srcCount.setLayoutData(srcCountGrDt);
-        this.srcCount.setFont(new Font(display, "ＭＳ ゴシック", 8, SWT.NORMAL));
+        this.srcCount.setFont(new Font(display, "Arial", 8, SWT.NORMAL));
         this.srcCount.setText("0"); //$NON-NLS-1$
         this.srcCount.setForeground(shell.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
 
@@ -806,7 +806,7 @@ public class Main implements PropertyChangeListener {
         dstListDescLblGrDt.minimumHeight = 12;
         dstListDescLblGrDt.heightHint = 12;
         dstListDescLbl.setLayoutData(dstListDescLblGrDt);
-        dstListDescLbl.setFont(new Font(display, "ＭＳ ゴシック", 8, SWT.NORMAL));
+        dstListDescLbl.setFont(new Font(display, "Arial", 8, SWT.NORMAL));
         dstListDescLbl.setText(Messages.getString("main.selected.app.list.count.label")); //$NON-NLS-1$
         dstListDescLbl.setForeground(shell.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
         this.dstCount = new Label(dstListLblComp, SWT.RIGHT);
@@ -814,7 +814,7 @@ public class Main implements PropertyChangeListener {
         dstCountGrDt.minimumHeight = 12;
         dstCountGrDt.heightHint = 12;
         this.dstCount.setLayoutData(dstCountGrDt);
-        this.dstCount.setFont(new Font(display, "ＭＳ ゴシック", 8, SWT.NORMAL));
+        this.dstCount.setFont(new Font(display, "Arial", 8, SWT.NORMAL));
         this.dstCount.setText("0"); //$NON-NLS-1$
         this.dstCount.setForeground(shell.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
 
@@ -951,7 +951,7 @@ public class Main implements PropertyChangeListener {
         vulExecuteBtn.setLayoutData(executeBtnGrDt);
         vulExecuteBtn.setText(Messages.getString("main.vul.export.button.title")); //$NON-NLS-1$
         vulExecuteBtn.setToolTipText(Messages.getString("main.vul.export.button.tooltip")); //$NON-NLS-1$
-        vulExecuteBtn.setFont(new Font(display, "ＭＳ ゴシック", 20, SWT.NORMAL));
+        vulExecuteBtn.setFont(new Font(display, "Arial", 20, SWT.NORMAL));
         vulExecuteBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -1064,7 +1064,7 @@ public class Main implements PropertyChangeListener {
         libExecuteBtn.setLayoutData(libExecuteBtnGrDt);
         libExecuteBtn.setText(Messages.getString("main.lib.export.button.title")); //$NON-NLS-1$
         libExecuteBtn.setToolTipText(Messages.getString("main.lib.export.button.tooltip")); //$NON-NLS-1$
-        libExecuteBtn.setFont(new Font(display, "ＭＳ ゴシック", 20, SWT.NORMAL));
+        libExecuteBtn.setFont(new Font(display, "Arial", 20, SWT.NORMAL));
         libExecuteBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -1210,7 +1210,7 @@ public class Main implements PropertyChangeListener {
         attackLoadBtn.setLayoutData(attackLoadBtnGrDt);
         attackLoadBtn.setText(Messages.getString("main.attackevent.load.button.title")); //$NON-NLS-1$
         attackLoadBtn.setToolTipText(Messages.getString("main.attackevent.load.button.tooltip")); //$NON-NLS-1$
-        attackLoadBtn.setFont(new Font(display, "ＭＳ ゴシック", 20, SWT.NORMAL));
+        attackLoadBtn.setFont(new Font(display, "Arial", 20, SWT.NORMAL));
         attackLoadBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -1219,7 +1219,8 @@ public class Main implements PropertyChangeListener {
                 attackTable.removeAll();
                 Date[] frToDate = getFrToDetectedDate();
                 if (frToDate.length != 2) {
-                    MessageDialog.openError(shell, Messages.getString("main.attackevent.load.message.dialog.title"), Messages.getString("main.attackevent.load.message.dialog.undefined.term.error.message")); //$NON-NLS-1$ //$NON-NLS-2$
+                    MessageDialog.openError(shell, Messages.getString("main.attackevent.load.message.dialog.title"), //$NON-NLS-1$
+                            Messages.getString("main.attackevent.load.message.dialog.undefined.term.error.message")); //$NON-NLS-1$
                     return;
                 }
                 AttackEventsGetWithProgress progress = new AttackEventsGetWithProgress(shell, ps, getValidOrganizations(), frToDate[0], frToDate[1]);
@@ -1246,7 +1247,8 @@ public class Main implements PropertyChangeListener {
                     if (e.getTargetException() instanceof ApiException) {
                         MessageDialog.openError(shell, Messages.getString("main.attackevent.load.message.dialog.title"), String.format("TeamServerからエラーが返されました。\r\n%s", errorMsg)); //$NON-NLS-1$
                     } else if (e.getTargetException() instanceof NonApiException) {
-                        MessageDialog.openError(shell, Messages.getString("main.attackevent.load.message.dialog.title"), String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", errorMsg)); //$NON-NLS-1$
+                        MessageDialog.openError(shell, Messages.getString("main.attackevent.load.message.dialog.title"), //$NON-NLS-1$
+                                String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", errorMsg));
                     } else if (e.getTargetException() instanceof TsvException) {
                         MessageDialog.openError(shell, Messages.getString("main.attackevent.load.message.dialog.title"), errorMsg); //$NON-NLS-1$
                         return;
@@ -1269,7 +1271,7 @@ public class Main implements PropertyChangeListener {
         attackEventCountGrDt.heightHint = 12;
         attackEventCountGrDt.widthHint = 30;
         this.attackEventCount.setLayoutData(attackEventCountGrDt);
-        this.attackEventCount.setFont(new Font(display, "ＭＳ ゴシック", 10, SWT.NORMAL));
+        this.attackEventCount.setFont(new Font(display, "Arial", 10, SWT.NORMAL));
         this.attackEventCount.setText("0/0"); //$NON-NLS-1$
 
         attackTable = new Table(attackListGrp, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
@@ -1658,7 +1660,8 @@ public class Main implements PropertyChangeListener {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 if (protectFilterMap == null) {
-                    MessageDialog.openInformation(shell, Messages.getString("main.attackevent.filter.message.dialog.title"), Messages.getString("main.attackevent.filter.not.loaded.error.message")); //$NON-NLS-1$ //$NON-NLS-2$
+                    MessageDialog.openInformation(shell, Messages.getString("main.attackevent.filter.message.dialog.title"), //$NON-NLS-1$
+                            Messages.getString("main.attackevent.filter.not.loaded.error.message")); //$NON-NLS-1$
                     return;
                 }
                 String dayTimeHours = ps.getString(PreferenceConstants.ATTACK_RANGE_DAYTIME);
@@ -1706,7 +1709,7 @@ public class Main implements PropertyChangeListener {
         serverLoadBtn.setLayoutData(serverLoadBtnGrDt);
         serverLoadBtn.setText(Messages.getString("main.server.load.button.title")); //$NON-NLS-1$
         serverLoadBtn.setToolTipText(Messages.getString("main.server.load.button.tooltip")); //$NON-NLS-1$
-        serverLoadBtn.setFont(new Font(display, "ＭＳ ゴシック", 20, SWT.NORMAL));
+        serverLoadBtn.setFont(new Font(display, "Arial", 20, SWT.NORMAL));
         serverLoadBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -1893,7 +1896,8 @@ public class Main implements PropertyChangeListener {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 if (serverFilterMap == null) {
-                    MessageDialog.openInformation(shell, Messages.getString("main.server.filter.message.dialog.title"), Messages.getString("main.server.filter.not.loaded.error.message")); //$NON-NLS-1$ //$NON-NLS-2$
+                    MessageDialog.openInformation(shell, Messages.getString("main.server.filter.message.dialog.title"), //$NON-NLS-1$
+                            Messages.getString("main.server.filter.not.loaded.error.message")); //$NON-NLS-1$
                     return;
                 }
                 ServerFilterDialog filterDialog = new ServerFilterDialog(shell, serverFilterMap);
@@ -1979,7 +1983,7 @@ public class Main implements PropertyChangeListener {
         statusBarGrDt.minimumHeight = 11;
         statusBarGrDt.heightHint = 11;
         this.statusBar.setLayoutData(statusBarGrDt);
-        this.statusBar.setFont(new Font(display, "ＭＳ ゴシック", 9, SWT.NORMAL));
+        this.statusBar.setFont(new Font(display, "Arial", 9, SWT.NORMAL));
         this.statusBar.setForeground(shell.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
 
         uiUpdate();

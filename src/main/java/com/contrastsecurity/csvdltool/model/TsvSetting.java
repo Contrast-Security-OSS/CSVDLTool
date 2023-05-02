@@ -68,11 +68,11 @@ public class TsvSetting {
     @Override
     public String toString() {
         List<String> strList = new ArrayList<String>();
-        strList.add("tsv_enabled: " + this.tsv_enabled);
-        strList.add("tsv_type: " + this.tsv_type);
-        strList.add("tsv_device: " + this.tsv_device);
-        strList.add("google_configured: " + this.google_configured);
-        return String.join("\r\n", strList);
+        strList.add("tsv_enabled: " + this.tsv_enabled); //$NON-NLS-1$
+        strList.add("tsv_type: " + this.tsv_type); //$NON-NLS-1$
+        strList.add("tsv_device: " + this.tsv_device); //$NON-NLS-1$
+        strList.add("google_configured: " + this.google_configured); //$NON-NLS-1$
+        return String.join("\r\n", strList); //$NON-NLS-1$
     }
 
 }

@@ -76,8 +76,8 @@ public class Library {
 
     public String getLanguageCode() {
         switch (this.app_language) {
-            case "Java":
-                return "java";
+            case "Java": //$NON-NLS-1$
+                return "java"; //$NON-NLS-1$
             default:
                 return null;
         }
@@ -101,7 +101,7 @@ public class Library {
 
     public String getRelease_date() {
         LocalDateTime ldt = LocalDateTime.ofInstant(Instant.ofEpochMilli(Long.parseLong(this.release_date)), ZoneId.systemDefault());
-        DateTimeFormatter datetimeformatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        DateTimeFormatter datetimeformatter = DateTimeFormatter.ofPattern("yyyy-MM-dd"); //$NON-NLS-1$
         return datetimeformatter.format(ldt);
     }
 
@@ -119,7 +119,7 @@ public class Library {
 
     public String getLatest_release_date() {
         LocalDateTime ldt = LocalDateTime.ofInstant(Instant.ofEpochMilli(Long.parseLong(this.latest_release_date)), ZoneId.systemDefault());
-        DateTimeFormatter datetimeformatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        DateTimeFormatter datetimeformatter = DateTimeFormatter.ofPattern("yyyy-MM-dd"); //$NON-NLS-1$
         return datetimeformatter.format(ldt);
     }
 

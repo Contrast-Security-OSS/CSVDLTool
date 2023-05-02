@@ -85,9 +85,9 @@ public class Application {
     @Override
     public String toString() {
         List<String> strList = new ArrayList<String>();
-        strList.add("app_id: " + this.app_id);
-        strList.add("name: " + this.name);
-        return String.join(", ", strList);
+        strList.add("app_id: " + this.app_id); //$NON-NLS-1$
+        strList.add("name: " + this.name); //$NON-NLS-1$
+        return String.join(", ", strList); //$NON-NLS-1$
     }
 
     @Override

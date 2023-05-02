@@ -48,7 +48,7 @@ public class AttackEvent {
     // Jsonにはないフィールド
     private String source_name;
 
-    DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("HHmm");
+    DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("HHmm"); //$NON-NLS-1$
 
     public String getReceived() {
         return this.received;
@@ -177,7 +177,7 @@ public class AttackEvent {
 
     public String getSource_name() {
         if (this.source_name == null || this.source_name.isEmpty()) {
-            return "";
+            return ""; //$NON-NLS-1$
         }
         return source_name;
     }
@@ -189,13 +189,13 @@ public class AttackEvent {
     @Override
     public String toString() {
         List<String> strList = new ArrayList<String>();
-        strList.add(String.format("--- %s ---------------", this.event_uuid));
-        strList.add("source: " + this.source);
-        strList.add("result: " + this.result);
-        strList.add("displayName: " + this.displayName);
-        strList.add("Application: " + this.application.getName());
-        strList.add("Server: " + this.server.getName());
-        return String.join("\r\n", strList);
+        strList.add(String.format("--- %s ---------------", this.event_uuid)); //$NON-NLS-1$
+        strList.add("source: " + this.source); //$NON-NLS-1$
+        strList.add("result: " + this.result); //$NON-NLS-1$
+        strList.add("displayName: " + this.displayName); //$NON-NLS-1$
+        strList.add("Application: " + this.application.getName()); //$NON-NLS-1$
+        strList.add("Server: " + this.server.getName()); //$NON-NLS-1$
+        return String.join("\r\n", strList); //$NON-NLS-1$
     }
 
 }

@@ -67,10 +67,10 @@ public class Organization {
     @Override
     public String toString() {
         List<String> strList = new ArrayList<String>();
-        strList.add("name: " + this.name);
-        strList.add("organization_uuid: " + this.organization_uuid);
-        strList.add("valid: " + this.valid);
-        return String.join(", ", strList);
+        strList.add("name: " + this.name); //$NON-NLS-1$
+        strList.add("organization_uuid: " + this.organization_uuid); //$NON-NLS-1$
+        strList.add("valid: " + this.valid); //$NON-NLS-1$
+        return String.join(", ", strList); //$NON-NLS-1$
     }
 
     @Override

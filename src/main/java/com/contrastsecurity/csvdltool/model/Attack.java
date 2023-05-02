@@ -67,11 +67,11 @@ public class Attack {
     @Override
     public String toString() {
         List<String> strList = new ArrayList<String>();
-        strList.add(String.format("--- %s ---------------", this.uuid));
-        strList.add("start_time: " + this.start_time);
-        strList.add("end_time: " + this.end_time);
-        strList.add("source_name: " + this.source_name);
-        return String.join("\r\n", strList);
+        strList.add(String.format("--- %s ---------------", this.uuid)); //$NON-NLS-1$
+        strList.add("start_time: " + this.start_time); //$NON-NLS-1$
+        strList.add("end_time: " + this.end_time); //$NON-NLS-1$
+        strList.add("source_name: " + this.source_name); //$NON-NLS-1$
+        return String.join("\r\n", strList); //$NON-NLS-1$
     }
 
 }

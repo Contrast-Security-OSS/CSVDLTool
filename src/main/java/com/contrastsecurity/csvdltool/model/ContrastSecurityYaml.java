@@ -39,51 +39,51 @@ public class ContrastSecurityYaml {
 
     public String getUrl() {
         if (this.api == null) {
-            return "";
+            return ""; //$NON-NLS-1$
         }
-        if (this.api.containsKey("url")) {
-            return this.api.get("url").toString();
+        if (this.api.containsKey("url")) { //$NON-NLS-1$
+            return this.api.get("url").toString(); //$NON-NLS-1$
         }
-        return "";
+        return ""; //$NON-NLS-1$
     }
 
     public String getApiKey() {
         if (this.api == null) {
-            return "";
+            return ""; //$NON-NLS-1$
         }
-        if (this.api.containsKey("api_key")) {
-            return this.api.get("api_key").toString();
+        if (this.api.containsKey("api_key")) { //$NON-NLS-1$
+            return this.api.get("api_key").toString(); //$NON-NLS-1$
         }
-        return "";
+        return ""; //$NON-NLS-1$
     }
 
     public String getServiceKey() {
         if (this.api == null) {
-            return "";
+            return ""; //$NON-NLS-1$
         }
-        if (this.api.containsKey("service_key")) {
-            return this.api.get("service_key").toString();
+        if (this.api.containsKey("service_key")) { //$NON-NLS-1$
+            return this.api.get("service_key").toString(); //$NON-NLS-1$
         }
-        return "";
+        return ""; //$NON-NLS-1$
     }
 
     public String getUserName() {
         if (this.api == null) {
-            return "";
+            return ""; //$NON-NLS-1$
         }
-        if (this.api.containsKey("user_name")) {
-            return this.api.get("user_name").toString();
+        if (this.api.containsKey("user_name")) { //$NON-NLS-1$
+            return this.api.get("user_name").toString(); //$NON-NLS-1$
         }
-        return "";
+        return ""; //$NON-NLS-1$
     }
 
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append(String.format("url         : %s\n", getUrl()));
-        builder.append(String.format("api_key     : %s\n", getApiKey()));
-        builder.append(String.format("service_key : %s\n", getServiceKey()));
-        builder.append(String.format("user_name   : %s\n", getUserName()));
+        builder.append(String.format("url         : %s\n", getUrl())); //$NON-NLS-1$
+        builder.append(String.format("api_key     : %s\n", getApiKey())); //$NON-NLS-1$
+        builder.append(String.format("service_key : %s\n", getServiceKey())); //$NON-NLS-1$
+        builder.append(String.format("user_name   : %s\n", getUserName())); //$NON-NLS-1$
         return builder.toString();
     }
 

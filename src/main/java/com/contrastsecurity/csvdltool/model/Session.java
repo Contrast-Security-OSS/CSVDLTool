@@ -53,6 +53,6 @@ public class Session {
         for (SessionMetadata sm : this.metadata) {
             strList.add(sm.toString());
         }
-        return String.join("\r\n", strList);
+        return String.join("\r\n", strList); //$NON-NLS-1$
     }
 }

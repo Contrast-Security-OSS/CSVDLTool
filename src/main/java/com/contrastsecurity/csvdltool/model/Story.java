@@ -60,6 +60,6 @@ public class Story {
         List<String> strList = new ArrayList<String>();
         strList.add(this.traceId);
         strList.add(this.risk.toString());
-        return String.join("\r\n", strList);
+        return String.join("\r\n", strList); //$NON-NLS-1$
     }
 }

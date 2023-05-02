@@ -76,12 +76,12 @@ public class UserInput {
     @Override
     public String toString() {
         List<String> strList = new ArrayList<String>();
-        strList.add("value: " + this.value);
-        strList.add("name: " + this.name);
-        strList.add("type: " + this.type);
-        strList.add("omitted_value: " + this.omitted_value);
-        strList.add("truncated_value: " + this.truncated_value);
-        return String.join(", ", strList);
+        strList.add("value: " + this.value); //$NON-NLS-1$
+        strList.add("name: " + this.name); //$NON-NLS-1$
+        strList.add("type: " + this.type); //$NON-NLS-1$
+        strList.add("omitted_value: " + this.omitted_value); //$NON-NLS-1$
+        strList.add("truncated_value: " + this.truncated_value); //$NON-NLS-1$
+        return String.join(", ", strList); //$NON-NLS-1$
     }
 
 }

@@ -54,6 +54,6 @@ public class SessionMetadata {
 
     @Override
     public String toString() {
-        return String.format("%s(%s): %s", this.display_label, this.agent_label, this.value);
+        return String.format("%s(%s): %s", this.display_label, this.agent_label, this.value); //$NON-NLS-1$
     }
 }

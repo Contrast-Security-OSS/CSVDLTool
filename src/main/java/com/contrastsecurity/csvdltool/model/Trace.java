@@ -140,10 +140,10 @@ public class Trace {
     }
 
     public String getStatus() {
-        Pattern p = Pattern.compile("^[A-Za-z\\s]+$");
+        Pattern p = Pattern.compile("^[A-Za-z\\s]+$"); //$NON-NLS-1$
         Matcher m = p.matcher(this.status);
         if (m.matches()) {
-            return StatusEnum.valueOf(this.status.replaceAll(" ", "").toUpperCase()).getLabel();
+            return StatusEnum.valueOf(this.status.replaceAll(" ", "").toUpperCase()).getLabel(); //$NON-NLS-1$ //$NON-NLS-2$
         }
         return this.status;
     }
@@ -154,12 +154,12 @@ public class Trace {
 
     public String getPending_status() {
         if (this.pending_status == null) {
-            return "";
+            return ""; //$NON-NLS-1$
         }
-        Pattern p = Pattern.compile("^[A-Za-z\\s]+$");
+        Pattern p = Pattern.compile("^[A-Za-z\\s]+$"); //$NON-NLS-1$
         Matcher m = p.matcher(this.pending_status);
         if (m.matches()) {
-            return StatusEnum.valueOf(this.pending_status.replaceAll(" ", "").toUpperCase()).getLabel();
+            return StatusEnum.valueOf(this.pending_status.replaceAll(" ", "").toUpperCase()).getLabel(); //$NON-NLS-1$ //$NON-NLS-2$
         }
         return this.pending_status;
     }
@@ -249,11 +249,11 @@ public class Trace {
     @Override
     public String toString() {
         List<String> strList = new ArrayList<String>();
-        strList.add(String.format("--- %s ---------------", this.uuid));
-        strList.add("category_label: " + this.category_label);
-        strList.add("rule_title: " + this.rule_title);
-        strList.add("impact_label: " + this.impact_label);
-        return String.join("\r\n", strList);
+        strList.add(String.format("--- %s ---------------", this.uuid)); //$NON-NLS-1$
+        strList.add("category_label: " + this.category_label); //$NON-NLS-1$
+        strList.add("rule_title: " + this.rule_title); //$NON-NLS-1$
+        strList.add("impact_label: " + this.impact_label); //$NON-NLS-1$
+        return String.join("\r\n", strList); //$NON-NLS-1$
     }
 
 }

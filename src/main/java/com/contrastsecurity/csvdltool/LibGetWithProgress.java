@@ -78,7 +78,7 @@ public class LibGetWithProgress implements IRunnableWithProgress {
     private boolean isIncludeCVEDetail;
     private Timer timer;
 
-    Logger logger = LogManager.getLogger("csvdltool");
+    Logger logger = LogManager.getLogger("csvdltool"); //$NON-NLS-1$
 
     public LibGetWithProgress(Shell shell, PreferenceStore ps, List<String> dstApps, Map<String, AppInfo> fullAppMap, boolean isOnlyHasCVE, boolean isIncludeCVEDetail) {
         this.shell = shell;
@@ -142,8 +142,8 @@ public class LibGetWithProgress implements IRunnableWithProgress {
             if (this.isIncludeCVEDetail) {
                 String dirPath = timestamp;
                 if (OS.isFamilyMac()) {
-                    if (System.getProperty("user.dir").contains(".app/Contents/Java")) {
-                        dirPath = "../../../" + timestamp;
+                    if (System.getProperty("user.dir").contains(".app/Contents/Java")) { //$NON-NLS-1$ //$NON-NLS-2$
+                        dirPath = "../../../" + timestamp; //$NON-NLS-1$
                     }
                 }
                 Path dir = Paths.get(dirPath);
@@ -152,7 +152,7 @@ public class LibGetWithProgress implements IRunnableWithProgress {
             // 選択済みアプリのライブラリ情報を取得
             monitor.setTaskName("ライブラリの情報を取得...");
             SubProgressMonitor sub1Monitor = new SubProgressMonitor(monitor, 80);
-            sub1Monitor.beginTask("", dstApps.size());
+            sub1Monitor.beginTask("", dstApps.size()); //$NON-NLS-1$
             int appIdx = 1;
             for (String appLabel : dstApps) {
                 Organization org = fullAppMap.get(appLabel).getOrganization();
@@ -178,7 +178,7 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                     Thread.sleep(sleepTrace);
                 }
                 SubProgressMonitor sub1_1Monitor = new SubProgressMonitor(sub1Monitor, 1);
-                sub1_1Monitor.beginTask("", allLibraries.size());
+                sub1_1Monitor.beginTask("", allLibraries.size()); //$NON-NLS-1$
                 int libIdx = 1;
                 for (Library library : allLibraries) {
                     if (monitor.isCanceled()) {
@@ -233,7 +233,7 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                                 break;
                             case LIB_10: {
                                 // ==================== 10. ライセンス ====================
-                                StringJoiner sj = new StringJoiner(csvColumn.getSeparateStr().replace("\\r", "\r").replace("\\n", "\n"));
+                                StringJoiner sj = new StringJoiner(csvColumn.getSeparateStr().replace("\\r", "\r").replace("\\n", "\n")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
                                 for (String license : library.getLicenses()) {
                                     sj.add(license);
                                 }
@@ -243,7 +243,7 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                             }
                             case LIB_11: {
                                 // ==================== 11. 関連アプリケーション ====================
-                                StringJoiner sj = new StringJoiner(csvColumn.getSeparateStr().replace("\\r", "\r").replace("\\n", "\n"));
+                                StringJoiner sj = new StringJoiner(csvColumn.getSeparateStr().replace("\\r", "\r").replace("\\n", "\n")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
                                 for (Application app : library.getApps()) {
                                     sj.add(app.getName());
                                 }
@@ -252,7 +252,7 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                             }
                             case LIB_12: {
                                 // ==================== 12. 関連サーバ ====================
-                                StringJoiner sj = new StringJoiner(csvColumn.getSeparateStr().replace("\\r", "\r").replace("\\n", "\n"));
+                                StringJoiner sj = new StringJoiner(csvColumn.getSeparateStr().replace("\\r", "\r").replace("\\n", "\n")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
                                 for (Server server : library.getServers()) {
                                     sj.add(server.getName());
                                 }
@@ -261,7 +261,7 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                             }
                             case LIB_13: {
                                 // ==================== 13. CVE ====================
-                                StringJoiner sj = new StringJoiner(csvColumn.getSeparateStr().replace("\\r", "\r").replace("\\n", "\n"));
+                                StringJoiner sj = new StringJoiner(csvColumn.getSeparateStr().replace("\\r", "\r").replace("\\n", "\n")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
                                 for (Vuln vuln : library.getVulns()) {
                                     sj.add(vuln.getName());
                                 }
@@ -270,7 +270,7 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                             }
                             case LIB_14: {
                                 // ==================== 14. ライブラリタグ ====================
-                                StringJoiner sj = new StringJoiner(csvColumn.getSeparateStr().replace("\\r", "\r").replace("\\n", "\n"));
+                                StringJoiner sj = new StringJoiner(csvColumn.getSeparateStr().replace("\\r", "\r").replace("\\n", "\n")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
                                 if (library.getTags() != null) {
                                     for (String tag : library.getTags()) {
                                         sj.add(tag);
@@ -291,11 +291,11 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                                 // ==================== 17. ライブラリへのリンク ====================
                                 String languageCode = library.getLanguageCode();
                                 if (languageCode != null) {
-                                    String link = String.format("%s/static/ng/index.html#/%s/libraries/%s/%s", this.ps.getString(PreferenceConstants.CONTRAST_URL),
+                                    String link = String.format("%s/static/ng/index.html#/%s/libraries/%s/%s", this.ps.getString(PreferenceConstants.CONTRAST_URL), //$NON-NLS-1$
                                             org.getOrganization_uuid(), languageCode, library.getHash());
                                     csvLineList.add(link);
                                 } else {
-                                    csvLineList.add("-");
+                                    csvLineList.add("-"); //$NON-NLS-1$
                                 }
                                 break;
                             }
@@ -303,11 +303,11 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                                 // ==================== 18. ライブラリへのリンク（ハイパーリンク） ====================
                                 String languageCode = library.getLanguageCode();
                                 if (languageCode != null) {
-                                    String link = String.format("%s/static/ng/index.html#/%s/libraries/%s/%s", this.ps.getString(PreferenceConstants.CONTRAST_URL),
+                                    String link = String.format("%s/static/ng/index.html#/%s/libraries/%s/%s", this.ps.getString(PreferenceConstants.CONTRAST_URL), //$NON-NLS-1$
                                             org.getOrganization_uuid(), languageCode, library.getHash());
-                                    csvLineList.add(String.format("=HYPERLINK(\"%s\",\"%s\")", link, "TeamServerへ"));
+                                    csvLineList.add(String.format("=HYPERLINK(\"%s\",\"%s\")", link, Messages.getString("libgetwithprogress.to.teamserver.hyperlink.text"))); //$NON-NLS-1$ //$NON-NLS-2$
                                 } else {
-                                    csvLineList.add("-");
+                                    csvLineList.add("-"); //$NON-NLS-1$
                                 }
                                 break;
                             }
@@ -348,15 +348,15 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                     if (isIncludeCVEDetail && !library.getVulns().isEmpty()) {
                         // ==================== 14. 詳細 ====================
                         if (OS.isFamilyWindows()) {
-                            csvLineList.add(String.format("=HYPERLINK(\".\\%s.txt\",\"%s\")", library.getHash(), library.getHash()));
+                            csvLineList.add(String.format("=HYPERLINK(\".\\%s.txt\",\"%s\")", library.getHash(), library.getHash())); //$NON-NLS-1$
                         } else {
-                            csvLineList.add(String.format("=HYPERLINK(\"%s.txt\",\"%s\")", library.getHash(), library.getHash()));
+                            csvLineList.add(String.format("=HYPERLINK(\"%s.txt\",\"%s\")", library.getHash(), library.getHash())); //$NON-NLS-1$
                         }
-                        String textFileName = String.format("%s\\%s.txt", timestamp, library.getHash());
+                        String textFileName = String.format("%s\\%s.txt", timestamp, library.getHash()); //$NON-NLS-1$
                         if (OS.isFamilyMac()) {
-                            textFileName = String.format("%s/%s.txt", timestamp, library.getHash());
-                            if (System.getProperty("user.dir").contains(".app/Contents/Java")) {
-                                textFileName = String.format("../../../%s/%s.txt", timestamp, library.getHash());
+                            textFileName = String.format("%s/%s.txt", timestamp, library.getHash()); //$NON-NLS-1$
+                            if (System.getProperty("user.dir").contains(".app/Contents/Java")) { //$NON-NLS-1$ //$NON-NLS-2$
+                                textFileName = String.format("../../../%s/%s.txt", timestamp, library.getHash()); //$NON-NLS-1$
                             }
                         }
                         File file = new File(textFileName);
@@ -391,7 +391,7 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                 sub1_1Monitor.done();
                 appIdx++;
             }
-            monitor.subTask("");
+            monitor.subTask(""); //$NON-NLS-1$
             sub1Monitor.done();
         } catch (Exception e) {
             throw new InvocationTargetException(e);
@@ -405,19 +405,19 @@ public class LibGetWithProgress implements IRunnableWithProgress {
         monitor.setTaskName("CSV出力");
         Thread.sleep(500);
         SubProgressMonitor sub2Monitor = new SubProgressMonitor(monitor, 20);
-        sub2Monitor.beginTask("", csvList.size());
-        String filePath = timestamp + ".csv";
+        sub2Monitor.beginTask("", csvList.size()); //$NON-NLS-1$
+        String filePath = timestamp + ".csv"; //$NON-NLS-1$
         if (OS.isFamilyMac()) {
-            if (System.getProperty("user.dir").contains(".app/Contents/Java")) {
-                filePath = "../../../" + timestamp + ".csv";
+            if (System.getProperty("user.dir").contains(".app/Contents/Java")) { //$NON-NLS-1$ //$NON-NLS-2$
+                filePath = "../../../" + timestamp + ".csv"; //$NON-NLS-1$ //$NON-NLS-2$
             }
         }
         if (isIncludeCVEDetail) {
-            filePath = timestamp + "\\" + timestamp + ".csv";
+            filePath = timestamp + "\\" + timestamp + ".csv"; //$NON-NLS-1$ //$NON-NLS-2$
             if (OS.isFamilyMac()) {
-                filePath = timestamp + "/" + timestamp + ".csv";
-                if (System.getProperty("user.dir").contains(".app/Contents/Java")) {
-                    filePath = "../../../" + timestamp + "/" + timestamp + ".csv";
+                filePath = timestamp + "/" + timestamp + ".csv"; //$NON-NLS-1$ //$NON-NLS-2$
+                if (System.getProperty("user.dir").contains(".app/Contents/Java")) { //$NON-NLS-1$ //$NON-NLS-2$
+                    filePath = "../../../" + timestamp + "/" + timestamp + ".csv"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                 }
             }
         }

@@ -1448,7 +1448,7 @@ public class Main implements PropertyChangeListener {
                                 // ==================== 14. 攻撃イベントへのリンク（ハイパーリンク） ====================
                                 String link = String.format("%s/static/ng/index.html#/%s/attacks/events/%s", ps.getString(PreferenceConstants.CONTRAST_URL), //$NON-NLS-1$
                                         attackEvent.getOrganization().getOrganization_uuid().trim(), attackEvent.getEvent_uuid());
-                                csvLineList.add(String.format("=HYPERLINK(\"%s\",\"%s\")", link, "TeamServerへ"));
+                                csvLineList.add(String.format("=HYPERLINK(\"%s\",\"%s\")", link, Messages.getString("main.to.teamserver.hyperlink.text"))); //$NON-NLS-2$
                                 break;
                             }
                         }

@@ -65,7 +65,7 @@ public class ContrastJson {
 
     @Override
     public String toString() {
-        return String.format("%s - %s", this.success, this.messages);
+        return String.format("%s - %s", this.success, this.messages); //$NON-NLS-1$
     }
 
 }

@@ -61,11 +61,11 @@ public class GlobalPropertiesJson extends ContrastJson {
     }
 
     public static int getInternalVersionNumber(String v) {
-        String[] versions = v.split(Pattern.quote("."));
+        String[] versions = v.split(Pattern.quote(".")); //$NON-NLS-1$
         String v1 = versions[0];
-        String v2 = versions[1].length() > 1 ? versions[1] : String.format("0%s", versions[1]);
-        String v3 = versions[2].length() > 1 ? versions[2] : String.format("0%s", versions[2]);
-        return Integer.parseInt(String.format("%s%s%s", v1, v2, v3));
+        String v2 = versions[1].length() > 1 ? versions[1] : String.format("0%s", versions[1]); //$NON-NLS-1$
+        String v3 = versions[2].length() > 1 ? versions[2] : String.format("0%s", versions[2]); //$NON-NLS-1$
+        return Integer.parseInt(String.format("%s%s%s", v1, v2, v3)); //$NON-NLS-1$
     }
 
     public VersionDiff compareVersion(String chkVersion) {

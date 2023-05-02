@@ -44,7 +44,7 @@ public class SessionMetadataJson extends ContrastJson {
     public String toString() {
         List<String> strList = new ArrayList<String>();
         strList.add(session.toString());
-        return String.join("\r\n", strList);
+        return String.join("\r\n", strList); //$NON-NLS-1$
     }
 
 }

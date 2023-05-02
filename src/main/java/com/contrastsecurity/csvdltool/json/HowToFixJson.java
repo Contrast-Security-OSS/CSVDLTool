@@ -60,10 +60,10 @@ public class HowToFixJson extends ContrastJson {
     @Override
     public String toString() {
         List<String> strList = new ArrayList<String>();
-        strList.add("owasp: " + this.owasp);
-        strList.add("cwe: " + this.cwe);
+        strList.add("owasp: " + this.owasp); //$NON-NLS-1$
+        strList.add("cwe: " + this.cwe); //$NON-NLS-1$
         strList.add(this.recommendation.toString());
-        return String.join("\r\n", strList);
+        return String.join("\r\n", strList); //$NON-NLS-1$
     }
 
 }

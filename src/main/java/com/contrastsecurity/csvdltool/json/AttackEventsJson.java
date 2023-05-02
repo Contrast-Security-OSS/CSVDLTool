@@ -41,7 +41,7 @@ public class AttackEventsJson extends ContrastJson {
 
     @Override
     public String toString() {
-        StringJoiner sj = new StringJoiner("\r\n");
+        StringJoiner sj = new StringJoiner("\r\n"); //$NON-NLS-1$
         for (AttackEvent event : this.events) {
             sj.add(event.toString());
         }

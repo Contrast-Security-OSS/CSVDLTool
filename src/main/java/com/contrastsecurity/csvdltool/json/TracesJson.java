@@ -39,7 +39,7 @@ public class TracesJson extends ContrastJson {
 
     @Override
     public String toString() {
-        StringJoiner sj = new StringJoiner("\r\n");
+        StringJoiner sj = new StringJoiner("\r\n"); //$NON-NLS-1$
         for (String s : this.traces) {
             sj.add(s);
         }

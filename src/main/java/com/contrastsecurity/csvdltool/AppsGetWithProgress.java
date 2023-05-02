@@ -62,7 +62,7 @@ public class AppsGetWithProgress implements IRunnableWithProgress {
     private Set<Filter> severityFilterSet = new LinkedHashSet<Filter>();
     private Set<Filter> vulnTypeFilterSet = new LinkedHashSet<Filter>();
 
-    Logger logger = LogManager.getLogger("csvdltool");
+    Logger logger = LogManager.getLogger("csvdltool"); //$NON-NLS-1$
 
     public AppsGetWithProgress(Shell shell, PreferenceStore ps, List<Organization> orgs) {
         this.shell = shell;
@@ -78,15 +78,15 @@ public class AppsGetWithProgress implements IRunnableWithProgress {
         if (this.orgs.size() > 1) {
             prefix_org_flg = true;
         }
-        monitor.beginTask("アプリケーション一覧の読み込み...", 100 * this.orgs.size());
+        monitor.beginTask(Messages.getString("appsgetwithprogress.progress.loading.applications"), 100 * this.orgs.size()); //$NON-NLS-1$
         Thread.sleep(300);
         for (Organization org : this.orgs) {
             try {
                 monitor.setTaskName(org.getName());
                 // フィルタの情報を取得
-                monitor.subTask("フィルタの情報を取得...");
+                monitor.subTask(Messages.getString("appsgetwithprogress.progress.loading.filter")); //$NON-NLS-1$
                 SubProgressMonitor sub1Monitor = new SubProgressMonitor(monitor, 10);
-                sub1Monitor.beginTask("", 2);
+                sub1Monitor.beginTask("", 2); //$NON-NLS-1$
                 Api filterSeverityApi = new FilterSeverityApi(this.shell, this.ps, org);
                 Api filterVulnTypeApi = new FilterVulnTypeApi(this.shell, this.ps, org);
                 try {
@@ -106,16 +106,16 @@ public class AppsGetWithProgress implements IRunnableWithProgress {
                 sub1Monitor.done();
 
                 // アプリケーショングループの情報を取得
-                monitor.subTask("アプリケーショングループの情報を取得...");
+                monitor.subTask(Messages.getString("appsgetwithprogress.progress.loading.application.group")); //$NON-NLS-1$
                 Map<String, List<String>> appGroupMap = new HashMap<String, List<String>>();
                 Api groupsApi = new GroupsApi(this.shell, this.ps, org);
                 groupsApi.setIgnoreStatusCodes(new ArrayList(Arrays.asList(403)));
                 try {
                     List<CustomGroup> customGroups = (List<CustomGroup>) groupsApi.get();
                     SubProgressMonitor sub2Monitor = new SubProgressMonitor(monitor, 10);
-                    sub2Monitor.beginTask("", customGroups.size());
+                    sub2Monitor.beginTask("", customGroups.size()); //$NON-NLS-1$
                     for (CustomGroup customGroup : customGroups) {
-                        monitor.subTask(String.format("アプリケーショングループの情報を取得...%s", customGroup.getName()));
+                        monitor.subTask(String.format("%s%s", Messages.getString("appsgetwithprogress.progress.loading.application.group"), customGroup.getName())); //$NON-NLS-1$ //$NON-NLS-2$
                         List<ApplicationInCustomGroup> apps = customGroup.getApplications();
                         if (apps != null) {
                             for (ApplicationInCustomGroup app : apps) {
@@ -134,30 +134,30 @@ public class AppsGetWithProgress implements IRunnableWithProgress {
                     throw ae;
                 }
                 // アプリケーション一覧を取得
-                monitor.subTask("アプリケーション一覧の情報を取得...");
+                monitor.subTask(Messages.getString("appsgetwithprogress.progress.loading.application.data")); //$NON-NLS-1$
                 Api applicationsApi = new ApplicationsApi(this.shell, this.ps, org);
                 List<Application> applications = (List<Application>) applicationsApi.get();
                 SubProgressMonitor sub3Monitor = new SubProgressMonitor(monitor, 80);
-                sub3Monitor.beginTask("", applications.size());
+                sub3Monitor.beginTask("", applications.size()); //$NON-NLS-1$
                 for (Application app : applications) {
-                    monitor.subTask(String.format("アプリケーション一覧の情報を取得...%s", app.getName()));
-                    if (app.getLicense().getLevel().equals("Unlicensed")) {
+                    monitor.subTask(String.format("%s%s", Messages.getString("appsgetwithprogress.progress.loading.application.data"), app.getName())); //$NON-NLS-1$ //$NON-NLS-2$
+                    if (app.getLicense().getLevel().equals("Unlicensed")) { //$NON-NLS-1$
                         sub3Monitor.worked(1);
                         continue;
                     }
                     if (appGroupMap.containsKey(app.getName())) {
                         if (prefix_org_flg) {
-                            fullAppMap.put(String.format("[%s] %s - %s", org.getName(), app.getName(), String.join(", ", appGroupMap.get(app.getName()))),
+                            fullAppMap.put(String.format("[%s] %s - %s", org.getName(), app.getName(), String.join(", ", appGroupMap.get(app.getName()))), //$NON-NLS-1$ //$NON-NLS-2$
                                     new AppInfo(org, app.getName(), app.getApp_id(), app.getLanguage()));
                         } else {
-                            fullAppMap.put(String.format("%s - %s", app.getName(), String.join(", ", appGroupMap.get(app.getName()))),
+                            fullAppMap.put(String.format("%s - %s", app.getName(), String.join(", ", appGroupMap.get(app.getName()))), //$NON-NLS-1$ //$NON-NLS-2$
                                     new AppInfo(org, app.getName(), app.getApp_id(), app.getLanguage()));
                         }
                     } else {
                         if (prefix_org_flg) {
-                            fullAppMap.put(String.format("[%s] %s", org.getName(), app.getName()), new AppInfo(org, app.getName(), app.getApp_id(), app.getLanguage()));
+                            fullAppMap.put(String.format("[%s] %s", org.getName(), app.getName()), new AppInfo(org, app.getName(), app.getApp_id(), app.getLanguage())); //$NON-NLS-1$
                         } else {
-                            fullAppMap.put(String.format("%s", app.getName()), new AppInfo(org, app.getName(), app.getApp_id(), app.getLanguage()));
+                            fullAppMap.put(String.format("%s", app.getName()), new AppInfo(org, app.getName(), app.getApp_id(), app.getLanguage())); //$NON-NLS-1$
                         }
                     }
                     sub3Monitor.worked(1);

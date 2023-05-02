@@ -313,7 +313,7 @@ public class BasePreferencePage extends PreferencePage {
                 orgList = new Gson().fromJson(orgJsonStr, new TypeToken<List<Organization>>() {
                 }.getType());
             } catch (JsonSyntaxException e) {
-                MessageDialog.openError(getShell(), "組織設定の読み込み", String.format("組織設定の内容に問題があります。\r\n%s", orgJsonStr));
+                MessageDialog.openError(getShell(), "組織設定の読み込み", String.format("%s\r\n%s", "組織設定の内容に問題があります。", orgJsonStr));
                 orgList = new ArrayList<Organization>();
             }
         } else {

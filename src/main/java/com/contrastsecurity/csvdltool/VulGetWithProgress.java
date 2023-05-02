@@ -112,13 +112,13 @@ import com.google.gson.reflect.TypeToken;
 
 public class VulGetWithProgress implements IRunnableWithProgress {
 
-    private static final String ROUTE = "==================== ルート ====================";
-    private static final String HTTP_INFO = "==================== HTTP情報 ====================";
-    private static final String WHAT_HAPPEN = "==================== 何が起こったか？ ====================";
-    private static final String RISK = "==================== どんなリスクであるか？ ====================";
-    private static final String HOWTOFIX = "==================== 修正方法 ====================";
-    private static final String COMMENT = "==================== コメント ====================";
-    private static final String STACK_TRACE = "==================== 詳細 ====================";
+    private static final String ROUTE = Messages.getString("vulgetwithprogress.detail.header.route"); //$NON-NLS-1$
+    private static final String HTTP_INFO = Messages.getString("vulgetwithprogress.detail.header.httpinfo"); //$NON-NLS-1$
+    private static final String WHAT_HAPPEN = Messages.getString("vulgetwithprogress.detail.header.overview"); //$NON-NLS-1$
+    private static final String RISK = Messages.getString("vulgetwithprogress.detail.header.risk"); //$NON-NLS-1$
+    private static final String HOWTOFIX = Messages.getString("vulgetwithprogress.detail.header.howtofix"); //$NON-NLS-1$
+    private static final String COMMENT = Messages.getString("vulgetwithprogress.detail.header.activity"); //$NON-NLS-1$
+    private static final String STACK_TRACE = Messages.getString("vulgetwithprogress.detail.header.stacktrace"); //$NON-NLS-1$
 
     private Shell shell;
     private PreferenceStore ps;
@@ -133,7 +133,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
     private boolean isIncludeStackTrace;
     private Timer timer;
 
-    Logger logger = LogManager.getLogger("csvdltool");
+    Logger logger = LogManager.getLogger("csvdltool"); //$NON-NLS-1$
 
     public VulGetWithProgress(Shell shell, PreferenceStore ps, List<String> dstApps, Map<String, AppInfo> fullAppMap, Map<FilterEnum, Set<Filter>> filterMap, Date frDate,
             Date toDate, boolean isOnlyParentApp, boolean isOnlyCurVulExp, boolean isIncludeDesc, boolean isIncludeStackTrace) {
@@ -175,8 +175,8 @@ public class VulGetWithProgress implements IRunnableWithProgress {
         if (csvFileFormat == null || csvFileFormat.isEmpty()) {
             csvFileFormat = this.ps.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT_VUL);
         }
-        Pattern cwePtn = Pattern.compile("\\/(\\d+)\\.html$");
-        Pattern stsPtn = Pattern.compile("^[A-Za-z\\s]+$");
+        Pattern cwePtn = Pattern.compile("\\/(\\d+)\\.html$"); //$NON-NLS-1$
+        Pattern stsPtn = Pattern.compile("^[A-Za-z\\s]+$"); //$NON-NLS-1$
         String timestamp = new SimpleDateFormat(csvFileFormat).format(new Date());
         int sleepTrace = this.ps.getInt(PreferenceConstants.SLEEP_VUL);
         String columnJsonStr = this.ps.getString(PreferenceConstants.CSV_COLUMN_VUL);
@@ -202,8 +202,8 @@ public class VulGetWithProgress implements IRunnableWithProgress {
             if (this.isIncludeDesc) {
                 String dirPath = timestamp;
                 if (OS.isFamilyMac()) {
-                    if (System.getProperty("user.dir").contains(".app/Contents/Java")) {
-                        dirPath = "../../../" + timestamp;
+                    if (System.getProperty("user.dir").contains(".app/Contents/Java")) { //$NON-NLS-1$ //$NON-NLS-2$
+                        dirPath = "../../../" + timestamp; //$NON-NLS-1$
                     }
                 }
                 Path dir = Paths.get(dirPath);
@@ -214,7 +214,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                 orgs.add(fullAppMap.get(appLabel).getOrganization());
             }
             SubProgressMonitor sub1Monitor = new SubProgressMonitor(monitor, 10);
-            sub1Monitor.beginTask("", orgs.size() * 100);
+            sub1Monitor.beginTask("", orgs.size() * 100); //$NON-NLS-1$
             // アプリケーショングループの情報を取得
             monitor.setTaskName("アプリケーショングループの情報を取得...");
             for (Organization org : orgs) {
@@ -224,7 +224,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                 try {
                     List<CustomGroup> customGroups = (List<CustomGroup>) groupsApi.get();
                     SubProgressMonitor sub1_1Monitor = new SubProgressMonitor(sub1Monitor, 100);
-                    sub1_1Monitor.beginTask("", customGroups.size());
+                    sub1_1Monitor.beginTask("", customGroups.size()); //$NON-NLS-1$
                     for (CustomGroup customGroup : customGroups) {
                         monitor.subTask(customGroup.getName());
                         List<ApplicationInCustomGroup> apps = customGroup.getApplications();
@@ -245,7 +245,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                 } catch (ApiException ae) {
                 }
             }
-            monitor.subTask("");
+            monitor.subTask(""); //$NON-NLS-1$
             sub1Monitor.done();
 
             // コンプライアンスポリシーの情報を取得するか判定
@@ -261,7 +261,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
             // 選択済みアプリの脆弱性情報を取得
             monitor.setTaskName("脆弱性の情報を取得...");
             SubProgressMonitor sub2Monitor = new SubProgressMonitor(monitor, 80);
-            sub2Monitor.beginTask("", dstApps.size() * 100);
+            sub2Monitor.beginTask("", dstApps.size() * 100); //$NON-NLS-1$
             int appIdx = 1;
             for (String appLabel : dstApps) {
                 Organization org = fullAppMap.get(appLabel).getOrganization();
@@ -274,7 +274,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                     SubProgressMonitor sub2_1Monitor = new SubProgressMonitor(sub2Monitor, 20);
                     Api filterSecurityStandardApi = new FilterSecurityStandardApi(this.shell, this.ps, org);
                     List<Filter> filterSecurityStandards = (List<Filter>) filterSecurityStandardApi.get();
-                    sub2_1Monitor.beginTask("", filterSecurityStandards.size());
+                    sub2_1Monitor.beginTask("", filterSecurityStandards.size()); //$NON-NLS-1$
                     for (Filter ssFilter : filterSecurityStandards) {
                         monitor.subTask(String.format("コンプライアンスポリシー: %s", ssFilter.getLabel()));
                         if (monitor.isCanceled()) {
@@ -325,7 +325,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                     }
                 }
                 SubProgressMonitor sub2_2Monitor = new SubProgressMonitor(sub2Monitor, 80);
-                sub2_2Monitor.beginTask("", traces.size());
+                sub2_2Monitor.beginTask("", traces.size()); //$NON-NLS-1$
                 int traceIdx = 1;
                 for (String trace_id : traces) {
                     if (monitor.isCanceled()) {
@@ -368,7 +368,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                                 // ==================== 04. アプリケーションタグ ====================
                                 Api applicationTagsApi = new ApplicationTagsApi(this.shell, this.ps, org, appId);
                                 List<String> applicationTags = (List<String>) applicationTagsApi.get();
-                                csvLineList.add(String.join(csvColumn.getSeparateStr().replace("\\r", "\r").replace("\\n", "\n"), applicationTags));
+                                csvLineList.add(String.join(csvColumn.getSeparateStr().replace("\\r", "\r").replace("\\n", "\n"), applicationTags)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
                                 break;
                             case VUL_05:
                                 // ==================== 05. （脆弱性の）カテゴリ ====================
@@ -392,7 +392,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                                     if (m.find()) {
                                         csvLineList.add(m.group(1));
                                     } else {
-                                        csvLineList.add("");
+                                        csvLineList.add(""); //$NON-NLS-1$
                                     }
                                 } catch (Exception e) {
                                     this.shell.getDisplay().syncExec(new Runnable() {
@@ -406,9 +406,9 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                                     recommendation.setText("***** 取得に失敗しました。 *****");
                                     howToFixJson = new HowToFixJson();
                                     howToFixJson.setRecommendation(recommendation);
-                                    howToFixJson.setCwe("");
-                                    howToFixJson.setOwasp("");
-                                    csvLineList.add("");
+                                    howToFixJson.setCwe(""); //$NON-NLS-1$
+                                    howToFixJson.setOwasp(""); //$NON-NLS-1$
+                                    csvLineList.add(""); //$NON-NLS-1$
                                 }
                                 break;
                             case VUL_09:
@@ -422,9 +422,9 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                             case VUL_11:
                                 // ==================== 11. グループ（アプリケーションのグループ） ====================
                                 if (appGroupMap.containsKey(appName)) {
-                                    csvLineList.add(String.join(csvColumn.getSeparateStr().replace("\\r", "\r").replace("\\n", "\n"), appGroupMap.get(appName)));
+                                    csvLineList.add(String.join(csvColumn.getSeparateStr().replace("\\r", "\r").replace("\\n", "\n"), appGroupMap.get(appName))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
                                 } else {
-                                    csvLineList.add("");
+                                    csvLineList.add(""); //$NON-NLS-1$
                                 }
                                 break;
                             case VUL_12:
@@ -441,24 +441,24 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                                 break;
                             case VUL_15:
                                 // ==================== 15. ビルド番号 ====================
-                                csvLineList.add(String.join(csvColumn.getSeparateStr().replace("\\r", "\r").replace("\\n", "\n"), trace.getApp_version_tags()));
+                                csvLineList.add(String.join(csvColumn.getSeparateStr().replace("\\r", "\r").replace("\\n", "\n"), trace.getApp_version_tags())); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
                                 break;
                             case VUL_16:
                                 // ==================== 16. 次のサーバにより報告 ====================
                                 List<String> serverNameList = trace.getServers().stream().map(Server::getName).collect(Collectors.toList());
-                                csvLineList.add(String.join(csvColumn.getSeparateStr().replace("\\r", "\r").replace("\\n", "\n"), serverNameList));
+                                csvLineList.add(String.join(csvColumn.getSeparateStr().replace("\\r", "\r").replace("\\n", "\n"), serverNameList)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
                                 break;
                             case VUL_17:
                                 // ==================== 17. モジュール ====================
                                 Application app = trace.getApplication();
-                                String module = String.format("%s (%s) - %s", app.getName(), app.getContext_path(), app.getLanguage());
+                                String module = String.format("%s (%s) - %s", app.getName(), app.getContext_path(), app.getLanguage()); //$NON-NLS-1$
                                 csvLineList.add(module);
                                 break;
                             case VUL_18:
                                 // ==================== 18. 脆弱性タグ ====================
                                 Api traceTagsApi = new TraceTagsApi(this.shell, this.ps, org, trace_id);
                                 List<String> traceTags = (List<String>) traceTagsApi.get();
-                                csvLineList.add(String.join(csvColumn.getSeparateStr().replace("\\r", "\r").replace("\\n", "\n"), traceTags));
+                                csvLineList.add(String.join(csvColumn.getSeparateStr().replace("\\r", "\r").replace("\\n", "\n"), traceTags)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
                                 break;
                             case VUL_19:
                                 // ==================== 19. 保留中ステータス ====================
@@ -474,14 +474,14 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                                 break;
                             case VUL_22: {
                                 // ==================== 22. 脆弱性へのリンク ====================
-                                String link = String.format("%s/static/ng/index.html#/%s/applications/%s/vulns/%s", this.ps.getString(PreferenceConstants.CONTRAST_URL),
+                                String link = String.format("%s/static/ng/index.html#/%s/applications/%s/vulns/%s", this.ps.getString(PreferenceConstants.CONTRAST_URL), //$NON-NLS-1$
                                         org.getOrganization_uuid(), trace.getApplication().getApp_id(), trace.getUuid());
                                 csvLineList.add(link);
                                 break;
                             }
                             case VUL_23: {
                                 // ==================== 23. 脆弱性へのリンク（ハイパーリンク） ====================
-                                String link = String.format("%s/static/ng/index.html#/%s/applications/%s/vulns/%s", this.ps.getString(PreferenceConstants.CONTRAST_URL),
+                                String link = String.format("%s/static/ng/index.html#/%s/applications/%s/vulns/%s", this.ps.getString(PreferenceConstants.CONTRAST_URL), //$NON-NLS-1$
                                         org.getOrganization_uuid(), trace.getApplication().getApp_id(), trace.getUuid());
                                 csvLineList.add(String.format("=HYPERLINK(\"%s\",\"TeamServerへ\")", link));
                                 break;
@@ -494,7 +494,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                                 for (Route route : routes) {
                                     urlList.addAll(route.getObservations().stream().map(Observation::getUrl).collect(Collectors.toList()));
                                 }
-                                csvLineList.add(String.join(csvColumn.getSeparateStr().replace("\\r", "\r").replace("\\n", "\n"), urlList));
+                                csvLineList.add(String.join(csvColumn.getSeparateStr().replace("\\r", "\r").replace("\\n", "\n"), urlList)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
                                 break;
                             case VUL_25:
                                 // ==================== 25. セッションメタデータ ====================
@@ -502,9 +502,9 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                                 List<SessionMetadata> metadatas = (List<SessionMetadata>) sessionMetadataApi.get();
                                 List<String> smList = new ArrayList<String>();
                                 for (SessionMetadata sm : metadatas) {
-                                    smList.add(String.format("%s: %s", sm.getDisplay_label(), sm.getValue()));
+                                    smList.add(String.format("%s: %s", sm.getDisplay_label(), sm.getValue())); //$NON-NLS-1$
                                 }
-                                csvLineList.add(String.join(csvColumn.getSeparateStr().replace("\\r", "\r").replace("\\n", "\n"), smList));
+                                csvLineList.add(String.join(csvColumn.getSeparateStr().replace("\\r", "\r").replace("\\n", "\n"), smList)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
                                 break;
                             case VUL_26:
                                 // ==================== 26. コンプライアンスポリシー ====================
@@ -514,7 +514,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                                         ssNameList.add(k);
                                     }
                                 });
-                                csvLineList.add(String.join(csvColumn.getSeparateStr().replace("\\r", "\r").replace("\\n", "\n"), ssNameList));
+                                csvLineList.add(String.join(csvColumn.getSeparateStr().replace("\\r", "\r").replace("\\n", "\n"), ssNameList)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
                                 break;
                             case VUL_27:
                                 // ==================== 27. 検出日時 ====================
@@ -527,15 +527,15 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                     if (isIncludeDesc) {
                         // ==================== 19. 詳細（長文データ） ====================
                         if (OS.isFamilyWindows()) {
-                            csvLineList.add(String.format("=HYPERLINK(\".\\%s.txt\",\"%s\")", trace.getUuid(), trace.getUuid()));
+                            csvLineList.add(String.format("=HYPERLINK(\".\\%s.txt\",\"%s\")", trace.getUuid(), trace.getUuid())); //$NON-NLS-1$
                         } else {
-                            csvLineList.add(String.format("=HYPERLINK(\"%s.txt\",\"%s\")", trace.getUuid(), trace.getUuid()));
+                            csvLineList.add(String.format("=HYPERLINK(\"%s.txt\",\"%s\")", trace.getUuid(), trace.getUuid())); //$NON-NLS-1$
                         }
-                        String textFileName = String.format("%s\\%s.txt", timestamp, trace.getUuid());
+                        String textFileName = String.format("%s\\%s.txt", timestamp, trace.getUuid()); //$NON-NLS-1$
                         if (OS.isFamilyMac()) {
-                            textFileName = String.format("%s/%s.txt", timestamp, trace.getUuid());
-                            if (System.getProperty("user.dir").contains(".app/Contents/Java")) {
-                                textFileName = String.format("../../../%s/%s.txt", timestamp, trace.getUuid());
+                            textFileName = String.format("%s/%s.txt", timestamp, trace.getUuid()); //$NON-NLS-1$
+                            if (System.getProperty("user.dir").contains(".app/Contents/Java")) { //$NON-NLS-1$ //$NON-NLS-2$
+                                textFileName = String.format("../../../%s/%s.txt", timestamp, trace.getUuid()); //$NON-NLS-1$
                             }
                         }
                         File file = new File(textFileName);
@@ -549,7 +549,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                         for (Route route : routes) {
                             signatureUrlList.add(route.getSignature());
                             for (String url : route.getObservations().stream().map(Observation::getUrl).collect(Collectors.toList())) {
-                                signatureUrlList.add(String.format("- %s", url));
+                                signatureUrlList.add(String.format("- %s", url)); //$NON-NLS-1$
                             }
                         }
                         if (signatureUrlList.isEmpty()) {
@@ -614,39 +614,39 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                                 recommendation.setText("***** 取得に失敗しました。 *****");
                                 howToFixJson = new HowToFixJson();
                                 howToFixJson.setRecommendation(recommendation);
-                                howToFixJson.setCwe("");
-                                howToFixJson.setOwasp("");
+                                howToFixJson.setCwe(""); //$NON-NLS-1$
+                                howToFixJson.setOwasp(""); //$NON-NLS-1$
                             }
                         }
                         howToFixLines.add(howToFixJson.getRecommendation().getText());
-                        howToFixLines.add(String.format("CWE: %s", howToFixJson.getCwe()));
-                        howToFixLines.add(String.format("OWASP: %s", howToFixJson.getOwasp()));
+                        howToFixLines.add(String.format("CWE: %s", howToFixJson.getCwe())); //$NON-NLS-1$
+                        howToFixLines.add(String.format("OWASP: %s", howToFixJson.getOwasp())); //$NON-NLS-1$
                         FileUtils.writeLines(file, Main.FILE_ENCODING, howToFixLines, true);
                         // ==================== 19-6. コメント ====================
                         List<String> noteLines = new ArrayList<String>();
                         noteLines.add(COMMENT);
                         for (Note note : trace.getNotes()) {
-                            String statusVal = "";
-                            String subStatusVal = "";
+                            String statusVal = ""; //$NON-NLS-1$
+                            String subStatusVal = ""; //$NON-NLS-1$
                             List<Property> noteProperties = note.getProperties();
                             if (noteProperties != null) {
                                 for (Property prop : noteProperties) {
-                                    if (prop.getName().equals("status.change.status")) {
+                                    if (prop.getName().equals("status.change.status")) { //$NON-NLS-1$
                                         statusVal = prop.getValue();
-                                    } else if (prop.getName().equals("status.change.substatus")) {
+                                    } else if (prop.getName().equals("status.change.substatus")) { //$NON-NLS-1$
                                         subStatusVal = prop.getValue();
                                     }
                                 }
                             }
                             LocalDateTime ldt = LocalDateTime.ofInstant(Instant.ofEpochMilli(Long.parseLong(note.getLast_modification())), ZoneId.systemDefault());
                             // 日時と投稿者
-                            noteLines.add(String.format("[%s] %s", ldt.toString(), note.getLast_updater()));
+                            noteLines.add(String.format("[%s] %s", ldt.toString(), note.getLast_updater())); //$NON-NLS-1$
                             // ステータス変更
                             StringBuilder statusBuffer = new StringBuilder();
                             if (!statusVal.isEmpty()) {
                                 Matcher stsM = stsPtn.matcher(statusVal);
                                 if (stsM.matches()) {
-                                    String jpSts = StatusEnum.valueOf(statusVal.replaceAll(" ", "").toUpperCase()).getLabel();
+                                    String jpSts = StatusEnum.valueOf(statusVal.replaceAll(" ", "").toUpperCase()).getLabel(); //$NON-NLS-1$ //$NON-NLS-2$
                                     statusBuffer.append(String.format("次のステータスに変更: %s", jpSts));
                                 } else {
                                     statusBuffer.append(String.format("次のステータスに変更: %s", statusVal));
@@ -666,11 +666,11 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                         FileUtils.writeLines(file, Main.FILE_ENCODING, noteLines, true);
                     }
                     if (isIncludeStackTrace) {
-                        String textFileName = String.format("%s\\%s.txt", timestamp, trace.getUuid());
+                        String textFileName = String.format("%s\\%s.txt", timestamp, trace.getUuid()); //$NON-NLS-1$
                         if (OS.isFamilyMac()) {
-                            textFileName = String.format("%s/%s.txt", timestamp, trace.getUuid());
-                            if (System.getProperty("user.dir").contains(".app/Contents/Java")) {
-                                textFileName = String.format("../../../%s/%s.txt", timestamp, trace.getUuid());
+                            textFileName = String.format("%s/%s.txt", timestamp, trace.getUuid()); //$NON-NLS-1$
+                            if (System.getProperty("user.dir").contains(".app/Contents/Java")) { //$NON-NLS-1$ //$NON-NLS-2$
+                                textFileName = String.format("../../../%s/%s.txt", timestamp, trace.getUuid()); //$NON-NLS-1$
                             }
                         }
                         File file = new File(textFileName);
@@ -704,7 +704,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                 }
                 appIdx++;
             }
-            monitor.subTask("");
+            monitor.subTask(""); //$NON-NLS-1$
             sub2Monitor.done();
         } catch (Exception e) {
             throw new InvocationTargetException(e);
@@ -718,19 +718,19 @@ public class VulGetWithProgress implements IRunnableWithProgress {
         monitor.setTaskName("CSV出力");
         Thread.sleep(500);
         SubProgressMonitor sub3Monitor = new SubProgressMonitor(monitor, 10);
-        sub3Monitor.beginTask("", csvList.size());
-        String filePath = timestamp + ".csv";
+        sub3Monitor.beginTask("", csvList.size()); //$NON-NLS-1$
+        String filePath = timestamp + ".csv"; //$NON-NLS-1$
         if (OS.isFamilyMac()) {
-            if (System.getProperty("user.dir").contains(".app/Contents/Java")) {
-                filePath = "../../../" + timestamp + ".csv";
+            if (System.getProperty("user.dir").contains(".app/Contents/Java")) { //$NON-NLS-1$ //$NON-NLS-2$
+                filePath = "../../../" + timestamp + ".csv"; //$NON-NLS-1$ //$NON-NLS-2$
             }
         }
         if (isIncludeDesc) {
-            filePath = timestamp + "\\" + timestamp + ".csv";
+            filePath = timestamp + "\\" + timestamp + ".csv"; //$NON-NLS-1$ //$NON-NLS-2$
             if (OS.isFamilyMac()) {
-                filePath = timestamp + "/" + timestamp + ".csv";
-                if (System.getProperty("user.dir").contains(".app/Contents/Java")) {
-                    filePath = "../../../" + timestamp + "/" + timestamp + ".csv";
+                filePath = timestamp + "/" + timestamp + ".csv"; //$NON-NLS-1$ //$NON-NLS-2$
+                if (System.getProperty("user.dir").contains(".app/Contents/Java")) { //$NON-NLS-1$ //$NON-NLS-2$
+                    filePath = "../../../" + timestamp + "/" + timestamp + ".csv"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                 }
             }
         }

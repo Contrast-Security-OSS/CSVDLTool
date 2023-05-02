@@ -53,7 +53,7 @@ public class ServerWithProgress implements IRunnableWithProgress {
     private Set<Filter> agentVerFilterSet = new LinkedHashSet<Filter>();
     private Set<Filter> languageFilterSet = new LinkedHashSet<Filter>();
 
-    Logger logger = Logger.getLogger("csvdltool");
+    Logger logger = Logger.getLogger("csvdltool"); //$NON-NLS-1$
 
     public ServerWithProgress(Shell shell, PreferenceStore ps, List<Organization> orgs) {
         this.shell = shell;
@@ -65,32 +65,32 @@ public class ServerWithProgress implements IRunnableWithProgress {
     @SuppressWarnings("unchecked")
     @Override
     public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-        monitor.beginTask("サーバ一覧の読み込み...", 100 * this.orgs.size());
+        monitor.beginTask(Messages.getString("serverwithprogress.progress.loading.servers"), 100 * this.orgs.size()); //$NON-NLS-1$
         for (Organization org : this.orgs) {
             try {
                 List<Server> orgAttackEvents = new ArrayList<Server>();
                 monitor.setTaskName(org.getName());
                 // アプリケーション一覧を取得
-                monitor.subTask("サーバ一覧の情報を取得...");
+                monitor.subTask(Messages.getString("serverwithprogress.progress.loading.server")); //$NON-NLS-1$
                 Api attacksApi = new ServersApi(this.shell, this.ps, org, orgAttackEvents.size());
                 List<Server> tmpAttackEvents = (List<Server>) attacksApi.get();
                 orgAttackEvents.addAll(tmpAttackEvents);
                 int totalCount = attacksApi.getTotalCount();
                 SubProgressMonitor sub1Monitor = new SubProgressMonitor(monitor, 100);
-                sub1Monitor.beginTask("", totalCount);
-                monitor.subTask(String.format("サーバ一覧の情報を取得...(%d/%d)", orgAttackEvents.size(), totalCount));
+                sub1Monitor.beginTask("", totalCount); //$NON-NLS-1$
+                monitor.subTask(String.format("%s(%d/%d)", Messages.getString("serverwithprogress.progress.loading.server"), orgAttackEvents.size(), totalCount)); //$NON-NLS-1$ //$NON-NLS-2$
                 sub1Monitor.worked(tmpAttackEvents.size());
                 boolean incompleteFlg = false;
                 incompleteFlg = totalCount > orgAttackEvents.size();
                 while (incompleteFlg) {
                     Thread.sleep(200);
                     if (monitor.isCanceled()) {
-                        throw new InterruptedException("キャンセルされました。");
+                        throw new InterruptedException(Messages.getString("serverwithprogress.progress.canceled")); //$NON-NLS-1$
                     }
                     attacksApi = new ServersApi(this.shell, this.ps, org, orgAttackEvents.size());
                     tmpAttackEvents = (List<Server>) attacksApi.get();
                     orgAttackEvents.addAll(tmpAttackEvents);
-                    monitor.subTask(String.format("サーバ一覧の情報を取得...(%d/%d)", orgAttackEvents.size(), totalCount));
+                    monitor.subTask(String.format("%s(%d/%d)", Messages.getString("serverwithprogress.progress.loading.server"), orgAttackEvents.size(), totalCount)); //$NON-NLS-1$ //$NON-NLS-2$
                     sub1Monitor.worked(tmpAttackEvents.size());
                     incompleteFlg = totalCount > orgAttackEvents.size();
                 }

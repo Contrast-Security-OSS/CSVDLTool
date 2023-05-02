@@ -99,7 +99,7 @@ public abstract class Api {
         DELETE
     }
 
-    Logger logger = LogManager.getLogger("csvdltool");
+    Logger logger = LogManager.getLogger("csvdltool"); //$NON-NLS-1$
 
     protected Shell shell;
     protected IPreferenceStore ps;
@@ -151,7 +151,7 @@ public abstract class Api {
         }
 
         boolean isNeedPassInput = false;
-        if (this.ps.getString(PreferenceConstants.PASS_TYPE).equals("input")) {
+        if (this.ps.getString(PreferenceConstants.PASS_TYPE).equals("input")) { //$NON-NLS-1$
             if (this.ps.getString(PreferenceConstants.PASSWORD).isEmpty()) {
                 isNeedPassInput = true;
             }
@@ -172,11 +172,11 @@ public abstract class Api {
                 public void run() {
                     int result = passwordDialog.open();
                     if (IDialogConstants.OK_ID != result) {
-                        pass = "";
+                        pass = ""; //$NON-NLS-1$
                     }
                     pass = passwordDialog.getPass();
                     if (pass == null) {
-                        pass = "";
+                        pass = ""; //$NON-NLS-1$
                     }
                 }
             });
@@ -195,7 +195,7 @@ public abstract class Api {
             List<Cookie> cookies = cookieJar.loadForRequest(HttpUrl.parse(ps.getString(PreferenceConstants.CONTRAST_URL)));
             String xsrf_token = null;
             for (Cookie c : cookies) {
-                if (c.name().equals("XSRF-TOKEN")) {
+                if (c.name().equals("XSRF-TOKEN")) { //$NON-NLS-1$
                     xsrf_token = c.value();
                     this.ps.setValue(PreferenceConstants.XSRF_TOKEN, xsrf_token);
                     this.ps.setValue(PreferenceConstants.BASIC_AUTH_STATUS, BasicAuthStatusEnum.AUTH.name());
@@ -261,10 +261,10 @@ public abstract class Api {
             Type contrastType = new TypeToken<ContrastJson>() {
             }.getType();
             ContrastJson contrastJson = gson.fromJson(e.getMessage(), contrastType);
-            if (contrastJson.getSuccess().equals("false") && contrastJson.getMessages().contains("TSV code required")) {
+            if (contrastJson.getSuccess().equals("false") && contrastJson.getMessages().contains("TSV code required")) { //$NON-NLS-1$ //$NON-NLS-2$
                 TsvSetting ts = new TsvSetting();
                 ts.setTsv_enabled(true);
-                ts.setTsv_type("EMAIL");
+                ts.setTsv_type("EMAIL"); //$NON-NLS-1$
                 return ts;
             }
         } catch (ApiException e) {
@@ -292,7 +292,7 @@ public abstract class Api {
                 if (tsvSetting.getTsv_type() == null) {
                     throw new TsvException("二段階認証コードの通知方法の取得に失敗しました。\r\n二段階認証の設定に問題がないかご確認ください。");
                 }
-                if (tsvSetting.getTsv_type().equals("EMAIL")) {
+                if (tsvSetting.getTsv_type().equals("EMAIL")) { //$NON-NLS-1$
                     Api tsvInitializeApi = null;
                     if (((CSVDLToolShell) this.shell).getMain().getAuthType() == AuthType.PASSWORD) {
                         tsvInitializeApi = new TsvInitializeApi(this.shell, this.ps, this.org, this.contrastUrl, this.userName);
@@ -300,7 +300,7 @@ public abstract class Api {
                         tsvInitializeApi = new TsvInitializeApi(this.shell, this.ps, this.org, this.contrastUrl, this.userName, this.serviceKey);
                     }
                     String rtnMsg = (String) tsvInitializeApi.postWithoutCheckTsv();
-                    if (!rtnMsg.equals("true")) {
+                    if (!rtnMsg.equals("true")) { //$NON-NLS-1$
                         throw new TsvException("二段階認証コードのメール送信要求に失敗しました。");
                     }
                 }
@@ -310,11 +310,11 @@ public abstract class Api {
                     public void run() {
                         int result = tsvDialog.open();
                         if (IDialogConstants.OK_ID != result) {
-                            code = "";
+                            code = ""; //$NON-NLS-1$
                         }
                         code = tsvDialog.getCode();
                         if (code == null) {
-                            code = "";
+                            code = ""; //$NON-NLS-1$
                         }
                     }
                 });
@@ -323,13 +323,13 @@ public abstract class Api {
                     tsvAuthorizeApi.setIgnoreStatusCodes(new ArrayList(Arrays.asList(400)));
                     try {
                         String rtnMsg = (String) tsvAuthorizeApi.postWithoutCheckTsv();
-                        if (rtnMsg.equals("true")) {
+                        if (rtnMsg.equals("true")) { //$NON-NLS-1$
                             this.ps.setValue(PreferenceConstants.TSV_STATUS, TsvStatusEnum.AUTH.name());
                         } else {
                             throw new TsvFailureException("二段階認証に失敗しました。");
                         }
                     } catch (NonApiException nae) {
-                        if (nae.getMessage().equals("400")) {
+                        if (nae.getMessage().equals("400")) { //$NON-NLS-1$
                             throw new TsvException("二段階認証に失敗しました。");
                         }
                     }
@@ -459,14 +459,14 @@ public abstract class Api {
     protected List<Header> getHeaders() {
         List<Header> headers = new ArrayList<Header>();
         if (((CSVDLToolShell) this.shell).getMain().getAuthType() == AuthType.PASSWORD) {
-            headers.add(new BasicHeader("X-XSRF-TOKEN", ps.getString(PreferenceConstants.XSRF_TOKEN)));
+            headers.add(new BasicHeader("X-XSRF-TOKEN", ps.getString(PreferenceConstants.XSRF_TOKEN))); //$NON-NLS-1$
         } else {
             String apiKey = this.org.getApikey();
-            String auth = String.format("%s:%s", this.userName, this.serviceKey);
+            String auth = String.format("%s:%s", this.userName, this.serviceKey); //$NON-NLS-1$
             byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(StandardCharsets.ISO_8859_1));
             String authHeader = new String(encodedAuth);
-            headers.add(new BasicHeader(HttpHeaders.ACCEPT, "application/json"));
-            headers.add(new BasicHeader("API-Key", apiKey));
+            headers.add(new BasicHeader(HttpHeaders.ACCEPT, "application/json")); //$NON-NLS-1$
+            headers.add(new BasicHeader("API-Key", apiKey)); //$NON-NLS-1$
             headers.add(new BasicHeader(HttpHeaders.AUTHORIZATION, authHeader));
         }
         return headers;
@@ -510,7 +510,7 @@ public abstract class Api {
             clientBuilder.readTimeout(sockettTimeout, TimeUnit.MILLISECONDS).connectTimeout(connectTimeout, TimeUnit.MILLISECONDS);
 
             if (this.ps.getBoolean(PreferenceConstants.IGNORE_SSLCERT_CHECK)) {
-                SSLContext sslContext = SSLContext.getInstance("SSL");
+                SSLContext sslContext = SSLContext.getInstance("SSL"); //$NON-NLS-1$
                 TrustManager[] trustAllCerts = getTrustManager();
                 sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
                 SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
@@ -526,16 +526,16 @@ public abstract class Api {
             if (this.ps.getBoolean(PreferenceConstants.PROXY_YUKO)) {
                 clientBuilder.proxy(new Proxy(Proxy.Type.HTTP,
                         new InetSocketAddress(this.ps.getString(PreferenceConstants.PROXY_HOST), Integer.parseInt(this.ps.getString(PreferenceConstants.PROXY_PORT)))));
-                if (!this.ps.getString(PreferenceConstants.PROXY_AUTH).equals("none")) {
+                if (!this.ps.getString(PreferenceConstants.PROXY_AUTH).equals("none")) { //$NON-NLS-1$
                     Authenticator proxyAuthenticator = null;
                     // プロキシ認証あり
-                    if (this.ps.getString(PreferenceConstants.PROXY_AUTH).equals("input")) {
+                    if (this.ps.getString(PreferenceConstants.PROXY_AUTH).equals("input")) { //$NON-NLS-1$
                         proxyAuthenticator = new Authenticator() {
 
                             @Override
                             public Request authenticate(Route route, Response response) throws IOException {
                                 String credential = Credentials.basic(ps.getString(PreferenceConstants.PROXY_TMP_USER), ps.getString(PreferenceConstants.PROXY_TMP_PASS));
-                                return response.request().newBuilder().header("Proxy-Authorization", credential).build();
+                                return response.request().newBuilder().header("Proxy-Authorization", credential).build(); //$NON-NLS-1$
                             }
                         };
                     } else {
@@ -548,7 +548,7 @@ public abstract class Api {
                                 @Override
                                 public Request authenticate(Route route, Response response) throws IOException {
                                     String credential = Credentials.basic(ps.getString(PreferenceConstants.PROXY_USER), proxy_pass);
-                                    return response.request().newBuilder().header("Proxy-Authorization", credential).build();
+                                    return response.request().newBuilder().header("Proxy-Authorization", credential).build(); //$NON-NLS-1$
                                 }
                             };
                         } catch (Exception e) {
@@ -593,8 +593,8 @@ public abstract class Api {
                         Type contrastType = new TypeToken<ContrastJson>() {
                         }.getType();
                         ContrastJson contrastJson = gson.fromJson(response.body().string(), contrastType);
-                        if (contrastJson.getSuccess().equals("false")) {
-                            if (contrastJson.getMessages().contains("Invalid CSRF token") || contrastJson.getMessages().contains("Authorization failure")) {
+                        if (contrastJson.getSuccess().equals("false")) { //$NON-NLS-1$
+                            if (contrastJson.getMessages().contains("Invalid CSRF token") || contrastJson.getMessages().contains("Authorization failure")) { //$NON-NLS-1$ //$NON-NLS-2$
                                 shell.getDisplay().syncExec(new Runnable() {
                                     @Override
                                     public void run() {
@@ -605,7 +605,7 @@ public abstract class Api {
                                 // ps.setValue(PreferenceConstants.BASIC_AUTH_STATUS, BasicAuthStatusEnum.NONE.name());
                                 // ps.setValue(PreferenceConstants.XSRF_TOKEN, "");
                                 throw new ApiException("認証が必要です。もう一度実行してください。");
-                            } else if (contrastJson.getMessages().contains("Unable to sign in. Contact your administrator.")) {
+                            } else if (contrastJson.getMessages().contains("Unable to sign in. Contact your administrator.")) { //$NON-NLS-1$
                                 throw new ApiException("認証に失敗しました。\r\nUsername, Passwordが正しいか再度ご確認ください。\r\nまたはアカウントがロックされているかもしれません。管理者に問い合わせてください。");
                             } else {
                                 throw new BasicAuthFailureException("認証に失敗しました。\r\nUsername, Passwordが正しいか再度ご確認ください。");

@@ -127,7 +127,7 @@ public class LibCSVColumnPreferencePage extends PreferencePage {
                     });
                 }
             } catch (JsonSyntaxException e) {
-                MessageDialog.openError(getShell(), "ライブラリ出力項目の読み込み", String.format("ライブラリ出力項目の内容に問題があります。\r\n%s", columnJsonStr));
+                MessageDialog.openError(getShell(), "ライブラリ出力項目の読み込み", String.format("%s\r\n%s", "ライブラリ出力項目の内容に問題があります。", columnJsonStr));
                 columnList = new ArrayList<LibCSVColumn>();
             }
         } else {

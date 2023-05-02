@@ -12,7 +12,7 @@ public class AppGetProgressMonitorDialog extends ProgressMonitorDialog {
     @Override
     protected void configureShell(Shell newShell) {
         super.configureShell(newShell);
-        newShell.setText("アプリケーション一覧の読み込み");
+        newShell.setText(Messages.getString("appgetprogressmonitordialog.title")); //$NON-NLS-1$
     }
 
 }

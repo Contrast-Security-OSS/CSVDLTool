@@ -127,7 +127,7 @@ public class LibCSVColumnPreferencePage extends PreferencePage {
                     });
                 }
             } catch (JsonSyntaxException e) {
-                MessageDialog.openError(getShell(), "ライブラリ出力項目の読み込み", String.format("%s\r\n%s", "ライブラリ出力項目の内容に問題があります。", columnJsonStr));
+                MessageDialog.openError(getShell(), Messages.getString("libcsvcolumnpreferencepage.message.dialog.title"), String.format("%s\r\n%s", Messages.getString("libcsvcolumnpreferencepage.message.dialog.json.load.error.message"), columnJsonStr)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                 columnList = new ArrayList<LibCSVColumn>();
             }
         } else {

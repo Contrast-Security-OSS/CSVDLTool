@@ -631,7 +631,7 @@ public class Main implements PropertyChangeListener {
         srcListDescLblGrDt.minimumHeight = 12;
         srcListDescLblGrDt.heightHint = 12;
         srcListDescLbl.setLayoutData(srcListDescLblGrDt);
-        srcListDescLbl.setFont(new Font(display, "Arial", 8, SWT.NORMAL));
+        srcListDescLbl.setFont(new Font(display, "Arial", 8, SWT.NORMAL)); //$NON-NLS-1$
         srcListDescLbl.setText(Messages.getString("main.available.app.list.count.label")); //$NON-NLS-1$
         srcListDescLbl.setForeground(shell.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
         this.srcCount = new Label(srcListLblComp, SWT.RIGHT);
@@ -639,7 +639,7 @@ public class Main implements PropertyChangeListener {
         srcCountGrDt.minimumHeight = 12;
         srcCountGrDt.heightHint = 12;
         this.srcCount.setLayoutData(srcCountGrDt);
-        this.srcCount.setFont(new Font(display, "Arial", 8, SWT.NORMAL));
+        this.srcCount.setFont(new Font(display, "Arial", 8, SWT.NORMAL)); //$NON-NLS-1$
         this.srcCount.setText("0"); //$NON-NLS-1$
         this.srcCount.setForeground(shell.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
 
@@ -806,7 +806,7 @@ public class Main implements PropertyChangeListener {
         dstListDescLblGrDt.minimumHeight = 12;
         dstListDescLblGrDt.heightHint = 12;
         dstListDescLbl.setLayoutData(dstListDescLblGrDt);
-        dstListDescLbl.setFont(new Font(display, "Arial", 8, SWT.NORMAL));
+        dstListDescLbl.setFont(new Font(display, "Arial", 8, SWT.NORMAL)); //$NON-NLS-1$
         dstListDescLbl.setText(Messages.getString("main.selected.app.list.count.label")); //$NON-NLS-1$
         dstListDescLbl.setForeground(shell.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
         this.dstCount = new Label(dstListLblComp, SWT.RIGHT);
@@ -814,7 +814,7 @@ public class Main implements PropertyChangeListener {
         dstCountGrDt.minimumHeight = 12;
         dstCountGrDt.heightHint = 12;
         this.dstCount.setLayoutData(dstCountGrDt);
-        this.dstCount.setFont(new Font(display, "Arial", 8, SWT.NORMAL));
+        this.dstCount.setFont(new Font(display, "Arial", 8, SWT.NORMAL)); //$NON-NLS-1$
         this.dstCount.setText("0"); //$NON-NLS-1$
         this.dstCount.setForeground(shell.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
 
@@ -951,7 +951,7 @@ public class Main implements PropertyChangeListener {
         vulExecuteBtn.setLayoutData(executeBtnGrDt);
         vulExecuteBtn.setText(Messages.getString("main.vul.export.button.title")); //$NON-NLS-1$
         vulExecuteBtn.setToolTipText(Messages.getString("main.vul.export.button.tooltip")); //$NON-NLS-1$
-        vulExecuteBtn.setFont(new Font(display, "Arial", 20, SWT.NORMAL));
+        vulExecuteBtn.setFont(new Font(display, "Arial", 20, SWT.NORMAL)); //$NON-NLS-1$
         vulExecuteBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -1064,7 +1064,7 @@ public class Main implements PropertyChangeListener {
         libExecuteBtn.setLayoutData(libExecuteBtnGrDt);
         libExecuteBtn.setText(Messages.getString("main.lib.export.button.title")); //$NON-NLS-1$
         libExecuteBtn.setToolTipText(Messages.getString("main.lib.export.button.tooltip")); //$NON-NLS-1$
-        libExecuteBtn.setFont(new Font(display, "Arial", 20, SWT.NORMAL));
+        libExecuteBtn.setFont(new Font(display, "Arial", 20, SWT.NORMAL)); //$NON-NLS-1$
         libExecuteBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -1210,7 +1210,7 @@ public class Main implements PropertyChangeListener {
         attackLoadBtn.setLayoutData(attackLoadBtnGrDt);
         attackLoadBtn.setText(Messages.getString("main.attackevent.load.button.title")); //$NON-NLS-1$
         attackLoadBtn.setToolTipText(Messages.getString("main.attackevent.load.button.tooltip")); //$NON-NLS-1$
-        attackLoadBtn.setFont(new Font(display, "Arial", 20, SWT.NORMAL));
+        attackLoadBtn.setFont(new Font(display, "Arial", 20, SWT.NORMAL)); //$NON-NLS-1$
         attackLoadBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -1271,7 +1271,7 @@ public class Main implements PropertyChangeListener {
         attackEventCountGrDt.heightHint = 12;
         attackEventCountGrDt.widthHint = 30;
         this.attackEventCount.setLayoutData(attackEventCountGrDt);
-        this.attackEventCount.setFont(new Font(display, "Arial", 10, SWT.NORMAL));
+        this.attackEventCount.setFont(new Font(display, "Arial", 10, SWT.NORMAL)); //$NON-NLS-1$
         this.attackEventCount.setText("0/0"); //$NON-NLS-1$
 
         attackTable = new Table(attackListGrp, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
@@ -1709,7 +1709,7 @@ public class Main implements PropertyChangeListener {
         serverLoadBtn.setLayoutData(serverLoadBtnGrDt);
         serverLoadBtn.setText(Messages.getString("main.server.load.button.title")); //$NON-NLS-1$
         serverLoadBtn.setToolTipText(Messages.getString("main.server.load.button.tooltip")); //$NON-NLS-1$
-        serverLoadBtn.setFont(new Font(display, "Arial", 20, SWT.NORMAL));
+        serverLoadBtn.setFont(new Font(display, "Arial", 20, SWT.NORMAL)); //$NON-NLS-1$
         serverLoadBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -1983,7 +1983,7 @@ public class Main implements PropertyChangeListener {
         statusBarGrDt.minimumHeight = 11;
         statusBarGrDt.heightHint = 11;
         this.statusBar.setLayoutData(statusBarGrDt);
-        this.statusBar.setFont(new Font(display, "Arial", 9, SWT.NORMAL));
+        this.statusBar.setFont(new Font(display, "Arial", 9, SWT.NORMAL)); //$NON-NLS-1$
         this.statusBar.setForeground(shell.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
 
         uiUpdate();

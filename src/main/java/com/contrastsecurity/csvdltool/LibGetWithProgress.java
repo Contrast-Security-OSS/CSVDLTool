@@ -305,7 +305,7 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                                 if (languageCode != null) {
                                     String link = String.format("%s/static/ng/index.html#/%s/libraries/%s/%s", this.ps.getString(PreferenceConstants.CONTRAST_URL),
                                             org.getOrganization_uuid(), languageCode, library.getHash());
-                                    csvLineList.add(String.format("=HYPERLINK(\"%s\",\"TeamServerへ\")", link));
+                                    csvLineList.add(String.format("=HYPERLINK(\"%s\",\"%s\")", link, "TeamServerへ"));
                                 } else {
                                     csvLineList.add("-");
                                 }

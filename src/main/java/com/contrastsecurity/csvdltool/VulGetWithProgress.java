@@ -483,7 +483,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                                 // ==================== 23. 脆弱性へのリンク（ハイパーリンク） ====================
                                 String link = String.format("%s/static/ng/index.html#/%s/applications/%s/vulns/%s", this.ps.getString(PreferenceConstants.CONTRAST_URL), //$NON-NLS-1$
                                         org.getOrganization_uuid(), trace.getApplication().getApp_id(), trace.getUuid());
-                                csvLineList.add(String.format("=HYPERLINK(\"%s\",\"TeamServerへ\")", link));
+                                csvLineList.add(String.format("=HYPERLINK(\"%s\",\"%s\")", link, "TeamServerへ"));
                                 break;
                             }
                             case VUL_24:

@@ -26,6 +26,7 @@ package com.contrastsecurity.csvdltool.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.contrastsecurity.csvdltool.Messages;
 import com.google.gson.annotations.SerializedName;
 
 public class EventDetail {
@@ -88,17 +89,17 @@ public class EventDetail {
 
     public List<String> getDetailLines() {
         List<String> detailLines = new ArrayList<String>();
-        detailLines.add(String.format("クラス.メソッド : %s.%s", this.classStr, this.method));
-        detailLines.add(String.format("オブジェクト    : %s", this.object));
-        detailLines.add(String.format("リターン        : %s", this.returnStr));
+        detailLines.add(String.format("%s %s.%s", Messages.getString("eventdetail.detail.class.method.text"), this.classStr, this.method)); //$NON-NLS-1$ //$NON-NLS-2$
+        detailLines.add(String.format("%s %s", Messages.getString("eventdetail.detail.object.text"), this.object)); //$NON-NLS-1$ //$NON-NLS-2$
+        detailLines.add(String.format("%s %s", Messages.getString("eventdetail.detail.return.text"), this.returnStr)); //$NON-NLS-1$ //$NON-NLS-2$
         List<String> paramList = new ArrayList<String>();
         if (this.getParameters() != null) {
             for (Parameter param : this.getParameters()) {
                 paramList.add(param.getParameter());
             }
         }
-        detailLines.add(String.format("パラメータ      : %s", String.join(", ", paramList)));
-        detailLines.add("スタックトレース:");
+        detailLines.add(String.format("%s %s", Messages.getString("eventdetail.detail.parameter.text"), String.join(", ", paramList))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        detailLines.add(Messages.getString("eventdetail.detail.stacktrace.text")); //$NON-NLS-1$
         if (this.getStacktraces() != null) {
             for (StackTrace stackTrace : this.getStacktraces()) {
                 detailLines.add(stackTrace.getDescription());

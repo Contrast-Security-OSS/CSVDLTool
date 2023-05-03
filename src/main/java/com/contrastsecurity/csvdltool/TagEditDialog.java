@@ -78,9 +78,9 @@ public class TagEditDialog extends Dialog {
         srcNameGrpGrDt.minimumWidth = 200;
         srcNameGrpGrDt.horizontalSpan = 2;
         srcNameGrp.setLayoutData(srcNameGrpGrDt);
-        srcNameGrp.setText("既存タグ");
+        srcNameGrp.setText(Messages.getString("tageditdialog.exist.tags.label")); //$NON-NLS-1$
 
-        new Label(srcNameGrp, SWT.LEFT).setText("削除するタグにチェックをいれてください。");
+        new Label(srcNameGrp, SWT.LEFT).setText(Messages.getString("tageditdialog.remove.tag.label")); //$NON-NLS-1$
 
         final Table srcNameTable = new Table(srcNameGrp, SWT.CHECK | SWT.BORDER | SWT.V_SCROLL);
         GridData srcNameTableGrDt = new GridData(GridData.FILL_BOTH);
@@ -113,10 +113,10 @@ public class TagEditDialog extends Dialog {
             }
         });
 
-        new Label(composite, SWT.LEFT).setText("タグ：");
+        new Label(composite, SWT.LEFT).setText(Messages.getString("tageditdialog.tag.label")); //$NON-NLS-1$
         tagTxt = new Text(composite, SWT.BORDER);
         tagTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        tagTxt.setMessage("追加するタグはこちらに入力してください。");
+        tagTxt.setMessage(Messages.getString("tageditdialog.tag.text.message")); //$NON-NLS-1$
         tagTxt.addListener(SWT.FocusIn, new Listener() {
             public void handleEvent(Event e) {
                 tagTxt.selectAll();
@@ -170,6 +170,6 @@ public class TagEditDialog extends Dialog {
     @Override
     protected void configureShell(Shell newShell) {
         super.configureShell(newShell);
-        newShell.setText("タグ編集");
+        newShell.setText(Messages.getString("tageditdialog.title")); //$NON-NLS-1$
     }
 }

@@ -527,11 +527,12 @@ public class Main implements PropertyChangeListener {
                     // }
                     String errorMsg = e.getTargetException().getMessage();
                     if (e.getTargetException() instanceof ApiException) {
-                        MessageDialog.openError(shell, Messages.getString("main.application.load.message.dialog.title"), String.format("TeamServerからエラーが返されました。\r\n%s", errorMsg)); //$NON-NLS-1$
+                        MessageDialog.openError(shell, Messages.getString("main.application.load.message.dialog.title"), //$NON-NLS-1$
+                                String.format("%s\r\n%s", "TeamServerからエラーが返されました。", errorMsg)); //$NON-NLS-1$
                     } else if (e.getTargetException() instanceof NonApiException) {
                         logger.error(trace);
                         MessageDialog.openError(shell, Messages.getString("main.application.load.message.dialog.title"), //$NON-NLS-1$
-                                String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", errorMsg));
+                                String.format("%s %s\r\n%s", "想定外のステータスコード:", errorMsg, "ログファイルをご確認ください。")); //$NON-NLS-1$
                     } else if (e.getTargetException() instanceof TsvException) {
                         MessageDialog.openError(shell, Messages.getString("main.application.load.message.dialog.title"), errorMsg); //$NON-NLS-1$
                         return;
@@ -540,7 +541,8 @@ public class Main implements PropertyChangeListener {
                         return;
                     } else {
                         logger.error(trace);
-                        MessageDialog.openError(shell, Messages.getString("main.application.load.message.dialog.title"), String.format("不明なエラーです。ログファイルをご確認ください。\r\n%s", errorMsg)); //$NON-NLS-1$
+                        MessageDialog.openError(shell, Messages.getString("main.application.load.message.dialog.title"), //$NON-NLS-1$
+                                String.format("%s\r\n%s", "不明なエラーです。ログファイルをご確認ください。", errorMsg)); //$NON-NLS-1$
                     }
                     return;
                 } catch (InterruptedException e) {
@@ -975,11 +977,12 @@ public class Main implements PropertyChangeListener {
                     // }
                     String exceptionMsg = e.getTargetException().getMessage();
                     if (e.getTargetException() instanceof ApiException) {
-                        MessageDialog.openError(shell, Messages.getString("main.vul.export.message.dialog.title"), String.format("TeamServerからエラーが返されました。\r\n%s", exceptionMsg)); //$NON-NLS-1$
+                        MessageDialog.openError(shell, Messages.getString("main.vul.export.message.dialog.title"), //$NON-NLS-1$
+                                String.format("%s\r\n%s", "TeamServerからエラーが返されました。", exceptionMsg)); //$NON-NLS-1$
                     } else if (e.getTargetException() instanceof NonApiException) {
                         logger.error(trace);
                         MessageDialog.openError(shell, Messages.getString("main.vul.export.message.dialog.title"), //$NON-NLS-1$
-                                String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", exceptionMsg));
+                                String.format("%s %s\r\n%s", "想定外のステータスコード:", exceptionMsg, "ログファイルをご確認ください。")); //$NON-NLS-1$
                     } else if (e.getTargetException() instanceof InterruptedException) {
                         MessageDialog.openInformation(shell, trace, exceptionMsg);
                     } else if (e.getTargetException() instanceof TsvException) {
@@ -990,7 +993,8 @@ public class Main implements PropertyChangeListener {
                         return;
                     } else {
                         logger.error(trace);
-                        MessageDialog.openError(shell, Messages.getString("main.vul.export.message.dialog.title"), String.format("不明なエラーです。ログファイルをご確認ください。\r\n%s", exceptionMsg)); //$NON-NLS-1$
+                        MessageDialog.openError(shell, Messages.getString("main.vul.export.message.dialog.title"), //$NON-NLS-1$
+                                String.format("%s\r\n%s", "不明なエラーです。ログファイルをご確認ください。", exceptionMsg)); //$NON-NLS-1$
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -1087,11 +1091,12 @@ public class Main implements PropertyChangeListener {
                     // }
                     String exceptionMsg = e.getTargetException().getMessage();
                     if (e.getTargetException() instanceof ApiException) {
-                        MessageDialog.openError(shell, Messages.getString("main.lib.export.message.dialog.title"), String.format("TeamServerからエラーが返されました。\r\n%s", exceptionMsg)); //$NON-NLS-1$
+                        MessageDialog.openError(shell, Messages.getString("main.lib.export.message.dialog.title"), //$NON-NLS-1$
+                                String.format("%s\r\n%s", "TeamServerからエラーが返されました。", exceptionMsg)); //$NON-NLS-1$
                     } else if (e.getTargetException() instanceof NonApiException) {
                         logger.error(trace);
                         MessageDialog.openError(shell, Messages.getString("main.lib.export.message.dialog.title"), //$NON-NLS-1$
-                                String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", exceptionMsg));
+                                String.format("%s %s\r\n%s", "想定外のステータスコード:", exceptionMsg, "ログファイルをご確認ください。")); //$NON-NLS-1$
                     } else if (e.getTargetException() instanceof InterruptedException) {
                         MessageDialog.openInformation(shell, trace, exceptionMsg);
                     } else if (e.getTargetException() instanceof TsvException) {
@@ -1102,7 +1107,8 @@ public class Main implements PropertyChangeListener {
                         return;
                     } else {
                         logger.error(trace);
-                        MessageDialog.openError(shell, Messages.getString("main.lib.export.message.dialog.title"), String.format("不明なエラーです。ログファイルをご確認ください。\r\n%s", exceptionMsg)); //$NON-NLS-1$
+                        MessageDialog.openError(shell, Messages.getString("main.lib.export.message.dialog.title"), //$NON-NLS-1$
+                                String.format("%s\r\n%s", "不明なエラーです。ログファイルをご確認ください。", exceptionMsg)); //$NON-NLS-1$
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -1245,10 +1251,11 @@ public class Main implements PropertyChangeListener {
                     }
                     String errorMsg = e.getTargetException().getMessage();
                     if (e.getTargetException() instanceof ApiException) {
-                        MessageDialog.openError(shell, Messages.getString("main.attackevent.load.message.dialog.title"), String.format("TeamServerからエラーが返されました。\r\n%s", errorMsg)); //$NON-NLS-1$
+                        MessageDialog.openError(shell, Messages.getString("main.attackevent.load.message.dialog.title"), //$NON-NLS-1$
+                                String.format("%s\r\n%s", "TeamServerからエラーが返されました。", errorMsg)); //$NON-NLS-1$
                     } else if (e.getTargetException() instanceof NonApiException) {
                         MessageDialog.openError(shell, Messages.getString("main.attackevent.load.message.dialog.title"), //$NON-NLS-1$
-                                String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", errorMsg));
+                                String.format("%s %s\r\n%s", "想定外のステータスコード:", errorMsg, "ログファイルをご確認ください。")); //$NON-NLS-1$
                     } else if (e.getTargetException() instanceof TsvException) {
                         MessageDialog.openError(shell, Messages.getString("main.attackevent.load.message.dialog.title"), errorMsg); //$NON-NLS-1$
                         return;
@@ -1256,7 +1263,8 @@ public class Main implements PropertyChangeListener {
                         MessageDialog.openError(shell, Messages.getString("main.attackevent.load.message.dialog.title"), errorMsg); //$NON-NLS-1$
                         return;
                     } else {
-                        MessageDialog.openError(shell, Messages.getString("main.attackevent.load.message.dialog.title"), String.format("不明なエラーです。ログファイルをご確認ください。\r\n%s", errorMsg)); //$NON-NLS-1$
+                        MessageDialog.openError(shell, Messages.getString("main.attackevent.load.message.dialog.title"), //$NON-NLS-1$
+                                String.format("%s\r\n%s", "不明なエラーです。ログファイルをご確認ください。", errorMsg)); //$NON-NLS-1$
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -1448,7 +1456,7 @@ public class Main implements PropertyChangeListener {
                                 // ==================== 14. 攻撃イベントへのリンク（ハイパーリンク） ====================
                                 String link = String.format("%s/static/ng/index.html#/%s/attacks/events/%s", ps.getString(PreferenceConstants.CONTRAST_URL), //$NON-NLS-1$
                                         attackEvent.getOrganization().getOrganization_uuid().trim(), attackEvent.getEvent_uuid());
-                                csvLineList.add(String.format("=HYPERLINK(\"%s\",\"%s\")", link, Messages.getString("main.to.teamserver.hyperlink.text"))); //$NON-NLS-2$
+                                csvLineList.add(String.format("=HYPERLINK(\"%s\",\"%s\")", link, Messages.getString("main.to.teamserver.hyperlink.text"))); //$NON-NLS-1$//$NON-NLS-2$
                                 break;
                             }
                         }
@@ -1735,9 +1743,10 @@ public class Main implements PropertyChangeListener {
                     }
                     String errorMsg = e.getTargetException().getMessage();
                     if (e.getTargetException() instanceof ApiException) {
-                        MessageDialog.openError(shell, Messages.getString("main.server.load.message.dialog.title"), String.format("TeamServerからエラーが返されました。\r\n%s", errorMsg)); //$NON-NLS-1$
+                        MessageDialog.openError(shell, Messages.getString("main.server.load.message.dialog.title"), String.format("%s\r\n%s", "TeamServerからエラーが返されました。", errorMsg)); //$NON-NLS-1$ //$NON-NLS-2$
                     } else if (e.getTargetException() instanceof NonApiException) {
-                        MessageDialog.openError(shell, Messages.getString("main.server.load.message.dialog.title"), String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", errorMsg)); //$NON-NLS-1$
+                        MessageDialog.openError(shell, Messages.getString("main.server.load.message.dialog.title"), //$NON-NLS-1$
+                                String.format("%s %s\r\n%s", "想定外のステータスコード:", errorMsg, "ログファイルをご確認ください。")); //$NON-NLS-1$
                     } else if (e.getTargetException() instanceof TsvException) {
                         MessageDialog.openError(shell, Messages.getString("main.server.load.message.dialog.title"), errorMsg); //$NON-NLS-1$
                         return;
@@ -1745,7 +1754,8 @@ public class Main implements PropertyChangeListener {
                         MessageDialog.openError(shell, Messages.getString("main.server.load.message.dialog.title"), errorMsg); //$NON-NLS-1$
                         return;
                     } else {
-                        MessageDialog.openError(shell, Messages.getString("main.server.load.message.dialog.title"), String.format("不明なエラーです。ログファイルをご確認ください。\r\n%s", errorMsg)); //$NON-NLS-1$
+                        MessageDialog.openError(shell, Messages.getString("main.server.load.message.dialog.title"), //$NON-NLS-1$
+                                String.format("%s\r\n%s", "不明なエラーです。ログファイルをご確認ください。", errorMsg)); //$NON-NLS-1$
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -1793,7 +1803,7 @@ public class Main implements PropertyChangeListener {
                         columnList = new Gson().fromJson(columnJsonStr, new TypeToken<List<ServerCSVColumn>>() {
                         }.getType());
                     } catch (JsonSyntaxException jse) {
-                        MessageDialog.openError(shell, "サーバ出力項目の読み込み", String.format("サーバ出力項目の内容に問題があります。\r\n%s", columnJsonStr));
+                        MessageDialog.openError(shell, "サーバ出力項目の読み込み", String.format("%s\r\n%s", "サーバ出力項目の内容に問題があります。", columnJsonStr)); //$NON-NLS-2$
                         columnList = new ArrayList<ServerCSVColumn>();
                     }
                 } else {

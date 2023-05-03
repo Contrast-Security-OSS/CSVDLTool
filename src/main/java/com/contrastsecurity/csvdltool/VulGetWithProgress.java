@@ -397,7 +397,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                                 } catch (Exception e) {
                                     this.shell.getDisplay().syncExec(new Runnable() {
                                         public void run() {
-                                            if (!MessageDialog.openConfirm(shell, Messages.getString("vulgetwithprogress.message.dialog.title"), "修正方法、CWE、OWASPの情報を取得する際に例外が発生しました。\r\n例外についてはログでご確認ください。処理を続けますか？")) { //$NON-NLS-1$
+                                            if (!MessageDialog.openConfirm(shell, Messages.getString("vulgetwithprogress.message.dialog.title"), Messages.getString("vulgetwithprogress.message.dialog.howtofix.get.error.message"))) { //$NON-NLS-1$ //$NON-NLS-2$
                                                 monitor.setCanceled(true);
                                             }
                                         }
@@ -574,7 +574,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                         } catch (Exception e) {
                             this.shell.getDisplay().syncExec(new Runnable() {
                                 public void run() {
-                                    if (!MessageDialog.openConfirm(shell, Messages.getString("vulgetwithprogress.message.dialog.title"), "何が起こったか？、どんなリスクであるか？の情報を取得する際に例外が発生しました。\r\n例外についてはログでご確認ください。処理を続けますか？")) { //$NON-NLS-1$
+                                    if (!MessageDialog.openConfirm(shell, Messages.getString("vulgetwithprogress.message.dialog.title"), Messages.getString("vulgetwithprogress.message.dialog.overview.get.error.message"))) { //$NON-NLS-1$ //$NON-NLS-2$
                                         monitor.setCanceled(true);
                                     }
                                 }
@@ -605,7 +605,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                             } catch (Exception e) {
                                 this.shell.getDisplay().syncExec(new Runnable() {
                                     public void run() {
-                                        if (!MessageDialog.openConfirm(shell, Messages.getString("vulgetwithprogress.message.dialog.title"), "修正方法、CWE、OWASPの情報を取得する際に例外が発生しました。\r\n例外についてはログでご確認ください。処理を続けますか？")) { //$NON-NLS-1$
+                                        if (!MessageDialog.openConfirm(shell, Messages.getString("vulgetwithprogress.message.dialog.title"), Messages.getString("vulgetwithprogress.message.dialog.howtofix.get.error.message"))) { //$NON-NLS-1$ //$NON-NLS-2$
                                             monitor.setCanceled(true);
                                         }
                                     }

@@ -219,9 +219,9 @@ public abstract class Api {
             String trace = stringWriter.toString();
             logger.error(trace);
             if (e instanceof UnknownHostException) {
-                throw new BasicAuthException(String.format("ホストが見つかりません。\r\n%s", e.getMessage()));
+                throw new BasicAuthException(String.format("%s\r\n%s", "ホストが見つかりません。", e.getMessage())); //$NON-NLS-1$
             }
-            throw new BasicAuthException(String.format("%s\r\nエラーの詳細はログファイルでご確認ください。", e.getMessage()));
+            throw new BasicAuthException(String.format("%s\r\n%s", e.getMessage(), "エラーの詳細はログファイルでご確認ください。")); //$NON-NLS-1$
         }
     }
 
@@ -268,11 +268,11 @@ public abstract class Api {
                 return ts;
             }
         } catch (ApiException e) {
-            throw new TsvException(String.format("TeamServerからエラーが返されました。\r\n%s", e.getMessage()));
+            throw new TsvException(String.format("%s\r\n%s", "TeamServerからエラーが返されました。", e.getMessage())); //$NON-NLS-1$
         } catch (NonApiException e) {
-            throw new TsvException(String.format("想定外のステータスコード: %s\r\nログファイルをご確認ください。", e.getMessage()));
+            throw new TsvException(String.format("%s %s\r\n%s", "想定外のステータスコード:", e.getMessage(), "ログファイルをご確認ください。")); //$NON-NLS-1$
         } catch (Exception e) {
-            throw new TsvException(String.format("不明なエラーです。ログファイルをご確認ください。\r\n%s", e.getMessage()));
+            throw new TsvException(String.format("%s\r\n%s", "不明なエラーです。ログファイルをご確認ください。", e.getMessage())); //$NON-NLS-1$
         }
         return null;
     }

@@ -169,8 +169,8 @@ public class VulGetWithProgress implements IRunnableWithProgress {
             int time = 1000 * 60 * auto_login_interval;
             this.timer.schedule(task, time, time);
         }
-        monitor.setTaskName("脆弱性情報の取得を開始しています...");
-        monitor.beginTask("脆弱性情報の取得を開始しています...", 100);
+        monitor.setTaskName(Messages.getString("vulgetwithprogress.progress.loading.starting.vulnerabilities")); //$NON-NLS-1$
+        monitor.beginTask(Messages.getString("vulgetwithprogress.progress.loading.starting.vulnerabilities"), 100); //$NON-NLS-1$
         String csvFileFormat = this.ps.getString(PreferenceConstants.CSV_FILE_FORMAT_VUL);
         if (csvFileFormat == null || csvFileFormat.isEmpty()) {
             csvFileFormat = this.ps.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT_VUL);
@@ -186,7 +186,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                 columnList = new Gson().fromJson(columnJsonStr, new TypeToken<List<VulCSVColumn>>() {
                 }.getType());
             } catch (JsonSyntaxException e) {
-                MessageDialog.openError(this.shell, "脆弱性出力項目の読み込み", String.format("%s\r\n%s", "脆弱性出力項目の内容に問題があります。", columnJsonStr)); //$NON-NLS-2$
+                MessageDialog.openError(this.shell, Messages.getString("vulgetwithprogress.message.dialog.title"), String.format("%s\r\n%s", Messages.getString("vulgetwithprogress.message.dialog.json.load.error.message"), columnJsonStr));  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
                 columnList = new ArrayList<VulCSVColumn>();
             }
         } else {
@@ -216,9 +216,9 @@ public class VulGetWithProgress implements IRunnableWithProgress {
             SubProgressMonitor sub1Monitor = new SubProgressMonitor(monitor, 10);
             sub1Monitor.beginTask("", orgs.size() * 100); //$NON-NLS-1$
             // アプリケーショングループの情報を取得
-            monitor.setTaskName("アプリケーショングループの情報を取得...");
+            monitor.setTaskName(Messages.getString("vulgetwithprogress.progress.loading.application.group")); //$NON-NLS-1$
             for (Organization org : orgs) {
-                monitor.setTaskName(String.format("%s%s", "アプリケーショングループの情報を取得...", org.getName())); //$NON-NLS-1$
+                monitor.setTaskName(String.format("%s%s", Messages.getString("vulgetwithprogress.progress.loading.application.group"), org.getName())); //$NON-NLS-1$ //$NON-NLS-2$
                 Api groupsApi = new GroupsApi(this.shell, this.ps, org);
                 groupsApi.setIgnoreStatusCodes(new ArrayList(Arrays.asList(403)));
                 try {
@@ -259,7 +259,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
             }
 
             // 選択済みアプリの脆弱性情報を取得
-            monitor.setTaskName("脆弱性の情報を取得...");
+            monitor.setTaskName(Messages.getString("vulgetwithprogress.progress.loading.vulnerability")); //$NON-NLS-1$
             SubProgressMonitor sub2Monitor = new SubProgressMonitor(monitor, 80);
             sub2Monitor.beginTask("", dstApps.size() * 100); //$NON-NLS-1$
             int appIdx = 1;
@@ -267,7 +267,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                 Organization org = fullAppMap.get(appLabel).getOrganization();
                 String appName = fullAppMap.get(appLabel).getAppName();
                 String appId = fullAppMap.get(appLabel).getAppId();
-                monitor.setTaskName(String.format("%s[%s] %s (%d/%d)", "脆弱性の情報を取得...", org.getName(), appName, appIdx, dstApps.size())); //$NON-NLS-1$
+                monitor.setTaskName(String.format("%s[%s] %s (%d/%d)", Messages.getString("vulgetwithprogress.progress.loading.vulnerability"), org.getName(), appName, appIdx, dstApps.size())); //$NON-NLS-1$ //$NON-NLS-2$
                 // コンプライアンスポリシーの情報を取得
                 Map<String, List<String>> securityStandardVulnUuidMap = new HashMap<String, List<String>>();
                 if (validCompliancePolicy) {
@@ -276,12 +276,12 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                     List<Filter> filterSecurityStandards = (List<Filter>) filterSecurityStandardApi.get();
                     sub2_1Monitor.beginTask("", filterSecurityStandards.size()); //$NON-NLS-1$
                     for (Filter ssFilter : filterSecurityStandards) {
-                        monitor.subTask(String.format("%s %s", "コンプライアンスポリシー:", ssFilter.getLabel())); //$NON-NLS-1$
+                        monitor.subTask(String.format("%s %s", Messages.getString("vulgetwithprogress.progress.loading.compliance.policy.label"), ssFilter.getLabel())); //$NON-NLS-1$ //$NON-NLS-2$
                         if (monitor.isCanceled()) {
                             if (this.timer != null) {
                                 timer.cancel();
                             }
-                            throw new InterruptedException("キャンセルされました。");
+                            throw new InterruptedException(Messages.getString("vulgetwithprogress.progress.canceled")); //$NON-NLS-1$
                         }
                         List<Vulnerability> allVuls = new ArrayList<Vulnerability>();
                         Api tracesFilterBySecurityStandardApi = new TracesFilterBySecurityStandardApi(this.shell, this.ps, org, appId, ssFilter.getKeycode(), 0);
@@ -332,12 +332,12 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                         if (this.timer != null) {
                             timer.cancel();
                         }
-                        throw new InterruptedException("キャンセルされました。");
+                        throw new InterruptedException(Messages.getString("vulgetwithprogress.progress.canceled")); //$NON-NLS-1$
                     }
                     List<String> csvLineList = new ArrayList<String>();
                     Api traceApi = new TraceApi(this.shell, this.ps, org, appId, trace_id);
                     Trace trace = (Trace) traceApi.get();
-                    monitor.subTask(String.format("%s %s (%d/%d)", "脆弱性:", trace.getTitle(), traceIdx, traces.size())); //$NON-NLS-1$
+                    monitor.subTask(String.format("%s %s (%d/%d)", Messages.getString("vulgetwithprogress.progress.loading.vulnerability.label"), trace.getTitle(), traceIdx, traces.size())); //$NON-NLS-1$ //$NON-NLS-2$
                     Application realApp = trace.getApplication();
                     if (isOnlyParentApp) {
                         if (!appName.equals(realApp.getName())) {
@@ -397,13 +397,13 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                                 } catch (Exception e) {
                                     this.shell.getDisplay().syncExec(new Runnable() {
                                         public void run() {
-                                            if (!MessageDialog.openConfirm(shell, "脆弱性情報の取得", "修正方法、CWE、OWASPの情報を取得する際に例外が発生しました。\r\n例外についてはログでご確認ください。処理を続けますか？")) {
+                                            if (!MessageDialog.openConfirm(shell, Messages.getString("vulgetwithprogress.message.dialog.title"), "修正方法、CWE、OWASPの情報を取得する際に例外が発生しました。\r\n例外についてはログでご確認ください。処理を続けますか？")) { //$NON-NLS-1$
                                                 monitor.setCanceled(true);
                                             }
                                         }
                                     });
                                     Recommendation recommendation = new Recommendation();
-                                    recommendation.setText("***** 取得に失敗しました。 *****");
+                                    recommendation.setText(Messages.getString("vulgetwithprogress.detail.header.get.error")); //$NON-NLS-1$
                                     howToFixJson = new HowToFixJson();
                                     howToFixJson.setRecommendation(recommendation);
                                     howToFixJson.setCwe(""); //$NON-NLS-1$
@@ -483,7 +483,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                                 // ==================== 23. 脆弱性へのリンク（ハイパーリンク） ====================
                                 String link = String.format("%s/static/ng/index.html#/%s/applications/%s/vulns/%s", this.ps.getString(PreferenceConstants.CONTRAST_URL), //$NON-NLS-1$
                                         org.getOrganization_uuid(), trace.getApplication().getApp_id(), trace.getUuid());
-                                csvLineList.add(String.format("=HYPERLINK(\"%s\",\"%s\")", link, "TeamServerへ")); //$NON-NLS-1$
+                                csvLineList.add(String.format("=HYPERLINK(\"%s\",\"%s\")", link, Messages.getString("vulgetwithprogress.to.teamserver.hyperlink.text"))); //$NON-NLS-1$ //$NON-NLS-2$
                                 break;
                             }
                             case VUL_24:
@@ -553,7 +553,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                             }
                         }
                         if (signatureUrlList.isEmpty()) {
-                            signatureUrlList.add("なし");
+                            signatureUrlList.add(Messages.getString("vulgetwithprogress.none.text")); //$NON-NLS-1$
                         }
                         signatureUrlList.add(0, ROUTE);
                         FileUtils.writeLines(file, Main.FILE_ENCODING, signatureUrlList, true);
@@ -564,7 +564,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                         if (httpRequest != null) {
                             FileUtils.writeLines(file, Main.FILE_ENCODING, Arrays.asList(HTTP_INFO, httpRequest.getText()), true);
                         } else {
-                            FileUtils.writeLines(file, Main.FILE_ENCODING, Arrays.asList(HTTP_INFO, "なし"), true);
+                            FileUtils.writeLines(file, Main.FILE_ENCODING, Arrays.asList(HTTP_INFO, Messages.getString("vulgetwithprogress.none.text")), true); //$NON-NLS-1$
                         }
 
                         Api storyApi = new StoryApi(this.shell, this.ps, org, trace_id);
@@ -574,13 +574,13 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                         } catch (Exception e) {
                             this.shell.getDisplay().syncExec(new Runnable() {
                                 public void run() {
-                                    if (!MessageDialog.openConfirm(shell, "脆弱性情報の取得", "何が起こったか？、どんなリスクであるか？の情報を取得する際に例外が発生しました。\r\n例外についてはログでご確認ください。処理を続けますか？")) {
+                                    if (!MessageDialog.openConfirm(shell, Messages.getString("vulgetwithprogress.message.dialog.title"), "何が起こったか？、どんなリスクであるか？の情報を取得する際に例外が発生しました。\r\n例外についてはログでご確認ください。処理を続けますか？")) { //$NON-NLS-1$
                                         monitor.setCanceled(true);
                                     }
                                 }
                             });
                             Risk risk = new Risk();
-                            risk.setText("***** 取得に失敗しました。 *****");
+                            risk.setText(Messages.getString("vulgetwithprogress.detail.header.get.error")); //$NON-NLS-1$
                             story = new Story();
                             story.setRisk(risk);
                             story.setChapters(new ArrayList<Chapter>());
@@ -605,13 +605,13 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                             } catch (Exception e) {
                                 this.shell.getDisplay().syncExec(new Runnable() {
                                     public void run() {
-                                        if (!MessageDialog.openConfirm(shell, "脆弱性情報の取得", "修正方法、CWE、OWASPの情報を取得する際に例外が発生しました。\r\n例外についてはログでご確認ください。処理を続けますか？")) {
+                                        if (!MessageDialog.openConfirm(shell, Messages.getString("vulgetwithprogress.message.dialog.title"), "修正方法、CWE、OWASPの情報を取得する際に例外が発生しました。\r\n例外についてはログでご確認ください。処理を続けますか？")) { //$NON-NLS-1$
                                             monitor.setCanceled(true);
                                         }
                                     }
                                 });
                                 Recommendation recommendation = new Recommendation();
-                                recommendation.setText("***** 取得に失敗しました。 *****");
+                                recommendation.setText(Messages.getString("vulgetwithprogress.detail.header.get.error")); //$NON-NLS-1$
                                 howToFixJson = new HowToFixJson();
                                 howToFixJson.setRecommendation(recommendation);
                                 howToFixJson.setCwe(""); //$NON-NLS-1$
@@ -619,8 +619,8 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                             }
                         }
                         howToFixLines.add(howToFixJson.getRecommendation().getText());
-                        howToFixLines.add(String.format("%s %s", "CWE:", howToFixJson.getCwe())); //$NON-NLS-1$
-                        howToFixLines.add(String.format("%s %s", "OWASP:", howToFixJson.getOwasp())); //$NON-NLS-1$
+                        howToFixLines.add(String.format("%s %s", Messages.getString("vulgetwithprogress.cwe.label"), howToFixJson.getCwe())); //$NON-NLS-1$ //$NON-NLS-2$
+                        howToFixLines.add(String.format("%s %s", Messages.getString("vulgetwithprogress.owasp.label"), howToFixJson.getOwasp())); //$NON-NLS-1$ //$NON-NLS-2$
                         FileUtils.writeLines(file, Main.FILE_ENCODING, howToFixLines, true);
                         // ==================== 19-6. コメント ====================
                         List<String> noteLines = new ArrayList<String>();
@@ -647,9 +647,9 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                                 Matcher stsM = stsPtn.matcher(statusVal);
                                 if (stsM.matches()) {
                                     String jpSts = StatusEnum.valueOf(statusVal.replaceAll(" ", "").toUpperCase()).getLabel(); //$NON-NLS-1$ //$NON-NLS-2$
-                                    statusBuffer.append(String.format("%s %s", "次のステータスに変更:", jpSts)); //$NON-NLS-1$
+                                    statusBuffer.append(String.format("%s %s", Messages.getString("vulgetwithprogress.status.changed.to.text"), jpSts)); //$NON-NLS-1$ //$NON-NLS-2$
                                 } else {
-                                    statusBuffer.append(String.format("%s %s", "次のステータスに変更:", statusVal)); //$NON-NLS-1$
+                                    statusBuffer.append(String.format("%s %s", Messages.getString("vulgetwithprogress.status.changed.to.text"), statusVal)); //$NON-NLS-1$ //$NON-NLS-2$
                                 }
                             }
                             if (!subStatusVal.isEmpty()) {
@@ -715,7 +715,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
         }
 
         // ========== CSV出力 ==========
-        monitor.setTaskName("CSV出力");
+        monitor.setTaskName(Messages.getString("vulgetwithprogress.progress.output.csv")); //$NON-NLS-1$
         Thread.sleep(500);
         SubProgressMonitor sub3Monitor = new SubProgressMonitor(monitor, 10);
         sub3Monitor.beginTask("", csvList.size()); //$NON-NLS-1$
@@ -748,7 +748,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                     }
                 }
                 if (isIncludeDesc) {
-                    csvHeaderList.add("詳細");
+                    csvHeaderList.add(Messages.getString("vulgetwithprogress.detail.column.title")); //$NON-NLS-1$
                 }
                 printer.printRecord(csvHeaderList);
             }

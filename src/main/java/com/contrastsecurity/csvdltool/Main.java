@@ -1292,7 +1292,7 @@ public class Main implements PropertyChangeListener {
         attackTable.setMenu(menuTable);
 
         MenuItem miTag = new MenuItem(menuTable, SWT.NONE);
-        miTag.setText("タグ編集");
+        miTag.setText(Messages.getString("main.attackevent.menu.item.edit.tag")); //$NON-NLS-1$
         miTag.addSelectionListener(new SelectionAdapter() {
             @SuppressWarnings("unchecked")
             @Override
@@ -1341,7 +1341,7 @@ public class Main implements PropertyChangeListener {
                             for (AttackEvent attackEvent : filteredAttackEvents) {
                                 addColToAttackTable(attackEvent, -1);
                             }
-                            MessageDialog.openInformation(shell, "攻撃イベントへのタグ編集", "選択されている攻撃イベントにタグを編集しました。");
+                            MessageDialog.openInformation(shell, Messages.getString("main.attackevent.message.dialog.edit.tag.title"), Messages.getString("main.attackevent.message.dialog.edit.tag.message")); //$NON-NLS-1$ //$NON-NLS-2$
                         }
                     }
                 } catch (Exception e2) {
@@ -1351,7 +1351,7 @@ public class Main implements PropertyChangeListener {
         });
 
         MenuItem miExp = new MenuItem(menuTable, SWT.NONE);
-        miExp.setText("CSVエクスポート");
+        miExp.setText(Messages.getString("main.attackevent.menu.item.export.csv")); //$NON-NLS-1$
         miExp.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -1380,7 +1380,7 @@ public class Main implements PropertyChangeListener {
                         columnList = new Gson().fromJson(columnJsonStr, new TypeToken<List<AttackEventCSVColumn>>() {
                         }.getType());
                     } catch (JsonSyntaxException jse) {
-                        MessageDialog.openError(shell, "攻撃イベント出力項目の読み込み", String.format("攻撃イベント出力項目の内容に問題があります。\r\n%s", columnJsonStr));
+                        MessageDialog.openError(shell, Messages.getString("main.attackevent.message.dialog.json.load.error.title"), String.format("攻撃イベント出力項目の内容に問題があります。\r\n%s", columnJsonStr)); //$NON-NLS-1$
                         columnList = new ArrayList<AttackEventCSVColumn>();
                     }
                 } else {
@@ -1477,7 +1477,7 @@ public class Main implements PropertyChangeListener {
                     for (List<String> csvLine : csvList) {
                         printer.printRecord(csvLine);
                     }
-                    MessageDialog.openInformation(shell, "攻撃イベント一覧のエクスポート", "csvファイルをエクスポートしました。");
+                    MessageDialog.openInformation(shell, Messages.getString("main.attackevent.message.dialog.export.csv.title"), Messages.getString("main.attackevent.message.dialog.export.csv.message")); //$NON-NLS-1$ //$NON-NLS-2$
                 } catch (IOException ioe) {
                     ioe.printStackTrace();
                 }
@@ -1485,7 +1485,7 @@ public class Main implements PropertyChangeListener {
         });
 
         MenuItem miReport = new MenuItem(menuTable, SWT.NONE);
-        miReport.setText("レポート出力");
+        miReport.setText(Messages.getString("main.attackevent.menu.item.output.report")); //$NON-NLS-1$
         miReport.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -1536,7 +1536,7 @@ public class Main implements PropertyChangeListener {
                             }
                         }
                     }
-                    MessageDialog.openInformation(shell, "攻撃イベント一覧のレポート出力", "txtファイルをエクスポートしました。");
+                    MessageDialog.openInformation(shell, Messages.getString("main.attackevent.message.dialog.export.txt.title"), Messages.getString("main.attackevent.message.dialog.export.txt.message")); //$NON-NLS-1$ //$NON-NLS-2$
                 } catch (IOException ioe) {
                     ioe.printStackTrace();
                 }
@@ -1544,15 +1544,15 @@ public class Main implements PropertyChangeListener {
         });
 
         MenuItem miJump = new MenuItem(menuTable, SWT.NONE);
-        miJump.setText("ブラウザで開く");
+        miJump.setText(Messages.getString("main.attackevent.menu.item.browser.open")); //$NON-NLS-1$
         miJump.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 int[] selectIndexes = attackTable.getSelectionIndices();
                 if (selectIndexes.length > 10) {
                     MessageBox messageBox = new MessageBox(shell, SWT.ICON_QUESTION | SWT.YES | SWT.NO);
-                    messageBox.setText("攻撃イベントをブラウザで開く");
-                    messageBox.setMessage(String.format("選択されている攻撃イベントが%d個あります。すべて開きますか？", selectIndexes.length));
+                    messageBox.setText(Messages.getString("main.attackevent.message.dialog.browser.open.title")); //$NON-NLS-1$
+                    messageBox.setMessage(String.format(Messages.getString("main.attackevent.message.dialog.browser.open.confirm.message"), selectIndexes.length)); //$NON-NLS-1$
                     int response = messageBox.open();
                     if (response == SWT.NO) {
                         return;
@@ -1576,7 +1576,7 @@ public class Main implements PropertyChangeListener {
         });
 
         MenuItem miUrlCopy = new MenuItem(menuTable, SWT.NONE);
-        miUrlCopy.setText("TeamServerのURLをコピー");
+        miUrlCopy.setText(Messages.getString("main.attackevent.menu.item.copy.teamserver.url")); //$NON-NLS-1$
         miUrlCopy.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -1592,7 +1592,7 @@ public class Main implements PropertyChangeListener {
         });
 
         MenuItem miSelectAll = new MenuItem(menuTable, SWT.NONE);
-        miSelectAll.setText("すべて選択（Ctrl + A）");
+        miSelectAll.setText(Messages.getString("main.attackevent.menu.item.select.all")); //$NON-NLS-1$
         miSelectAll.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -1774,7 +1774,7 @@ public class Main implements PropertyChangeListener {
         serverTable.setMenu(menuServerTable);
 
         MenuItem miServerExp = new MenuItem(menuServerTable, SWT.NONE);
-        miServerExp.setText("CSVエクスポート");
+        miServerExp.setText(Messages.getString("main.server.menu.item.export.csv")); //$NON-NLS-1$
         miServerExp.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -1803,7 +1803,7 @@ public class Main implements PropertyChangeListener {
                         columnList = new Gson().fromJson(columnJsonStr, new TypeToken<List<ServerCSVColumn>>() {
                         }.getType());
                     } catch (JsonSyntaxException jse) {
-                        MessageDialog.openError(shell, "サーバ出力項目の読み込み", String.format("%s\r\n%s", "サーバ出力項目の内容に問題があります。", columnJsonStr)); //$NON-NLS-2$
+                        MessageDialog.openError(shell, Messages.getString("main.server.message.dialog.json.load.error.title"), String.format("%s\r\n%s", Messages.getString("main.server.message.dialog.json.load.error.message"), columnJsonStr));  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
                         columnList = new ArrayList<ServerCSVColumn>();
                     }
                 } else {
@@ -1854,7 +1854,7 @@ public class Main implements PropertyChangeListener {
                     for (List<String> csvLine : csvList) {
                         printer.printRecord(csvLine);
                     }
-                    MessageDialog.openInformation(shell, "サーバ一覧のエクスポート", "csvファイルをエクスポートしました。");
+                    MessageDialog.openInformation(shell, Messages.getString("main.server.message.dialog.export.csv.title"), Messages.getString("main.server.message.dialog.export.csv.message")); //$NON-NLS-1$ //$NON-NLS-2$
                 } catch (IOException ioe) {
                     ioe.printStackTrace();
                 }

@@ -24,16 +24,16 @@
 package com.contrastsecurity.csvdltool;
 
 public enum FilterEnum {
-    SEVERITY("重大度"),
-    VULNTYPE("脆弱性タイプ"),
-    SOURCE_NAME("ソース名"),
-    SOURCE_IP("ソースIP"),
-    APPLICATION("アプリケーション"),
-    RULE("ルール"),
-    LANGUAGE("言語"),
-    AGENT_VERSION("エージェントバージョン"),
-    TAG("タグ"),
-    BUSINESS_HOURS("時間帯");
+    SEVERITY(Messages.getString("filterenum.severity")), //$NON-NLS-1$
+    VULNTYPE(Messages.getString("filterenum.vulntype")), //$NON-NLS-1$
+    SOURCE_NAME(Messages.getString("filterenum.source.name")), //$NON-NLS-1$
+    SOURCE_IP(Messages.getString("filterenum.source.ip")), //$NON-NLS-1$
+    APPLICATION(Messages.getString("filterenum.application")), //$NON-NLS-1$
+    RULE(Messages.getString("filterenum.rule")), //$NON-NLS-1$
+    LANGUAGE(Messages.getString("filterenum.language")), //$NON-NLS-1$
+    AGENT_VERSION(Messages.getString("filterenum.agent.version")), //$NON-NLS-1$
+    TAG(Messages.getString("filterenum.tag")), //$NON-NLS-1$
+    BUSINESS_HOURS(Messages.getString("filterenum.business.hours")); //$NON-NLS-1$
 
     private String filterName;
 

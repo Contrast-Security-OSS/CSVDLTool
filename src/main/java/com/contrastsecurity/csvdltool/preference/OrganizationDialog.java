@@ -168,7 +168,7 @@ public class OrganizationDialog extends Dialog {
                     String.format("%s\r\n%s", Messages.getString("organizationdialog.message.dialog.teamserver.return.error.message"), e.getMessage())); //$NON-NLS-1$ //$NON-NLS-2$
         } catch (NonApiException e) {
             MessageDialog.openError(getShell(), Messages.getString("organizationdialog.message.dialog.title"), //$NON-NLS-1$
-                    String.format("%s: %s\r\n%s", Messages.getString("organizationdialog.message.dialog.unexpected.status.code.error.message"), e.getMessage(), Messages.getString("organizationdialog.message.dialog.make.sure.logfile.message"))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                    String.format("%s %s\r\n%s", Messages.getString("organizationdialog.message.dialog.unexpected.status.code.error.message"), e.getMessage(), Messages.getString("organizationdialog.message.dialog.make.sure.logfile.message"))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         } catch (TsvException e) {
             MessageDialog.openError(getShell(), Messages.getString("organizationdialog.message.dialog.title"), e.getMessage()); //$NON-NLS-1$
         } catch (Exception e) {

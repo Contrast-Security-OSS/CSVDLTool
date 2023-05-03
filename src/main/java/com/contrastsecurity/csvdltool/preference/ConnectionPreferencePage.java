@@ -264,7 +264,7 @@ public class ConnectionPreferencePage extends PreferencePage {
             try {
                 passTxt.setText(encryptor.decrypt(ps.getString(PreferenceConstants.PROXY_PASS)));
             } catch (Exception e) {
-                MessageDialog.openError(getShell(), Messages.getString("connectionpreferencepage.dialog.title"), "プロキシパスワードの復号化に失敗しました。\r\nパスワードの設定をやり直してください。"); //$NON-NLS-1$
+                MessageDialog.openError(getShell(), Messages.getString("connectionpreferencepage.dialog.title"), Messages.getString("connectionpreferencepage.proxy.password.decrypt.error.message")); //$NON-NLS-1$ //$NON-NLS-2$
                 passTxt.setText(""); //$NON-NLS-1$
             }
         } else {
@@ -333,10 +333,10 @@ public class ConnectionPreferencePage extends PreferencePage {
             sessionTimeoutPlanGrp.setLayout(autoLogOutGrpLt);
             GridData autoLogOutGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
             sessionTimeoutPlanGrp.setLayoutData(autoLogOutGrpGrDt);
-            sessionTimeoutPlanGrp.setText("セッションタイムアウト対策");
+            sessionTimeoutPlanGrp.setText(Messages.getString("connectionpreferencepage.login.session.timeout.measure.group.title")); //$NON-NLS-1$
 
             // ========== ConnetionTimeout ========== //
-            new Label(sessionTimeoutPlanGrp, SWT.LEFT).setText("自動再ログイン間隔（分）：");
+            new Label(sessionTimeoutPlanGrp, SWT.LEFT).setText(Messages.getString("connectionpreferencepage.auto.re-login.interval.label")); //$NON-NLS-1$
             autoReLogInIntervalTxt = new Text(sessionTimeoutPlanGrp, SWT.BORDER);
             autoReLogInIntervalTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             autoReLogInIntervalTxt.setText(ps.getString(PreferenceConstants.AUTO_RELOGIN_INTERVAL));
@@ -348,7 +348,7 @@ public class ConnectionPreferencePage extends PreferencePage {
             new Label(sessionTimeoutPlanGrp, SWT.LEFT).setText(""); //$NON-NLS-1$
             Label connectionHint = new Label(sessionTimeoutPlanGrp, SWT.LEFT);
             connectionHint.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-            connectionHint.setText("時間のかかる処理中にセッションタイムアウトが発生してしまうのを防ぐため指定された間隔で自動再ログインを行います。\r\n自動再ログインが不要な場合は0を指定してください。デフォルトは105分(1時間45分)です。");
+            connectionHint.setText(Messages.getString("connectionpreferencepage.auto.re-login.interval.desc.text")); //$NON-NLS-1$
         }
 
         Composite buttonGrp = new Composite(parent, SWT.NONE);
@@ -404,16 +404,16 @@ public class ConnectionPreferencePage extends PreferencePage {
         ps.setValue(PreferenceConstants.PROXY_YUKO, this.validFlg.getSelection());
         if (this.validFlg.getSelection()) {
             if (this.hostTxt.getText().isEmpty()) {
-                errors.add("・ホストを指定してください。");
+                errors.add(Messages.getString("connectionpreferencepage.message.dialog.host.empty.error.message")); //$NON-NLS-1$
             }
         }
         ps.setValue(PreferenceConstants.PROXY_HOST, this.hostTxt.getText());
         if (this.validFlg.getSelection()) {
             if (this.portTxt.getText().isEmpty()) {
-                errors.add("・ポート番号を指定してください。");
+                errors.add(Messages.getString("connectionpreferencepage.message.dialog.port.empty.error.message")); //$NON-NLS-1$
             } else {
                 if (!StringUtils.isNumeric(this.portTxt.getText())) {
-                    errors.add("・ポート番号は数値を指定してください。");
+                    errors.add(Messages.getString("connectionpreferencepage.message.dialog.port.non.integer.error.message")); //$NON-NLS-1$
                 }
             }
         }
@@ -425,7 +425,7 @@ public class ConnectionPreferencePage extends PreferencePage {
         } else if (authSave.getSelection()) {
             ps.setValue(PreferenceConstants.PROXY_AUTH, "save"); //$NON-NLS-1$
             if (this.userTxt.getText().isEmpty() || this.passTxt.getText().isEmpty()) {
-                errors.add("・プロキシ認証のユーザー、パスワードを設定してください。");
+                errors.add(Messages.getString("connectionpreferencepage.message.dialog.user.password.empty.error.message")); //$NON-NLS-1$
             } else {
                 ps.setValue(PreferenceConstants.PROXY_USER, this.userTxt.getText());
                 BasicTextEncryptor encryptor = new BasicTextEncryptor();
@@ -444,30 +444,30 @@ public class ConnectionPreferencePage extends PreferencePage {
         ps.setValue(PreferenceConstants.IGNORE_SSLCERT_CHECK, this.ignoreSSLCertCheckFlg.getSelection());
 
         if (this.connectionTimeoutTxt.getText().isEmpty()) {
-            errors.add("・ConnetionTimeoutを指定してください。");
+            errors.add(Messages.getString("connectionpreferencepage.message.dialog.connection.timeout.empty.error.message")); //$NON-NLS-1$
         } else {
             if (!StringUtils.isNumeric(this.connectionTimeoutTxt.getText())) {
-                errors.add("・ConnetionTimeoutは整数値を指定してください。");
+                errors.add(Messages.getString("connectionpreferencepage.message.dialog.connection.timeout.non-integer.error.message")); //$NON-NLS-1$
             } else {
                 ps.setValue(PreferenceConstants.CONNECTION_TIMEOUT, this.connectionTimeoutTxt.getText());
             }
         }
 
         if (this.socketTimeoutTxt.getText().isEmpty()) {
-            errors.add("・SocketTimeoutを指定してください。");
+            errors.add(Messages.getString("connectionpreferencepage.message.dialog.socket.timeout.empty.error.message")); //$NON-NLS-1$
         } else {
             if (!StringUtils.isNumeric(this.socketTimeoutTxt.getText())) {
-                errors.add("・SocketTimeoutは整数値を指定してください。");
+                errors.add(Messages.getString("connectionpreferencepage.message.dialog.socket.timeout.non-integer.error.message")); //$NON-NLS-1$
             } else {
                 ps.setValue(PreferenceConstants.SOCKET_TIMEOUT, this.socketTimeoutTxt.getText());
             }
         }
         if (authType == AuthType.PASSWORD) {
             if (this.autoReLogInIntervalTxt.getText().isEmpty()) {
-                errors.add("・自動再ログイン間隔（分）を指定してください。");
+                errors.add(Messages.getString("connectionpreferencepage.message.dialog.auto.re-login.interval.empty.error.message")); //$NON-NLS-1$
             } else {
                 if (!StringUtils.isNumeric(this.autoReLogInIntervalTxt.getText())) {
-                    errors.add("・自動再ログイン間隔（分）は整数値を指定してください。");
+                    errors.add(Messages.getString("connectionpreferencepage.message.dialog.auto.re-login.interval.non-integer.error.message")); //$NON-NLS-1$
                 } else {
                     ps.setValue(PreferenceConstants.AUTO_RELOGIN_INTERVAL, this.autoReLogInIntervalTxt.getText());
                 }

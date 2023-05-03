@@ -63,7 +63,7 @@ public class AttackEventsGetWithProgress implements IRunnableWithProgress {
     private Set<Filter> ruleFilterSet = new LinkedHashSet<Filter>();
     private Set<Filter> tagFilterSet = new LinkedHashSet<Filter>();
 
-    Logger logger = LogManager.getLogger("csvdltool");
+    Logger logger = LogManager.getLogger("csvdltool"); //$NON-NLS-1$
 
     public AttackEventsGetWithProgress(Shell shell, PreferenceStore ps, List<Organization> orgs, Date frDate, Date toDate) {
         this.shell = shell;
@@ -80,7 +80,7 @@ public class AttackEventsGetWithProgress implements IRunnableWithProgress {
         monitor.beginTask("攻撃イベント一覧の読み込み...", 100 * this.orgs.size());
         for (Organization org : this.orgs) {
             try {
-                monitor.setTaskName(String.format("[%s] 攻撃イベント一覧の読み込み", org.getName()));
+                monitor.setTaskName(String.format("[%s] %s", org.getName(), "攻撃イベント一覧の読み込み")); //$NON-NLS-1$
                 // 攻撃一覧を読み込み
                 monitor.subTask("攻撃一覧の情報を取得...");
                 SubProgressMonitor sub1Monitor = new SubProgressMonitor(monitor, 30);
@@ -88,7 +88,7 @@ public class AttackEventsGetWithProgress implements IRunnableWithProgress {
                 Api attackssApi = new AttacksApi(this.shell, this.ps, org, frDetectedDate, toDetectedDate, 0);
                 List<Attack> tmpAttacks = (List<Attack>) attackssApi.post();
                 int totalAttackCount = attackssApi.getTotalCount();
-                sub1Monitor.beginTask("", totalAttackCount);
+                sub1Monitor.beginTask("", totalAttackCount); //$NON-NLS-1$
                 allAttacks.addAll(tmpAttacks);
                 for (Attack atck : tmpAttacks) {
                     Api attackApi = new AttackApi(this.shell, this.ps, org, atck.getUuid());
@@ -116,7 +116,7 @@ public class AttackEventsGetWithProgress implements IRunnableWithProgress {
                 // 攻撃イベント一覧を読み込み
                 monitor.subTask("攻撃イベント一覧の情報を取得...");
                 SubProgressMonitor sub2Monitor = new SubProgressMonitor(monitor, 70);
-                sub2Monitor.beginTask("", allAttacks.size());
+                sub2Monitor.beginTask("", allAttacks.size()); //$NON-NLS-1$
                 for (Attack attack : allAttacks) {
                     if (monitor.isCanceled()) {
                         throw new InterruptedException("キャンセルされました。");
@@ -129,7 +129,7 @@ public class AttackEventsGetWithProgress implements IRunnableWithProgress {
                     }
                     orgAttackEvents.addAll(tmpAttackEvents);
                     int totalCount = attackEventsApi.getTotalCount();
-                    monitor.subTask(String.format("攻撃イベント一覧の情報を取得...(%d/%d)", orgAttackEvents.size(), totalCount));
+                    monitor.subTask(String.format("%s...(%d/%d)", "攻撃イベント一覧の情報を取得", orgAttackEvents.size(), totalCount)); //$NON-NLS-1$
                     boolean incompleteFlg = false;
                     incompleteFlg = totalCount > orgAttackEvents.size();
                     while (incompleteFlg) {
@@ -143,7 +143,7 @@ public class AttackEventsGetWithProgress implements IRunnableWithProgress {
                             tmpAttackEvent.setSource_name(attack.getSource_name());
                         }
                         orgAttackEvents.addAll(tmpAttackEvents);
-                        monitor.subTask(String.format("攻撃イベント一覧の情報を取得...(%d/%d)", orgAttackEvents.size(), totalCount));
+                        monitor.subTask(String.format("%s...(%d/%d)", "攻撃イベント一覧の情報を取得", orgAttackEvents.size(), totalCount)); //$NON-NLS-1$
                         incompleteFlg = totalCount > orgAttackEvents.size();
                     }
                     sub2Monitor.worked(1);
@@ -169,7 +169,7 @@ public class AttackEventsGetWithProgress implements IRunnableWithProgress {
             applicationFilterSet.add(new Filter(attackEvent.getApplication().getName()));
             ruleFilterSet.add(new Filter(attackEvent.getRule()));
             if (attackEvent.getTags().isEmpty()) {
-                tagFilterSet.add(new Filter(""));
+                tagFilterSet.add(new Filter("")); //$NON-NLS-1$
             } else {
                 for (String tag : attackEvent.getTags()) {
                     tagFilterSet.add(new Filter(tag));

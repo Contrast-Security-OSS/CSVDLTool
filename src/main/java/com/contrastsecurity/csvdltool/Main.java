@@ -528,11 +528,11 @@ public class Main implements PropertyChangeListener {
                     String errorMsg = e.getTargetException().getMessage();
                     if (e.getTargetException() instanceof ApiException) {
                         MessageDialog.openError(shell, Messages.getString("main.application.load.message.dialog.title"), //$NON-NLS-1$
-                                String.format("%s\r\n%s", "TeamServerからエラーが返されました。", errorMsg)); //$NON-NLS-1$
+                                String.format("%s\r\n%s", Messages.getString("main.teamserver.return.error"), errorMsg)); //$NON-NLS-1$ //$NON-NLS-2$
                     } else if (e.getTargetException() instanceof NonApiException) {
                         logger.error(trace);
                         MessageDialog.openError(shell, Messages.getString("main.application.load.message.dialog.title"), //$NON-NLS-1$
-                                String.format("%s %s\r\n%s", "想定外のステータスコード:", errorMsg, "ログファイルをご確認ください。")); //$NON-NLS-1$
+                                String.format("%s %s\r\n%s", Messages.getString("main.unexpected.status.code.error"), errorMsg, Messages.getString("main.message.dialog.make.sure.logfile.message"))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                     } else if (e.getTargetException() instanceof TsvException) {
                         MessageDialog.openError(shell, Messages.getString("main.application.load.message.dialog.title"), errorMsg); //$NON-NLS-1$
                         return;
@@ -542,7 +542,7 @@ public class Main implements PropertyChangeListener {
                     } else {
                         logger.error(trace);
                         MessageDialog.openError(shell, Messages.getString("main.application.load.message.dialog.title"), //$NON-NLS-1$
-                                String.format("%s\r\n%s", "不明なエラーです。ログファイルをご確認ください。", errorMsg)); //$NON-NLS-1$
+                                String.format("%s\r\n%s", Messages.getString("main.message.dialog.unknown.error.message"), errorMsg)); //$NON-NLS-1$ //$NON-NLS-2$
                     }
                     return;
                 } catch (InterruptedException e) {
@@ -978,11 +978,11 @@ public class Main implements PropertyChangeListener {
                     String exceptionMsg = e.getTargetException().getMessage();
                     if (e.getTargetException() instanceof ApiException) {
                         MessageDialog.openError(shell, Messages.getString("main.vul.export.message.dialog.title"), //$NON-NLS-1$
-                                String.format("%s\r\n%s", "TeamServerからエラーが返されました。", exceptionMsg)); //$NON-NLS-1$
+                                String.format("%s\r\n%s", Messages.getString("main.teamserver.return.error"), exceptionMsg)); //$NON-NLS-1$ //$NON-NLS-2$
                     } else if (e.getTargetException() instanceof NonApiException) {
                         logger.error(trace);
                         MessageDialog.openError(shell, Messages.getString("main.vul.export.message.dialog.title"), //$NON-NLS-1$
-                                String.format("%s %s\r\n%s", "想定外のステータスコード:", exceptionMsg, "ログファイルをご確認ください。")); //$NON-NLS-1$
+                                String.format("%s %s\r\n%s", Messages.getString("main.unexpected.status.code.error"), exceptionMsg, Messages.getString("main.message.dialog.make.sure.logfile.message"))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                     } else if (e.getTargetException() instanceof InterruptedException) {
                         MessageDialog.openInformation(shell, trace, exceptionMsg);
                     } else if (e.getTargetException() instanceof TsvException) {
@@ -994,7 +994,7 @@ public class Main implements PropertyChangeListener {
                     } else {
                         logger.error(trace);
                         MessageDialog.openError(shell, Messages.getString("main.vul.export.message.dialog.title"), //$NON-NLS-1$
-                                String.format("%s\r\n%s", "不明なエラーです。ログファイルをご確認ください。", exceptionMsg)); //$NON-NLS-1$
+                                String.format("%s\r\n%s", Messages.getString("main.message.dialog.unknown.error.message"), exceptionMsg)); //$NON-NLS-1$ //$NON-NLS-2$
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -1092,11 +1092,11 @@ public class Main implements PropertyChangeListener {
                     String exceptionMsg = e.getTargetException().getMessage();
                     if (e.getTargetException() instanceof ApiException) {
                         MessageDialog.openError(shell, Messages.getString("main.lib.export.message.dialog.title"), //$NON-NLS-1$
-                                String.format("%s\r\n%s", "TeamServerからエラーが返されました。", exceptionMsg)); //$NON-NLS-1$
+                                String.format("%s\r\n%s", Messages.getString("main.teamserver.return.error"), exceptionMsg)); //$NON-NLS-1$ //$NON-NLS-2$
                     } else if (e.getTargetException() instanceof NonApiException) {
                         logger.error(trace);
                         MessageDialog.openError(shell, Messages.getString("main.lib.export.message.dialog.title"), //$NON-NLS-1$
-                                String.format("%s %s\r\n%s", "想定外のステータスコード:", exceptionMsg, "ログファイルをご確認ください。")); //$NON-NLS-1$
+                                String.format("%s %s\r\n%s", Messages.getString("main.unexpected.status.code.error"), exceptionMsg, Messages.getString("main.message.dialog.make.sure.logfile.message"))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                     } else if (e.getTargetException() instanceof InterruptedException) {
                         MessageDialog.openInformation(shell, trace, exceptionMsg);
                     } else if (e.getTargetException() instanceof TsvException) {
@@ -1108,7 +1108,7 @@ public class Main implements PropertyChangeListener {
                     } else {
                         logger.error(trace);
                         MessageDialog.openError(shell, Messages.getString("main.lib.export.message.dialog.title"), //$NON-NLS-1$
-                                String.format("%s\r\n%s", "不明なエラーです。ログファイルをご確認ください。", exceptionMsg)); //$NON-NLS-1$
+                                String.format("%s\r\n%s", Messages.getString("main.message.dialog.unknown.error.message"), exceptionMsg)); //$NON-NLS-1$ //$NON-NLS-2$
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -1252,10 +1252,10 @@ public class Main implements PropertyChangeListener {
                     String errorMsg = e.getTargetException().getMessage();
                     if (e.getTargetException() instanceof ApiException) {
                         MessageDialog.openError(shell, Messages.getString("main.attackevent.load.message.dialog.title"), //$NON-NLS-1$
-                                String.format("%s\r\n%s", "TeamServerからエラーが返されました。", errorMsg)); //$NON-NLS-1$
+                                String.format("%s\r\n%s", Messages.getString("main.teamserver.return.error"), errorMsg)); //$NON-NLS-1$ //$NON-NLS-2$
                     } else if (e.getTargetException() instanceof NonApiException) {
                         MessageDialog.openError(shell, Messages.getString("main.attackevent.load.message.dialog.title"), //$NON-NLS-1$
-                                String.format("%s %s\r\n%s", "想定外のステータスコード:", errorMsg, "ログファイルをご確認ください。")); //$NON-NLS-1$
+                                String.format("%s %s\r\n%s", Messages.getString("main.unexpected.status.code.error"), errorMsg, Messages.getString("main.message.dialog.make.sure.logfile.message"))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                     } else if (e.getTargetException() instanceof TsvException) {
                         MessageDialog.openError(shell, Messages.getString("main.attackevent.load.message.dialog.title"), errorMsg); //$NON-NLS-1$
                         return;
@@ -1264,7 +1264,7 @@ public class Main implements PropertyChangeListener {
                         return;
                     } else {
                         MessageDialog.openError(shell, Messages.getString("main.attackevent.load.message.dialog.title"), //$NON-NLS-1$
-                                String.format("%s\r\n%s", "不明なエラーです。ログファイルをご確認ください。", errorMsg)); //$NON-NLS-1$
+                                String.format("%s\r\n%s", Messages.getString("main.message.dialog.unknown.error.message"), errorMsg)); //$NON-NLS-1$ //$NON-NLS-2$
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -1743,10 +1743,10 @@ public class Main implements PropertyChangeListener {
                     }
                     String errorMsg = e.getTargetException().getMessage();
                     if (e.getTargetException() instanceof ApiException) {
-                        MessageDialog.openError(shell, Messages.getString("main.server.load.message.dialog.title"), String.format("%s\r\n%s", "TeamServerからエラーが返されました。", errorMsg)); //$NON-NLS-1$ //$NON-NLS-2$
+                        MessageDialog.openError(shell, Messages.getString("main.server.load.message.dialog.title"), String.format("%s\r\n%s", Messages.getString("main.teamserver.return.error"), errorMsg)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                     } else if (e.getTargetException() instanceof NonApiException) {
                         MessageDialog.openError(shell, Messages.getString("main.server.load.message.dialog.title"), //$NON-NLS-1$
-                                String.format("%s %s\r\n%s", "想定外のステータスコード:", errorMsg, "ログファイルをご確認ください。")); //$NON-NLS-1$
+                                String.format("%s %s\r\n%s", Messages.getString("main.unexpected.status.code.error"), errorMsg, Messages.getString("main.message.dialog.make.sure.logfile.message"))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                     } else if (e.getTargetException() instanceof TsvException) {
                         MessageDialog.openError(shell, Messages.getString("main.server.load.message.dialog.title"), errorMsg); //$NON-NLS-1$
                         return;
@@ -1755,7 +1755,7 @@ public class Main implements PropertyChangeListener {
                         return;
                     } else {
                         MessageDialog.openError(shell, Messages.getString("main.server.load.message.dialog.title"), //$NON-NLS-1$
-                                String.format("%s\r\n%s", "不明なエラーです。ログファイルをご確認ください。", errorMsg)); //$NON-NLS-1$
+                                String.format("%s\r\n%s", Messages.getString("main.message.dialog.unknown.error.message"), errorMsg)); //$NON-NLS-1$ //$NON-NLS-2$
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();

@@ -77,12 +77,12 @@ public class AttackEventsGetWithProgress implements IRunnableWithProgress {
     @SuppressWarnings("unchecked")
     @Override
     public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-        monitor.beginTask("攻撃イベント一覧の読み込み...", 100 * this.orgs.size());
+        monitor.beginTask(Messages.getString("attackeventsgetwithprogress.progress.loading.attackevents.organization.name"), 100 * this.orgs.size()); //$NON-NLS-1$
         for (Organization org : this.orgs) {
             try {
-                monitor.setTaskName(String.format("[%s] %s", org.getName(), "攻撃イベント一覧の読み込み")); //$NON-NLS-1$
+                monitor.setTaskName(String.format("%s%s", org.getName(), Messages.getString("attackeventsgetwithprogress.progress.loading.attackevents.organization.name"))); //$NON-NLS-1$ //$NON-NLS-2$
                 // 攻撃一覧を読み込み
-                monitor.subTask("攻撃一覧の情報を取得...");
+                monitor.subTask(Messages.getString("attackeventsgetwithprogress.progress.loading.attackevents")); //$NON-NLS-1$
                 SubProgressMonitor sub1Monitor = new SubProgressMonitor(monitor, 30);
                 List<Attack> allAttacks = new ArrayList<Attack>();
                 Api attackssApi = new AttacksApi(this.shell, this.ps, org, frDetectedDate, toDetectedDate, 0);
@@ -114,12 +114,12 @@ public class AttackEventsGetWithProgress implements IRunnableWithProgress {
                 sub1Monitor.done();
 
                 // 攻撃イベント一覧を読み込み
-                monitor.subTask("攻撃イベント一覧の情報を取得...");
+                monitor.subTask(Messages.getString("attackeventsgetwithprogress.progress.loading.attackevents")); //$NON-NLS-1$
                 SubProgressMonitor sub2Monitor = new SubProgressMonitor(monitor, 70);
                 sub2Monitor.beginTask("", allAttacks.size()); //$NON-NLS-1$
                 for (Attack attack : allAttacks) {
                     if (monitor.isCanceled()) {
-                        throw new InterruptedException("キャンセルされました。");
+                        throw new InterruptedException(Messages.getString("attackeventsgetwithprogress.progress.canceled")); //$NON-NLS-1$
                     }
                     List<AttackEvent> orgAttackEvents = new ArrayList<AttackEvent>();
                     Api attackEventsApi = new AttackEventsByAttackUuidApi(this.shell, this.ps, org, attack.getUuid(), frDetectedDate, toDetectedDate, orgAttackEvents.size());
@@ -129,13 +129,13 @@ public class AttackEventsGetWithProgress implements IRunnableWithProgress {
                     }
                     orgAttackEvents.addAll(tmpAttackEvents);
                     int totalCount = attackEventsApi.getTotalCount();
-                    monitor.subTask(String.format("%s...(%d/%d)", "攻撃イベント一覧の情報を取得", orgAttackEvents.size(), totalCount)); //$NON-NLS-1$
+                    monitor.subTask(String.format("%s(%d/%d)", Messages.getString("attackeventsgetwithprogress.progress.loading.attackevents"), orgAttackEvents.size(), totalCount)); //$NON-NLS-1$ //$NON-NLS-2$
                     boolean incompleteFlg = false;
                     incompleteFlg = totalCount > orgAttackEvents.size();
                     while (incompleteFlg) {
                         Thread.sleep(100);
                         if (monitor.isCanceled()) {
-                            throw new InterruptedException("キャンセルされました。");
+                            throw new InterruptedException(Messages.getString("attackeventsgetwithprogress.progress.canceled")); //$NON-NLS-1$
                         }
                         attackEventsApi = new AttackEventsByAttackUuidApi(this.shell, this.ps, org, attack.getUuid(), frDetectedDate, toDetectedDate, orgAttackEvents.size());
                         tmpAttackEvents = (List<AttackEvent>) attackEventsApi.post();
@@ -143,7 +143,7 @@ public class AttackEventsGetWithProgress implements IRunnableWithProgress {
                             tmpAttackEvent.setSource_name(attack.getSource_name());
                         }
                         orgAttackEvents.addAll(tmpAttackEvents);
-                        monitor.subTask(String.format("%s...(%d/%d)", "攻撃イベント一覧の情報を取得", orgAttackEvents.size(), totalCount)); //$NON-NLS-1$
+                        monitor.subTask(String.format("%s(%d/%d)", Messages.getString("attackeventsgetwithprogress.progress.loading.attackevents"), orgAttackEvents.size(), totalCount)); //$NON-NLS-1$ //$NON-NLS-2$
                         incompleteFlg = totalCount > orgAttackEvents.size();
                     }
                     sub2Monitor.worked(1);

@@ -53,7 +53,7 @@ public class TagInputDialog extends Dialog {
     protected Control createDialogArea(Composite parent) {
         Composite composite = (Composite) super.createDialogArea(parent);
         composite.setLayout(new GridLayout(2, false));
-        new Label(composite, SWT.LEFT).setText("タグ：");
+        new Label(composite, SWT.LEFT).setText(Messages.getString("tagInputdialog.tag.label")); //$NON-NLS-1$
         tagTxt = new Text(composite, SWT.BORDER);
         tagTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         tagTxt.addListener(SWT.FocusIn, new Listener() {
@@ -106,6 +106,6 @@ public class TagInputDialog extends Dialog {
     @Override
     protected void configureShell(Shell newShell) {
         super.configureShell(newShell);
-        newShell.setText("タグ入力");
+        newShell.setText(Messages.getString("tagInputdialog.title")); //$NON-NLS-1$
     }
 }

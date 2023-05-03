@@ -1380,7 +1380,7 @@ public class Main implements PropertyChangeListener {
                         columnList = new Gson().fromJson(columnJsonStr, new TypeToken<List<AttackEventCSVColumn>>() {
                         }.getType());
                     } catch (JsonSyntaxException jse) {
-                        MessageDialog.openError(shell, Messages.getString("main.attackevent.message.dialog.json.load.error.title"), String.format("攻撃イベント出力項目の内容に問題があります。\r\n%s", columnJsonStr)); //$NON-NLS-1$
+                        MessageDialog.openError(shell, Messages.getString("main.attackevent.message.dialog.json.load.error.title"), String.format("%s\r\n%s", Messages.getString("main.attackevent.message.dialog.json.load.error.message"), columnJsonStr)); //$NON-NLS-1$ //$NON-NLS-3$
                         columnList = new ArrayList<AttackEventCSVColumn>();
                     }
                 } else {

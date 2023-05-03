@@ -850,7 +850,7 @@ public class Main implements PropertyChangeListener {
         vulFilterGrp.setLayoutData(vulFilterGrpGrDt);
         vulFilterGrp.setText(Messages.getString("main.vul.filter.condition.group.title")); //$NON-NLS-1$
 
-        new Label(vulFilterGrp, SWT.LEFT).setText(Messages.getString("main.vul.filter.condition.severity.label.title")); //$NON-NLS-1$
+        new Label(vulFilterGrp, SWT.LEFT).setText(Messages.getString("main.vul.filter.condition.severity.label")); //$NON-NLS-1$
         vulSeverityFilterTxt = new Text(vulFilterGrp, SWT.BORDER);
         vulSeverityFilterTxt.setText(Messages.getString("main.load.application.message")); //$NON-NLS-1$
         vulSeverityFilterTxt.setEditable(false);
@@ -882,7 +882,7 @@ public class Main implements PropertyChangeListener {
             }
         });
 
-        new Label(vulFilterGrp, SWT.LEFT).setText(Messages.getString("main.vul.filter.condition.vulntype.label.title")); //$NON-NLS-1$
+        new Label(vulFilterGrp, SWT.LEFT).setText(Messages.getString("main.vul.filter.condition.vulntype.label")); //$NON-NLS-1$
         vulVulnTypeFilterTxt = new Text(vulFilterGrp, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL);
         vulVulnTypeFilterTxt.setText(Messages.getString("main.load.application.message")); //$NON-NLS-1$
         vulVulnTypeFilterTxt.setEditable(false);
@@ -916,7 +916,7 @@ public class Main implements PropertyChangeListener {
             }
         });
 
-        new Label(vulFilterGrp, SWT.LEFT).setText(Messages.getString("main.vul.filter.condition.lastdetected.label.title")); //$NON-NLS-1$
+        new Label(vulFilterGrp, SWT.LEFT).setText(Messages.getString("main.vul.filter.condition.lastdetected.label")); //$NON-NLS-1$
         vulLastDetectedFilterTxt = new Text(vulFilterGrp, SWT.BORDER);
         vulLastDetectedFilterTxt.setText(Messages.getString("main.vul.filter.condition.lastdetected.all")); //$NON-NLS-1$
         vulLastDetectedFilterTxt.setEditable(false);

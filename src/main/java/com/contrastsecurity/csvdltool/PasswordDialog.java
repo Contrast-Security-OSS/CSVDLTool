@@ -60,7 +60,7 @@ public class PasswordDialog extends Dialog {
         Composite composite = (Composite) super.createDialogArea(parent);
         composite.setLayout(new GridLayout(2, false));
 
-        new Label(composite, SWT.LEFT).setText(Messages.getString("passworddialog.password.text.label.title")); //$NON-NLS-1$
+        new Label(composite, SWT.LEFT).setText(Messages.getString("passworddialog.password.text.label")); //$NON-NLS-1$
         passTxt = new Text(composite, SWT.BORDER);
         passTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         passTxt.setEchoChar('*');

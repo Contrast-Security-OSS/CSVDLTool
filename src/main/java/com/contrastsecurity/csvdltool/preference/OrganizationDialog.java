@@ -85,7 +85,7 @@ public class OrganizationDialog extends Dialog {
     protected Control createDialogArea(Composite parent) {
         Composite composite = (Composite) super.createDialogArea(parent);
         composite.setLayout(new GridLayout(2, false));
-        new Label(composite, SWT.LEFT).setText(Messages.getString("organizationdialog.org.id.label.title")); //$NON-NLS-1$
+        new Label(composite, SWT.LEFT).setText(Messages.getString("organizationdialog.org.id.label")); //$NON-NLS-1$
         orgIdTxt = new Text(composite, SWT.BORDER);
         orgIdTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         orgIdTxt.addListener(SWT.FocusIn, new Listener() {
@@ -106,7 +106,7 @@ public class OrganizationDialog extends Dialog {
             }
         });
         orgIdTxt.setFocus();
-        new Label(composite, SWT.LEFT).setText(Messages.getString("organizationdialog.org.apikey.label.title")); //$NON-NLS-1$
+        new Label(composite, SWT.LEFT).setText(Messages.getString("organizationdialog.org.apikey.label")); //$NON-NLS-1$
         apiKeyTxt = new Text(composite, SWT.BORDER);
         apiKeyTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         apiKeyTxt.addListener(SWT.FocusIn, new Listener() {

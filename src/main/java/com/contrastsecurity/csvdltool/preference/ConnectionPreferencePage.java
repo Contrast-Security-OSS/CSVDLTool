@@ -304,7 +304,7 @@ public class ConnectionPreferencePage extends PreferencePage {
         timeoutGrp.setText(Messages.getString("connectionpreferencepage.timeout.group.title")); //$NON-NLS-1$
 
         // ========== ConnetionTimeout ========== //
-        new Label(timeoutGrp, SWT.LEFT).setText(Messages.getString("connectionpreferencepage.timeout.connection.timeout.label.title")); //$NON-NLS-1$
+        new Label(timeoutGrp, SWT.LEFT).setText(Messages.getString("connectionpreferencepage.timeout.connection.timeout.label")); //$NON-NLS-1$
         connectionTimeoutTxt = new Text(timeoutGrp, SWT.BORDER);
         connectionTimeoutTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         connectionTimeoutTxt.setText(ps.getString(PreferenceConstants.CONNECTION_TIMEOUT));
@@ -315,7 +315,7 @@ public class ConnectionPreferencePage extends PreferencePage {
         });
 
         // ========== SocketTimeout ========== //
-        new Label(timeoutGrp, SWT.LEFT).setText(Messages.getString("connectionpreferencepage.timeout.socket.timeout.label.title")); //$NON-NLS-1$
+        new Label(timeoutGrp, SWT.LEFT).setText(Messages.getString("connectionpreferencepage.timeout.socket.timeout.label")); //$NON-NLS-1$
         socketTimeoutTxt = new Text(timeoutGrp, SWT.BORDER);
         socketTimeoutTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         socketTimeoutTxt.setText(ps.getString(PreferenceConstants.SOCKET_TIMEOUT));

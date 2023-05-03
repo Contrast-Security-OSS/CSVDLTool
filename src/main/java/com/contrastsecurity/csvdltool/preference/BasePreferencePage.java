@@ -116,7 +116,7 @@ public class BasePreferencePage extends PreferencePage {
         GridData baseGrpLtGrDt = new GridData(GridData.FILL_BOTH);
         baseGrp.setLayoutData(baseGrpLtGrDt);
 
-        new Label(baseGrp, SWT.LEFT).setText(Messages.getString("basepreferencepage.contrast.url.text.label.title")); //$NON-NLS-1$
+        new Label(baseGrp, SWT.LEFT).setText(Messages.getString("basepreferencepage.contrast.url.text.label")); //$NON-NLS-1$
         new Label(baseGrp, SWT.LEFT).setText(""); //$NON-NLS-1$
         contrastUrlTxt = new Text(baseGrp, SWT.BORDER);
         contrastUrlTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -149,7 +149,7 @@ public class BasePreferencePage extends PreferencePage {
             }
         });
 
-        new Label(baseGrp, SWT.LEFT).setText(Messages.getString("basepreferencepage.username.text.label.title")); //$NON-NLS-1$
+        new Label(baseGrp, SWT.LEFT).setText(Messages.getString("basepreferencepage.username.text.label")); //$NON-NLS-1$
         Label icon = new Label(baseGrp, SWT.NONE);
         Image iconImg = new Image(parent.getDisplay(), Main.class.getClassLoader().getResourceAsStream("help.png")); //$NON-NLS-1$
         icon.setImage(iconImg);
@@ -190,7 +190,7 @@ public class BasePreferencePage extends PreferencePage {
             GridData passwordLblGrDt = new GridData();
             passwordLblGrDt.verticalAlignment = SWT.TOP;
             passwordLbl.setLayoutData(passwordLblGrDt);
-            passwordLbl.setText(Messages.getString("basepreferencepage.password.text.label.title")); //$NON-NLS-1$
+            passwordLbl.setText(Messages.getString("basepreferencepage.password.text.label")); //$NON-NLS-1$
             new Label(baseGrp, SWT.LEFT).setText(""); //$NON-NLS-1$
             Group passwordGrp = new Group(baseGrp, SWT.NONE);
             GridLayout passwordGrpLt = new GridLayout(2, false);
@@ -270,7 +270,7 @@ public class BasePreferencePage extends PreferencePage {
                 }
             }
         } else {
-            new Label(baseGrp, SWT.LEFT).setText(Messages.getString("basepreferencepage.servicekey.text.label.title")); //$NON-NLS-1$
+            new Label(baseGrp, SWT.LEFT).setText(Messages.getString("basepreferencepage.servicekey.text.label")); //$NON-NLS-1$
             new Label(baseGrp, SWT.LEFT).setText(""); //$NON-NLS-1$
             serviceKeyTxt = new Text(baseGrp, SWT.BORDER);
             serviceKeyTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));

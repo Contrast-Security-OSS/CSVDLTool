@@ -127,7 +127,7 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                 columnList = new Gson().fromJson(columnJsonStr, new TypeToken<List<LibCSVColumn>>() {
                 }.getType());
             } catch (JsonSyntaxException e) {
-                MessageDialog.openError(this.shell, "ライブラリ情報出力項目の読み込み", String.format("ライブラリ情報出力項目の内容に問題があります。\r\n%s", columnJsonStr));
+                MessageDialog.openError(this.shell, "ライブラリ情報出力項目の読み込み", String.format("%s\r\n%s", "ライブラリ情報出力項目の内容に問題があります。", columnJsonStr)); //$NON-NLS-2$
                 columnList = new ArrayList<LibCSVColumn>();
             }
         } else {
@@ -158,7 +158,7 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                 Organization org = fullAppMap.get(appLabel).getOrganization();
                 String appName = fullAppMap.get(appLabel).getAppName();
                 String appId = fullAppMap.get(appLabel).getAppId();
-                monitor.setTaskName(String.format("ライブラリの情報を取得...[%s] %s (%d/%d)", org.getName(), appName, appIdx, dstApps.size()));
+                monitor.setTaskName(String.format("%s[%s] %s (%d/%d)", "ライブラリの情報を取得...", org.getName(), appName, appIdx, dstApps.size())); //$NON-NLS-1$
                 List<Library> allLibraries = new ArrayList<Library>();
                 Api librariesApi = new LibrariesApi(this.shell, this.ps, org, appId, filter, allLibraries.size());
                 allLibraries.addAll((List<Library>) librariesApi.get());
@@ -189,7 +189,7 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                     }
                     List<String> csvLineList = new ArrayList<String>();
                     monitor.subTask(library.getFile_name());
-                    monitor.subTask(String.format("ライブラリ: %s (%d/%d)", library.getFile_name(), libIdx, allLibraries.size()));
+                    monitor.subTask(String.format("%s %s (%d/%d)", "ライブラリ:", library.getFile_name(), libIdx, allLibraries.size())); //$NON-NLS-1$
                     for (LibCSVColumn csvColumn : columnList) {
                         if (!csvColumn.isValid()) {
                             continue;
@@ -364,22 +364,22 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                             // ==================== 14-1. タイトル ====================
                             FileUtils.writeLines(file, Main.FILE_ENCODING,
                                     Arrays.asList(
-                                            String.format("=============== %s(CVSS %s) %s ===============", vuln.getName(), vuln.getSeverity_value(), vuln.getSeverity_code())),
+                                            String.format("=============== %s(CVSS %s) %s ===============", vuln.getName(), vuln.getSeverity_value(), vuln.getSeverity_code())), //$NON-NLS-1$
                                     true);
                             // ==================== 14-2. 説明 ====================
                             FileUtils.writeLines(file, Main.FILE_ENCODING, Arrays.asList(vuln.getDescription()), true);
                             // ==================== 14-3. 機密性への影響 ====================
-                            FileUtils.writeLines(file, Main.FILE_ENCODING, Arrays.asList(String.format("機密性への影響: %s", vuln.getConfidentiality_impact())), true);
+                            FileUtils.writeLines(file, Main.FILE_ENCODING, Arrays.asList(String.format("%s %s", "機密性への影響:", vuln.getConfidentiality_impact())), true); //$NON-NLS-1$
                             // ==================== 14-4. 完全性への影響 ====================
-                            FileUtils.writeLines(file, Main.FILE_ENCODING, Arrays.asList(String.format("完全性への影響: %s", vuln.getIntegrity_impact())), true);
+                            FileUtils.writeLines(file, Main.FILE_ENCODING, Arrays.asList(String.format("%s %s", "完全性への影響:", vuln.getIntegrity_impact())), true); //$NON-NLS-1$
                             // ==================== 14-5. 可用性への影響 ====================
-                            FileUtils.writeLines(file, Main.FILE_ENCODING, Arrays.asList(String.format("可用性への影響: %s", vuln.getAvailability_impact())), true);
+                            FileUtils.writeLines(file, Main.FILE_ENCODING, Arrays.asList(String.format("%s %s", "可用性への影響:", vuln.getAvailability_impact())), true); //$NON-NLS-1$
                             // ==================== 14-6. 攻撃前の認証要否 ====================
-                            FileUtils.writeLines(file, Main.FILE_ENCODING, Arrays.asList(String.format("攻撃前の認証要否: %s", vuln.getAuthentication())), true);
+                            FileUtils.writeLines(file, Main.FILE_ENCODING, Arrays.asList(String.format("%s %s", "攻撃前の認証要否:", vuln.getAuthentication())), true); //$NON-NLS-1$
                             // ==================== 14-7. 攻撃元区分 ====================
-                            FileUtils.writeLines(file, Main.FILE_ENCODING, Arrays.asList(String.format("攻撃元区分: %s", vuln.getAccess_vector())), true);
+                            FileUtils.writeLines(file, Main.FILE_ENCODING, Arrays.asList(String.format("%s %s", "攻撃元区分:", vuln.getAccess_vector())), true); //$NON-NLS-1$
                             // ==================== 14-8. 攻撃条件複雑さ ====================
-                            FileUtils.writeLines(file, Main.FILE_ENCODING, Arrays.asList(String.format("攻撃条件複雑さ: %s", vuln.getAccess_complexity())), true);
+                            FileUtils.writeLines(file, Main.FILE_ENCODING, Arrays.asList(String.format("%s %s", "攻撃条件複雑さ:", vuln.getAccess_complexity())), true); //$NON-NLS-1$
                         }
                     }
 

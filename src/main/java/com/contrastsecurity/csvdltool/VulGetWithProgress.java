@@ -186,7 +186,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                 columnList = new Gson().fromJson(columnJsonStr, new TypeToken<List<VulCSVColumn>>() {
                 }.getType());
             } catch (JsonSyntaxException e) {
-                MessageDialog.openError(this.shell, "脆弱性出力項目の読み込み", String.format("脆弱性出力項目の内容に問題があります。\r\n%s", columnJsonStr));
+                MessageDialog.openError(this.shell, "脆弱性出力項目の読み込み", String.format("%s\r\n%s", "脆弱性出力項目の内容に問題があります。", columnJsonStr)); //$NON-NLS-2$
                 columnList = new ArrayList<VulCSVColumn>();
             }
         } else {
@@ -218,7 +218,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
             // アプリケーショングループの情報を取得
             monitor.setTaskName("アプリケーショングループの情報を取得...");
             for (Organization org : orgs) {
-                monitor.setTaskName(String.format("アプリケーショングループの情報を取得...%s", org.getName()));
+                monitor.setTaskName(String.format("%s%s", "アプリケーショングループの情報を取得...", org.getName())); //$NON-NLS-1$
                 Api groupsApi = new GroupsApi(this.shell, this.ps, org);
                 groupsApi.setIgnoreStatusCodes(new ArrayList(Arrays.asList(403)));
                 try {
@@ -267,7 +267,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                 Organization org = fullAppMap.get(appLabel).getOrganization();
                 String appName = fullAppMap.get(appLabel).getAppName();
                 String appId = fullAppMap.get(appLabel).getAppId();
-                monitor.setTaskName(String.format("脆弱性の情報を取得...[%s] %s (%d/%d)", org.getName(), appName, appIdx, dstApps.size()));
+                monitor.setTaskName(String.format("%s[%s] %s (%d/%d)", "脆弱性の情報を取得...", org.getName(), appName, appIdx, dstApps.size())); //$NON-NLS-1$
                 // コンプライアンスポリシーの情報を取得
                 Map<String, List<String>> securityStandardVulnUuidMap = new HashMap<String, List<String>>();
                 if (validCompliancePolicy) {
@@ -276,7 +276,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                     List<Filter> filterSecurityStandards = (List<Filter>) filterSecurityStandardApi.get();
                     sub2_1Monitor.beginTask("", filterSecurityStandards.size()); //$NON-NLS-1$
                     for (Filter ssFilter : filterSecurityStandards) {
-                        monitor.subTask(String.format("コンプライアンスポリシー: %s", ssFilter.getLabel()));
+                        monitor.subTask(String.format("%s %s", "コンプライアンスポリシー:", ssFilter.getLabel())); //$NON-NLS-1$
                         if (monitor.isCanceled()) {
                             if (this.timer != null) {
                                 timer.cancel();
@@ -337,7 +337,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                     List<String> csvLineList = new ArrayList<String>();
                     Api traceApi = new TraceApi(this.shell, this.ps, org, appId, trace_id);
                     Trace trace = (Trace) traceApi.get();
-                    monitor.subTask(String.format("脆弱性: %s (%d/%d)", trace.getTitle(), traceIdx, traces.size()));
+                    monitor.subTask(String.format("%s %s (%d/%d)", "脆弱性:", trace.getTitle(), traceIdx, traces.size())); //$NON-NLS-1$
                     Application realApp = trace.getApplication();
                     if (isOnlyParentApp) {
                         if (!appName.equals(realApp.getName())) {
@@ -483,7 +483,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                                 // ==================== 23. 脆弱性へのリンク（ハイパーリンク） ====================
                                 String link = String.format("%s/static/ng/index.html#/%s/applications/%s/vulns/%s", this.ps.getString(PreferenceConstants.CONTRAST_URL), //$NON-NLS-1$
                                         org.getOrganization_uuid(), trace.getApplication().getApp_id(), trace.getUuid());
-                                csvLineList.add(String.format("=HYPERLINK(\"%s\",\"%s\")", link, "TeamServerへ"));
+                                csvLineList.add(String.format("=HYPERLINK(\"%s\",\"%s\")", link, "TeamServerへ")); //$NON-NLS-1$
                                 break;
                             }
                             case VUL_24:
@@ -619,8 +619,8 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                             }
                         }
                         howToFixLines.add(howToFixJson.getRecommendation().getText());
-                        howToFixLines.add(String.format("CWE: %s", howToFixJson.getCwe())); //$NON-NLS-1$
-                        howToFixLines.add(String.format("OWASP: %s", howToFixJson.getOwasp())); //$NON-NLS-1$
+                        howToFixLines.add(String.format("%s %s", "CWE:", howToFixJson.getCwe())); //$NON-NLS-1$
+                        howToFixLines.add(String.format("%s %s", "OWASP:", howToFixJson.getOwasp())); //$NON-NLS-1$
                         FileUtils.writeLines(file, Main.FILE_ENCODING, howToFixLines, true);
                         // ==================== 19-6. コメント ====================
                         List<String> noteLines = new ArrayList<String>();
@@ -647,13 +647,13 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                                 Matcher stsM = stsPtn.matcher(statusVal);
                                 if (stsM.matches()) {
                                     String jpSts = StatusEnum.valueOf(statusVal.replaceAll(" ", "").toUpperCase()).getLabel(); //$NON-NLS-1$ //$NON-NLS-2$
-                                    statusBuffer.append(String.format("次のステータスに変更: %s", jpSts));
+                                    statusBuffer.append(String.format("%s %s", "次のステータスに変更:", jpSts)); //$NON-NLS-1$
                                 } else {
-                                    statusBuffer.append(String.format("次のステータスに変更: %s", statusVal));
+                                    statusBuffer.append(String.format("%s %s", "次のステータスに変更:", statusVal)); //$NON-NLS-1$
                                 }
                             }
                             if (!subStatusVal.isEmpty()) {
-                                statusBuffer.append(String.format("(%s)", subStatusVal));
+                                statusBuffer.append(String.format("(%s)", subStatusVal)); //$NON-NLS-1$
                             }
                             if (statusBuffer.length() > 0) {
                                 noteLines.add(statusBuffer.toString());
@@ -681,13 +681,13 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                         List<EventSummary> eventSummaries = (List<EventSummary>) eventSummaryApi.get();
                         for (EventSummary es : eventSummaries) {
                             if (es.getCollapsedEvents() != null && es.getCollapsedEvents().isEmpty()) {
-                                detailLines.add(String.format("[%s]", es.getDescription()));
+                                detailLines.add(String.format("[%s]", es.getDescription())); //$NON-NLS-1$
                                 Api eventDetailApi = new EventDetailApi(this.shell, this.ps, org, trace_id, es.getId());
                                 EventDetail ed = (EventDetail) eventDetailApi.get();
                                 detailLines.addAll(ed.getDetailLines());
                             } else {
                                 for (CollapsedEventSummary ce : es.getCollapsedEvents()) {
-                                    detailLines.add(String.format("[%s]", es.getDescription()));
+                                    detailLines.add(String.format("[%s]", es.getDescription())); //$NON-NLS-1$
                                     Api eventDetailApi = new EventDetailApi(this.shell, this.ps, org, trace_id, ce.getId());
                                     EventDetail ed = (EventDetail) eventDetailApi.get();
                                     detailLines.addAll(ed.getDetailLines());

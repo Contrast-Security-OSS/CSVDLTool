@@ -24,7 +24,7 @@
 package com.contrastsecurity.csvdltool;
 
 public enum StatusEnum {
-    REPORTED("報告済"), SUSPICIOUS("疑わしい"), CONFIRMED("確認済"), NOTAPROBLEM("問題無し"), REMEDIATED("修復済"), FIXED("修正完了");
+    REPORTED(Messages.getString("statusenum.reported")), SUSPICIOUS(Messages.getString("statusenum.suspicious")), CONFIRMED(Messages.getString("statusenum.confirmed")), NOTAPROBLEM(Messages.getString("statusenum.not-a-problem")), REMEDIATED(Messages.getString("statusenum.fixed")), FIXED(Messages.getString("statusenum.remediated")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 
     private String label;
 

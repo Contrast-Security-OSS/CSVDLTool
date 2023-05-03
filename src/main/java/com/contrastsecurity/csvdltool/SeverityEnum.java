@@ -24,7 +24,7 @@
 package com.contrastsecurity.csvdltool;
 
 public enum SeverityEnum {
-    CRITICAL("重大"), HIGH("高"), MEDIUM("中"), LOW("低"), NOTE("注意");
+    CRITICAL(Messages.getString("severityenum.critical")), HIGH(Messages.getString("severityenum.high")), MEDIUM(Messages.getString("severityenum.medium")), LOW(Messages.getString("severityenum.low")), NOTE(Messages.getString("severityenum.note")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 
     private String label;
 

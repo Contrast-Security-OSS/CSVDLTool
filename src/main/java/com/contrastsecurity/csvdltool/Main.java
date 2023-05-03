@@ -552,11 +552,11 @@ public class Main implements PropertyChangeListener {
                 if (fullAppMap.isEmpty()) {
                     String userName = ps.getString(PreferenceConstants.USERNAME);
                     StringJoiner sj = new StringJoiner("\r\n"); //$NON-NLS-1$
-                    sj.add("アプリケーションの取得件数が０件です。考えられる原因としては以下となります。");
-                    sj.add("・下記ユーザーのアプリケーションアクセスグループにView権限が設定されていない。");
+                    sj.add(Messages.getString("main.application.load.empty.list.warning.message.1")); //$NON-NLS-1$
+                    sj.add(Messages.getString("main.application.load.empty.list.warning.message.2")); //$NON-NLS-1$
                     sj.add(String.format("　%s", userName)); //$NON-NLS-1$
-                    sj.add("・Assessライセンスが付与されているアプリケーションがない。");
-                    sj.add("・接続設定が正しくない。プロキシの設定がされていない。など");
+                    sj.add(Messages.getString("main.application.load.empty.list.warning.message.3")); //$NON-NLS-1$
+                    sj.add(Messages.getString("main.application.load.empty.list.warning.message.4")); //$NON-NLS-1$
                     MessageDialog.openInformation(shell, Messages.getString("main.application.load.message.dialog.title"), sj.toString()); //$NON-NLS-1$
                 }
                 for (String appLabel : fullAppMap.keySet()) {
@@ -1123,7 +1123,7 @@ public class Main implements PropertyChangeListener {
         }
         includeCVEDetailChk = new Button(libButtonGrp, SWT.CHECK);
         includeCVEDetailChk.setText(Messages.getString("main.lib.export.option.include.detail")); //$NON-NLS-1$
-        includeCVEDetailChk.setToolTipText("CVEの詳細情報が添付ファイルで出力されます。");
+        includeCVEDetailChk.setToolTipText(Messages.getString("main.lib.export.option.include.detail.tooltip")); //$NON-NLS-1$
         if (this.ps.getBoolean(PreferenceConstants.INCLUDE_CVE_DETAIL)) {
             includeCVEDetailChk.setSelection(true);
         }
@@ -1380,7 +1380,7 @@ public class Main implements PropertyChangeListener {
                         columnList = new Gson().fromJson(columnJsonStr, new TypeToken<List<AttackEventCSVColumn>>() {
                         }.getType());
                     } catch (JsonSyntaxException jse) {
-                        MessageDialog.openError(shell, Messages.getString("main.attackevent.message.dialog.json.load.error.title"), String.format("%s\r\n%s", Messages.getString("main.attackevent.message.dialog.json.load.error.message"), columnJsonStr)); //$NON-NLS-1$ //$NON-NLS-3$
+                        MessageDialog.openError(shell, Messages.getString("main.attackevent.message.dialog.json.load.error.title"), String.format("%s\r\n%s", Messages.getString("main.attackevent.message.dialog.json.load.error.message"), columnJsonStr)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                         columnList = new ArrayList<AttackEventCSVColumn>();
                     }
                 } else {

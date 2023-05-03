@@ -162,7 +162,7 @@ public class CSVPreferencePage extends PreferencePage {
         GridData defaultBtnGrDt = new GridData(SWT.RIGHT, SWT.BOTTOM, true, true, 1, 1);
         defaultBtnGrDt.widthHint = 100;
         defaultBtn.setLayoutData(defaultBtnGrDt);
-        defaultBtn.setText(Messages.getString("csvpreferencepage.restoredefaults.button.title")); //$NON-NLS-1$
+        defaultBtn.setText(Messages.getString("preferencepage.restoredefaults.button.title")); //$NON-NLS-1$
         defaultBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -177,7 +177,7 @@ public class CSVPreferencePage extends PreferencePage {
         GridData applyBtnGrDt = new GridData(SWT.RIGHT, SWT.BOTTOM, true, true, 1, 1);
         applyBtnGrDt.widthHint = 90;
         applyBtn.setLayoutData(applyBtnGrDt);
-        applyBtn.setText(Messages.getString("csvpreferencepage.apply.button.title")); //$NON-NLS-1$
+        applyBtn.setText(Messages.getString("preferencepage.apply.button.title")); //$NON-NLS-1$
         applyBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {

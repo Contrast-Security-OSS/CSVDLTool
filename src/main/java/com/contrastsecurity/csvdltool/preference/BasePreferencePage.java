@@ -531,7 +531,7 @@ public class BasePreferencePage extends PreferencePage {
         applyBtnGrDt.widthHint = 90;
         applyBtnGrDt.horizontalSpan = 2;
         applyBtn.setLayoutData(applyBtnGrDt);
-        applyBtn.setText(Messages.getString("basepreferencepage.apply.button.title")); //$NON-NLS-1$
+        applyBtn.setText(Messages.getString("preferencepage.apply.button.title")); //$NON-NLS-1$
         applyBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {

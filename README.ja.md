@@ -10,7 +10,7 @@ Windows8.1、Windows10, Mac11(Big Sur)かそれ以上
 いずれも、jre1.8.0_202
 
 ## インストール
-[Release](https://github.com/Contrast-Security-OSS/CSVDLTool/releases) で以下3種類のバイナリを提供しています。ビルド不要でダウンロード後すぐにお使いいただけます。
+[Release](https://github.com/Contrast-Security-OSS/CSVDLTool/releases) で幾つかのバイナリを提供しています。ビルド不要でダウンロード後すぐに使用できます。  
 - Windows
   - CSVDLTool_X.X.X.zip  
     初回ダウンロードの場合はこちらをダウンロードして解凍して、お使いください。  
@@ -26,6 +26,11 @@ Windows8.1、Windows10, Mac11(Big Sur)かそれ以上
     # 解凍コマンド
     7z x CSVDLTool_X.X.X.cli7z
     ```
+ #### 監査ログ版について
+上記のバイナリはトークン認証版となります。ファイル名に`auditlog`が含まれるバイナリはパスワード認証版となります。  
+トークン認証版では認証時にサーバ側の監査ログに記録されません[^1]。 ですがパスワード認証版では監査ログに認証時の記録が行われます。  
+ご使用環境に応じてバイナリを選択してください。
+[^1]: 一部環境を除きます。
 
 ## 使用方法
 - contrast_security.yamlをエージェントのDLウィザードからDLしてexeと同じ場所に配置してください。（任意）

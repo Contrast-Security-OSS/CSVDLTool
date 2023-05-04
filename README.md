@@ -5,7 +5,7 @@ English | [Japanese](https://github.com/Contrast-Security-OSS/CSVDLTool/blob/mai
 Users can export a lot of information from TeamServer, but with this tool even more information can be exported in CSV format.  
 
 ## System Requirements
-Windows8.1、Windows10, Mac11(Big Sur) or higher  
+Windows8.1、Windows10, MacOS11(Big Sur) or higher  
 jre1.8.0_202
 
 ## Installation
@@ -25,6 +25,11 @@ There are several binaries on [Release](https://github.com/Contrast-Security-OSS
     # Unzip command
     7z x CSVDLTool_X.X.X.cli7z
     ```
+#### About AuditLog Version
+As binaries above are Token authentication version.  
+Binaries which contains `auditlog` in file name are Password authentication version.  
+Authentication by Token authentication version is not recorded in audit log, but Password authentication version is recorded in audit log.  
+Select which tool to use according to your situation.
 
 ## Usage
 - contrast_security.yamlをエージェントのDLウィザードからDLしてexeと同じ場所に配置してください。（任意）
@@ -39,27 +44,28 @@ There are several binaries on [Release](https://github.com/Contrast-Security-OSS
 
 使用方法の詳細については [Release](https://github.com/Contrast-Security-OSS/CSVDLTool/releases) からダウンロードできるzipファイルに同梱のマニュアルpdfをご確認ください。
 ## Build
-### 環境にあわせてbuild.gradleの以下箇所を弄ってください。
-- Windows 64bitの場合（java 64bitでEclipseなど動かしている場合はこのままで良いです）
+### build.gradle
+Modify the following line of build.gradle according to your environment.
+- Windows 64bit
   ```gradle
   compile group: 'org.eclipse.swt', name:   'org.eclipse.swt.win32.win32.x86_64', version: '4.3'
   //compile group: 'org.eclipse.swt', name: 'org.eclipse.swt.win32.win32.x86', version: '4.3'
   //compile group: 'org.eclipse.platform', name: 'org.eclipse.swt.cocoa.macosx.x86_64', version: '3.109.0', transitive: false
   ```
-- Windows 32bitの場合（exeを作るために32bit版のビルドをする場合）
+- Windows 32bit
   ```gradle
   //compile group: 'org.eclipse.swt', name:   'org.eclipse.swt.win32.win32.x86_64', version: '4.3'
   compile group: 'org.eclipse.swt', name: 'org.eclipse.swt.win32.win32.x86', version: '4.3'
   //compile group: 'org.eclipse.platform', name: 'org.eclipse.swt.cocoa.macosx.x86_64', version: '3.109.0', transitive: false
   ```
-- Macの場合
+- MacOS
   ```gradle
   //compile group: 'org.eclipse.swt', name:   'org.eclipse.swt.win32.win32.x86_64', version: '4.3'
   //compile group: 'org.eclipse.swt', name: 'org.eclipse.swt.win32.win32.x86', version: '4.3'
   compile group: 'org.eclipse.platform', name: 'org.eclipse.swt.cocoa.macosx.x86_64', version: '3.109.0', transitive: false
   ```
 
-### コマンドプロンプト、ターミナルでビルドする場合
+### Build and Export Jar
 - Windows
   ```powershell
   gradlew clean jar
@@ -68,9 +74,9 @@ There are several binaries on [Release](https://github.com/Contrast-Security-OSS
   ```bash
   ./gradlew clean jar
   ```
-build\libsの下にjarが作成されます。
+jar file will be created under `build\libs`.
 
-### Eclipseでビルド、実行できるようにする場合
+### Build and Run on Eclipse IDE
 - Windows
   ```powershell
   gradlew cleanEclipse eclipse
@@ -79,7 +85,8 @@ build\libsの下にjarが作成されます。
   ```bash
   ./gradlew cleanEclipse eclipse
   ```
-Eclipseでプロジェクトをリフレッシュすると、あとは実行でcom.contrastsecurity.csvdltool.Mainで、ツールが起動します。
+Refresh your project in Eclipse. Clean and Build if necessary.  
+Specify `com.contrastsecurity.csvdltool.Main` class and execute Java. CSVDLTool will launch.
 
 ## Distribution
 

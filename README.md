@@ -48,8 +48,8 @@ Select which tool to use according to your situation.
 - 取得ボタンを押下します。成功するとexeと同じ場所にcsvファイルが出力されています。
 
 使用方法の詳細については [Release](https://github.com/Contrast-Security-OSS/CSVDLTool/releases) からダウンロードできるzipファイルに同梱のマニュアルpdfをご確認ください。
-## Build
-### build.gradle
+## Building of CSVDLTool
+### Building with build.gradle
 Modify the following line of build.gradle according to your environment.
 - Windows 64bit
   ```gradle
@@ -95,15 +95,15 @@ Specify `com.contrastsecurity.csvdltool.Main` class and execute Java. CSVDLTool 
 
 ## Distribution
 
-### Windows配布用のexe化について
-- launch4jを使っています。
+### Convert jar to exe
+- Using [launch4j](https://launch4j.sourceforge.net/).
 - launch4j.xmlを読み込むと、ある程度設定が入っていて、あとはjar（ビルドによって作成された）やexeのパスを修正するぐらいです。
 - jreがインストールされていない環境でも、jreフォルダを同梱することで環境に依存せずjavaを実行できるような設定になっています。  
   jreをDLして解凍したフォルダを **jre** というフォルダ名として置いておくと、優先して使用するような設定に既になっています。
 - 32bit版Javaにしている理由ですが、今はもうないかもしれないですが、32bit版のwindowsの場合も想定してという感じです。
 
-### Mac配布用のapp化について
-- javapackagerを使っています。
+### Convert jar to app
+- Using javapackager.
 - jreを同梱させるため、実施するMacに1.8.0_202のJREフォルダを任意の場所に配置しておいてください。
 - jarpackage.sh内の3〜7行目を適宜、修正してください。
 - jarpackage.shを実行します。
@@ -111,7 +111,7 @@ Specify `com.contrastsecurity.csvdltool.Main` class and execute Java. CSVDLTool 
   ./jarpackage.sh
   ./jarpackage_auditlog.sh
   ```
-  build/libs/bundle下にappフォルダが作られます。
+  app folder will be created under `build\libs/bundle`.
 
 ### exe, appへの署名について
 まず、証明書ファイル(pfx)と証明書パスワードを入手してください。  

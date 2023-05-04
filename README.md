@@ -28,8 +28,10 @@ There are several binaries on [Release](https://github.com/Contrast-Security-OSS
 #### About AuditLog Version
 As binaries above are Token authentication version.  
 Binaries which contains `auditlog` in file name are Password authentication version.  
-Authentication by Token authentication version is not recorded in audit log, but Password authentication version is recorded in audit log.  
+Authentication by Token authentication version is not recorded in audit log[^1], but Password authentication version is recorded in audit log.  
 Select which tool to use according to your situation.
+
+[^1]:Except for some environments.
 
 ## Usage
 - contrast_security.yamlをエージェントのDLウィザードからDLしてexeと同じ場所に配置してください。（任意）

@@ -7,7 +7,7 @@ Users can export a lot of information from TeamServer, but with this tool even m
 ## System Requirements
 #### OS
 - Windows8.1, 10, 11
-- MacOS11(Big Sur) or higher
+- macOS 11(Big Sur) or higher
 #### Runtime  
 - jre1.8
 
@@ -19,7 +19,7 @@ There are several binaries on [Release](https://github.com/Contrast-Security-OSS
   As jre folder(1.8.0_202) is included, you can use `CSVDLTool` without installing JRE.  
 - CSVDLTool_X.X.X.exe  
   If you have already downloaded the zip, you can update CSVDLTool just by replacing the exe file.
-#### Mac
+#### macOS
 - CSVDLTool_X.X.X.cli7z  
   Unzip this file with the command below.  
   ```bash
@@ -61,7 +61,7 @@ compile group: 'org.eclipse.swt', name:   'org.eclipse.swt.win32.win32.x86_64', 
 compile group: 'org.eclipse.swt', name: 'org.eclipse.swt.win32.win32.x86', version: '4.3'
 //compile group: 'org.eclipse.platform', name: 'org.eclipse.swt.cocoa.macosx.x86_64', version: '3.109.0', transitive: false
 ```
-#### MacOS
+#### macOS
 ```gradle
 //compile group: 'org.eclipse.swt', name:   'org.eclipse.swt.win32.win32.x86_64', version: '4.3'
 //compile group: 'org.eclipse.swt', name: 'org.eclipse.swt.win32.win32.x86', version: '4.3'
@@ -73,7 +73,7 @@ compile group: 'org.eclipse.platform', name: 'org.eclipse.swt.cocoa.macosx.x86_6
 ```powershell
 gradlew clean jar
 ```
-#### Mac
+#### macOS
 ```bash
 ./gradlew clean jar
 ```
@@ -84,7 +84,7 @@ jar file will be created under `build\libs`.
 ```powershell
 gradlew cleanEclipse eclipse
 ```
-#### Mac
+#### macOS
 ```bash
 ./gradlew cleanEclipse eclipse
 ```
@@ -93,14 +93,14 @@ Specify `com.contrastsecurity.csvdltool.Main` class and execute Java. CSVDLTool 
 
 ## Distribution
 ### Convert jar to executable binary
-#### Windows(jar to exe)
+#### Windows (jar to exe)
 - Using [launch4j](https://launch4j.sourceforge.net/).
 - launch4j.xmlを読み込むと、ある程度設定が入っていて、あとはjar（ビルドによって作成された）やexeのパスを修正するぐらいです。
 - jreがインストールされていない環境でも、jreフォルダを同梱することで環境に依存せずjavaを実行できるような設定になっています。  
   jreをDLして解凍したフォルダを **jre** というフォルダ名として置いておくと、優先して使用するような設定に既になっています。
 - 32bit版Javaにしている理由ですが、今はもうないかもしれないですが、32bit版のwindowsの場合も想定してという感じです。
 
-#### MacOS(jar to app)
+#### macOS (jar to app)
 - Using javapackager.
 - jreを同梱させるため、実施するMacに1.8.0_202のJREフォルダを任意の場所に配置しておいてください。
 - jarpackage.sh内の3〜7行目を適宜、修正してください。
@@ -128,7 +128,7 @@ Specify `com.contrastsecurity.csvdltool.Main` class and execute Java. CSVDLTool 
   ```
 - 署名の確認  
   署名の確認については、exeを右クリック->プロパティ で確認できます。
-#### MacOS
+#### macOS
 - 証明書ファイルの読み込み  
   pfxファイルをダブルクリックでキーチェーンアクセス.appに読み込ませます。証明書パスワード入力が必要  
   読み込めたら、Common Name(通称)をコピー
@@ -145,7 +145,7 @@ Specify `com.contrastsecurity.csvdltool.Main` class and execute Java. CSVDLTool 
   ```
     
 ### 圧縮について補足
-- Mac
+- macOS
   ```bash
   7z a CSVDLTool_1.9.2.cli7z CSVDLTool_1.9.2.app/
   7z a CSVDLTool_1.9.2_auditlog.cli7z CSVDLTool_1.9.2_auditlog.app/

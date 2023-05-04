@@ -1,20 +1,36 @@
-### 概要
-TeamServerに登録されている脆弱性情報及びライブラリ情報のCSV形式レポートを取得するツールです。  
-TeamServerから直接CSVレポートを出力することも出来ますが、本ツールではより多くの情報を取得したり  
-その情報をカスタマイズしたりすることが出来ます。  
-使用方法の詳細については [Release](https://github.com/Contrast-Security-OSS/CSVDLTool/releases) からダウンロードできるzipファイルに同梱のマニュアルpdfをご確認ください。
+# CSVDLTool
 
+`CSVDLTool` is a tool to help users who use Contrast.  
+Users can export a lot of information from TeamServer, but with this tool even more information can be exported in CSV format.  
 
-### 動作環境
-Windows8.1、Windows10, Mac11(Big Sur)  
-いずれも、jre1.8.0_202
+## System Requirements
+Windows8.1、Windows10, Mac11(Big Sur) or higher  
+jre1.8.0_202
 
-### ソースからビルドする場合
+## Installation
+There are several binaries on [Release](https://github.com/Contrast-Security-OSS/CSVDLTool/releases) page. You can use CSVDLTool without build process.  
+- Windows
+  - CSVDLTool_X.X.X.zip  
+    If you are downloading for the first time, please download this binary.  
+    As jre folder(1.8.0_202) is included, you can use `CSVDLTool` without installing JRE.  
+  - CSVDLTool_X.X.X.exe  
+    If you have already downloaded the zip, you can update CSVDLTool just by replacing the exe file.
+- Mac
+  - CSVDLTool_X.X.X.cli7z  
+    Unzip this file with the command below.  
+    ```bash
+    # Installing p7zip
+    brew install p7zip
+    # Unzip command
+    7z x CSVDLTool_X.X.X.cli7z
+    ```
+
+## Build
 
 ビルドからではなく、すぐにお使いいただく場合は[リリースについて](#リリースについて)を参照ください。
 
 
-#### 環境にあわせてbuild.gradleの以下箇所を弄ってください。
+### 環境にあわせてbuild.gradleの以下箇所を弄ってください。
 
 - Windows 64bitの場合（java 64bitでEclipseなど動かしている場合はこのままで良いです）
 
@@ -38,7 +54,7 @@ Windows8.1、Windows10, Mac11(Big Sur)
   compile group: 'org.eclipse.platform', name: 'org.eclipse.swt.cocoa.macosx.x86_64', version: '3.109.0', transitive: false
   ```
 
-#### コマンドプロンプト、ターミナルでビルドする場合
+### コマンドプロンプト、ターミナルでビルドする場合
 
 - Windows
   ```powershell
@@ -50,7 +66,7 @@ Windows8.1、Windows10, Mac11(Big Sur)
   ```
 build\libsの下にjarが作成されます。
 
-#### Eclipseでビルド、実行できるようにする場合
+### Eclipseでビルド、実行できるようにする場合
 
 - Windows
   ```powershell
@@ -62,7 +78,7 @@ build\libsの下にjarが作成されます。
   ```
 Eclipseでプロジェクトをリフレッシュすると、あとは実行でcom.contrastsecurity.csvdltool.Mainで、ツールが起動します。
 
-#### Windows配布用のexe化について
+### Windows配布用のexe化について
 
 - launch4jを使っています。
 - launch4j.xmlを読み込むと、ある程度設定が入っていて、あとはjar（ビルドによって作成された）やexeのパスを修正するぐらいです。
@@ -70,7 +86,7 @@ Eclipseでプロジェクトをリフレッシュすると、あとは実行でc
   jreをDLして解凍したフォルダを **jre** というフォルダ名として置いておくと、優先して使用するような設定に既になっています。
 - 32bit版Javaにしている理由ですが、今はもうないかもしれないですが、32bit版のwindowsの場合も想定してという感じです。
 
-#### Mac配布用のapp化について
+### Mac配布用のapp化について
 
 - javapackagerを使っています。
 - jreを同梱させるため、実施するMacに1.8.0_202のJREフォルダを任意の場所に配置しておいてください。
@@ -82,7 +98,7 @@ Eclipseでプロジェクトをリフレッシュすると、あとは実行でc
   ```
   build/libs/bundle下にappフォルダが作られます。
 
-#### exe, appへの署名について
+### exe, appへの署名について
 
 まず、証明書ファイル(pfx)と証明書パスワードを入手してください。  
 署名についは以下の手順で実行してください。  
@@ -115,7 +131,7 @@ Eclipseでプロジェクトをリフレッシュすると、あとは実行でc
     codesign -d --verbose=4 CSVDLTool_1.9.2_auditlog.app
     ```
     
-#### 圧縮について補足
+### 圧縮について補足
 
 - Mac
   ```bash
@@ -123,7 +139,7 @@ Eclipseでプロジェクトをリフレッシュすると、あとは実行でc
   7z a CSVDLTool_1.9.2_auditlog.cli7z CSVDLTool_1.9.2_auditlog.app/
   ```
 
-### 起動後の使い方について
+## 起動後の使い方について
 
 - contrast_security.yamlをエージェントのDLウィザードからDLしてexeと同じ場所に配置してください。（任意）
   任意というのは、yamlから読み込まなくても、あとで全て手入力でも可能だからです。
@@ -136,23 +152,3 @@ Eclipseでプロジェクトをリフレッシュすると、あとは実行でc
 - 取得ボタンを押下します。成功するとexeと同じ場所にcsvファイルが出力されています。
 
 使用方法の詳細については [Release](https://github.com/Contrast-Security-OSS/CSVDLTool/releases) からダウンロードできるzipファイルに同梱のマニュアルpdfをご確認ください。
-
-### リリースについて
-[Release](https://github.com/Contrast-Security-OSS/CSVDLTool/releases) で以下3種類のバイナリを提供しています。ビルド不要でダウンロード後すぐにお使いいただけます。
-- Windows
-  - CSVDLTool_X.X.X.zip  
-    初回ダウンロードの場合はこちらをダウンロードして解凍して、お使いください。  
-    jreフォルダ（1.8.0_202）が同梱されているため、exeの起動ですぐにツールを使用できます。
-  - CSVDLTool_X.X.X.exe  
-    既にzipをダウンロード済みの場合はexeのダウンロードと入れ替えのみでツールを使用できます。
-- Mac
-  - CSVDLTool_X.X.X.cli7z  
-    下記コマンドで解凍してください。  
-    ```bash
-    # p7zipのインストールについては
-    brew install p7zip
-    # 解凍コマンド
-    7z x CSVDLTool_X.X.X.cli7z
-    ```
-
-以上

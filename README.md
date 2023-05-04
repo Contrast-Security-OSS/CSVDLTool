@@ -39,25 +39,20 @@ There are several binaries on [Release](https://github.com/Contrast-Security-OSS
 
 使用方法の詳細については [Release](https://github.com/Contrast-Security-OSS/CSVDLTool/releases) からダウンロードできるzipファイルに同梱のマニュアルpdfをご確認ください。
 ## Build
-
 ### 環境にあわせてbuild.gradleの以下箇所を弄ってください。
-
 - Windows 64bitの場合（java 64bitでEclipseなど動かしている場合はこのままで良いです）
-
   ```gradle
   compile group: 'org.eclipse.swt', name:   'org.eclipse.swt.win32.win32.x86_64', version: '4.3'
   //compile group: 'org.eclipse.swt', name: 'org.eclipse.swt.win32.win32.x86', version: '4.3'
   //compile group: 'org.eclipse.platform', name: 'org.eclipse.swt.cocoa.macosx.x86_64', version: '3.109.0', transitive: false
   ```
 - Windows 32bitの場合（exeを作るために32bit版のビルドをする場合）
-
   ```gradle
   //compile group: 'org.eclipse.swt', name:   'org.eclipse.swt.win32.win32.x86_64', version: '4.3'
   compile group: 'org.eclipse.swt', name: 'org.eclipse.swt.win32.win32.x86', version: '4.3'
   //compile group: 'org.eclipse.platform', name: 'org.eclipse.swt.cocoa.macosx.x86_64', version: '3.109.0', transitive: false
   ```
 - Macの場合
-
   ```gradle
   //compile group: 'org.eclipse.swt', name:   'org.eclipse.swt.win32.win32.x86_64', version: '4.3'
   //compile group: 'org.eclipse.swt', name: 'org.eclipse.swt.win32.win32.x86', version: '4.3'
@@ -65,7 +60,6 @@ There are several binaries on [Release](https://github.com/Contrast-Security-OSS
   ```
 
 ### コマンドプロンプト、ターミナルでビルドする場合
-
 - Windows
   ```powershell
   gradlew clean jar
@@ -77,7 +71,6 @@ There are several binaries on [Release](https://github.com/Contrast-Security-OSS
 build\libsの下にjarが作成されます。
 
 ### Eclipseでビルド、実行できるようにする場合
-
 - Windows
   ```powershell
   gradlew cleanEclipse eclipse
@@ -89,8 +82,8 @@ build\libsの下にjarが作成されます。
 Eclipseでプロジェクトをリフレッシュすると、あとは実行でcom.contrastsecurity.csvdltool.Mainで、ツールが起動します。
 
 ## Distribution
-### Windows配布用のexe化について
 
+### Windows配布用のexe化について
 - launch4jを使っています。
 - launch4j.xmlを読み込むと、ある程度設定が入っていて、あとはjar（ビルドによって作成された）やexeのパスを修正するぐらいです。
 - jreがインストールされていない環境でも、jreフォルダを同梱することで環境に依存せずjavaを実行できるような設定になっています。  
@@ -98,7 +91,6 @@ Eclipseでプロジェクトをリフレッシュすると、あとは実行でc
 - 32bit版Javaにしている理由ですが、今はもうないかもしれないですが、32bit版のwindowsの場合も想定してという感じです。
 
 ### Mac配布用のapp化について
-
 - javapackagerを使っています。
 - jreを同梱させるため、実施するMacに1.8.0_202のJREフォルダを任意の場所に配置しておいてください。
 - jarpackage.sh内の3〜7行目を適宜、修正してください。
@@ -110,7 +102,6 @@ Eclipseでプロジェクトをリフレッシュすると、あとは実行でc
   build/libs/bundle下にappフォルダが作られます。
 
 ### exe, appへの署名について
-
 まず、証明書ファイル(pfx)と証明書パスワードを入手してください。  
 署名についは以下の手順で実行してください。  
 - Windows  
@@ -143,7 +134,6 @@ Eclipseでプロジェクトをリフレッシュすると、あとは実行でc
     ```
     
 ### 圧縮について補足
-
 - Mac
   ```bash
   7z a CSVDLTool_1.9.2.cli7z CSVDLTool_1.9.2.app/

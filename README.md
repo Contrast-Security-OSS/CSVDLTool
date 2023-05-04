@@ -144,7 +144,7 @@ Specify `com.contrastsecurity.csvdltool.Main` class and execute Java. CSVDLTool 
   codesign -d --verbose=4 CSVDLTool_1.9.2_auditlog.app
   ```
     
-### 圧縮について補足
+#### 圧縮について補足
 - macOS
   ```bash
   7z a CSVDLTool_1.9.2.cli7z CSVDLTool_1.9.2.app/

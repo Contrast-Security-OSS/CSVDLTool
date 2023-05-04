@@ -13,21 +13,21 @@ Users can export a lot of information from TeamServer, but with this tool even m
 
 ## Installation
 There are several binaries on [Release](https://github.com/Contrast-Security-OSS/CSVDLTool/releases) page. You can use CSVDLTool without build process.  
-- Windows
-  - CSVDLTool_X.X.X.zip  
-    If you are downloading for the first time, please download this binary.  
-    As jre folder(1.8.0_202) is included, you can use `CSVDLTool` without installing JRE.  
-  - CSVDLTool_X.X.X.exe  
-    If you have already downloaded the zip, you can update CSVDLTool just by replacing the exe file.
-- Mac
-  - CSVDLTool_X.X.X.cli7z  
-    Unzip this file with the command below.  
-    ```bash
-    # Installing p7zip
-    brew install p7zip
-    # Unzip command
-    7z x CSVDLTool_X.X.X.cli7z
-    ```
+#### Windows
+- CSVDLTool_X.X.X.zip  
+  If you are downloading for the first time, please download this binary.  
+  As jre folder(1.8.0_202) is included, you can use `CSVDLTool` without installing JRE.  
+- CSVDLTool_X.X.X.exe  
+  If you have already downloaded the zip, you can update CSVDLTool just by replacing the exe file.
+#### Mac
+- CSVDLTool_X.X.X.cli7z  
+  Unzip this file with the command below.  
+  ```bash
+  # Installing p7zip
+  brew install p7zip
+  # Unzip command
+  7z x CSVDLTool_X.X.X.cli7z
+  ```
 #### About AuditLog Version
 As binaries above are Token authentication version.  
 Binaries which contains `auditlog` in file name are Password authentication version.  
@@ -49,58 +49,58 @@ Select which tool to use according to your situation.
 ## Building of CSVDLTool
 ### Building with build.gradle
 Modify the following line of build.gradle according to your environment.
-- Windows 64bit
-  ```gradle
-  compile group: 'org.eclipse.swt', name:   'org.eclipse.swt.win32.win32.x86_64', version: '4.3'
-  //compile group: 'org.eclipse.swt', name: 'org.eclipse.swt.win32.win32.x86', version: '4.3'
-  //compile group: 'org.eclipse.platform', name: 'org.eclipse.swt.cocoa.macosx.x86_64', version: '3.109.0', transitive: false
-  ```
-- Windows 32bit
-  ```gradle
-  //compile group: 'org.eclipse.swt', name:   'org.eclipse.swt.win32.win32.x86_64', version: '4.3'
-  compile group: 'org.eclipse.swt', name: 'org.eclipse.swt.win32.win32.x86', version: '4.3'
-  //compile group: 'org.eclipse.platform', name: 'org.eclipse.swt.cocoa.macosx.x86_64', version: '3.109.0', transitive: false
-  ```
-- MacOS
-  ```gradle
-  //compile group: 'org.eclipse.swt', name:   'org.eclipse.swt.win32.win32.x86_64', version: '4.3'
-  //compile group: 'org.eclipse.swt', name: 'org.eclipse.swt.win32.win32.x86', version: '4.3'
-  compile group: 'org.eclipse.platform', name: 'org.eclipse.swt.cocoa.macosx.x86_64', version: '3.109.0', transitive: false
-  ```
+#### Windows 64bit
+```gradle
+compile group: 'org.eclipse.swt', name:   'org.eclipse.swt.win32.win32.x86_64', version: '4.3'
+//compile group: 'org.eclipse.swt', name: 'org.eclipse.swt.win32.win32.x86', version: '4.3'
+//compile group: 'org.eclipse.platform', name: 'org.eclipse.swt.cocoa.macosx.x86_64', version: '3.109.0', transitive: false
+```
+#### Windows 32bit
+```gradle
+//compile group: 'org.eclipse.swt', name:   'org.eclipse.swt.win32.win32.x86_64', version: '4.3'
+compile group: 'org.eclipse.swt', name: 'org.eclipse.swt.win32.win32.x86', version: '4.3'
+//compile group: 'org.eclipse.platform', name: 'org.eclipse.swt.cocoa.macosx.x86_64', version: '3.109.0', transitive: false
+```
+#### MacOS
+```gradle
+//compile group: 'org.eclipse.swt', name:   'org.eclipse.swt.win32.win32.x86_64', version: '4.3'
+//compile group: 'org.eclipse.swt', name: 'org.eclipse.swt.win32.win32.x86', version: '4.3'
+compile group: 'org.eclipse.platform', name: 'org.eclipse.swt.cocoa.macosx.x86_64', version: '3.109.0', transitive: false
+```
 
 ### Build and Export Jar
-- Windows
-  ```powershell
-  gradlew clean jar
-  ```
-- Mac
-  ```bash
-  ./gradlew clean jar
-  ```
+#### Windows
+```powershell
+gradlew clean jar
+```
+#### Mac
+```bash
+./gradlew clean jar
+```
 jar file will be created under `build\libs`.
 
 ### Build and Run on Eclipse IDE
-- Windows
-  ```powershell
-  gradlew cleanEclipse eclipse
-  ```
-- Mac
-  ```bash
-  ./gradlew cleanEclipse eclipse
-  ```
+#### Windows
+```powershell
+gradlew cleanEclipse eclipse
+```
+#### Mac
+```bash
+./gradlew cleanEclipse eclipse
+```
 Refresh your project in Eclipse. Clean and Build if necessary.  
 Specify `com.contrastsecurity.csvdltool.Main` class and execute Java. CSVDLTool will launch.
 
 ## Distribution
-
-### Convert jar to exe
+### Convert jar to executable binary
+#### Windows(jar to exe)
 - Using [launch4j](https://launch4j.sourceforge.net/).
 - launch4j.xmlを読み込むと、ある程度設定が入っていて、あとはjar（ビルドによって作成された）やexeのパスを修正するぐらいです。
 - jreがインストールされていない環境でも、jreフォルダを同梱することで環境に依存せずjavaを実行できるような設定になっています。  
   jreをDLして解凍したフォルダを **jre** というフォルダ名として置いておくと、優先して使用するような設定に既になっています。
 - 32bit版Javaにしている理由ですが、今はもうないかもしれないですが、32bit版のwindowsの場合も想定してという感じです。
 
-### Convert jar to app
+#### MacOS(jar to app)
 - Using javapackager.
 - jreを同梱させるため、実施するMacに1.8.0_202のJREフォルダを任意の場所に配置しておいてください。
 - jarpackage.sh内の3〜7行目を適宜、修正してください。
@@ -111,37 +111,38 @@ Specify `com.contrastsecurity.csvdltool.Main` class and execute Java. CSVDLTool 
   ```
   app folder will be created under `build\libs/bundle`.
 
-### exe, appへの署名について
+### Digital Signatures
 まず、証明書ファイル(pfx)と証明書パスワードを入手してください。  
 署名についは以下の手順で実行してください。  
-- Windows  
-  - エイリアスの確認
-    ```powershell
-    keytool -list -v -storetype pkcs12 -keystore C:\Users\turbou\Desktop\CSVDLTool_work\XXXXX.pfx
-    # 証明書パスワードを入力
-    ```
-  - 署名  
-    launch4jのsign4jを使用します。
-    ```powershell
-    cd C:\Program Files (x86)\launch4j\sign4j
-    sign4j.exe java -jar jsign-2.0.jar --alias 1 --keystore C:\Users\turbou\Desktop\CSVDLTool_work\XXXXX.pfx --storepass [パスワード] C:\Users\turbou\Desktop\CSVDLTool_work\common\CSVDLTool_1.9.2.exe
-    ```
-  - 署名の確認  
-    署名の確認については、exeを右クリック->プロパティ で確認できます。
-- Mac
-  - 証明書ファイルの読み込み  
-    pfxファイルをダブルクリックでキーチェーンアクセス.appに読み込ませます。証明書パスワード入力が必要  
-    読み込めたら、Common Name(通称)をコピー
-  - 署名
-    ```bash
-    codesign --deep -s "Contrast Security, Inc." -v CSVDLTool_1.9.2.app
-    codesign --deep -s "Contrast Security, Inc." -v CSVDLTool_1.9.2_auditlog.app
-    ```
-  - 署名の確認
-    ```bash
-    codesign -d --verbose=4 CSVDLTool_1.9.2.app
-    codesign -d --verbose=4 CSVDLTool_1.9.2_auditlog.app
-    ```
+#### Windows
+- エイリアスの確認
+  ```powershell
+  keytool -list -v -storetype pkcs12 -keystore C:\Users\turbou\Desktop\CSVDLTool_work\XXXXX.pfx
+  # 証明書パスワードを入力
+  ```
+- 署名  
+  Using sign4j in launch4j.  
+  ```powershell
+  cd C:\Program Files (x86)\launch4j\sign4j
+  sign4j.exe java -jar jsign-2.0.jar --alias 1 --keystore C:\Users\turbou\Desktop\CSVDLTool_work\XXXXX.pfx --storepass [パスワード] C:\Users\turbou\Desktop\CSVDLTool_work\common\CSVDLTool_1.9.2.exe
+  ```
+- 署名の確認  
+  署名の確認については、exeを右クリック->プロパティ で確認できます。
+#### MacOS
+- 証明書ファイルの読み込み  
+  pfxファイルをダブルクリックでキーチェーンアクセス.appに読み込ませます。証明書パスワード入力が必要  
+  読み込めたら、Common Name(通称)をコピー
+- 署名
+  Using codesign.  
+  ```bash
+  codesign --deep -s "Contrast Security, Inc." -v CSVDLTool_1.9.2.app
+  codesign --deep -s "Contrast Security, Inc." -v CSVDLTool_1.9.2_auditlog.app
+  ```
+- 署名の確認
+  ```bash
+  codesign -d --verbose=4 CSVDLTool_1.9.2.app
+  codesign -d --verbose=4 CSVDLTool_1.9.2_auditlog.app
+  ```
     
 ### 圧縮について補足
 - Mac

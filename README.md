@@ -132,7 +132,7 @@ Specify `com.contrastsecurity.csvdltool.Main` class and execute Java. CSVDLTool 
 - 証明書ファイルの読み込み  
   pfxファイルをダブルクリックでキーチェーンアクセス.appに読み込ませます。証明書パスワード入力が必要  
   読み込めたら、Common Name(通称)をコピー
-- 署名
+- 署名  
   Using codesign.  
   ```bash
   codesign --deep -s "Contrast Security, Inc." -v CSVDLTool_1.9.2.app

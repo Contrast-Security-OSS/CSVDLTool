@@ -1,4 +1,4 @@
-# CSVDLTool [![GitHub](https://img.shields.io/github/license/Contrast-Security-OSS/CSVDLTool?color=blightgreen)](LICENSE) ![GitHub release (latest by date)](https://img.shields.io/github/v/release/Contrast-Security-OSS/CSVDLTool)
+# CSVDLTool [![GitHub](https://img.shields.io/github/license/Contrast-Security-OSS/CSVDLTool?color=blightgreen)](LICENSE) [![GitHub release (latest by date)](https://img.shields.io/github/v/release/Contrast-Security-OSS/CSVDLTool)](https://github.com/Contrast-Security-OSS/CSVDLTool/releases/latest)
 [English](https://github.com/Contrast-Security-OSS/CSVDLTool/blob/main/README.md) | Japanese
 
 TeamServerに登録されている脆弱性情報及びライブラリ情報のCSV形式レポートを取得するツールです。  

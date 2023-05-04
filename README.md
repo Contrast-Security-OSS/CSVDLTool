@@ -5,8 +5,11 @@ English | [Japanese](https://github.com/Contrast-Security-OSS/CSVDLTool/blob/mai
 Users can export a lot of information from TeamServer, but with this tool even more information can be exported in CSV format.  
 
 ## System Requirements
-Windows8.1、Windows10, MacOS11(Big Sur) or higher  
-jre1.8.0_202
+#### OS
+- Windows8.1, 10, 11
+- MacOS11(Big Sur) or higher
+#### Runtime  
+- jre1.8
 
 ## Installation
 There are several binaries on [Release](https://github.com/Contrast-Security-OSS/CSVDLTool/releases) page. You can use CSVDLTool without build process.  

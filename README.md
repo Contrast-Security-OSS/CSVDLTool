@@ -1,4 +1,5 @@
 # CSVDLTool
+English | [Japanese](https://github.com/Contrast-Security-OSS/CSVDLTool/blob/main/README.ja.md)
 
 `CSVDLTool` is a tool to help users who use Contrast.  
 Users can export a lot of information from TeamServer, but with this tool even more information can be exported in CSV format.  
@@ -25,10 +26,19 @@ There are several binaries on [Release](https://github.com/Contrast-Security-OSS
     7z x CSVDLTool_X.X.X.cli7z
     ```
 
+## Usage
+- contrast_security.yamlをエージェントのDLウィザードからDLしてexeと同じ場所に配置してください。（任意）
+  任意というのは、yamlから読み込まなくても、あとで全て手入力でも可能だからです。
+- 設定画面で、TeamServerのURL、ユーザ名、サービスキーを個人のものに変更してください。
+- 組織情報の追加ボタンで組織を追加してください。
+  組織は複数登録が可能です。CSVレポートを取得する対象の組織にチェックを入れてください。
+  ※ 必要に応じて、プロキシ設定も行っておいてください。
+- 設定を閉じて、アプリの読み込みをして、アプリケーション一覧をロードします。
+- 脆弱性のCSVを取得するアプリをダブルクリックなり矢印で選択して右のボックスに移動します。（これが対象となります）
+- 取得ボタンを押下します。成功するとexeと同じ場所にcsvファイルが出力されています。
+
+使用方法の詳細については [Release](https://github.com/Contrast-Security-OSS/CSVDLTool/releases) からダウンロードできるzipファイルに同梱のマニュアルpdfをご確認ください。
 ## Build
-
-ビルドからではなく、すぐにお使いいただく場合は[リリースについて](#リリースについて)を参照ください。
-
 
 ### 環境にあわせてbuild.gradleの以下箇所を弄ってください。
 
@@ -78,6 +88,7 @@ build\libsの下にjarが作成されます。
   ```
 Eclipseでプロジェクトをリフレッシュすると、あとは実行でcom.contrastsecurity.csvdltool.Mainで、ツールが起動します。
 
+## Distribution
 ### Windows配布用のexe化について
 
 - launch4jを使っています。
@@ -139,16 +150,3 @@ Eclipseでプロジェクトをリフレッシュすると、あとは実行でc
   7z a CSVDLTool_1.9.2_auditlog.cli7z CSVDLTool_1.9.2_auditlog.app/
   ```
 
-## 起動後の使い方について
-
-- contrast_security.yamlをエージェントのDLウィザードからDLしてexeと同じ場所に配置してください。（任意）
-  任意というのは、yamlから読み込まなくても、あとで全て手入力でも可能だからです。
-- 設定画面で、TeamServerのURL、ユーザ名、サービスキーを個人のものに変更してください。
-- 組織情報の追加ボタンで組織を追加してください。
-  組織は複数登録が可能です。CSVレポートを取得する対象の組織にチェックを入れてください。
-  ※ 必要に応じて、プロキシ設定も行っておいてください。
-- 設定を閉じて、アプリの読み込みをして、アプリケーション一覧をロードします。
-- 脆弱性のCSVを取得するアプリをダブルクリックなり矢印で選択して右のボックスに移動します。（これが対象となります）
-- 取得ボタンを押下します。成功するとexeと同じ場所にcsvファイルが出力されています。
-
-使用方法の詳細については [Release](https://github.com/Contrast-Security-OSS/CSVDLTool/releases) からダウンロードできるzipファイルに同梱のマニュアルpdfをご確認ください。

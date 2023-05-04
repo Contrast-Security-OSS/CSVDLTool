@@ -37,8 +37,6 @@ Select which tool to use according to your situation.
 [^1]:Except for some environments.
 
 ## Usage
-- contrast_security.yamlをエージェントのDLウィザードからDLしてexeと同じ場所に配置してください。（任意）
-  任意というのは、yamlから読み込まなくても、あとで全て手入力でも可能だからです。
 - 設定画面で、TeamServerのURL、ユーザ名、サービスキーを個人のものに変更してください。
 - 組織情報の追加ボタンで組織を追加してください。
   組織は複数登録が可能です。CSVレポートを取得する対象の組織にチェックを入れてください。

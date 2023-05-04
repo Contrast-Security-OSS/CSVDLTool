@@ -6,8 +6,12 @@ TeamServerから直接CSVレポートを出力することも出来ますが、�
 その情報をカスタマイズしたりすることが出来ます。  
 
 ## 動作環境
-Windows8.1、Windows10, Mac11(Big Sur)かそれ以上  
-いずれも、jre1.8.0_202
+#### OS
+- Windows8.1、 10, 11
+- Mac11(Big Sur)かそれ以上
+
+#### Runtime
+jre1.8
 
 ## インストール
 [Release](https://github.com/Contrast-Security-OSS/CSVDLTool/releases) で幾つかのバイナリを提供しています。ビルド不要でダウンロード後すぐに使用できます。  

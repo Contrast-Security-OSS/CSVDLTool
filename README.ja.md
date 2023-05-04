@@ -11,7 +11,7 @@ TeamServerから直接CSVレポートを出力することも出来ますが、�
 - macOS 11(Big Sur)かそれ以上
 
 #### Runtime
-jre1.8
+- jre1.8
 
 ## インストール
 [Release](https://github.com/Contrast-Security-OSS/CSVDLTool/releases) で幾つかのバイナリを提供しています。ビルド不要でダウンロード後すぐに使用できます。  

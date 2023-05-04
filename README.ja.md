@@ -80,7 +80,7 @@ jre1.8
   ```bash
   ./gradlew clean jar
   ```
-build\libsの下にjarが作成されます。
+`build\libs`の下にjarが作成されます。
 
 #### Eclipseでビルド、実行できるようにする場合
 - Windows
@@ -91,7 +91,7 @@ build\libsの下にjarが作成されます。
   ```bash
   ./gradlew cleanEclipse eclipse
   ```
-Eclipseでプロジェクトをリフレッシュすると、あとは実行でcom.contrastsecurity.csvdltool.Mainで、ツールが起動します。
+Eclipseでプロジェクトをリフレッシュすると、あとはJavaの実行で`com.contrastsecurity.csvdltool.Main`クラス指定で、ツールが起動します。
 
 ## 配布
 #### Windows配布用のexe化について

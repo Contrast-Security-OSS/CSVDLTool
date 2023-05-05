@@ -49,7 +49,7 @@ Select which tool to use according to your situation.
 
 ## Building of CSVDLTool
 ### Building with build.gradle
-Modify the following line of build.gradle according to your environment.
+Modify the following line of `build.gradle` according to your environment.
 #### Windows 64bit
 ```gradle
 compile group: 'org.eclipse.swt', name:   'org.eclipse.swt.win32.win32.x86_64', version: '4.3'

@@ -12,7 +12,7 @@ Users can export a lot of information from TeamServer, but with this tool even m
 - jre1.8
 
 ## Installation
-There are several binaries on [Release](https://github.com/Contrast-Security-OSS/CSVDLTool/releases) page. You can use CSVDLTool without build process.  
+There are several binaries on [Release](https://github.com/Contrast-Security-OSS/CSVDLTool/releases/latest) page. You can use CSVDLTool without build process.  
 #### Windows
 - CSVDLTool_X.X.X.zip  
   If you are downloading for the first time, please download this binary.  

@@ -1,7 +1,7 @@
 keytool -list -v -storetype pkcs12 -keystore C:\Users\turbou\Desktop\CSVDLTool_work\XXXXX.pfx
-[パスワード]を入力
-エイリアスを確認
+Enter a [Password]
+Confirm Arias
 
 cd C:\Program Files (x86)\launch4j\sign4j
-sign4j.exe java -jar jsign-2.0.jar --alias 1 --keystore C:\Users\turbou\Desktop\CSVDLTool_work\contrast-code.pfx --storepass [パスワード] C:\Users\turbou\Desktop\CSVDLTool_work\common\CSVDLTool_1.9.2.exe
-sign4j.exe java -jar jsign-2.0.jar --alias 1 --keystore C:\Users\turbou\Desktop\CSVDLTool_work\contrast-code.pfx --storepass [パスワード] C:\Users\turbou\Desktop\CSVDLTool_work\common\CSVDLTool_1.9.2_auditlog.exe
+sign4j.exe java -jar jsign-2.0.jar --alias 1 --keystore C:\Users\turbou\Desktop\CSVDLTool_work\contrast-code.pfx --storepass [Password] C:\Users\turbou\Desktop\CSVDLTool_work\common\CSVDLTool_1.9.2.exe
+sign4j.exe java -jar jsign-2.0.jar --alias 1 --keystore C:\Users\turbou\Desktop\CSVDLTool_work\contrast-code.pfx --storepass [Password] C:\Users\turbou\Desktop\CSVDLTool_work\common\CSVDLTool_1.9.2_auditlog.exe

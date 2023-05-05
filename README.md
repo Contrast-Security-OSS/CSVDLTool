@@ -129,7 +129,7 @@ First of all, get the certificate file(pfx) and the certificate password.
   You can confirm the signature in the properties of the exe file.
 #### macOS
 - Install certifiate to your PC.  
-  Double-click the pfx file to install into KeychainAccess. At that time, certificate password is needed.
+  Double-click the pfx file to install into KeychainAccess. At that time, certificate password is needed.  
   After installation, copy the `Common Name`.
 - Sign  
   Using codesign.  

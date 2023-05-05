@@ -111,42 +111,46 @@ Specify `com.contrastsecurity.csvdltool.Main` class and execute Java. CSVDLTool 
   ```
   app folder will be created under `build\libs/bundle`.
 
-### Digital Signatures
-まず、証明書ファイル(pfx)と証明書パスワードを入手してください。  
-署名についは以下の手順で実行してください。  
+### Digital Signature
+First of all, get the certificate file(pfx) and the certificate password.    
 #### Windows
-- エイリアスの確認
+- Check arias
   ```powershell
   keytool -list -v -storetype pkcs12 -keystore C:\Users\turbou\Desktop\CSVDLTool_work\XXXXX.pfx
-  # 証明書パスワードを入力
+  # Enter a certificate password.
   ```
-- 署名  
+- Sign  
   Using sign4j in launch4j.  
   ```powershell
   cd C:\Program Files (x86)\launch4j\sign4j
-  sign4j.exe java -jar jsign-2.0.jar --alias 1 --keystore C:\Users\turbou\Desktop\CSVDLTool_work\XXXXX.pfx --storepass [パスワード] C:\Users\turbou\Desktop\CSVDLTool_work\common\CSVDLTool_1.9.2.exe
+  sign4j.exe java -jar jsign-2.0.jar --alias 1 --keystore C:\Users\turbou\Desktop\CSVDLTool_work\XXXXX.pfx --storepass [] C:\Users\turbou\Desktop\CSVDLTool_work\common\CSVDLTool_1.9.2.exe
   ```
-- 署名の確認  
-  署名の確認については、exeを右クリック->プロパティ で確認できます。
+- Confirm Digital Signatures  
+  You can confirm the signature in the properties of the exe file.
 #### macOS
-- 証明書ファイルの読み込み  
-  pfxファイルをダブルクリックでキーチェーンアクセス.appに読み込ませます。証明書パスワード入力が必要  
-  読み込めたら、Common Name(通称)をコピー
-- 署名  
+- Install certifiate to your PC.  
+  Double-click the pfx file to install into KeychainAccess. At that time, certificate password is needed.
+  After installation, copy the `Common Name`.
+- Sign  
   Using codesign.  
   ```bash
   codesign --deep -s "Contrast Security, Inc." -v CSVDLTool_1.9.2.app
   codesign --deep -s "Contrast Security, Inc." -v CSVDLTool_1.9.2_auditlog.app
   ```
-- 署名の確認
+- Confirm Digital Signatures
   ```bash
   codesign -d --verbose=4 CSVDLTool_1.9.2.app
   codesign -d --verbose=4 CSVDLTool_1.9.2_auditlog.app
   ```
     
-#### 圧縮について補足
+#### How to compress
+- Windows  
+  Using 7-Zip.
 - macOS
   ```bash
+  # Installing p7zip
+  brew install p7zip
+  # Compress
   7z a CSVDLTool_1.9.2.cli7z CSVDLTool_1.9.2.app/
   7z a CSVDLTool_1.9.2_auditlog.cli7z CSVDLTool_1.9.2_auditlog.app/
   ```

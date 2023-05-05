@@ -45,7 +45,8 @@ Select which tool to use according to your situation.
 - 脆弱性のCSVを取得するアプリをダブルクリックなり矢印で選択して右のボックスに移動します。（これが対象となります）
 - 取得ボタンを押下します。成功するとexeと同じ場所にcsvファイルが出力されています。
 
-使用方法の詳細については [Release](https://github.com/Contrast-Security-OSS/CSVDLTool/releases) からダウンロードできるzipファイルに同梱のマニュアルpdfをご確認ください。
+使用方法の詳細については [Release](https://github.com/Contrast-Security-OSS/CSVDLTool/releases/latest) からダウンロードできるzipファイルに同梱のマニュアルpdfをご確認ください。
+
 ## Building of CSVDLTool
 ### Building with build.gradle
 Modify the following line of build.gradle according to your environment.

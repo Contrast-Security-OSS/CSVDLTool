@@ -49,7 +49,7 @@ TeamServerから直接CSVレポートを出力することも出来ますが、�
 
 ### ビルド
 ### gradleによるビルド
-環境にあわせてbuild.gradleの以下箇所を弄ってください。
+環境にあわせて`build.gradle`の以下箇所を弄ってください。
 #### Windows 64bitの場合（java 64bitでEclipseなど動かしている場合はこのままで良いです）
 ```gradle
 compile group: 'org.eclipse.swt', name:   'org.eclipse.swt.win32.win32.x86_64', version: '4.3'

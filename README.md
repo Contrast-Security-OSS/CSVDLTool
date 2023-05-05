@@ -37,15 +37,12 @@ Select which tool to use according to your situation.
 [^1]:Except for some environments.
 
 ## Usage
-- 設定画面で、TeamServerのURL、ユーザ名、サービスキーを個人のものに変更してください。
-- 組織情報の追加ボタンで組織を追加してください。
-  組織は複数登録が可能です。CSVレポートを取得する対象の組織にチェックを入れてください。
-  ※ 必要に応じて、プロキシ設定も行っておいてください。
-- 設定を閉じて、アプリの読み込みをして、アプリケーション一覧をロードします。
-- 脆弱性のCSVを取得するアプリをダブルクリックなり矢印で選択して右のボックスに移動します。（これが対象となります）
-- 取得ボタンを押下します。成功するとexeと同じ場所にcsvファイルが出力されています。
+1. Set the Team Server URL, username and service key in `General` preference page.
+1. Add organization.  
+  You can regist multiple oraganition.  
+  *Note: If needed connection settings(e.g. use proxy), complete the settings in `Connection` preference page.*
 
-使用方法の詳細については [Release](https://github.com/Contrast-Security-OSS/CSVDLTool/releases/latest) からダウンロードできるzipファイルに同梱のマニュアルpdfをご確認ください。
+After initial setting, you can export data at ASSESS, PROTECT and SERVER tabs.
 
 ## Building of CSVDLTool
 ### Building with build.gradle

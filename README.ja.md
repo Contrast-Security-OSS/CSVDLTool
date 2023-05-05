@@ -14,7 +14,7 @@ TeamServerから直接CSVレポートを出力することも出来ますが、�
 - jre1.8
 
 ## インストール
-[Release](https://github.com/Contrast-Security-OSS/CSVDLTool/releases) で幾つかのバイナリを提供しています。ビルド不要でダウンロード後すぐに使用できます。  
+[Release](https://github.com/Contrast-Security-OSS/CSVDLTool/releases/latest) で幾つかのバイナリを提供しています。ビルド不要でダウンロード後すぐに使用できます。  
 #### Windows
 - CSVDLTool_X.X.X.zip  
   初回ダウンロードの場合はこちらをダウンロードして解凍して、お使いください。  
@@ -45,7 +45,7 @@ TeamServerから直接CSVレポートを出力することも出来ますが、�
 - 脆弱性のCSVを取得するアプリをダブルクリックなり矢印で選択して右のボックスに移動します。（これが対象となります）
 - 取得ボタンを押下します。成功するとexeと同じ場所にcsvファイルが出力されています。
 
-使用方法の詳細については [Release](https://github.com/Contrast-Security-OSS/CSVDLTool/releases) からダウンロードできるzipファイルに同梱のマニュアルpdfをご確認ください。
+使用方法の詳細については [Release](https://github.com/Contrast-Security-OSS/CSVDLTool/releases/latest) からダウンロードできるzipファイルに同梱のマニュアルpdfをご確認ください。
 
 ### ビルド
 ### gradleによるビルド

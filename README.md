@@ -99,15 +99,15 @@ Specify `com.contrastsecurity.csvdltool.Main` class and execute Java. CSVDLTool 
 - 32bit版Javaにしている理由ですが、今はもうないかもしれないですが、32bit版のwindowsの場合も想定してという感じです。
 
 #### macOS (jar to app)
-- Using javapackager.
-- If including jre, place the jre folder anywhere on the file system.
-- If needed, correct lines 3 to 7 in jarpackage.sh.
-- run `jarpackage.sh`.
-  ```bash
-  ./jarpackage.sh
-  ./jarpackage_auditlog.sh
-  ```
-  app folder will be created under `build\libs/bundle`.
+1. Using javapackager.
+1. If including jre, place the jre folder anywhere on the file system.
+1. If needed, correct lines 3 to 7 in jarpackage.sh.
+1. run `jarpackage.sh`.  
+    ```bash
+    ./jarpackage.sh
+    ./jarpackage_auditlog.sh
+    ```
+    app folder will be created under `build\libs/bundle`.
 
 ### Digital Signature
 First of all, get the certificate file(pfx) and the certificate password.    

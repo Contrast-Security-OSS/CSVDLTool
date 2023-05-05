@@ -100,9 +100,9 @@ Specify `com.contrastsecurity.csvdltool.Main` class and execute Java. CSVDLTool 
 
 #### macOS (jar to app)
 - Using javapackager.
-- jreを同梱させるため、実施するMacに1.8.0_202のJREフォルダを任意の場所に配置しておいてください。
-- jarpackage.sh内の3〜7行目を適宜、修正してください。
-- jarpackage.shを実行します。
+- If including jre, place the jre folder anywhere on the file system.
+- If needed, correct lines 3 to 7 in jarpackage.sh.
+- run `jarpackage.sh`.
   ```bash
   ./jarpackage.sh
   ./jarpackage_auditlog.sh

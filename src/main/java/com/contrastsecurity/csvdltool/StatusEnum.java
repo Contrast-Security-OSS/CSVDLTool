@@ -24,7 +24,12 @@
 package com.contrastsecurity.csvdltool;
 
 public enum StatusEnum {
-    REPORTED(Messages.getString("statusenum.reported")), SUSPICIOUS(Messages.getString("statusenum.suspicious")), CONFIRMED(Messages.getString("statusenum.confirmed")), NOTAPROBLEM(Messages.getString("statusenum.not-a-problem")), REMEDIATED(Messages.getString("statusenum.fixed")), FIXED(Messages.getString("statusenum.remediated")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+    REPORTED(Messages.getString("statusenum.reported")), //$NON-NLS-1$
+    SUSPICIOUS(Messages.getString("statusenum.suspicious")), //$NON-NLS-1$
+    CONFIRMED(Messages.getString("statusenum.confirmed")), //$NON-NLS-1$
+    NOTAPROBLEM(Messages.getString("statusenum.not-a-problem")), //$NON-NLS-1$
+    REMEDIATED(Messages.getString("statusenum.remediated")), //$NON-NLS-1$
+    FIXED(Messages.getString("statusenum.fixed")); //$NON-NLS-1$
 
     private String label;
 

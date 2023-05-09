@@ -58,6 +58,8 @@ public class Trace {
     private String impact;
     private String severity;
 
+    Pattern statusPattern = Pattern.compile("^[A-Za-z\\s]+$"); //$NON-NLS-1$
+
     public String getCategory() {
         return category;
     }
@@ -140,10 +142,9 @@ public class Trace {
     }
 
     public String getStatus() {
-        Pattern p = Pattern.compile("^[A-Za-z\\s]+$"); //$NON-NLS-1$
-        Matcher m = p.matcher(this.status);
-        if (m.matches()) {
-            return StatusEnum.valueOf(this.status.replaceAll(" ", "").toUpperCase()).getLabel(); //$NON-NLS-1$ //$NON-NLS-2$
+        Matcher m = statusPattern.matcher(this.status);
+        if (m.matches() || this.status.equals("Remediated - Auto-Verified")) {
+            return StatusEnum.valueOf(this.status.replaceAll(" ", "").replaceAll("-", "_").toUpperCase()).getLabel(); //$NON-NLS-1$ //$NON-NLS-2$
         }
         return this.status;
     }

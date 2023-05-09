@@ -29,6 +29,7 @@ public enum StatusEnum {
     CONFIRMED(Messages.getString("statusenum.confirmed")), //$NON-NLS-1$
     NOTAPROBLEM(Messages.getString("statusenum.not-a-problem")), //$NON-NLS-1$
     REMEDIATED(Messages.getString("statusenum.remediated")), //$NON-NLS-1$
+    REMEDIATED_AUTO_VERIFIED(Messages.getString("statusenum.remediated-auto-verified")), //$NON-NLS-1$
     FIXED(Messages.getString("statusenum.fixed")); //$NON-NLS-1$
 
     private String label;

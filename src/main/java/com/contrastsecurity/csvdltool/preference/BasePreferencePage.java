@@ -265,7 +265,8 @@ public class BasePreferencePage extends PreferencePage {
                 try {
                     passTxt.setText(encryptor.decrypt(ps.getString(PreferenceConstants.PASSWORD)));
                 } catch (Exception e) {
-                    MessageDialog.openError(getShell(), Messages.getString("basepreferencepage.dialog.title"), Messages.getString("basepreferencepage.password.decrypt.error.message")); //$NON-NLS-1$ //$NON-NLS-2$
+                    MessageDialog.openError(getShell(), Messages.getString("basepreferencepage.dialog.title"), //$NON-NLS-1$
+                            Messages.getString("basepreferencepage.password.decrypt.error.message")); //$NON-NLS-1$
                     passTxt.setText(""); //$NON-NLS-1$
                 }
             }
@@ -313,7 +314,8 @@ public class BasePreferencePage extends PreferencePage {
                 orgList = new Gson().fromJson(orgJsonStr, new TypeToken<List<Organization>>() {
                 }.getType());
             } catch (JsonSyntaxException e) {
-                MessageDialog.openError(getShell(), Messages.getString("basepreferencepage.dialog.title"), String.format("%s\r\n%s", Messages.getString("basepreferencepage.message.dialog.organization.json.load.error.message"), orgJsonStr)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                MessageDialog.openError(getShell(), Messages.getString("basepreferencepage.dialog.title"), //$NON-NLS-1$
+                        String.format("%s\r\n%s", Messages.getString("basepreferencepage.message.dialog.organization.json.load.error.message"), orgJsonStr)); //$NON-NLS-1$ //$NON-NLS-2$
                 orgList = new ArrayList<Organization>();
             }
         } else {
@@ -369,7 +371,9 @@ public class BasePreferencePage extends PreferencePage {
         buttonGrp.setLayout(new GridLayout(1, true));
 
         addBtn = new Button(buttonGrp, SWT.NULL);
-        addBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        GridData addBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        addBtnGrDt.minimumWidth = 60;
+        addBtn.setLayoutData(addBtnGrDt);
         addBtn.setText(Messages.getString("basepreferencepage.org.add.button.title")); //$NON-NLS-1$
         if (this.authType == AuthType.PASSWORD) {
             if (contrastUrlTxt.getText().trim().isEmpty() || userNameTxt.getText().trim().isEmpty()) {
@@ -436,7 +440,9 @@ public class BasePreferencePage extends PreferencePage {
         });
 
         final Button rmvBtn = new Button(buttonGrp, SWT.NULL);
-        rmvBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        GridData rmvBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        rmvBtnGrDt.minimumWidth = 60;
+        rmvBtn.setLayoutData(rmvBtnGrDt);
         rmvBtn.setText(Messages.getString("basepreferencepage.org.rmv.button.title")); //$NON-NLS-1$
         rmvBtn.setEnabled(false);
         rmvBtn.addSelectionListener(new SelectionAdapter() {
@@ -469,7 +475,9 @@ public class BasePreferencePage extends PreferencePage {
         });
 
         bulkOnBtn = new Button(buttonGrp, SWT.NULL);
-        bulkOnBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        GridData bulkOnBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        bulkOnBtnGrDt.minimumWidth = 60;
+        bulkOnBtn.setLayoutData(bulkOnBtnGrDt);
         bulkOnBtn.setText(Messages.getString("basepreferencepage.org.all.on.button.title")); //$NON-NLS-1$
         bulkOnBtn.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -486,7 +494,9 @@ public class BasePreferencePage extends PreferencePage {
         });
 
         bulkOffBtn = new Button(buttonGrp, SWT.NULL);
-        bulkOffBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        GridData bulkOffBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        bulkOffBtnGrDt.minimumWidth = 60;
+        bulkOffBtn.setLayoutData(bulkOffBtnGrDt);
         bulkOffBtn.setText(Messages.getString("basepreferencepage.org.all.off.button.title")); //$NON-NLS-1$
         bulkOffBtn.addSelectionListener(new SelectionAdapter() {
             @Override

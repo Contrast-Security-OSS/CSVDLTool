@@ -32,7 +32,6 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -65,17 +64,22 @@ public class FilterLastDetectedDialog extends Dialog {
     @Override
     protected Control createDialogArea(Composite parent) {
         Composite composite = (Composite) super.createDialogArea(parent);
-        GridLayout compositeLt = new GridLayout(5, false);
+        GridLayout compositeLt = new GridLayout(3, false);
         compositeLt.marginWidth = 25;
         compositeLt.marginHeight = 10;
         compositeLt.horizontalSpacing = 15;
         composite.setLayout(compositeLt);
         GridData compositeGrDt = new GridData(GridData.FILL_HORIZONTAL);
-        compositeGrDt.horizontalAlignment = SWT.CENTER;
         composite.setLayoutData(compositeGrDt);
 
-        frCalendar = new DateTime(composite, SWT.CALENDAR);
-        GridData frCalendarGrDt = new GridData(SWT.RIGHT, SWT.CENTER, false, false, 2, 1);
+        Composite frComp = new Composite(composite, SWT.NONE);
+        GridLayout frCompLt = new GridLayout(2, false);
+        frComp.setLayout(frCompLt);
+        GridData frCompGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        frComp.setLayoutData(frCompGrDt);
+
+        frCalendar = new DateTime(frComp, SWT.CALENDAR);
+        GridData frCalendarGrDt = new GridData(SWT.CENTER, SWT.CENTER, false, false, 2, 1);
         frCalendar.setLayoutData(frCalendarGrDt);
         frCalendar.addListener(SWT.MouseUp, new Listener() {
             @Override
@@ -87,23 +91,9 @@ public class FilterLastDetectedDialog extends Dialog {
             }
         });
 
-        new Label(composite, SWT.NULL).setText("～"); //$NON-NLS-1$
-
-        toCalendar = new DateTime(composite, SWT.CALENDAR);
-        GridData toCalendarGrDt = new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1);
-        toCalendar.setLayoutData(toCalendarGrDt);
-        toCalendar.addListener(SWT.MouseUp, new Listener() {
-            @Override
-            public void handleEvent(Event event) {
-                cal.set(toCalendar.getYear(), toCalendar.getMonth(), toCalendar.getDay(), 0, 0, 0);
-                toDateText.setText(sdf.format(cal.getTime()));
-                cal.set(toCalendar.getYear(), toCalendar.getMonth(), toCalendar.getDay(), 23, 59, 59);
-                toDate = cal.getTime();
-            }
-        });
-
-        Button frBtn = new Button(composite, SWT.NULL);
+        Button frBtn = new Button(frComp, SWT.NULL);
         GridData frBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        frBtnGrDt.minimumWidth = 60;
         frBtn.setLayoutData(frBtnGrDt);
         frBtn.setText(Messages.getString("filterLastdetecteddialog.clear.date.filter.from")); //$NON-NLS-1$
         frBtn.addSelectionListener(new SelectionAdapter() {
@@ -112,8 +102,8 @@ public class FilterLastDetectedDialog extends Dialog {
                 frDate = null;
             }
         });
-        frDateText = new Text(composite, SWT.BORDER);
-        GridData frDateTextGrDt = new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1);
+        frDateText = new Text(frComp, SWT.BORDER);
+        GridData frDateTextGrDt = new GridData(GridData.FILL_HORIZONTAL);
         frDateTextGrDt.minimumWidth = 100;
         frDateText.setLayoutData(frDateTextGrDt);
         frDateText.setEditable(false);
@@ -125,9 +115,36 @@ public class FilterLastDetectedDialog extends Dialog {
             cal.set(frCalendar.getYear(), frCalendar.getMonth(), frCalendar.getDay(), 0, 0, 0);
             // frDateText.setText(sdf.format(cal.getTime()));
         }
-        new Label(composite, SWT.NULL).setText("～"); //$NON-NLS-1$
-        toDateText = new Text(composite, SWT.BORDER);
-        GridData toDateTextGrDt = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+
+        Composite frToComp = new Composite(composite, SWT.NONE);
+        GridLayout frToCompLt = new GridLayout(1, false);
+        frToComp.setLayout(frToCompLt);
+        GridData frToCompGrDt = new GridData();
+        frToComp.setLayoutData(frToCompGrDt);
+
+        new Label(frToComp, SWT.NULL).setText("～"); //$NON-NLS-1$
+
+        Composite toComp = new Composite(composite, SWT.NONE);
+        GridLayout toCompLt = new GridLayout(2, false);
+        toComp.setLayout(toCompLt);
+        GridData toCompGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        toComp.setLayoutData(toCompGrDt);
+
+        toCalendar = new DateTime(toComp, SWT.CALENDAR);
+        GridData toCalendarGrDt = new GridData(SWT.CENTER, SWT.CENTER, false, false, 2, 1);
+        toCalendar.setLayoutData(toCalendarGrDt);
+        toCalendar.addListener(SWT.MouseUp, new Listener() {
+            @Override
+            public void handleEvent(Event event) {
+                cal.set(toCalendar.getYear(), toCalendar.getMonth(), toCalendar.getDay(), 0, 0, 0);
+                toDateText.setText(sdf.format(cal.getTime()));
+                cal.set(toCalendar.getYear(), toCalendar.getMonth(), toCalendar.getDay(), 23, 59, 59);
+                toDate = cal.getTime();
+            }
+        });
+
+        toDateText = new Text(toComp, SWT.BORDER);
+        GridData toDateTextGrDt = new GridData(GridData.FILL_HORIZONTAL);
         toDateTextGrDt.minimumWidth = 100;
         toDateText.setLayoutData(toDateTextGrDt);
         toDateText.setEditable(false);
@@ -139,8 +156,9 @@ public class FilterLastDetectedDialog extends Dialog {
             cal.set(toCalendar.getYear(), toCalendar.getMonth(), toCalendar.getDay(), 0, 0, 0);
             // toDateText.setText(sdf.format(cal.getTime()));
         }
-        Button toBtn = new Button(composite, SWT.NULL);
+        Button toBtn = new Button(toComp, SWT.NULL);
         GridData toBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        toBtnGrDt.minimumWidth = 60;
         toBtn.setLayoutData(toBtnGrDt);
         toBtn.setText(Messages.getString("filterLastdetecteddialog.clear.date.filter.to")); //$NON-NLS-1$
         toBtn.addSelectionListener(new SelectionAdapter() {
@@ -174,11 +192,6 @@ public class FilterLastDetectedDialog extends Dialog {
             super.okPressed();
         }
         super.buttonPressed(buttonId);
-    }
-
-    @Override
-    protected Point getInitialSize() {
-        return new Point(600, 300);
     }
 
     @Override

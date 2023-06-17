@@ -371,9 +371,7 @@ public class BasePreferencePage extends PreferencePage {
         buttonGrp.setLayout(new GridLayout(1, true));
 
         addBtn = new Button(buttonGrp, SWT.NULL);
-        GridData addBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
-        addBtnGrDt.minimumWidth = 60;
-        addBtn.setLayoutData(addBtnGrDt);
+        addBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         addBtn.setText(Messages.getString("basepreferencepage.org.add.button.title")); //$NON-NLS-1$
         if (this.authType == AuthType.PASSWORD) {
             if (contrastUrlTxt.getText().trim().isEmpty() || userNameTxt.getText().trim().isEmpty()) {
@@ -440,9 +438,7 @@ public class BasePreferencePage extends PreferencePage {
         });
 
         final Button rmvBtn = new Button(buttonGrp, SWT.NULL);
-        GridData rmvBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
-        rmvBtnGrDt.minimumWidth = 60;
-        rmvBtn.setLayoutData(rmvBtnGrDt);
+        rmvBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         rmvBtn.setText(Messages.getString("basepreferencepage.org.rmv.button.title")); //$NON-NLS-1$
         rmvBtn.setEnabled(false);
         rmvBtn.addSelectionListener(new SelectionAdapter() {
@@ -475,9 +471,7 @@ public class BasePreferencePage extends PreferencePage {
         });
 
         bulkOnBtn = new Button(buttonGrp, SWT.NULL);
-        GridData bulkOnBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
-        bulkOnBtnGrDt.minimumWidth = 60;
-        bulkOnBtn.setLayoutData(bulkOnBtnGrDt);
+        bulkOnBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         bulkOnBtn.setText(Messages.getString("basepreferencepage.org.all.on.button.title")); //$NON-NLS-1$
         bulkOnBtn.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -494,9 +488,7 @@ public class BasePreferencePage extends PreferencePage {
         });
 
         bulkOffBtn = new Button(buttonGrp, SWT.NULL);
-        GridData bulkOffBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
-        bulkOffBtnGrDt.minimumWidth = 60;
-        bulkOffBtn.setLayoutData(bulkOffBtnGrDt);
+        bulkOffBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         bulkOffBtn.setText(Messages.getString("basepreferencepage.org.all.off.button.title")); //$NON-NLS-1$
         bulkOffBtn.addSelectionListener(new SelectionAdapter() {
             @Override

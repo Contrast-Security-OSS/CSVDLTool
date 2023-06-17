@@ -30,7 +30,6 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -87,7 +86,9 @@ public class OrganizationDialog extends Dialog {
         composite.setLayout(new GridLayout(2, false));
         new Label(composite, SWT.LEFT).setText(Messages.getString("organizationdialog.org.id.label")); //$NON-NLS-1$
         orgIdTxt = new Text(composite, SWT.BORDER);
-        orgIdTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        GridData orgIdTxtGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        orgIdTxtGrDt.minimumWidth = 300;
+        orgIdTxt.setLayoutData(orgIdTxtGrDt);
         orgIdTxt.addListener(SWT.FocusIn, new Listener() {
             public void handleEvent(Event e) {
                 orgIdTxt.selectAll();
@@ -108,7 +109,9 @@ public class OrganizationDialog extends Dialog {
         orgIdTxt.setFocus();
         new Label(composite, SWT.LEFT).setText(Messages.getString("organizationdialog.org.apikey.label")); //$NON-NLS-1$
         apiKeyTxt = new Text(composite, SWT.BORDER);
-        apiKeyTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        GridData apiKeyTxtGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        apiKeyTxtGrDt.minimumWidth = 300;
+        apiKeyTxt.setLayoutData(apiKeyTxtGrDt);
         apiKeyTxt.addListener(SWT.FocusIn, new Listener() {
             public void handleEvent(Event e) {
                 apiKeyTxt.selectAll();
@@ -168,7 +171,8 @@ public class OrganizationDialog extends Dialog {
                     String.format("%s\r\n%s", Messages.getString("organizationdialog.message.dialog.teamserver.return.error.message"), e.getMessage())); //$NON-NLS-1$ //$NON-NLS-2$
         } catch (NonApiException e) {
             MessageDialog.openError(getShell(), Messages.getString("organizationdialog.message.dialog.title"), //$NON-NLS-1$
-                    String.format("%s %s\r\n%s", Messages.getString("organizationdialog.message.dialog.unexpected.status.code.error.message"), e.getMessage(), Messages.getString("organizationdialog.message.dialog.make.sure.logfile.message"))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                    String.format("%s %s\r\n%s", Messages.getString("organizationdialog.message.dialog.unexpected.status.code.error.message"), e.getMessage(), //$NON-NLS-1$ //$NON-NLS-2$
+                            Messages.getString("organizationdialog.message.dialog.make.sure.logfile.message"))); //$NON-NLS-1$
         } catch (TsvException e) {
             MessageDialog.openError(getShell(), Messages.getString("organizationdialog.message.dialog.title"), e.getMessage()); //$NON-NLS-1$
         } catch (Exception e) {
@@ -176,11 +180,6 @@ public class OrganizationDialog extends Dialog {
                     String.format("%s\r\n%s", Messages.getString("organizationdialog.message.dialog.unknown.error.message"), e.getMessage())); //$NON-NLS-1$ //$NON-NLS-2$
         }
         super.okPressed();
-    }
-
-    @Override
-    protected Point getInitialSize() {
-        return new Point(480, 150);
     }
 
     @Override

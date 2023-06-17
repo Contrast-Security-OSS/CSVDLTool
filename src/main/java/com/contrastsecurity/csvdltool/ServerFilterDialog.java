@@ -40,7 +40,6 @@ import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -236,11 +235,6 @@ public class ServerFilterDialog extends Dialog {
     @Override
     protected void okPressed() {
         super.okPressed();
-    }
-
-    @Override
-    protected Point getInitialSize() {
-        return new Point(640, 480);
     }
 
     @Override

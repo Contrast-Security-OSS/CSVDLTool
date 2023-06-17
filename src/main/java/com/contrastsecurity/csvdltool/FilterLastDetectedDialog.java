@@ -114,7 +114,7 @@ public class FilterLastDetectedDialog extends Dialog {
         });
         frDateText = new Text(composite, SWT.BORDER);
         GridData frDateTextGrDt = new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1);
-        frDateTextGrDt.widthHint = 100;
+        frDateTextGrDt.minimumWidth = 100;
         frDateText.setLayoutData(frDateTextGrDt);
         frDateText.setEditable(false);
         if (frDate != null) {
@@ -128,7 +128,7 @@ public class FilterLastDetectedDialog extends Dialog {
         new Label(composite, SWT.NULL).setText("～"); //$NON-NLS-1$
         toDateText = new Text(composite, SWT.BORDER);
         GridData toDateTextGrDt = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        toDateTextGrDt.widthHint = 100;
+        toDateTextGrDt.minimumWidth = 100;
         toDateText.setLayoutData(toDateTextGrDt);
         toDateText.setEditable(false);
         if (toDate != null) {

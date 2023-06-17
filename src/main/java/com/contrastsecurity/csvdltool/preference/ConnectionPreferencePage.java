@@ -145,7 +145,7 @@ public class ConnectionPreferencePage extends PreferencePage {
         new Label(proxyHostGrp, SWT.LEFT).setText(Messages.getString("connectionpreferencepage.proxy.port")); //$NON-NLS-1$
         portTxt = new Text(proxyHostGrp, SWT.BORDER);
         GridData portTxtGrDt = new GridData();
-        portTxtGrDt.widthHint = 100;
+        portTxtGrDt.minimumWidth = 100;
         portTxt.setLayoutData(portTxtGrDt);
         portTxt.setText(ps.getString(PreferenceConstants.PROXY_PORT));
         portTxt.setTextLimit(5);
@@ -264,7 +264,8 @@ public class ConnectionPreferencePage extends PreferencePage {
             try {
                 passTxt.setText(encryptor.decrypt(ps.getString(PreferenceConstants.PROXY_PASS)));
             } catch (Exception e) {
-                MessageDialog.openError(getShell(), Messages.getString("connectionpreferencepage.dialog.title"), Messages.getString("connectionpreferencepage.proxy.password.decrypt.error.message")); //$NON-NLS-1$ //$NON-NLS-2$
+                MessageDialog.openError(getShell(), Messages.getString("connectionpreferencepage.dialog.title"), //$NON-NLS-1$
+                        Messages.getString("connectionpreferencepage.proxy.password.decrypt.error.message")); //$NON-NLS-1$
                 passTxt.setText(""); //$NON-NLS-1$
             }
         } else {
@@ -364,7 +365,7 @@ public class ConnectionPreferencePage extends PreferencePage {
 
         Button defaultBtn = new Button(buttonGrp, SWT.NULL);
         GridData defaultBtnGrDt = new GridData(SWT.RIGHT, SWT.BOTTOM, true, true, 1, 1);
-        defaultBtnGrDt.widthHint = 100;
+        defaultBtnGrDt.minimumWidth = 100;
         defaultBtn.setLayoutData(defaultBtnGrDt);
         defaultBtn.setText(Messages.getString("preferencepage.restoredefaults.button.title")); //$NON-NLS-1$
         defaultBtn.addSelectionListener(new SelectionAdapter() {
@@ -380,7 +381,7 @@ public class ConnectionPreferencePage extends PreferencePage {
 
         Button applyBtn = new Button(buttonGrp, SWT.NULL);
         GridData applyBtnGrDt = new GridData(SWT.RIGHT, SWT.BOTTOM, true, true, 1, 1);
-        applyBtnGrDt.widthHint = 90;
+        applyBtnGrDt.minimumWidth = 90;
         applyBtn.setLayoutData(applyBtnGrDt);
         applyBtn.setText(Messages.getString("preferencepage.apply.button.title")); //$NON-NLS-1$
         applyBtn.addSelectionListener(new SelectionAdapter() {

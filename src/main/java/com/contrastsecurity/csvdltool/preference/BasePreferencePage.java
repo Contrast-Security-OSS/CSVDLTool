@@ -528,7 +528,7 @@ public class BasePreferencePage extends PreferencePage {
 
         Button applyBtn = new Button(composite, SWT.NULL);
         GridData applyBtnGrDt = new GridData(SWT.RIGHT, SWT.BOTTOM, true, true, 1, 1);
-        applyBtnGrDt.widthHint = 90;
+        applyBtnGrDt.minimumWidth = 90;
         applyBtnGrDt.horizontalSpan = 2;
         applyBtn.setLayoutData(applyBtnGrDt);
         applyBtn.setText(Messages.getString("preferencepage.apply.button.title")); //$NON-NLS-1$

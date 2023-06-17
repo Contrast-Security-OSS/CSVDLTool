@@ -61,15 +61,15 @@ public class AboutPage extends PreferencePage {
         Label icon = new Label(appGrp, SWT.NONE);
         GridData iconGrDt = new GridData();
         iconGrDt.horizontalSpan = 3;
-        iconGrDt.heightHint = 80;
-        iconGrDt.widthHint = 300;
+        iconGrDt.minimumHeight = 80;
+        iconGrDt.minimumWidth = 300;
         icon.setLayoutData(iconGrDt);
         Image iconImg = new Image(parent.getDisplay(), Main.class.getClassLoader().getResourceAsStream("banner.png")); //$NON-NLS-1$
         icon.setImage(iconImg);
 
         Label versionTitleLbl = new Label(appGrp, SWT.NONE);
         GridData versionTitleLblGrDt = new GridData();
-        versionTitleLblGrDt.widthHint = 100;
+        versionTitleLblGrDt.minimumHeight = 100;
         versionTitleLbl.setLayoutData(versionTitleLblGrDt);
         versionTitleLbl.setText("Version:"); //$NON-NLS-1$
         Label versionValueLbl = new Label(appGrp, SWT.NONE);

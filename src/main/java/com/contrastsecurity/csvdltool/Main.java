@@ -587,7 +587,7 @@ public class Main implements PropertyChangeListener {
 
         srcListLanguagesFilter = new Text(srcGrp, SWT.BORDER);
         GridData srcListLanguagesFilterGrDt = new GridData();
-        srcListLanguagesFilterGrDt.widthHint = 40;
+        srcListLanguagesFilterGrDt.minimumWidth = 40;
         srcListLanguagesFilter.setLayoutData(srcListLanguagesFilterGrDt);
         srcListLanguagesFilter.setMessage(Messages.getString("main.src.apps.filter.language.message")); //$NON-NLS-1$
         srcListLanguagesFilter.addModifyListener(new ModifyListener() {
@@ -631,7 +631,6 @@ public class Main implements PropertyChangeListener {
         Label srcListDescLbl = new Label(srcListLblComp, SWT.LEFT);
         GridData srcListDescLblGrDt = new GridData(GridData.FILL_HORIZONTAL);
         srcListDescLblGrDt.minimumHeight = 12;
-        srcListDescLblGrDt.heightHint = 12;
         srcListDescLbl.setLayoutData(srcListDescLblGrDt);
         srcListDescLbl.setFont(new Font(display, "Arial", 8, SWT.NORMAL)); //$NON-NLS-1$
         srcListDescLbl.setText(Messages.getString("main.available.app.list.count.label")); //$NON-NLS-1$
@@ -639,7 +638,6 @@ public class Main implements PropertyChangeListener {
         this.srcCount = new Label(srcListLblComp, SWT.RIGHT);
         GridData srcCountGrDt = new GridData(GridData.FILL_HORIZONTAL);
         srcCountGrDt.minimumHeight = 12;
-        srcCountGrDt.heightHint = 12;
         this.srcCount.setLayoutData(srcCountGrDt);
         this.srcCount.setFont(new Font(display, "Arial", 8, SWT.NORMAL)); //$NON-NLS-1$
         this.srcCount.setText("0"); //$NON-NLS-1$
@@ -806,7 +804,6 @@ public class Main implements PropertyChangeListener {
         Label dstListDescLbl = new Label(dstListLblComp, SWT.LEFT);
         GridData dstListDescLblGrDt = new GridData(GridData.FILL_HORIZONTAL);
         dstListDescLblGrDt.minimumHeight = 12;
-        dstListDescLblGrDt.heightHint = 12;
         dstListDescLbl.setLayoutData(dstListDescLblGrDt);
         dstListDescLbl.setFont(new Font(display, "Arial", 8, SWT.NORMAL)); //$NON-NLS-1$
         dstListDescLbl.setText(Messages.getString("main.selected.app.list.count.label")); //$NON-NLS-1$
@@ -814,7 +811,6 @@ public class Main implements PropertyChangeListener {
         this.dstCount = new Label(dstListLblComp, SWT.RIGHT);
         GridData dstCountGrDt = new GridData(GridData.FILL_HORIZONTAL);
         dstCountGrDt.minimumHeight = 12;
-        dstCountGrDt.heightHint = 12;
         this.dstCount.setLayoutData(dstCountGrDt);
         this.dstCount.setFont(new Font(display, "Arial", 8, SWT.NORMAL)); //$NON-NLS-1$
         this.dstCount.setText("0"); //$NON-NLS-1$
@@ -889,7 +885,7 @@ public class Main implements PropertyChangeListener {
         vulVulnTypeFilterTxt.setText(Messages.getString("main.load.application.message")); //$NON-NLS-1$
         vulVulnTypeFilterTxt.setEditable(false);
         GridData vulVulnTypeFilterTxtGrDt = new GridData(GridData.FILL_HORIZONTAL);
-        vulVulnTypeFilterTxtGrDt.heightHint = 2 * vulVulnTypeFilterTxt.getLineHeight();
+        vulVulnTypeFilterTxtGrDt.minimumHeight = 2 * vulVulnTypeFilterTxt.getLineHeight();
         vulVulnTypeFilterTxt.setLayoutData(vulVulnTypeFilterTxtGrDt);
         vulVulnTypeFilterTxt.addListener(SWT.MouseUp, new Listener() {
             public void handleEvent(Event e) {
@@ -949,7 +945,7 @@ public class Main implements PropertyChangeListener {
         // ========== 取得ボタン ==========
         vulExecuteBtn = new Button(vulButtonGrp, SWT.PUSH);
         GridData executeBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
-        executeBtnGrDt.heightHint = 50;
+        executeBtnGrDt.minimumHeight = 50;
         vulExecuteBtn.setLayoutData(executeBtnGrDt);
         vulExecuteBtn.setText(Messages.getString("main.vul.export.button.title")); //$NON-NLS-1$
         vulExecuteBtn.setToolTipText(Messages.getString("main.vul.export.button.tooltip")); //$NON-NLS-1$
@@ -1064,7 +1060,7 @@ public class Main implements PropertyChangeListener {
         // ========== 取得ボタン ==========
         libExecuteBtn = new Button(libButtonGrp, SWT.PUSH);
         GridData libExecuteBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
-        libExecuteBtnGrDt.heightHint = 50;
+        libExecuteBtnGrDt.minimumHeight = 50;
         libExecuteBtn.setLayoutData(libExecuteBtnGrDt);
         libExecuteBtn.setText(Messages.getString("main.lib.export.button.title")); //$NON-NLS-1$
         libExecuteBtn.setToolTipText(Messages.getString("main.lib.export.button.tooltip")); //$NON-NLS-1$
@@ -1212,7 +1208,7 @@ public class Main implements PropertyChangeListener {
         attackLoadBtn = new Button(attackListGrp, SWT.PUSH);
         GridData attackLoadBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
         attackLoadBtnGrDt.horizontalSpan = 3;
-        attackLoadBtnGrDt.heightHint = 50;
+        attackLoadBtnGrDt.minimumHeight = 50;
         attackLoadBtn.setLayoutData(attackLoadBtnGrDt);
         attackLoadBtn.setText(Messages.getString("main.attackevent.load.button.title")); //$NON-NLS-1$
         attackLoadBtn.setToolTipText(Messages.getString("main.attackevent.load.button.tooltip")); //$NON-NLS-1$
@@ -1276,8 +1272,6 @@ public class Main implements PropertyChangeListener {
         GridData attackEventCountGrDt = new GridData(GridData.FILL_HORIZONTAL);
         attackEventCountGrDt.minimumHeight = 12;
         attackEventCountGrDt.minimumWidth = 30;
-        attackEventCountGrDt.heightHint = 12;
-        attackEventCountGrDt.widthHint = 30;
         this.attackEventCount.setLayoutData(attackEventCountGrDt);
         this.attackEventCount.setFont(new Font(display, "Arial", 10, SWT.NORMAL)); //$NON-NLS-1$
         this.attackEventCount.setText("0/0"); //$NON-NLS-1$
@@ -1713,7 +1707,7 @@ public class Main implements PropertyChangeListener {
         serverLoadBtn = new Button(serverListGrp, SWT.PUSH);
         GridData serverLoadBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
         serverLoadBtnGrDt.horizontalSpan = 3;
-        serverLoadBtnGrDt.heightHint = 50;
+        serverLoadBtnGrDt.minimumHeight = 50;
         serverLoadBtn.setLayoutData(serverLoadBtnGrDt);
         serverLoadBtn.setText(Messages.getString("main.server.load.button.title")); //$NON-NLS-1$
         serverLoadBtn.setToolTipText(Messages.getString("main.server.load.button.tooltip")); //$NON-NLS-1$
@@ -1991,7 +1985,6 @@ public class Main implements PropertyChangeListener {
         this.statusBar = new Label(shell, SWT.RIGHT);
         GridData statusBarGrDt = new GridData(GridData.FILL_HORIZONTAL);
         statusBarGrDt.minimumHeight = 11;
-        statusBarGrDt.heightHint = 11;
         this.statusBar.setLayoutData(statusBarGrDt);
         this.statusBar.setFont(new Font(display, "Arial", 9, SWT.NORMAL)); //$NON-NLS-1$
         this.statusBar.setForeground(shell.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));

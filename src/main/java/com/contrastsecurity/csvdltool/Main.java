@@ -89,7 +89,9 @@ import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -483,6 +485,8 @@ public class Main implements PropertyChangeListener {
                 }
             }
         });
+
+        Font bigFont = new Font(display, "Arial", 20, SWT.NORMAL);
 
         // #################### ASSESS #################### //
         CTabItem assessTabItem = new CTabItem(mainTabFolder, SWT.NONE);
@@ -945,8 +949,13 @@ public class Main implements PropertyChangeListener {
 
         // ========== 取得ボタン ==========
         vulExecuteBtn = new Button(vulButtonGrp, SWT.PUSH);
+        GC gc = new GC(vulExecuteBtn);
+        gc.setFont(bigFont);
+        Point bigBtnSize = gc.textExtent(Messages.getString("main.vul.export.button.title"));
+        gc.dispose();
         GridData executeBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
         executeBtnGrDt.minimumHeight = 50;
+        executeBtnGrDt.heightHint = bigBtnSize.y + 20;
         vulExecuteBtn.setLayoutData(executeBtnGrDt);
         vulExecuteBtn.setText(Messages.getString("main.vul.export.button.title")); //$NON-NLS-1$
         vulExecuteBtn.setToolTipText(Messages.getString("main.vul.export.button.tooltip")); //$NON-NLS-1$
@@ -1063,6 +1072,7 @@ public class Main implements PropertyChangeListener {
         libExecuteBtn = new Button(libButtonGrp, SWT.PUSH);
         GridData libExecuteBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
         libExecuteBtnGrDt.minimumHeight = 50;
+        libExecuteBtnGrDt.heightHint = bigBtnSize.y + 20;
         libExecuteBtn.setLayoutData(libExecuteBtnGrDt);
         libExecuteBtn.setText(Messages.getString("main.lib.export.button.title")); //$NON-NLS-1$
         libExecuteBtn.setToolTipText(Messages.getString("main.lib.export.button.tooltip")); //$NON-NLS-1$
@@ -1212,6 +1222,7 @@ public class Main implements PropertyChangeListener {
         GridData attackLoadBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
         attackLoadBtnGrDt.horizontalSpan = 3;
         attackLoadBtnGrDt.minimumHeight = 50;
+        attackLoadBtnGrDt.heightHint = bigBtnSize.y + 20;
         attackLoadBtn.setLayoutData(attackLoadBtnGrDt);
         attackLoadBtn.setText(Messages.getString("main.attackevent.load.button.title")); //$NON-NLS-1$
         attackLoadBtn.setToolTipText(Messages.getString("main.attackevent.load.button.tooltip")); //$NON-NLS-1$
@@ -1716,6 +1727,7 @@ public class Main implements PropertyChangeListener {
         GridData serverLoadBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
         serverLoadBtnGrDt.horizontalSpan = 3;
         serverLoadBtnGrDt.minimumHeight = 50;
+        serverLoadBtnGrDt.heightHint = bigBtnSize.y + 20;
         serverLoadBtn.setLayoutData(serverLoadBtnGrDt);
         serverLoadBtn.setText(Messages.getString("main.server.load.button.title")); //$NON-NLS-1$
         serverLoadBtn.setToolTipText(Messages.getString("main.server.load.button.tooltip")); //$NON-NLS-1$

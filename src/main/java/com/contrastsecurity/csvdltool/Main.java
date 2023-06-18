@@ -532,7 +532,8 @@ public class Main implements PropertyChangeListener {
                     } else if (e.getTargetException() instanceof NonApiException) {
                         logger.error(trace);
                         MessageDialog.openError(shell, Messages.getString("main.application.load.message.dialog.title"), //$NON-NLS-1$
-                                String.format("%s %s\r\n%s", Messages.getString("main.unexpected.status.code.error"), errorMsg, Messages.getString("main.message.dialog.make.sure.logfile.message"))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                                String.format("%s %s\r\n%s", Messages.getString("main.unexpected.status.code.error"), errorMsg, //$NON-NLS-1$ //$NON-NLS-2$
+                                        Messages.getString("main.message.dialog.make.sure.logfile.message"))); //$NON-NLS-1$
                     } else if (e.getTargetException() instanceof TsvException) {
                         MessageDialog.openError(shell, Messages.getString("main.application.load.message.dialog.title"), errorMsg); //$NON-NLS-1$
                         return;
@@ -944,7 +945,7 @@ public class Main implements PropertyChangeListener {
 
         // ========== 取得ボタン ==========
         vulExecuteBtn = new Button(vulButtonGrp, SWT.PUSH);
-        GridData executeBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        GridData executeBtnGrDt = new GridData(GridData.FILL_BOTH);
         executeBtnGrDt.minimumHeight = 50;
         vulExecuteBtn.setLayoutData(executeBtnGrDt);
         vulExecuteBtn.setText(Messages.getString("main.vul.export.button.title")); //$NON-NLS-1$
@@ -978,7 +979,8 @@ public class Main implements PropertyChangeListener {
                     } else if (e.getTargetException() instanceof NonApiException) {
                         logger.error(trace);
                         MessageDialog.openError(shell, Messages.getString("main.vul.export.message.dialog.title"), //$NON-NLS-1$
-                                String.format("%s %s\r\n%s", Messages.getString("main.unexpected.status.code.error"), exceptionMsg, Messages.getString("main.message.dialog.make.sure.logfile.message"))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                                String.format("%s %s\r\n%s", Messages.getString("main.unexpected.status.code.error"), exceptionMsg, //$NON-NLS-1$ //$NON-NLS-2$
+                                        Messages.getString("main.message.dialog.make.sure.logfile.message"))); //$NON-NLS-1$
                     } else if (e.getTargetException() instanceof InterruptedException) {
                         MessageDialog.openInformation(shell, trace, exceptionMsg);
                     } else if (e.getTargetException() instanceof TsvException) {
@@ -1059,7 +1061,7 @@ public class Main implements PropertyChangeListener {
 
         // ========== 取得ボタン ==========
         libExecuteBtn = new Button(libButtonGrp, SWT.PUSH);
-        GridData libExecuteBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        GridData libExecuteBtnGrDt = new GridData(GridData.FILL_BOTH);
         libExecuteBtnGrDt.minimumHeight = 50;
         libExecuteBtn.setLayoutData(libExecuteBtnGrDt);
         libExecuteBtn.setText(Messages.getString("main.lib.export.button.title")); //$NON-NLS-1$
@@ -1092,7 +1094,8 @@ public class Main implements PropertyChangeListener {
                     } else if (e.getTargetException() instanceof NonApiException) {
                         logger.error(trace);
                         MessageDialog.openError(shell, Messages.getString("main.lib.export.message.dialog.title"), //$NON-NLS-1$
-                                String.format("%s %s\r\n%s", Messages.getString("main.unexpected.status.code.error"), exceptionMsg, Messages.getString("main.message.dialog.make.sure.logfile.message"))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                                String.format("%s %s\r\n%s", Messages.getString("main.unexpected.status.code.error"), exceptionMsg, //$NON-NLS-1$ //$NON-NLS-2$
+                                        Messages.getString("main.message.dialog.make.sure.logfile.message"))); //$NON-NLS-1$
                     } else if (e.getTargetException() instanceof InterruptedException) {
                         MessageDialog.openInformation(shell, trace, exceptionMsg);
                     } else if (e.getTargetException() instanceof TsvException) {
@@ -1206,7 +1209,7 @@ public class Main implements PropertyChangeListener {
         }
 
         attackLoadBtn = new Button(attackListGrp, SWT.PUSH);
-        GridData attackLoadBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        GridData attackLoadBtnGrDt = new GridData(GridData.FILL_BOTH);
         attackLoadBtnGrDt.horizontalSpan = 3;
         attackLoadBtnGrDt.minimumHeight = 50;
         attackLoadBtn.setLayoutData(attackLoadBtnGrDt);
@@ -1251,7 +1254,8 @@ public class Main implements PropertyChangeListener {
                                 String.format("%s\r\n%s", Messages.getString("main.teamserver.return.error"), errorMsg)); //$NON-NLS-1$ //$NON-NLS-2$
                     } else if (e.getTargetException() instanceof NonApiException) {
                         MessageDialog.openError(shell, Messages.getString("main.attackevent.load.message.dialog.title"), //$NON-NLS-1$
-                                String.format("%s %s\r\n%s", Messages.getString("main.unexpected.status.code.error"), errorMsg, Messages.getString("main.message.dialog.make.sure.logfile.message"))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                                String.format("%s %s\r\n%s", Messages.getString("main.unexpected.status.code.error"), errorMsg, //$NON-NLS-1$ //$NON-NLS-2$
+                                        Messages.getString("main.message.dialog.make.sure.logfile.message"))); //$NON-NLS-1$
                     } else if (e.getTargetException() instanceof TsvException) {
                         MessageDialog.openError(shell, Messages.getString("main.attackevent.load.message.dialog.title"), errorMsg); //$NON-NLS-1$
                         return;
@@ -1335,7 +1339,8 @@ public class Main implements PropertyChangeListener {
                             for (AttackEvent attackEvent : filteredAttackEvents) {
                                 addColToAttackTable(attackEvent, -1);
                             }
-                            MessageDialog.openInformation(shell, Messages.getString("main.attackevent.message.dialog.edit.tag.title"), Messages.getString("main.attackevent.message.dialog.edit.tag.message")); //$NON-NLS-1$ //$NON-NLS-2$
+                            MessageDialog.openInformation(shell, Messages.getString("main.attackevent.message.dialog.edit.tag.title"), //$NON-NLS-1$
+                                    Messages.getString("main.attackevent.message.dialog.edit.tag.message")); //$NON-NLS-1$
                         }
                     }
                 } catch (Exception e2) {
@@ -1374,7 +1379,8 @@ public class Main implements PropertyChangeListener {
                         columnList = new Gson().fromJson(columnJsonStr, new TypeToken<List<AttackEventCSVColumn>>() {
                         }.getType());
                     } catch (JsonSyntaxException jse) {
-                        MessageDialog.openError(shell, Messages.getString("main.attackevent.message.dialog.json.load.error.title"), String.format("%s\r\n%s", Messages.getString("main.attackevent.message.dialog.json.load.error.message"), columnJsonStr)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                        MessageDialog.openError(shell, Messages.getString("main.attackevent.message.dialog.json.load.error.title"), //$NON-NLS-1$
+                                String.format("%s\r\n%s", Messages.getString("main.attackevent.message.dialog.json.load.error.message"), columnJsonStr)); //$NON-NLS-1$ //$NON-NLS-2$
                         columnList = new ArrayList<AttackEventCSVColumn>();
                     }
                 } else {
@@ -1471,7 +1477,8 @@ public class Main implements PropertyChangeListener {
                     for (List<String> csvLine : csvList) {
                         printer.printRecord(csvLine);
                     }
-                    MessageDialog.openInformation(shell, Messages.getString("main.attackevent.message.dialog.export.csv.title"), Messages.getString("main.attackevent.message.dialog.export.csv.message")); //$NON-NLS-1$ //$NON-NLS-2$
+                    MessageDialog.openInformation(shell, Messages.getString("main.attackevent.message.dialog.export.csv.title"), //$NON-NLS-1$
+                            Messages.getString("main.attackevent.message.dialog.export.csv.message")); //$NON-NLS-1$
                 } catch (IOException ioe) {
                     ioe.printStackTrace();
                 }
@@ -1530,7 +1537,8 @@ public class Main implements PropertyChangeListener {
                             }
                         }
                     }
-                    MessageDialog.openInformation(shell, Messages.getString("main.attackevent.message.dialog.export.txt.title"), Messages.getString("main.attackevent.message.dialog.export.txt.message")); //$NON-NLS-1$ //$NON-NLS-2$
+                    MessageDialog.openInformation(shell, Messages.getString("main.attackevent.message.dialog.export.txt.title"), //$NON-NLS-1$
+                            Messages.getString("main.attackevent.message.dialog.export.txt.message")); //$NON-NLS-1$
                 } catch (IOException ioe) {
                     ioe.printStackTrace();
                 }
@@ -1705,7 +1713,7 @@ public class Main implements PropertyChangeListener {
         serverListGrp.setLayoutData(serverListGrpGrDt);
 
         serverLoadBtn = new Button(serverListGrp, SWT.PUSH);
-        GridData serverLoadBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        GridData serverLoadBtnGrDt = new GridData(GridData.FILL_BOTH);
         serverLoadBtnGrDt.horizontalSpan = 3;
         serverLoadBtnGrDt.minimumHeight = 50;
         serverLoadBtn.setLayoutData(serverLoadBtnGrDt);
@@ -1737,10 +1745,12 @@ public class Main implements PropertyChangeListener {
                     }
                     String errorMsg = e.getTargetException().getMessage();
                     if (e.getTargetException() instanceof ApiException) {
-                        MessageDialog.openError(shell, Messages.getString("main.server.load.message.dialog.title"), String.format("%s\r\n%s", Messages.getString("main.teamserver.return.error"), errorMsg)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                        MessageDialog.openError(shell, Messages.getString("main.server.load.message.dialog.title"), //$NON-NLS-1$
+                                String.format("%s\r\n%s", Messages.getString("main.teamserver.return.error"), errorMsg)); //$NON-NLS-1$ //$NON-NLS-2$
                     } else if (e.getTargetException() instanceof NonApiException) {
                         MessageDialog.openError(shell, Messages.getString("main.server.load.message.dialog.title"), //$NON-NLS-1$
-                                String.format("%s %s\r\n%s", Messages.getString("main.unexpected.status.code.error"), errorMsg, Messages.getString("main.message.dialog.make.sure.logfile.message"))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                                String.format("%s %s\r\n%s", Messages.getString("main.unexpected.status.code.error"), errorMsg, //$NON-NLS-1$ //$NON-NLS-2$
+                                        Messages.getString("main.message.dialog.make.sure.logfile.message"))); //$NON-NLS-1$
                     } else if (e.getTargetException() instanceof TsvException) {
                         MessageDialog.openError(shell, Messages.getString("main.server.load.message.dialog.title"), errorMsg); //$NON-NLS-1$
                         return;
@@ -1797,7 +1807,8 @@ public class Main implements PropertyChangeListener {
                         columnList = new Gson().fromJson(columnJsonStr, new TypeToken<List<ServerCSVColumn>>() {
                         }.getType());
                     } catch (JsonSyntaxException jse) {
-                        MessageDialog.openError(shell, Messages.getString("main.server.message.dialog.json.load.error.title"), String.format("%s\r\n%s", Messages.getString("main.server.message.dialog.json.load.error.message"), columnJsonStr));  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+                        MessageDialog.openError(shell, Messages.getString("main.server.message.dialog.json.load.error.title"), //$NON-NLS-1$
+                                String.format("%s\r\n%s", Messages.getString("main.server.message.dialog.json.load.error.message"), columnJsonStr)); //$NON-NLS-1$ //$NON-NLS-2$
                         columnList = new ArrayList<ServerCSVColumn>();
                     }
                 } else {
@@ -1848,7 +1859,8 @@ public class Main implements PropertyChangeListener {
                     for (List<String> csvLine : csvList) {
                         printer.printRecord(csvLine);
                     }
-                    MessageDialog.openInformation(shell, Messages.getString("main.server.message.dialog.export.csv.title"), Messages.getString("main.server.message.dialog.export.csv.message")); //$NON-NLS-1$ //$NON-NLS-2$
+                    MessageDialog.openInformation(shell, Messages.getString("main.server.message.dialog.export.csv.title"), //$NON-NLS-1$
+                            Messages.getString("main.server.message.dialog.export.csv.message")); //$NON-NLS-1$
                 } catch (IOException ioe) {
                     ioe.printStackTrace();
                 }

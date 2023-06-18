@@ -945,7 +945,7 @@ public class Main implements PropertyChangeListener {
 
         // ========== 取得ボタン ==========
         vulExecuteBtn = new Button(vulButtonGrp, SWT.PUSH);
-        GridData executeBtnGrDt = new GridData(GridData.FILL_BOTH);
+        GridData executeBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
         executeBtnGrDt.minimumHeight = 50;
         vulExecuteBtn.setLayoutData(executeBtnGrDt);
         vulExecuteBtn.setText(Messages.getString("main.vul.export.button.title")); //$NON-NLS-1$
@@ -1061,7 +1061,7 @@ public class Main implements PropertyChangeListener {
 
         // ========== 取得ボタン ==========
         libExecuteBtn = new Button(libButtonGrp, SWT.PUSH);
-        GridData libExecuteBtnGrDt = new GridData(GridData.FILL_BOTH);
+        GridData libExecuteBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
         libExecuteBtnGrDt.minimumHeight = 50;
         libExecuteBtn.setLayoutData(libExecuteBtnGrDt);
         libExecuteBtn.setText(Messages.getString("main.lib.export.button.title")); //$NON-NLS-1$
@@ -1209,7 +1209,7 @@ public class Main implements PropertyChangeListener {
         }
 
         attackLoadBtn = new Button(attackListGrp, SWT.PUSH);
-        GridData attackLoadBtnGrDt = new GridData(GridData.FILL_BOTH);
+        GridData attackLoadBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
         attackLoadBtnGrDt.horizontalSpan = 3;
         attackLoadBtnGrDt.minimumHeight = 50;
         attackLoadBtn.setLayoutData(attackLoadBtnGrDt);
@@ -1713,7 +1713,7 @@ public class Main implements PropertyChangeListener {
         serverListGrp.setLayoutData(serverListGrpGrDt);
 
         serverLoadBtn = new Button(serverListGrp, SWT.PUSH);
-        GridData serverLoadBtnGrDt = new GridData(GridData.FILL_BOTH);
+        GridData serverLoadBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
         serverLoadBtnGrDt.horizontalSpan = 3;
         serverLoadBtnGrDt.minimumHeight = 50;
         serverLoadBtn.setLayoutData(serverLoadBtnGrDt);

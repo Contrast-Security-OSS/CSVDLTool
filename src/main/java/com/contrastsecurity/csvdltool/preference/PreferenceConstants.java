@@ -34,6 +34,8 @@ public class PreferenceConstants {
     public static final String TARGET_ORGS = new String("com.contrastsecurity.csvdltool.target_orgs"); //$NON-NLS-1$
     public static final String TSV_STATUS = new String("com.contrastsecurity.csvdltool.tsv_status"); //$NON-NLS-1$
     public static final String AUTH_RETRY_MAX = new String("com.contrastsecurity.csvdltool.auth_retry_max"); //$NON-NLS-1$
+    public static final String SERVERLESS_HOST = new String("com.contrastsecurity.csvdltool.serverless.host"); //$NON-NLS-1$
+    public static final String SERVERLESS_TOKEN = new String("com.contrastsecurity.csvdltool.serverless.token"); //$NON-NLS-1$
 
     public static final String PROXY_YUKO = new String("com.contrastsecurity.csvdltool.proxy_yuko"); //$NON-NLS-1$
     public static final String PROXY_HOST = new String("com.contrastsecurity.csvdltool.proxy_host"); //$NON-NLS-1$

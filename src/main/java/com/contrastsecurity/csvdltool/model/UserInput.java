@@ -34,6 +34,9 @@ public class UserInput {
     private boolean truncated_value;
 
     public String getValue() {
+        if (this.value == null) {
+            return "";
+        }
         return value;
     }
 

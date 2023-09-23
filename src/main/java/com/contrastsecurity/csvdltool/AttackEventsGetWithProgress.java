@@ -85,9 +85,9 @@ public class AttackEventsGetWithProgress implements IRunnableWithProgress {
                 monitor.subTask(Messages.getString("attackeventsgetwithprogress.progress.loading.attackevents")); //$NON-NLS-1$
                 SubProgressMonitor sub1Monitor = new SubProgressMonitor(monitor, 30);
                 List<Attack> allAttacks = new ArrayList<Attack>();
-                Api attackssApi = new AttacksApi(this.shell, this.ps, org, frDetectedDate, toDetectedDate, 0);
-                List<Attack> tmpAttacks = (List<Attack>) attackssApi.post();
-                int totalAttackCount = attackssApi.getTotalCount();
+                Api attacksApi = new AttacksApi(this.shell, this.ps, org, frDetectedDate, toDetectedDate, 0);
+                List<Attack> tmpAttacks = (List<Attack>) attacksApi.post();
+                int totalAttackCount = attacksApi.getTotalCount();
                 sub1Monitor.beginTask("", totalAttackCount); //$NON-NLS-1$
                 allAttacks.addAll(tmpAttacks);
                 for (Attack atck : tmpAttacks) {
@@ -100,8 +100,8 @@ public class AttackEventsGetWithProgress implements IRunnableWithProgress {
                 attackIncompleteFlg = totalAttackCount > allAttacks.size();
                 while (attackIncompleteFlg) {
                     Thread.sleep(100);
-                    attackssApi = new AttacksApi(this.shell, this.ps, org, frDetectedDate, toDetectedDate, allAttacks.size());
-                    tmpAttacks = (List<Attack>) attackssApi.post();
+                    attacksApi = new AttacksApi(this.shell, this.ps, org, frDetectedDate, toDetectedDate, allAttacks.size());
+                    tmpAttacks = (List<Attack>) attacksApi.post();
                     allAttacks.addAll(tmpAttacks);
                     for (Attack atck : tmpAttacks) {
                         Api attackApi = new AttackApi(this.shell, this.ps, org, atck.getUuid());

@@ -1811,6 +1811,10 @@ public class Main implements PropertyChangeListener {
         serverlessResultLoadBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
+                if (selectedAccountIndex < 0) {
+                    MessageDialog.openInformation(shell, Messages.getString("main.attackevent.load.message.dialog.title"), "先にアカウントを読み込んでください。"); //$NON-NLS-1$
+                    return;
+                }
                 resultTable.clearAll();
                 resultTable.removeAll();
                 Account targetAccount = serverlessAccounts.get(selectedAccountIndex);

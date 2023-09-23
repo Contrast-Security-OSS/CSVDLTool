@@ -1214,9 +1214,9 @@ public class Main implements PropertyChangeListener {
         attackDetectedFilterTxt = new Text(attackTermGrp, SWT.BORDER);
         long frLong = ps.getLong(PreferenceConstants.ATTACK_DETECTED_DATE_TERM_FR);
         long toLong = ps.getLong(PreferenceConstants.ATTACK_DETECTED_DATE_TERM_TO);
-        Date fr = frLong > 0 ? new Date(frLong) : null;
-        Date to = frLong > 0 ? new Date(toLong) : null;
-        attackDetectedTermTextSet(fr, to);
+        this.frDetectedDate = frLong > 0 ? new Date(frLong) : null;
+        this.toDetectedDate = frLong > 0 ? new Date(toLong) : null;
+        attackDetectedTermTextSet(this.frDetectedDate, this.toDetectedDate);
         attackDetectedFilterTxt.setEditable(false);
         attackDetectedFilterTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         attackDetectedFilterTxt.addListener(SWT.MouseUp, new Listener() {
@@ -1231,8 +1231,6 @@ public class Main implements PropertyChangeListener {
                 attackLoadBtn.setFocus();
             }
         });
-        this.frDetectedDate = null;
-        this.toDetectedDate = null;
         for (Button termBtn : this.attackTermRadios) {
             termBtn.setSelection(false);
             if (this.attackTermRadios.indexOf(termBtn) == this.ps.getInt(PreferenceConstants.ATTACK_DETECTED_DATE_FILTER)) {

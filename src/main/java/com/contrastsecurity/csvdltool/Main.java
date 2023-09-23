@@ -1192,30 +1192,36 @@ public class Main implements PropertyChangeListener {
         attackTermRadios.add(attackTermThisWeek);
         attackTermPeriod = new Button(attackTermGrp, SWT.RADIO);
         attackTermPeriod.setText(Messages.getString("main.attackevent.data.range.radio.custom")); //$NON-NLS-1$
+        attackTermPeriod.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                if (attackTermPeriod.getSelection()) {
+                    long frLong = ps.getLong(PreferenceConstants.ATTACK_DETECTED_DATE_TERM_FR);
+                    long toLong = ps.getLong(PreferenceConstants.ATTACK_DETECTED_DATE_TERM_TO);
+                    Date fr = frLong > 0 ? new Date(frLong) : null;
+                    Date to = frLong > 0 ? new Date(toLong) : null;
+                    if (fr == null && to == null) {
+                        attackDetectedTermUpdate();
+                        attackLoadBtn.setFocus();
+                    }
+                    attackDetectedFilterTxt.setForeground(display.getSystemColor(SWT.COLOR_BLACK));
+                } else {
+                    attackDetectedFilterTxt.setForeground(display.getSystemColor(SWT.COLOR_GRAY));
+                }
+            }
+        });
         attackTermRadios.add(attackTermPeriod);
         attackDetectedFilterTxt = new Text(attackTermGrp, SWT.BORDER);
-        attackDetectedFilterTxt.setText(""); //$NON-NLS-1$
+        long frLong = ps.getLong(PreferenceConstants.ATTACK_DETECTED_DATE_TERM_FR);
+        long toLong = ps.getLong(PreferenceConstants.ATTACK_DETECTED_DATE_TERM_TO);
+        Date fr = frLong > 0 ? new Date(frLong) : null;
+        Date to = frLong > 0 ? new Date(toLong) : null;
+        attackDetectedTermTextSet(fr, to);
         attackDetectedFilterTxt.setEditable(false);
         attackDetectedFilterTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         attackDetectedFilterTxt.addListener(SWT.MouseUp, new Listener() {
-            public void handleEvent(Event e) {
-                FilterLastDetectedDialog filterDialog = new FilterLastDetectedDialog(shell, frDetectedDate, toDetectedDate);
-                int result = filterDialog.open();
-                if (IDialogConstants.OK_ID != result) {
-                    attackLoadBtn.setFocus();
-                    return;
-                }
-                frDetectedDate = filterDialog.getFrDate();
-                toDetectedDate = filterDialog.getToDate();
-                if (frDetectedDate != null && toDetectedDate != null) {
-                    attackDetectedFilterTxt.setText(String.format("%s ～ %s", sdf.format(frDetectedDate), sdf.format(toDetectedDate))); //$NON-NLS-1$
-                } else if (frDetectedDate != null) {
-                    attackDetectedFilterTxt.setText(String.format("%s ～", sdf.format(frDetectedDate))); //$NON-NLS-1$
-                } else if (toDetectedDate != null) {
-                    attackDetectedFilterTxt.setText(String.format("～ %s", sdf.format(toDetectedDate))); //$NON-NLS-1$
-                } else {
-                    attackDetectedFilterTxt.setText(""); //$NON-NLS-1$
-                }
+            public void handleEvent(Event event) {
+                attackDetectedTermUpdate();
                 if (!attackDetectedFilterTxt.getText().isEmpty()) {
                     for (Button rdo : attackTermRadios) {
                         rdo.setSelection(false);
@@ -1225,11 +1231,18 @@ public class Main implements PropertyChangeListener {
                 attackLoadBtn.setFocus();
             }
         });
+        this.frDetectedDate = null;
+        this.toDetectedDate = null;
         for (Button termBtn : this.attackTermRadios) {
             termBtn.setSelection(false);
             if (this.attackTermRadios.indexOf(termBtn) == this.ps.getInt(PreferenceConstants.ATTACK_DETECTED_DATE_FILTER)) {
                 termBtn.setSelection(true);
             }
+        }
+        if (attackTermPeriod.getSelection()) {
+            attackDetectedFilterTxt.setForeground(display.getSystemColor(SWT.COLOR_BLACK));
+        } else {
+            attackDetectedFilterTxt.setForeground(display.getSystemColor(SWT.COLOR_GRAY));
         }
 
         attackLoadBtn = new Button(attackListGrp, SWT.PUSH);
@@ -2210,6 +2223,32 @@ public class Main implements PropertyChangeListener {
             logger.error(trace);
         }
         display.dispose();
+    }
+
+    private void attackDetectedTermUpdate() {
+        FilterLastDetectedDialog filterDialog = new FilterLastDetectedDialog(shell, frDetectedDate, toDetectedDate);
+        int result = filterDialog.open();
+        if (IDialogConstants.OK_ID != result) {
+            attackLoadBtn.setFocus();
+            return;
+        }
+        frDetectedDate = filterDialog.getFrDate();
+        toDetectedDate = filterDialog.getToDate();
+        attackDetectedTermTextSet(frDetectedDate, toDetectedDate);
+        ps.setValue(PreferenceConstants.ATTACK_DETECTED_DATE_TERM_FR, frDetectedDate != null ? frDetectedDate.getTime() : 0);
+        ps.setValue(PreferenceConstants.ATTACK_DETECTED_DATE_TERM_TO, toDetectedDate != null ? toDetectedDate.getTime() : 0);
+    }
+
+    private void attackDetectedTermTextSet(Date fr, Date to) {
+        if (fr != null && to != null) {
+            attackDetectedFilterTxt.setText(String.format("%s - %s", sdf.format(fr), sdf.format(to))); //$NON-NLS-1$
+        } else if (frDetectedDate != null) {
+            attackDetectedFilterTxt.setText(String.format("%s -", sdf.format(fr))); //$NON-NLS-1$
+        } else if (toDetectedDate != null) {
+            attackDetectedFilterTxt.setText(String.format("- %s", sdf.format(to))); //$NON-NLS-1$
+        } else {
+            attackDetectedFilterTxt.setText(""); //$NON-NLS-1$
+        }
     }
 
     public void loggedIn() {

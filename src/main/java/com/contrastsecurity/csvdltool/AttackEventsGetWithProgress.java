@@ -80,22 +80,31 @@ public class AttackEventsGetWithProgress implements IRunnableWithProgress {
         monitor.beginTask(Messages.getString("attackeventsgetwithprogress.progress.loading.attackevents.organization.name"), 100 * this.orgs.size()); //$NON-NLS-1$
         for (Organization org : this.orgs) {
             try {
-                monitor.setTaskName(String.format("%s%s", org.getName(), Messages.getString("attackeventsgetwithprogress.progress.loading.attackevents.organization.name"))); //$NON-NLS-1$ //$NON-NLS-2$
+                monitor.setTaskName(String.format("%s %s", org.getName(), //$NON-NLS-1$
+                        Messages.getString("attackeventsgetwithprogress.progress.loading.attackevents.organization.name"))); //$NON-NLS-1$
                 // 攻撃一覧を読み込み
-                monitor.subTask(Messages.getString("attackeventsgetwithprogress.progress.loading.attackevents")); //$NON-NLS-1$
-                SubProgressMonitor sub1Monitor = new SubProgressMonitor(monitor, 30);
+                monitor.subTask(Messages.getString("attackeventsgetwithprogress.progress.loading.attacks")); //$NON-NLS-1$
+                SubProgressMonitor sub1Monitor = new SubProgressMonitor(monitor, 15);
                 List<Attack> allAttacks = new ArrayList<Attack>();
                 Api attacksApi = new AttacksApi(this.shell, this.ps, org, frDetectedDate, toDetectedDate, 0);
                 List<Attack> tmpAttacks = (List<Attack>) attacksApi.post();
                 int totalAttackCount = attacksApi.getTotalCount();
+                int attackProcessCount = 0;
+                monitor.subTask(String.format("%s(%d/%d)", Messages.getString("attackeventsgetwithprogress.progress.loading.attacks"), attackProcessCount, totalAttackCount)); //$NON-NLS-1$ //$NON-NLS-2$
                 sub1Monitor.beginTask("", totalAttackCount); //$NON-NLS-1$
                 allAttacks.addAll(tmpAttacks);
                 for (Attack atck : tmpAttacks) {
+                    if (monitor.isCanceled()) {
+                        throw new InterruptedException(Messages.getString("attackeventsgetwithprogress.progress.canceled")); //$NON-NLS-1$
+                    }
                     Api attackApi = new AttackApi(this.shell, this.ps, org, atck.getUuid());
                     Attack attackDetail = (Attack) attackApi.get();
                     atck.setSource_name(attackDetail.getSource_name());
+                    attackProcessCount++;
+                    monitor.subTask(String.format("%s(%d/%d)", Messages.getString("attackeventsgetwithprogress.progress.loading.attacks"), attackProcessCount, totalAttackCount)); //$NON-NLS-1$ //$NON-NLS-2$
+                    sub1Monitor.worked(1);
+                    Thread.sleep(100);
                 }
-                sub1Monitor.worked(tmpAttacks.size());
                 boolean attackIncompleteFlg = false;
                 attackIncompleteFlg = totalAttackCount > allAttacks.size();
                 while (attackIncompleteFlg) {
@@ -104,50 +113,75 @@ public class AttackEventsGetWithProgress implements IRunnableWithProgress {
                     tmpAttacks = (List<Attack>) attacksApi.post();
                     allAttacks.addAll(tmpAttacks);
                     for (Attack atck : tmpAttacks) {
-                        Api attackApi = new AttackApi(this.shell, this.ps, org, atck.getUuid());
-                        Attack attackDetail = (Attack) attackApi.get();
-                        atck.setSource_name(attackDetail.getSource_name());
-                    }
-                    sub1Monitor.worked(tmpAttacks.size());
-                    attackIncompleteFlg = totalAttackCount > allAttacks.size();
-                }
-                sub1Monitor.done();
-
-                // 攻撃イベント一覧を読み込み
-                monitor.subTask(Messages.getString("attackeventsgetwithprogress.progress.loading.attackevents")); //$NON-NLS-1$
-                SubProgressMonitor sub2Monitor = new SubProgressMonitor(monitor, 70);
-                sub2Monitor.beginTask("", allAttacks.size()); //$NON-NLS-1$
-                for (Attack attack : allAttacks) {
-                    if (monitor.isCanceled()) {
-                        throw new InterruptedException(Messages.getString("attackeventsgetwithprogress.progress.canceled")); //$NON-NLS-1$
-                    }
-                    List<AttackEvent> orgAttackEvents = new ArrayList<AttackEvent>();
-                    Api attackEventsApi = new AttackEventsByAttackUuidApi(this.shell, this.ps, org, attack.getUuid(), frDetectedDate, toDetectedDate, orgAttackEvents.size());
-                    List<AttackEvent> tmpAttackEvents = (List<AttackEvent>) attackEventsApi.post();
-                    for (AttackEvent tmpAttackEvent : tmpAttackEvents) {
-                        tmpAttackEvent.setSource_name(attack.getSource_name());
-                    }
-                    orgAttackEvents.addAll(tmpAttackEvents);
-                    int totalCount = attackEventsApi.getTotalCount();
-                    monitor.subTask(String.format("%s(%d/%d)", Messages.getString("attackeventsgetwithprogress.progress.loading.attackevents"), orgAttackEvents.size(), totalCount)); //$NON-NLS-1$ //$NON-NLS-2$
-                    boolean incompleteFlg = false;
-                    incompleteFlg = totalCount > orgAttackEvents.size();
-                    while (incompleteFlg) {
-                        Thread.sleep(100);
                         if (monitor.isCanceled()) {
                             throw new InterruptedException(Messages.getString("attackeventsgetwithprogress.progress.canceled")); //$NON-NLS-1$
                         }
+                        Api attackApi = new AttackApi(this.shell, this.ps, org, atck.getUuid());
+                        Attack attackDetail = (Attack) attackApi.get();
+                        atck.setSource_name(attackDetail.getSource_name());
+                        attackProcessCount++;
+                        monitor.subTask(
+                                String.format("%s(%d/%d)", Messages.getString("attackeventsgetwithprogress.progress.loading.attacks"), attackProcessCount, totalAttackCount)); //$NON-NLS-1$ //$NON-NLS-2$
+                        sub1Monitor.worked(1);
+                        Thread.sleep(100);
+                    }
+                    attackIncompleteFlg = totalAttackCount > allAttacks.size();
+                }
+                sub1Monitor.done();
+                Thread.sleep(250);
+
+                // 攻撃イベント一覧を読み込み
+                monitor.subTask(Messages.getString("attackeventsgetwithprogress.progress.loading.attackevents")); //$NON-NLS-1$
+                SubProgressMonitor sub2Monitor = new SubProgressMonitor(monitor, 85);
+                sub2Monitor.beginTask("", allAttacks.size()); //$NON-NLS-1$
+                attackProcessCount = 1;
+                for (Attack attack : allAttacks) {
+                    List<AttackEvent> orgAttackEvents = new ArrayList<AttackEvent>();
+                    Api attackEventsApi = new AttackEventsByAttackUuidApi(this.shell, this.ps, org, attack.getUuid(), frDetectedDate, toDetectedDate, orgAttackEvents.size());
+                    List<AttackEvent> tmpAttackEvents = (List<AttackEvent>) attackEventsApi.post();
+                    int totalCount = attackEventsApi.getTotalCount();
+                    int atkEvtProcessCount = 0;
+                    SubProgressMonitor sub2_1Monitor = new SubProgressMonitor(sub2Monitor, 1);
+                    sub2_1Monitor.beginTask("", totalCount);
+                    for (AttackEvent tmpAttackEvent : tmpAttackEvents) {
+                        if (monitor.isCanceled()) {
+                            throw new InterruptedException(Messages.getString("attackeventsgetwithprogress.progress.canceled")); //$NON-NLS-1$
+                        }
+                        tmpAttackEvent.setSource_name(attack.getSource_name());
+                        atkEvtProcessCount++;
+                        // monitor.subTask(String.format("%s(%d/%d)", attack.getSource_name(), processCount, totalCount)); //$NON-NLS-1$ //$NON-NLS-2$
+                        monitor.subTask(String.format("%s(%d/%d), %s(%d/%d)", Messages.getString("attackeventsgetwithprogress.progress.loading.attackevents.attack"),
+                                attackProcessCount, allAttacks.size(), Messages.getString("attackeventsgetwithprogress.progress.loading.attackevents.attackevent"),
+                                atkEvtProcessCount, totalCount));
+                        sub2_1Monitor.worked(1);
+                        Thread.sleep(20);
+                    }
+                    orgAttackEvents.addAll(tmpAttackEvents);
+                    boolean incompleteFlg = false;
+                    incompleteFlg = totalCount > orgAttackEvents.size();
+                    while (incompleteFlg) {
                         attackEventsApi = new AttackEventsByAttackUuidApi(this.shell, this.ps, org, attack.getUuid(), frDetectedDate, toDetectedDate, orgAttackEvents.size());
                         tmpAttackEvents = (List<AttackEvent>) attackEventsApi.post();
                         for (AttackEvent tmpAttackEvent : tmpAttackEvents) {
+                            if (monitor.isCanceled()) {
+                                throw new InterruptedException(Messages.getString("attackeventsgetwithprogress.progress.canceled")); //$NON-NLS-1$
+                            }
                             tmpAttackEvent.setSource_name(attack.getSource_name());
+                            atkEvtProcessCount++;
+                            // monitor.subTask(String.format("%s(%d/%d)", attack.getSource_name(), processCount, totalCount)); //$NON-NLS-1$ //$NON-NLS-2$
+                            monitor.subTask(String.format("%s(%d/%d), %s(%d/%d)", Messages.getString("attackeventsgetwithprogress.progress.loading.attackevents.attack"),
+                                    attackProcessCount, allAttacks.size(), Messages.getString("attackeventsgetwithprogress.progress.loading.attackevents.attackevent"),
+                                    atkEvtProcessCount, totalCount));
+                            sub2_1Monitor.worked(1);
+                            Thread.sleep(20);
                         }
                         orgAttackEvents.addAll(tmpAttackEvents);
-                        monitor.subTask(String.format("%s(%d/%d)", Messages.getString("attackeventsgetwithprogress.progress.loading.attackevents"), orgAttackEvents.size(), totalCount)); //$NON-NLS-1$ //$NON-NLS-2$
                         incompleteFlg = totalCount > orgAttackEvents.size();
+                        Thread.sleep(100);
                     }
-                    sub2Monitor.worked(1);
                     this.allAttackEvents.addAll(orgAttackEvents);
+                    attackProcessCount++;
+                    Thread.sleep(100);
                 }
                 sub2Monitor.done();
                 Thread.sleep(100);

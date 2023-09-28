@@ -57,6 +57,9 @@ public class Attack {
     }
 
     public String getSource_name() {
+        if (this.source_name == null) {
+            return "";
+        }
         return source_name;
     }
 

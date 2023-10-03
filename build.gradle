@@ -5,7 +5,7 @@ apply plugin: 'maven-publish'
 sourceCompatibility = JavaVersion.VERSION_17
 targetCompatibility = JavaVersion.VERSION_17
     
-version = '2.0.1'
+version = '2.1.0'
 
 def defaultEncoding = 'UTF-8'
     tasks.withType(AbstractCompile) each { it.options.encoding = defaultEncoding }

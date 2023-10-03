@@ -122,7 +122,7 @@ Eclipseでプロジェクトをリフレッシュすると、あとはJavaの実
   launch4jのsign4jを使用します。
   ```powershell
   cd C:\Program Files (x86)\launch4j\sign4j
-  sign4j.exe java -jar jsign-2.0.jar --alias 1 --keystore C:\Users\turbou\Desktop\CSVDLTool_work\XXXXX.pfx --storepass [パスワード] C:\Users\turbou\Desktop\CSVDLTool_work\common\CSVDLTool_2.0.1.exe
+  sign4j.exe java -jar jsign-2.0.jar --alias 1 --keystore C:\Users\turbou\Desktop\CSVDLTool_work\XXXXX.pfx --storepass [パスワード] C:\Users\turbou\Desktop\CSVDLTool_work\common\CSVDLTool_2.1.0.exe
   ```
 - 署名の確認  
   署名の確認については、exeを右クリック->プロパティ で確認できます。
@@ -132,18 +132,18 @@ Eclipseでプロジェクトをリフレッシュすると、あとはJavaの実
   読み込めたら、Common Name(通称)をコピー
 - 署名
   ```bash
-  codesign --deep -s "Contrast Security, Inc." -v CSVDLTool_2.0.1.app
-  codesign --deep -s "Contrast Security, Inc." -v CSVDLTool_2.0.1_auditlog.app
+  codesign --deep -s "Contrast Security, Inc." -v CSVDLTool_2.1.0.app
+  codesign --deep -s "Contrast Security, Inc." -v CSVDLTool_2.1.0_auditlog.app
   ```
 - 署名の確認
   ```bash
-  codesign -d --verbose=4 CSVDLTool_2.0.1.app
-  codesign -d --verbose=4 CSVDLTool_2.0.1_auditlog.app
+  codesign -d --verbose=4 CSVDLTool_2.1.0.app
+  codesign -d --verbose=4 CSVDLTool_2.1.0_auditlog.app
   ```
     
 #### 圧縮について補足
 - macOS
   ```bash
-  7z a CSVDLTool_2.0.1.cli7z CSVDLTool_2.0.1.app/
-  7z a CSVDLTool_2.0.1_auditlog.cli7z CSVDLTool_2.0.1_auditlog.app/
+  7z a CSVDLTool_2.1.0.cli7z CSVDLTool_2.1.0.app/
+  7z a CSVDLTool_2.1.0_auditlog.cli7z CSVDLTool_2.1.0_auditlog.app/
   ```

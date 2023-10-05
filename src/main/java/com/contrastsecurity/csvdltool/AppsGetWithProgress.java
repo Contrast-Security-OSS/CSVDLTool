@@ -36,7 +36,7 @@ import java.util.TreeMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.PreferenceStore;
 import org.eclipse.swt.widgets.Shell;
@@ -78,15 +78,16 @@ public class AppsGetWithProgress implements IRunnableWithProgress {
         if (this.orgs.size() > 1) {
             prefix_org_flg = true;
         }
-        monitor.beginTask(Messages.getString("appsgetwithprogress.progress.loading.applications"), 100 * this.orgs.size()); //$NON-NLS-1$
+        // monitor.beginTask(Messages.getString("appsgetwithprogress.progress.loading.applications"), 100 * this.orgs.size()); //$NON-NLS-1$
+        SubMonitor mainMonitor = SubMonitor.convert(monitor, 100).setWorkRemaining(this.orgs.size());
         Thread.sleep(300);
         for (Organization org : this.orgs) {
             try {
                 monitor.setTaskName(org.getName());
                 // フィルタの情報を取得
                 monitor.subTask(Messages.getString("appsgetwithprogress.progress.loading.filter")); //$NON-NLS-1$
-                SubProgressMonitor sub1Monitor = new SubProgressMonitor(monitor, 10);
-                sub1Monitor.beginTask("", 2); //$NON-NLS-1$
+                SubMonitor sub1Monitor = mainMonitor.split(10).setWorkRemaining(2);
+                // sub1Monitor.beginTask("", 2); //$NON-NLS-1$
                 Api filterSeverityApi = new FilterSeverityApi(this.shell, this.ps, org);
                 Api filterVulnTypeApi = new FilterVulnTypeApi(this.shell, this.ps, org);
                 try {
@@ -94,16 +95,16 @@ public class AppsGetWithProgress implements IRunnableWithProgress {
                     for (Filter filter : filterSeverities) {
                         severityFilterSet.add(filter);
                     }
-                    sub1Monitor.worked(1);
+                    sub1Monitor.split(1);
                     List<Filter> filterVulnTypes = (List<Filter>) filterVulnTypeApi.get();
                     for (Filter filter : filterVulnTypes) {
                         vulnTypeFilterSet.add(filter);
                     }
-                    sub1Monitor.worked(1);
+                    sub1Monitor.split(1);
                 } catch (ApiException ae) {
                     throw ae;
                 }
-                sub1Monitor.done();
+                // sub1Monitor.done();
 
                 // アプリケーショングループの情報を取得
                 monitor.subTask(Messages.getString("appsgetwithprogress.progress.loading.application.group")); //$NON-NLS-1$
@@ -112,8 +113,8 @@ public class AppsGetWithProgress implements IRunnableWithProgress {
                 groupsApi.setIgnoreStatusCodes(new ArrayList(Arrays.asList(403)));
                 try {
                     List<CustomGroup> customGroups = (List<CustomGroup>) groupsApi.get();
-                    SubProgressMonitor sub2Monitor = new SubProgressMonitor(monitor, 10);
-                    sub2Monitor.beginTask("", customGroups.size()); //$NON-NLS-1$
+                    SubMonitor sub2Monitor = sub1Monitor.split(10).setWorkRemaining(customGroups.size());
+                    // sub2Monitor.beginTask("", customGroups.size()); //$NON-NLS-1$
                     for (CustomGroup customGroup : customGroups) {
                         monitor.subTask(String.format("%s%s", Messages.getString("appsgetwithprogress.progress.loading.application.group"), customGroup.getName())); //$NON-NLS-1$ //$NON-NLS-2$
                         List<ApplicationInCustomGroup> apps = customGroup.getApplications();
@@ -127,9 +128,9 @@ public class AppsGetWithProgress implements IRunnableWithProgress {
                                 }
                             }
                         }
-                        sub2Monitor.worked(1);
+                        sub2Monitor.split(1);
                     }
-                    sub2Monitor.done();
+                    // sub2Monitor.done();
                 } catch (ApiException ae) {
                     throw ae;
                 }
@@ -137,12 +138,12 @@ public class AppsGetWithProgress implements IRunnableWithProgress {
                 monitor.subTask(Messages.getString("appsgetwithprogress.progress.loading.application.data")); //$NON-NLS-1$
                 Api applicationsApi = new ApplicationsApi(this.shell, this.ps, org);
                 List<Application> applications = (List<Application>) applicationsApi.get();
-                SubProgressMonitor sub3Monitor = new SubProgressMonitor(monitor, 80);
-                sub3Monitor.beginTask("", applications.size()); //$NON-NLS-1$
+                SubMonitor sub3Monitor = sub1Monitor.split(80).setWorkRemaining(applications.size());
+                // sub3Monitor.beginTask("", applications.size()); //$NON-NLS-1$
                 for (Application app : applications) {
                     monitor.subTask(String.format("%s%s", Messages.getString("appsgetwithprogress.progress.loading.application.data"), app.getName())); //$NON-NLS-1$ //$NON-NLS-2$
                     if (app.getLicense().getLevel().equals("Unlicensed")) { //$NON-NLS-1$
-                        sub3Monitor.worked(1);
+                        sub3Monitor.split(1);
                         continue;
                     }
                     if (appGroupMap.containsKey(app.getName())) {
@@ -160,16 +161,16 @@ public class AppsGetWithProgress implements IRunnableWithProgress {
                             fullAppMap.put(String.format("%s", app.getName()), new AppInfo(org, app.getName(), app.getApp_id(), app.getLanguage())); //$NON-NLS-1$
                         }
                     }
-                    sub3Monitor.worked(1);
+                    sub3Monitor.split(1);
                     Thread.sleep(10);
                 }
-                sub3Monitor.done();
+                // sub3Monitor.done();
                 Thread.sleep(500);
             } catch (Exception e) {
                 throw new InvocationTargetException(e);
             }
         }
-        monitor.done();
+        // monitor.done();
     }
 
     public Map<String, AppInfo> getFullAppMap() {

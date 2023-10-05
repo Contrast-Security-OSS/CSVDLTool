@@ -1,19 +1,24 @@
-apply plugin: 'java'
-apply plugin: 'eclipse'
-apply plugin: 'maven-publish'
+plugins {
+    id 'java'
+    id 'eclipse'
+    id 'maven-publish'
+}
 
 sourceCompatibility = JavaVersion.VERSION_17
 targetCompatibility = JavaVersion.VERSION_17
     
-version = '2.1.0'
-
 def defaultEncoding = 'UTF-8'
     tasks.withType(AbstractCompile) each { it.options.encoding = defaultEncoding }
 
-compileJava {
-    options.encoding = defaultEncoding
-}
+//compileJava {
+//    options.encoding = defaultEncoding
+//    options.compilerArgs << '-Xlint:unchecked'
+//}
 
+tasks.withType(JavaCompile) {
+    options.encoding = defaultEncoding
+    options.compilerArgs << '-Xlint:deprecation'
+}
 repositories {
     mavenCentral()
 }
@@ -34,15 +39,16 @@ dependencies {
     implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.10.0'
     implementation group: 'com.squareup.okhttp3', name: 'okhttp-urlconnection', version: '4.10.0'
 
-    implementation group: 'org.eclipse.core', name: 'commands', version: '3.3.0-I20070605-0010', transitive: false
-    implementation group: 'org.eclipse.equinox', name: 'common', version: '3.3.0-v20070426', transitive: false
-    implementation group: 'org.eclipse.ui', name: 'ide', version: '3.3.0-I20070620', transitive: false
-    implementation group: 'org.eclipse.ui', name: 'workbench', version: '3.3.0-I20070608-1100', transitive: false
-    implementation group: 'org.eclipse', name: 'jface', version: '3.3.0-I20070606-0010', transitive: false
+    implementation group: 'org.eclipse.platform', name: 'org.eclipse.core.commands', version: '3.11.100', transitive: false
+    implementation group: 'org.eclipse.platform', name: 'org.eclipse.equinox.common', version: '3.18.100', transitive: false
+    implementation group: 'org.eclipse.platform', name: 'org.eclipse.ui.ide', version: '3.21.100', transitive: false
+    implementation group: 'org.eclipse.platform', name: 'org.eclipse.ui.workbench', version: '3.130.0', transitive: false
+    implementation group: 'org.eclipse.platform', name: 'org.eclipse.jface', version: '3.31.0', transitive: false
+    implementation group: 'org.eclipse.platform', name: 'org.eclipse.osgi', version: '3.18.500', transitive: false
 
-    implementation group: 'org.eclipse.swt', name: 'org.eclipse.swt.win32.win32.x86_64', version: '4.3'
-    //implementation group: 'org.eclipse.swt', name: 'org.eclipse.swt.win32.win32.x86', version: '4.3'
-    //implementation group: 'org.eclipse.platform', name: 'org.eclipse.swt.cocoa.macosx.x86_64', version: '3.109.0', transitive: false
+    //implementation group: 'org.eclipse.platform', name: 'org.eclipse.swt.win32.win32.x86_64', version: '3.124.100', transitive: false
+    //implementation group: 'org.eclipse.platform', name: 'org.eclipse.swt.cocoa.macosx.x86_64', version: '3.124.100', transitive: false
+    implementation group: 'org.eclipse.platform', name: 'org.eclipse.swt.cocoa.macosx.aarch64', version: '3.124.100', transitive: false
 }
 
 test {
@@ -57,10 +63,10 @@ task copyToLib(type: Copy) {
 jar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     archiveBaseName = 'CSVDLTool'
+    archiveVersion = '2.1.0'
     exclude 'META-INF/*.RSA', 'META-INF/*.SF','META-INF/*.DSA' 
     manifest {
-        attributes 'Implementation-Title': 'Gradle Quickstart',
-                   'Implementation-Version': version
+        attributes 'Implementation-Title': 'Gradle Quickstart'
         attributes 'Main-Class': 'com.contrastsecurity.csvdltool.Main'
     }
     from configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }

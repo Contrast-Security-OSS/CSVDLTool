@@ -33,7 +33,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.PreferenceStore;
 import org.eclipse.swt.widgets.Shell;
@@ -65,43 +65,45 @@ public class ServerWithProgress implements IRunnableWithProgress {
     @SuppressWarnings("unchecked")
     @Override
     public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-        monitor.beginTask(Messages.getString("serverwithprogress.progress.loading.servers"), 100 * this.orgs.size()); //$NON-NLS-1$
+        // monitor.beginTask(Messages.getString("serverwithprogress.progress.loading.servers"), 100 * this.orgs.size()); //$NON-NLS-1$
+        SubMonitor mainMonitor = SubMonitor.convert(monitor, 100); // .setWorkRemaining(this.orgs.size());
         for (Organization org : this.orgs) {
             try {
                 List<Server> orgAttackEvents = new ArrayList<Server>();
-                monitor.setTaskName(org.getName());
+                mainMonitor.setTaskName(org.getName());
                 // アプリケーション一覧を取得
-                monitor.subTask(Messages.getString("serverwithprogress.progress.loading.server")); //$NON-NLS-1$
-                Api attacksApi = new ServersApi(this.shell, this.ps, org, orgAttackEvents.size());
-                List<Server> tmpAttackEvents = (List<Server>) attacksApi.get();
+                mainMonitor.subTask(Messages.getString("serverwithprogress.progress.loading.server")); //$NON-NLS-1$
+                Api serversApi = new ServersApi(this.shell, this.ps, org, orgAttackEvents.size());
+                List<Server> tmpAttackEvents = (List<Server>) serversApi.get();
                 orgAttackEvents.addAll(tmpAttackEvents);
-                int totalCount = attacksApi.getTotalCount();
-                SubProgressMonitor sub1Monitor = new SubProgressMonitor(monitor, 100);
-                sub1Monitor.beginTask("", totalCount); //$NON-NLS-1$
-                monitor.subTask(String.format("%s(%d/%d)", Messages.getString("serverwithprogress.progress.loading.server"), orgAttackEvents.size(), totalCount)); //$NON-NLS-1$ //$NON-NLS-2$
-                sub1Monitor.worked(tmpAttackEvents.size());
+                int totalCount = serversApi.getTotalCount();
+                SubMonitor sub1Monitor = mainMonitor.split(100).setWorkRemaining(totalCount);
+                // sub1Monitor.beginTask("", totalCount); //$NON-NLS-1$
+                mainMonitor.subTask(String.format("%s(%d/%d)", Messages.getString("serverwithprogress.progress.loading.server"), orgAttackEvents.size(), totalCount)); //$NON-NLS-1$ //$NON-NLS-2$
+                // sub1Monitor.worked(tmpAttackEvents.size());
+                sub1Monitor.split(tmpAttackEvents.size());
                 boolean incompleteFlg = false;
                 incompleteFlg = totalCount > orgAttackEvents.size();
                 while (incompleteFlg) {
                     Thread.sleep(200);
-                    if (monitor.isCanceled()) {
+                    if (mainMonitor.isCanceled()) {
                         throw new InterruptedException(Messages.getString("serverwithprogress.progress.canceled")); //$NON-NLS-1$
                     }
-                    attacksApi = new ServersApi(this.shell, this.ps, org, orgAttackEvents.size());
-                    tmpAttackEvents = (List<Server>) attacksApi.get();
+                    serversApi = new ServersApi(this.shell, this.ps, org, orgAttackEvents.size());
+                    tmpAttackEvents = (List<Server>) serversApi.get();
                     orgAttackEvents.addAll(tmpAttackEvents);
-                    monitor.subTask(String.format("%s(%d/%d)", Messages.getString("serverwithprogress.progress.loading.server"), orgAttackEvents.size(), totalCount)); //$NON-NLS-1$ //$NON-NLS-2$
-                    sub1Monitor.worked(tmpAttackEvents.size());
+                    mainMonitor.subTask(String.format("%s(%d/%d)", Messages.getString("serverwithprogress.progress.loading.server"), orgAttackEvents.size(), totalCount)); //$NON-NLS-1$ //$NON-NLS-2$
+                    // sub1Monitor.worked(tmpAttackEvents.size());
+                    sub1Monitor.split(tmpAttackEvents.size());
                     incompleteFlg = totalCount > orgAttackEvents.size();
                 }
-                sub1Monitor.done();
+                // sub1Monitor.done();
                 this.allServers.addAll(orgAttackEvents);
                 Thread.sleep(500);
             } catch (Exception e) {
                 throw new InvocationTargetException(e);
             }
         }
-        monitor.done();
     }
 
     public List<Server> getAllServers() {

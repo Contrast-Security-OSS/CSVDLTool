@@ -35,7 +35,7 @@ import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.PreferenceStore;
 import org.eclipse.swt.widgets.Shell;
@@ -84,7 +84,7 @@ public class AttackEventsGetWithProgress implements IRunnableWithProgress {
                         Messages.getString("attackeventsgetwithprogress.progress.loading.attackevents.organization.name"))); //$NON-NLS-1$
                 // 攻撃一覧を読み込み
                 monitor.subTask(Messages.getString("attackeventsgetwithprogress.progress.loading.attacks")); //$NON-NLS-1$
-                SubMonitor sub1Monitor = SubMonitor.convert(monitor, 15);
+                SubProgressMonitor sub1Monitor = new SubProgressMonitor(monitor, 15);
                 List<Attack> allAttacks = new ArrayList<Attack>();
                 Api attacksApi = new AttacksApi(this.shell, this.ps, org, frDetectedDate, toDetectedDate, 0);
                 List<Attack> tmpAttacks = (List<Attack>) attacksApi.post();
@@ -132,7 +132,7 @@ public class AttackEventsGetWithProgress implements IRunnableWithProgress {
 
                 // 攻撃イベント一覧を読み込み
                 monitor.subTask(Messages.getString("attackeventsgetwithprogress.progress.loading.attackevents")); //$NON-NLS-1$
-                SubMonitor sub2Monitor = SubMonitor.convert(monitor, 85);
+                SubProgressMonitor sub2Monitor = new SubProgressMonitor(monitor, 85);
                 sub2Monitor.beginTask("", allAttacks.size()); //$NON-NLS-1$
                 attackProcessCount = 1;
                 for (Attack attack : allAttacks) {
@@ -141,7 +141,7 @@ public class AttackEventsGetWithProgress implements IRunnableWithProgress {
                     List<AttackEvent> tmpAttackEvents = (List<AttackEvent>) attackEventsApi.post();
                     int totalCount = attackEventsApi.getTotalCount();
                     int atkEvtProcessCount = 0;
-                    SubMonitor sub2_1Monitor = SubMonitor.convert(sub2Monitor, 1);
+                    SubProgressMonitor sub2_1Monitor = new SubProgressMonitor(sub2Monitor, 1);
                     sub2_1Monitor.beginTask("", totalCount);
                     for (AttackEvent tmpAttackEvent : tmpAttackEvents) {
                         if (monitor.isCanceled()) {

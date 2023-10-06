@@ -49,7 +49,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.PreferenceStore;
@@ -127,8 +127,7 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                 columnList = new Gson().fromJson(columnJsonStr, new TypeToken<List<LibCSVColumn>>() {
                 }.getType());
             } catch (JsonSyntaxException e) {
-                MessageDialog.openError(this.shell, Messages.getString("libgetwithprogress.message.dialog.title"), //$NON-NLS-1$
-                        String.format("%s\r\n%s", Messages.getString("libgetwithprogress.message.dialog.json.load.error.message"), columnJsonStr)); //$NON-NLS-1$ //$NON-NLS-2$
+                MessageDialog.openError(this.shell, Messages.getString("libgetwithprogress.message.dialog.title"), String.format("%s\r\n%s", Messages.getString("libgetwithprogress.message.dialog.json.load.error.message"), columnJsonStr));  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
                 columnList = new ArrayList<LibCSVColumn>();
             }
         } else {
@@ -152,15 +151,14 @@ public class LibGetWithProgress implements IRunnableWithProgress {
             }
             // 選択済みアプリのライブラリ情報を取得
             monitor.setTaskName(Messages.getString("libgetwithprogress.progress.loading.libraries")); //$NON-NLS-1$
-            SubMonitor sub1Monitor = SubMonitor.convert(monitor, 80);
+            SubProgressMonitor sub1Monitor = new SubProgressMonitor(monitor, 80);
             sub1Monitor.beginTask("", dstApps.size()); //$NON-NLS-1$
             int appIdx = 1;
             for (String appLabel : dstApps) {
                 Organization org = fullAppMap.get(appLabel).getOrganization();
                 String appName = fullAppMap.get(appLabel).getAppName();
                 String appId = fullAppMap.get(appLabel).getAppId();
-                monitor.setTaskName(
-                        String.format("%s[%s] %s (%d/%d)", Messages.getString("libgetwithprogress.progress.loading.libraries"), org.getName(), appName, appIdx, dstApps.size())); //$NON-NLS-1$ //$NON-NLS-2$
+                monitor.setTaskName(String.format("%s[%s] %s (%d/%d)", Messages.getString("libgetwithprogress.progress.loading.libraries"), org.getName(), appName, appIdx, dstApps.size())); //$NON-NLS-1$ //$NON-NLS-2$
                 List<Library> allLibraries = new ArrayList<Library>();
                 Api librariesApi = new LibrariesApi(this.shell, this.ps, org, appId, filter, allLibraries.size());
                 allLibraries.addAll((List<Library>) librariesApi.get());
@@ -179,7 +177,7 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                     incompleteFlg = totalCount > allLibraries.size();
                     Thread.sleep(sleepTrace);
                 }
-                SubMonitor sub1_1Monitor = SubMonitor.convert(sub1Monitor, 1);
+                SubProgressMonitor sub1_1Monitor = new SubProgressMonitor(sub1Monitor, 1);
                 sub1_1Monitor.beginTask("", allLibraries.size()); //$NON-NLS-1$
                 int libIdx = 1;
                 for (Library library : allLibraries) {
@@ -191,8 +189,7 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                     }
                     List<String> csvLineList = new ArrayList<String>();
                     monitor.subTask(library.getFile_name());
-                    monitor.subTask(
-                            String.format("%s %s (%d/%d)", Messages.getString("libgetwithprogress.progress.loading.library"), library.getFile_name(), libIdx, allLibraries.size())); //$NON-NLS-1$ //$NON-NLS-2$
+                    monitor.subTask(String.format("%s %s (%d/%d)", Messages.getString("libgetwithprogress.progress.loading.library"), library.getFile_name(), libIdx, allLibraries.size())); //$NON-NLS-1$ //$NON-NLS-2$
                     for (LibCSVColumn csvColumn : columnList) {
                         if (!csvColumn.isValid()) {
                             continue;
@@ -372,27 +369,17 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                             // ==================== 14-2. 説明 ====================
                             FileUtils.writeLines(file, Main.FILE_ENCODING, Arrays.asList(vuln.getDescription()), true);
                             // ==================== 14-3. 機密性への影響 ====================
-                            FileUtils.writeLines(file, Main.FILE_ENCODING, Arrays.asList(
-                                    String.format("%s %s", Messages.getString("libgetwithprogress.detail.header.confidentiality-impact"), vuln.getConfidentiality_impact())), true); //$NON-NLS-1$ //$NON-NLS-2$
+                            FileUtils.writeLines(file, Main.FILE_ENCODING, Arrays.asList(String.format("%s %s", Messages.getString("libgetwithprogress.detail.header.confidentiality-impact"), vuln.getConfidentiality_impact())), true); //$NON-NLS-1$ //$NON-NLS-2$
                             // ==================== 14-4. 完全性への影響 ====================
-                            FileUtils.writeLines(file, Main.FILE_ENCODING,
-                                    Arrays.asList(String.format("%s %s", Messages.getString("libgetwithprogress.detail.header.integrity_impact"), vuln.getIntegrity_impact())), //$NON-NLS-1$ //$NON-NLS-2$
-                                    true);
+                            FileUtils.writeLines(file, Main.FILE_ENCODING, Arrays.asList(String.format("%s %s", Messages.getString("libgetwithprogress.detail.header.integrity_impact"), vuln.getIntegrity_impact())), true); //$NON-NLS-1$ //$NON-NLS-2$
                             // ==================== 14-5. 可用性への影響 ====================
-                            FileUtils.writeLines(file, Main.FILE_ENCODING,
-                                    Arrays.asList(
-                                            String.format("%s %s", Messages.getString("libgetwithprogress.detail.header.availability_impact"), vuln.getAvailability_impact())), //$NON-NLS-1$ //$NON-NLS-2$
-                                    true);
+                            FileUtils.writeLines(file, Main.FILE_ENCODING, Arrays.asList(String.format("%s %s", Messages.getString("libgetwithprogress.detail.header.availability_impact"), vuln.getAvailability_impact())), true); //$NON-NLS-1$ //$NON-NLS-2$
                             // ==================== 14-6. 攻撃前の認証要否 ====================
-                            FileUtils.writeLines(file, Main.FILE_ENCODING,
-                                    Arrays.asList(String.format("%s %s", Messages.getString("libgetwithprogress.detail.header.authentication"), vuln.getAuthentication())), true); //$NON-NLS-1$ //$NON-NLS-2$
+                            FileUtils.writeLines(file, Main.FILE_ENCODING, Arrays.asList(String.format("%s %s", Messages.getString("libgetwithprogress.detail.header.authentication"), vuln.getAuthentication())), true); //$NON-NLS-1$ //$NON-NLS-2$
                             // ==================== 14-7. 攻撃元区分 ====================
-                            FileUtils.writeLines(file, Main.FILE_ENCODING,
-                                    Arrays.asList(String.format("%s %s", Messages.getString("libgetwithprogress.detail.header.access_vector"), vuln.getAccess_vector())), true); //$NON-NLS-1$ //$NON-NLS-2$
+                            FileUtils.writeLines(file, Main.FILE_ENCODING, Arrays.asList(String.format("%s %s", Messages.getString("libgetwithprogress.detail.header.access_vector"), vuln.getAccess_vector())), true); //$NON-NLS-1$ //$NON-NLS-2$
                             // ==================== 14-8. 攻撃条件複雑さ ====================
-                            FileUtils.writeLines(file, Main.FILE_ENCODING,
-                                    Arrays.asList(String.format("%s %s", Messages.getString("libgetwithprogress.detail.header.access_complexity"), vuln.getAccess_complexity())), //$NON-NLS-1$ //$NON-NLS-2$
-                                    true);
+                            FileUtils.writeLines(file, Main.FILE_ENCODING, Arrays.asList(String.format("%s %s", Messages.getString("libgetwithprogress.detail.header.access_complexity"), vuln.getAccess_complexity())), true); //$NON-NLS-1$ //$NON-NLS-2$
                         }
                     }
 
@@ -417,7 +404,7 @@ public class LibGetWithProgress implements IRunnableWithProgress {
         // ========== CSV出力 ==========
         monitor.setTaskName(Messages.getString("libgetwithprogress.progress.output.csv")); //$NON-NLS-1$
         Thread.sleep(500);
-        SubMonitor sub2Monitor = SubMonitor.convert(monitor, 20);
+        SubProgressMonitor sub2Monitor = new SubProgressMonitor(monitor, 20);
         sub2Monitor.beginTask("", csvList.size()); //$NON-NLS-1$
         String filePath = timestamp + ".csv"; //$NON-NLS-1$
         if (OS.isFamilyMac()) {

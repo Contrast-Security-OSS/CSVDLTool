@@ -190,7 +190,7 @@ public class AttackEventsGetWithProgress implements IRunnableWithProgress {
                 throw new InvocationTargetException(e);
             }
         }
-        monitor.done();
+        subMonitor.done();
     }
 
     public List<AttackEvent> getAllAttackEvents() {

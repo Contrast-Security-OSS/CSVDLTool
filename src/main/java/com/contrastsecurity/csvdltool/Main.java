@@ -68,6 +68,7 @@ import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.exec.OS;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
@@ -292,8 +293,7 @@ public class Main implements PropertyChangeListener {
             try {
                 this.ps.load();
             } catch (FileNotFoundException fnfe) {
-                this.ps = new PreferenceStore("csvdltool.properties"); //$NON-NLS-1$
-                this.ps.load();
+                this.ps.save();
             }
         } catch (FileNotFoundException fnfe) {
         } catch (Exception e) {
@@ -557,6 +557,9 @@ public class Main implements PropertyChangeListener {
                         return;
                     } else if (e.getTargetException() instanceof BasicAuthException) {
                         MessageDialog.openError(shell, Messages.getString("main.application.load.message.dialog.title"), errorMsg); //$NON-NLS-1$
+                        return;
+                    } else if (e.getTargetException() instanceof OperationCanceledException) {
+                        MessageDialog.openInformation(shell, Messages.getString("main.application.load.message.dialog.title"), errorMsg); //$NON-NLS-1$
                         return;
                     } else {
                         logger.error(trace);

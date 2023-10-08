@@ -35,6 +35,7 @@ import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.PreferenceStore;
@@ -77,32 +78,32 @@ public class AttackEventsGetWithProgress implements IRunnableWithProgress {
     @SuppressWarnings("unchecked")
     @Override
     public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-        monitor.beginTask(Messages.getString("attackeventsgetwithprogress.progress.loading.attackevents.organization.name"), 100 * this.orgs.size()); //$NON-NLS-1$
+        SubMonitor subMonitor = SubMonitor.convert(monitor).setWorkRemaining(100 * this.orgs.size());
+        monitor.setTaskName(Messages.getString("attackeventsgetwithprogress.progress.loading.attackevents.organization.name")); //$NON-NLS-1$
         for (Organization org : this.orgs) {
             try {
                 monitor.setTaskName(String.format("%s %s", org.getName(), //$NON-NLS-1$
                         Messages.getString("attackeventsgetwithprogress.progress.loading.attackevents.organization.name"))); //$NON-NLS-1$
                 // 攻撃一覧を読み込み
                 monitor.subTask(Messages.getString("attackeventsgetwithprogress.progress.loading.attacks")); //$NON-NLS-1$
-                SubMonitor sub1Monitor = SubMonitor.convert(monitor, 15);
                 List<Attack> allAttacks = new ArrayList<Attack>();
                 Api attacksApi = new AttacksApi(this.shell, this.ps, org, frDetectedDate, toDetectedDate, 0);
                 List<Attack> tmpAttacks = (List<Attack>) attacksApi.post();
                 int totalAttackCount = attacksApi.getTotalCount();
                 int attackProcessCount = 0;
                 monitor.subTask(String.format("%s(%d/%d)", Messages.getString("attackeventsgetwithprogress.progress.loading.attacks"), attackProcessCount, totalAttackCount)); //$NON-NLS-1$ //$NON-NLS-2$
-                sub1Monitor.beginTask("", totalAttackCount); //$NON-NLS-1$
+                SubMonitor child1Monitor = subMonitor.split(15).setWorkRemaining(totalAttackCount);
                 allAttacks.addAll(tmpAttacks);
                 for (Attack atck : tmpAttacks) {
                     if (monitor.isCanceled()) {
-                        throw new InterruptedException(Messages.getString("attackeventsgetwithprogress.progress.canceled")); //$NON-NLS-1$
+                        throw new OperationCanceledException();
                     }
                     Api attackApi = new AttackApi(this.shell, this.ps, org, atck.getUuid());
                     Attack attackDetail = (Attack) attackApi.get();
                     atck.setSource_name(attackDetail.getSource_name());
                     attackProcessCount++;
                     monitor.subTask(String.format("%s(%d/%d)", Messages.getString("attackeventsgetwithprogress.progress.loading.attacks"), attackProcessCount, totalAttackCount)); //$NON-NLS-1$ //$NON-NLS-2$
-                    sub1Monitor.worked(1);
+                    child1Monitor.worked(1);
                     Thread.sleep(100);
                 }
                 boolean attackIncompleteFlg = false;
@@ -114,7 +115,7 @@ public class AttackEventsGetWithProgress implements IRunnableWithProgress {
                     allAttacks.addAll(tmpAttacks);
                     for (Attack atck : tmpAttacks) {
                         if (monitor.isCanceled()) {
-                            throw new InterruptedException(Messages.getString("attackeventsgetwithprogress.progress.canceled")); //$NON-NLS-1$
+                            throw new OperationCanceledException();
                         }
                         Api attackApi = new AttackApi(this.shell, this.ps, org, atck.getUuid());
                         Attack attackDetail = (Attack) attackApi.get();
@@ -122,18 +123,17 @@ public class AttackEventsGetWithProgress implements IRunnableWithProgress {
                         attackProcessCount++;
                         monitor.subTask(
                                 String.format("%s(%d/%d)", Messages.getString("attackeventsgetwithprogress.progress.loading.attacks"), attackProcessCount, totalAttackCount)); //$NON-NLS-1$ //$NON-NLS-2$
-                        sub1Monitor.worked(1);
+                        child1Monitor.worked(1);
                         Thread.sleep(100);
                     }
                     attackIncompleteFlg = totalAttackCount > allAttacks.size();
                 }
-                sub1Monitor.done();
+                child1Monitor.done();
                 Thread.sleep(250);
 
                 // 攻撃イベント一覧を読み込み
                 monitor.subTask(Messages.getString("attackeventsgetwithprogress.progress.loading.attackevents")); //$NON-NLS-1$
-                SubMonitor sub2Monitor = SubMonitor.convert(monitor, 85);
-                sub2Monitor.beginTask("", allAttacks.size()); //$NON-NLS-1$
+                SubMonitor child2Monitor = subMonitor.split(85).setWorkRemaining(allAttacks.size());
                 attackProcessCount = 1;
                 for (Attack attack : allAttacks) {
                     List<AttackEvent> orgAttackEvents = new ArrayList<AttackEvent>();
@@ -141,11 +141,10 @@ public class AttackEventsGetWithProgress implements IRunnableWithProgress {
                     List<AttackEvent> tmpAttackEvents = (List<AttackEvent>) attackEventsApi.post();
                     int totalCount = attackEventsApi.getTotalCount();
                     int atkEvtProcessCount = 0;
-                    SubMonitor sub2_1Monitor = SubMonitor.convert(sub2Monitor, 1);
-                    sub2_1Monitor.beginTask("", totalCount);
+                    SubMonitor child2_1Monitor = child2Monitor.split(1).setWorkRemaining(totalCount);
                     for (AttackEvent tmpAttackEvent : tmpAttackEvents) {
                         if (monitor.isCanceled()) {
-                            throw new InterruptedException(Messages.getString("attackeventsgetwithprogress.progress.canceled")); //$NON-NLS-1$
+                            throw new OperationCanceledException();
                         }
                         tmpAttackEvent.setSource_name(attack.getSource_name());
                         atkEvtProcessCount++;
@@ -153,8 +152,8 @@ public class AttackEventsGetWithProgress implements IRunnableWithProgress {
                         monitor.subTask(String.format("%s(%d/%d), %s(%d/%d)", Messages.getString("attackeventsgetwithprogress.progress.loading.attackevents.attack"),
                                 attackProcessCount, allAttacks.size(), Messages.getString("attackeventsgetwithprogress.progress.loading.attackevents.attackevent"),
                                 atkEvtProcessCount, totalCount));
-                        sub2_1Monitor.worked(1);
-                        Thread.sleep(20);
+                        child2_1Monitor.worked(1);
+                        Thread.sleep(15);
                     }
                     orgAttackEvents.addAll(tmpAttackEvents);
                     boolean incompleteFlg = false;
@@ -164,7 +163,7 @@ public class AttackEventsGetWithProgress implements IRunnableWithProgress {
                         tmpAttackEvents = (List<AttackEvent>) attackEventsApi.post();
                         for (AttackEvent tmpAttackEvent : tmpAttackEvents) {
                             if (monitor.isCanceled()) {
-                                throw new InterruptedException(Messages.getString("attackeventsgetwithprogress.progress.canceled")); //$NON-NLS-1$
+                                throw new OperationCanceledException();
                             }
                             tmpAttackEvent.setSource_name(attack.getSource_name());
                             atkEvtProcessCount++;
@@ -172,8 +171,8 @@ public class AttackEventsGetWithProgress implements IRunnableWithProgress {
                             monitor.subTask(String.format("%s(%d/%d), %s(%d/%d)", Messages.getString("attackeventsgetwithprogress.progress.loading.attackevents.attack"),
                                     attackProcessCount, allAttacks.size(), Messages.getString("attackeventsgetwithprogress.progress.loading.attackevents.attackevent"),
                                     atkEvtProcessCount, totalCount));
-                            sub2_1Monitor.worked(1);
-                            Thread.sleep(20);
+                            child2_1Monitor.worked(1);
+                            Thread.sleep(15);
                         }
                         orgAttackEvents.addAll(tmpAttackEvents);
                         incompleteFlg = totalCount > orgAttackEvents.size();
@@ -183,8 +182,10 @@ public class AttackEventsGetWithProgress implements IRunnableWithProgress {
                     attackProcessCount++;
                     Thread.sleep(100);
                 }
-                sub2Monitor.done();
+                child2Monitor.done();
                 Thread.sleep(100);
+            } catch (OperationCanceledException oce) {
+                throw new InvocationTargetException(new OperationCanceledException(Messages.getString("attackeventsgetwithprogress.progress.canceled")));
             } catch (Exception e) {
                 throw new InvocationTargetException(e);
             }

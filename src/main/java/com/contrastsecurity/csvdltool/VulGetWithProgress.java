@@ -58,6 +58,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -170,7 +171,8 @@ public class VulGetWithProgress implements IRunnableWithProgress {
             this.timer.schedule(task, time, time);
         }
         monitor.setTaskName(Messages.getString("vulgetwithprogress.progress.loading.starting.vulnerabilities")); //$NON-NLS-1$
-        monitor.beginTask(Messages.getString("vulgetwithprogress.progress.loading.starting.vulnerabilities"), 100); //$NON-NLS-1$
+        SubMonitor subMonitor = SubMonitor.convert(monitor, 100);
+
         String csvFileFormat = this.ps.getString(PreferenceConstants.CSV_FILE_FORMAT_VUL);
         if (csvFileFormat == null || csvFileFormat.isEmpty()) {
             csvFileFormat = this.ps.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT_VUL);
@@ -196,6 +198,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                 columnList.add(new VulCSVColumn(colEnum));
             }
         }
+        SubMonitor sub1Monitor = subMonitor.split(90).setWorkRemaining(100);
         Map<String, List<String>> appGroupMap = new HashMap<String, List<String>>();
         List<List<String>> csvList = new ArrayList<List<String>>();
         try {
@@ -214,8 +217,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
             for (String appLabel : dstApps) {
                 orgs.add(fullAppMap.get(appLabel).getOrganization());
             }
-            SubMonitor sub1Monitor = SubMonitor.convert(monitor, 10);
-            sub1Monitor.beginTask("", orgs.size() * 100); //$NON-NLS-1$
+            SubMonitor child1Monitor = sub1Monitor.split(10).setWorkRemaining(orgs.size());
             // アプリケーショングループの情報を取得
             monitor.setTaskName(Messages.getString("vulgetwithprogress.progress.loading.application.group")); //$NON-NLS-1$
             for (Organization org : orgs) {
@@ -224,8 +226,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                 groupsApi.setIgnoreStatusCodes(new ArrayList(Arrays.asList(403)));
                 try {
                     List<CustomGroup> customGroups = (List<CustomGroup>) groupsApi.get();
-                    SubMonitor sub1_1Monitor = SubMonitor.convert(sub1Monitor, 100);
-                    sub1_1Monitor.beginTask("", customGroups.size()); //$NON-NLS-1$
+                    SubMonitor child1_1Monitor = child1Monitor.split(100).setWorkRemaining(customGroups.size());
                     for (CustomGroup customGroup : customGroups) {
                         monitor.subTask(customGroup.getName());
                         List<ApplicationInCustomGroup> apps = customGroup.getApplications();
@@ -239,15 +240,15 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                                 }
                             }
                         }
-                        sub1_1Monitor.worked(1);
+                        child1_1Monitor.worked(1);
                     }
-                    sub1_1Monitor.done();
+                    child1_1Monitor.done();
                     Thread.sleep(500);
                 } catch (ApiException ae) {
                 }
+                child1Monitor.worked(1);
             }
-            monitor.subTask(""); //$NON-NLS-1$
-            sub1Monitor.done();
+            child1Monitor.done();
 
             // コンプライアンスポリシーの情報を取得するか判定
             boolean validCompliancePolicy = false;
@@ -261,8 +262,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
 
             // 選択済みアプリの脆弱性情報を取得
             monitor.setTaskName(Messages.getString("vulgetwithprogress.progress.loading.vulnerability")); //$NON-NLS-1$
-            SubMonitor sub2Monitor = SubMonitor.convert(monitor, 80);
-            sub2Monitor.beginTask("", dstApps.size() * 100); //$NON-NLS-1$
+            SubMonitor child2Monitor = sub1Monitor.split(90).setWorkRemaining(dstApps.size());
             int appIdx = 1;
             for (String appLabel : dstApps) {
                 Organization org = fullAppMap.get(appLabel).getOrganization();
@@ -273,17 +273,16 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                 // コンプライアンスポリシーの情報を取得
                 Map<String, List<String>> securityStandardVulnUuidMap = new HashMap<String, List<String>>();
                 if (validCompliancePolicy) {
-                    SubMonitor sub2_1Monitor = SubMonitor.convert(sub2Monitor, 20);
                     Api filterSecurityStandardApi = new FilterSecurityStandardApi(this.shell, this.ps, org);
                     List<Filter> filterSecurityStandards = (List<Filter>) filterSecurityStandardApi.get();
-                    sub2_1Monitor.beginTask("", filterSecurityStandards.size()); //$NON-NLS-1$
+                    SubMonitor child2_1Monitor = child2Monitor.split(20).setWorkRemaining(filterSecurityStandards.size());
                     for (Filter ssFilter : filterSecurityStandards) {
                         monitor.subTask(String.format("%s %s", Messages.getString("vulgetwithprogress.progress.loading.compliance.policy.label"), ssFilter.getLabel())); //$NON-NLS-1$ //$NON-NLS-2$
                         if (monitor.isCanceled()) {
                             if (this.timer != null) {
                                 timer.cancel();
                             }
-                            throw new InterruptedException(Messages.getString("vulgetwithprogress.progress.canceled")); //$NON-NLS-1$
+                            throw new OperationCanceledException();
                         }
                         List<Vulnerability> allVuls = new ArrayList<Vulnerability>();
                         Api tracesFilterBySecurityStandardApi = new TracesFilterBySecurityStandardApi(this.shell, this.ps, org, appId, ssFilter.getKeycode(), 0);
@@ -300,8 +299,9 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                             traceByFilterIncompleteFlg = totalTraceByFilterCount > allVuls.size();
                         }
                         securityStandardVulnUuidMap.put(ssFilter.getLabel(), allVuls.stream().map(Vulnerability::getUuid).collect(Collectors.toList()));
-                        sub2_1Monitor.worked(1);
+                        child2_1Monitor.worked(1);
                     }
+                    child2_1Monitor.done();
                 }
                 Thread.sleep(500);
                 Api tracesApi = new TracesApi(this.shell, this.ps, org, appId, filterMap, frLastDetectedDate, toLastDetectedDate);
@@ -326,25 +326,26 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                         }
                     }
                 }
-                SubMonitor sub2_2Monitor = SubMonitor.convert(sub2Monitor, 80);
-                sub2_2Monitor.beginTask("", traces.size()); //$NON-NLS-1$
+                SubMonitor child2_2Monitor = child2Monitor.split(80).setWorkRemaining(traces.size());
                 int traceIdx = 1;
                 for (String trace_id : traces) {
                     if (monitor.isCanceled()) {
                         if (this.timer != null) {
                             timer.cancel();
                         }
-                        throw new InterruptedException(Messages.getString("vulgetwithprogress.progress.canceled")); //$NON-NLS-1$
+                        throw new OperationCanceledException();
                     }
                     List<String> csvLineList = new ArrayList<String>();
+                    monitor.subTask(String.format("%s (%d/%d) %s", Messages.getString("vulgetwithprogress.progress.loading.vulnerability.label"), traceIdx, //$NON-NLS-1$ //$NON-NLS-2$
+                            traces.size(), trace_id));
                     Api traceApi = new TraceApi(this.shell, this.ps, org, appId, trace_id);
                     Trace trace = (Trace) traceApi.get();
-                    monitor.subTask(String.format("%s %s (%d/%d)", Messages.getString("vulgetwithprogress.progress.loading.vulnerability.label"), trace.getTitle(), traceIdx, //$NON-NLS-1$ //$NON-NLS-2$
-                            traces.size()));
+                    monitor.subTask(String.format("%s (%d/%d) %s", Messages.getString("vulgetwithprogress.progress.loading.vulnerability.label"), traceIdx, //$NON-NLS-1$ //$NON-NLS-2$
+                            traces.size(), trace.getTitle()));
                     Application realApp = trace.getApplication();
                     if (isOnlyParentApp) {
                         if (!appName.equals(realApp.getName())) {
-                            sub2_2Monitor.worked(1);
+                            child2_2Monitor.worked(1);
                             continue;
                         }
                     }
@@ -561,7 +562,6 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                         }
                         signatureUrlList.add(0, ROUTE);
                         FileUtils.writeLines(file, Main.FILE_ENCODING, signatureUrlList, true);
-
                         // ==================== 19-2. HTTP情報 ====================
                         Api httpRequestApi = new HttpRequestApi(this.shell, this.ps, org, trace_id);
                         HttpRequest httpRequest = (HttpRequest) httpRequestApi.get();
@@ -705,13 +705,14 @@ public class VulGetWithProgress implements IRunnableWithProgress {
 
                     csvList.add(csvLineList);
                     traceIdx++;
-                    sub2_2Monitor.worked(1);
+                    child2_2Monitor.worked(1);
                     Thread.sleep(sleepTrace);
                 }
                 appIdx++;
             }
-            monitor.subTask(""); //$NON-NLS-1$
-            sub2Monitor.done();
+            child2Monitor.done();
+        } catch (OperationCanceledException oce) {
+            throw new InvocationTargetException(new OperationCanceledException(Messages.getString("vulgetwithprogress.progress.canceled")));
         } catch (Exception e) {
             throw new InvocationTargetException(e);
         } finally {
@@ -719,12 +720,12 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                 this.timer.cancel();
             }
         }
+        sub1Monitor.done();
 
         // ========== CSV出力 ==========
         monitor.setTaskName(Messages.getString("vulgetwithprogress.progress.output.csv")); //$NON-NLS-1$
+        SubMonitor sub2Monitor = subMonitor.split(10).setWorkRemaining(csvList.size());
         Thread.sleep(500);
-        SubMonitor sub3Monitor = SubMonitor.convert(monitor, 10);
-        sub3Monitor.beginTask("", csvList.size()); //$NON-NLS-1$
         String filePath = timestamp + ".csv"; //$NON-NLS-1$
         if (OS.isFamilyMac()) {
             if (System.getProperty("user.dir").contains(".app/Contents/Java")) { //$NON-NLS-1$ //$NON-NLS-2$
@@ -760,13 +761,15 @@ public class VulGetWithProgress implements IRunnableWithProgress {
             }
             for (List<String> csvLine : csvList) {
                 printer.printRecord(csvLine);
-                sub3Monitor.worked(1);
-                Thread.sleep(10);
+                sub2Monitor.worked(1);
+                Thread.sleep(15);
             }
-            sub3Monitor.done();
+        } catch (OperationCanceledException oce) {
+            throw new InvocationTargetException(new OperationCanceledException(Messages.getString("vulgetwithprogress.progress.canceled")));
         } catch (IOException e) {
             e.printStackTrace();
         }
+        sub2Monitor.done();
         monitor.done();
     }
 }

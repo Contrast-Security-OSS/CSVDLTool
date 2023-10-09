@@ -49,6 +49,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -112,7 +113,7 @@ public class LibGetWithProgress implements IRunnableWithProgress {
             this.timer.schedule(task, time, time);
         }
         monitor.setTaskName(Messages.getString("libgetwithprogress.progress.loading.starting.libraries")); //$NON-NLS-1$
-        monitor.beginTask(Messages.getString("libgetwithprogress.progress.loading.starting.libraries"), 100); //$NON-NLS-1$
+        SubMonitor subMonitor = SubMonitor.convert(monitor, 100);
         String filter = "ALL"; //$NON-NLS-1$
         if (isOnlyHasCVE) {
             filter = "VULNERABLE"; //$NON-NLS-1$
@@ -155,8 +156,7 @@ public class LibGetWithProgress implements IRunnableWithProgress {
             }
             // 選択済みアプリのライブラリ情報を取得
             monitor.setTaskName(Messages.getString("libgetwithprogress.progress.loading.libraries")); //$NON-NLS-1$
-            SubMonitor sub1Monitor = SubMonitor.convert(monitor, 80);
-            sub1Monitor.beginTask("", dstApps.size()); //$NON-NLS-1$
+            SubMonitor sub1Monitor = subMonitor.split(80).setWorkRemaining(dstApps.size());
             int appIdx = 1;
             for (String appLabel : dstApps) {
                 Organization org = fullAppMap.get(appLabel).getOrganization();
@@ -175,22 +175,21 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                         if (this.timer != null) {
                             timer.cancel();
                         }
-                        throw new InterruptedException(Messages.getString("libgetwithprogress.progress.canceled")); //$NON-NLS-1$
+                        throw new OperationCanceledException();
                     }
                     librariesApi = new LibrariesApi(this.shell, this.ps, org, appId, filter, allLibraries.size());
                     allLibraries.addAll((List<Library>) librariesApi.get());
                     incompleteFlg = totalCount > allLibraries.size();
                     Thread.sleep(sleepTrace);
                 }
-                SubMonitor sub1_1Monitor = SubMonitor.convert(sub1Monitor, 1);
-                sub1_1Monitor.beginTask("", allLibraries.size()); //$NON-NLS-1$
+                SubMonitor sub1_1Monitor = sub1Monitor.split(1).setWorkRemaining(allLibraries.size());
                 int libIdx = 1;
                 for (Library library : allLibraries) {
                     if (monitor.isCanceled()) {
                         if (this.timer != null) {
                             timer.cancel();
                         }
-                        throw new InterruptedException(Messages.getString("libgetwithprogress.progress.canceled")); //$NON-NLS-1$
+                        throw new OperationCanceledException();
                     }
                     List<String> csvLineList = new ArrayList<String>();
                     monitor.subTask(library.getFile_name());
@@ -408,6 +407,8 @@ public class LibGetWithProgress implements IRunnableWithProgress {
             }
             monitor.subTask(""); //$NON-NLS-1$
             sub1Monitor.done();
+        } catch (OperationCanceledException oce) {
+            throw new InvocationTargetException(new OperationCanceledException(Messages.getString("libgetwithprogress.progress.canceled")));
         } catch (Exception e) {
             throw new InvocationTargetException(e);
         } finally {
@@ -419,8 +420,7 @@ public class LibGetWithProgress implements IRunnableWithProgress {
         // ========== CSV出力 ==========
         monitor.setTaskName(Messages.getString("libgetwithprogress.progress.output.csv")); //$NON-NLS-1$
         Thread.sleep(500);
-        SubMonitor sub2Monitor = SubMonitor.convert(monitor, 20);
-        sub2Monitor.beginTask("", csvList.size()); //$NON-NLS-1$
+        SubMonitor sub2Monitor = subMonitor.split(20).setWorkRemaining(csvList.size());
         String filePath = timestamp + ".csv"; //$NON-NLS-1$
         if (isIncludeCVEDetail) {
             filePath = timestamp + System.getProperty("file.separator") + timestamp + ".csv"; //$NON-NLS-1$ //$NON-NLS-2$
@@ -454,6 +454,8 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                 Thread.sleep(10);
             }
             sub2Monitor.done();
+        } catch (OperationCanceledException oce) {
+            throw new InvocationTargetException(new OperationCanceledException(Messages.getString("libgetwithprogress.progress.canceled")));
         } catch (IOException e) {
             e.printStackTrace();
         }

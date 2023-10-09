@@ -1143,6 +1143,9 @@ public class Main implements PropertyChangeListener {
                     } else if (e.getTargetException() instanceof BasicAuthException) {
                         MessageDialog.openError(shell, Messages.getString("main.lib.export.message.dialog.title"), exceptionMsg); //$NON-NLS-1$
                         return;
+                    } else if (e.getTargetException() instanceof OperationCanceledException) {
+                        MessageDialog.openInformation(shell, Messages.getString("main.lib.export.message.dialog.title"), exceptionMsg); //$NON-NLS-1$
+                        return;
                     } else {
                         logger.error(trace);
                         MessageDialog.openError(shell, Messages.getString("main.lib.export.message.dialog.title"), //$NON-NLS-1$

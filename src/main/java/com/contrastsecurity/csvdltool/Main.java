@@ -1803,9 +1803,9 @@ public class Main implements PropertyChangeListener {
                 try {
                     for (Organization org : getValidOrganizations()) {
                         Api tokenApi = new ServerlessTokenApi(shell, ps, org);
+                        tokenApi.setConnectTimeoutOverride(15000);
+                        tokenApi.setSocketTimeoutOverride(15000);
                         ServerlessTokenJson tokenJson = (ServerlessTokenJson) tokenApi.get();
-                        System.out.println(tokenJson);
-                        System.out.println(tokenJson.getAccessToken());
                         ps.setValue(PreferenceConstants.SERVERLESS_HOST, tokenJson.getHost());
                         ps.setValue(PreferenceConstants.SERVERLESS_TOKEN, tokenJson.getAccessToken());
                         Api accountsApi = new AccountsApi(shell, ps, tokenJson, org);
@@ -1821,7 +1821,7 @@ public class Main implements PropertyChangeListener {
                         selectedAccountIndex = 0;
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    MessageDialog.openError(shell, "アカウント一覧の読み込み", e.getMessage());
                 }
             }
         });

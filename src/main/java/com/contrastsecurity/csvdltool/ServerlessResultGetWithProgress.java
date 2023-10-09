@@ -30,6 +30,7 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.PreferenceStore;
 import org.eclipse.swt.widgets.Shell;
@@ -64,17 +65,30 @@ public class ServerlessResultGetWithProgress implements IRunnableWithProgress {
     @Override
     public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
         try {
+            SubMonitor subMonitor = SubMonitor.convert(monitor).setWorkRemaining(100);
+            monitor.setTaskName("サーバレスの脆弱性一覧を取得しています...");
+            monitor.subTask("関数一覧を取得しています。");
+            SubMonitor child1Monitor = subMonitor.split(20);
             Api functionsApi = new FunctionsApi(this.shell, this.ps, this.org, this.account);
             List<Function> tmpFunctions = (List<Function>) functionsApi.get();
+            child1Monitor.setWorkRemaining(tmpFunctions.size());
             // Map<Function, List<Result>> functionMap = new HashMap<Function, List<Result>>();
             for (Function function : tmpFunctions) {
+                monitor.subTask(function.getFunctionName());
                 // functionMap.put(function, new ArrayList<Result>());
                 this.functions.add(function);
+                child1Monitor.worked(1);
+                Thread.sleep(15);
             }
+            child1Monitor.done();
             Thread.sleep(200);
+            monitor.subTask("結果一覧を取得しています。");
+            SubMonitor child2Monitor = subMonitor.split(80);
             Api resultsApi = new ResultsApi(this.shell, this.ps, this.org, this.account);
             List<Result> results = (List<Result>) resultsApi.get();
+            child2Monitor.setWorkRemaining(results.size());
             for (Result result : results) {
+                monitor.subTask(result.getTitle());
                 Function chkFunction = new Function(result.getResourceId());
                 // if (functionMap.containsKey(chkFunction)) {
                 // functionMap.get(chkFunction).add(result);
@@ -84,8 +98,12 @@ public class ServerlessResultGetWithProgress implements IRunnableWithProgress {
                     Function f = this.functions.get(index);
                     f.getResults().add(result);
                 }
+                Thread.sleep(15);
+                child2Monitor.worked(1);
             }
+            child2Monitor.done();
             Thread.sleep(100);
+            subMonitor.done();
         } catch (Exception e) {
             throw new InvocationTargetException(e);
         }

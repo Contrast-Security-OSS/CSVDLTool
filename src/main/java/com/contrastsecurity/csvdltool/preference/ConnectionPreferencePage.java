@@ -48,8 +48,8 @@ import org.eclipse.swt.widgets.Text;
 import org.jasypt.util.text.BasicTextEncryptor;
 
 import com.contrastsecurity.csvdltool.Main;
-import com.contrastsecurity.csvdltool.Messages;
 import com.contrastsecurity.csvdltool.Main.AuthType;
+import com.contrastsecurity.csvdltool.Messages;
 
 public class ConnectionPreferencePage extends PreferencePage {
 

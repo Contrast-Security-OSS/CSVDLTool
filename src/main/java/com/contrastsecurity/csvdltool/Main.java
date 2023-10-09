@@ -98,6 +98,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
@@ -985,7 +986,11 @@ public class Main implements PropertyChangeListener {
                             Messages.getString("main.export.application.unselected.error.message")); //$NON-NLS-1$
                     return;
                 }
-                VulGetWithProgress progress = new VulGetWithProgress(shell, ps, dstApps, fullAppMap, assessFilterMap, frLastDetectedDate, toLastDetectedDate,
+                String outDirPath = ps.getString(PreferenceConstants.FILE_OUT_DIR);
+                if (outDirPath.isEmpty()) {
+                    outDirPath = getOutDirPath();
+                }
+                VulGetWithProgress progress = new VulGetWithProgress(shell, ps, outDirPath, dstApps, fullAppMap, assessFilterMap, frLastDetectedDate, toLastDetectedDate,
                         vulOnlyParentAppChk.getSelection(), vulOnlyCurVulExpChk.getSelection(), includeDescChk.getSelection(), includeStackTraceChk.getSelection());
                 ProgressMonitorDialog progDialog = new VulGetProgressMonitorDialog(shell);
                 try {
@@ -1105,7 +1110,11 @@ public class Main implements PropertyChangeListener {
                             Messages.getString("main.export.application.unselected.error.message")); //$NON-NLS-1$
                     return;
                 }
-                LibGetWithProgress progress = new LibGetWithProgress(shell, ps, dstApps, fullAppMap, onlyHasCVEChk.getSelection(), includeCVEDetailChk.getSelection());
+                String outDirPath = ps.getString(PreferenceConstants.FILE_OUT_DIR);
+                if (outDirPath.isEmpty()) {
+                    outDirPath = getOutDirPath();
+                }
+                LibGetWithProgress progress = new LibGetWithProgress(shell, ps, outDirPath, dstApps, fullAppMap, onlyHasCVEChk.getSelection(), includeCVEDetailChk.getSelection());
                 ProgressMonitorDialog progDialog = new LibGetProgressMonitorDialog(shell);
                 try {
                     progDialog.run(true, true, progress);
@@ -1399,6 +1408,10 @@ public class Main implements PropertyChangeListener {
         miExp.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
+                String outDirPath = ps.getString(PreferenceConstants.FILE_OUT_DIR);
+                if (outDirPath.isEmpty()) {
+                    outDirPath = getOutDirPath();
+                }
                 int[] selectIndexes = attackTable.getSelectionIndices();
                 List<List<String>> csvList = new ArrayList<List<String>>();
                 String csvFileFormat = ps.getString(PreferenceConstants.CSV_FILE_FORMAT_ATTACKEVENT);
@@ -1406,16 +1419,15 @@ public class Main implements PropertyChangeListener {
                     csvFileFormat = ps.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT_ATTACKEVENT);
                 }
                 String timestamp = new SimpleDateFormat(csvFileFormat).format(new Date());
-                String currentPath = System.getProperty("user.dir"); //$NON-NLS-1$
                 String filePath = timestamp + ".csv"; //$NON-NLS-1$
-                if (OS.isFamilyMac()) {
-                    if (currentPath.contains(".app/Contents/Java")) { //$NON-NLS-1$
-                        filePath = "../../../" + timestamp + ".csv"; //$NON-NLS-1$ //$NON-NLS-2$
-                    }
-                }
                 String csv_encoding = Main.CSV_WIN_ENCODING;
                 if (OS.isFamilyMac()) {
                     csv_encoding = Main.CSV_MAC_ENCODING;
+                }
+                filePath = outDirPath + System.getProperty("file.separator") + filePath;
+                File dir = new File(new File(filePath).getParent());
+                if (!dir.exists()) {
+                    dir.mkdirs();
                 }
                 String columnJsonStr = ps.getString(PreferenceConstants.CSV_COLUMN_ATTACKEVENT);
                 List<AttackEventCSVColumn> columnList = null;
@@ -1535,6 +1547,10 @@ public class Main implements PropertyChangeListener {
         miReport.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
+                String outDirPath = ps.getString(PreferenceConstants.FILE_OUT_DIR);
+                if (outDirPath.isEmpty()) {
+                    outDirPath = getOutDirPath();
+                }
                 int[] selectIndexes = attackTable.getSelectionIndices();
                 Set<String> srcIpSet = new HashSet<String>();
                 Set<String> ruleSet = new HashSet<String>();
@@ -1559,16 +1575,15 @@ public class Main implements PropertyChangeListener {
                     srcIpMap.get(srcIp).put(rule, ++cnt);
                 }
                 String timestamp = new SimpleDateFormat("'protect_report'_yyyy-MM-dd_HHmmss").format(new Date()); //$NON-NLS-1$
-                String currentPath = System.getProperty("user.dir"); //$NON-NLS-1$
                 String filePath = timestamp + ".txt"; //$NON-NLS-1$
-                if (OS.isFamilyMac()) {
-                    if (currentPath.contains(".app/Contents/Java")) { //$NON-NLS-1$
-                        filePath = "../../../" + timestamp + ".txt"; //$NON-NLS-1$ //$NON-NLS-2$
-                    }
-                }
                 String txt_encoding = Main.CSV_WIN_ENCODING;
                 if (OS.isFamilyMac()) {
                     txt_encoding = Main.CSV_MAC_ENCODING;
+                }
+                filePath = outDirPath + System.getProperty("file.separator") + filePath;
+                File dir = new File(new File(filePath).getParent());
+                if (!dir.exists()) {
+                    dir.mkdirs();
                 }
                 File f = new File(filePath);
                 try (PrintWriter printWriter = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(f), txt_encoding)))) {
@@ -2742,6 +2757,22 @@ public class Main implements PropertyChangeListener {
             System.out.println("tsv main"); //$NON-NLS-1$
         }
 
+    }
+
+    private String getOutDirPath() {
+        DirectoryDialog dirDialog = new DirectoryDialog(shell);
+        dirDialog.setFilterPath(System.getProperty("user.dir"));
+        if (!ps.getString(PreferenceConstants.FILE_OUT_MODE).equals("save")) {
+            dirDialog.setMessage("この出力先を記憶する場合は、出力設定で記憶するを選択してください。");
+        }
+        String outDirPath = dirDialog.open();
+        if (outDirPath == null) {
+            return null;
+        }
+        if (ps.getString(PreferenceConstants.FILE_OUT_MODE).equals("save")) {
+            ps.setValue(PreferenceConstants.FILE_OUT_DIR, outDirPath);
+        }
+        return outDirPath;
     }
 
     /**

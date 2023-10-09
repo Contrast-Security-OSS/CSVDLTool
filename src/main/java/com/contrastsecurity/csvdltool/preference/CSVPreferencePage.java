@@ -45,6 +45,9 @@ import com.contrastsecurity.csvdltool.Messages;
 
 public class CSVPreferencePage extends PreferencePage {
 
+    private Button fileOutputModeSaveBtn;
+    private Button fileOutputModeConfirmBtn;
+    private Text fileOutputTxt;
     private Text vulCSVFileFmtTxt;
     private Text libCSVFileFmtTxt;
     private Text evtCSVFileFmtTxt;
@@ -65,6 +68,44 @@ public class CSVPreferencePage extends PreferencePage {
         compositeLt.horizontalSpacing = 10;
         compositeLt.verticalSpacing = 20;
         composite.setLayout(compositeLt);
+
+        Group fileOutputGrp = new Group(composite, SWT.NONE);
+        GridLayout fileOutputGrpLt = new GridLayout(3, false);
+        fileOutputGrpLt.marginWidth = 10;
+        fileOutputGrpLt.marginHeight = 10;
+        fileOutputGrpLt.horizontalSpacing = 5;
+        fileOutputGrpLt.verticalSpacing = 10;
+        fileOutputGrp.setLayout(fileOutputGrpLt);
+        GridData fileOutputGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        // fileOutputGrpGrDt.horizontalSpan = 2;
+        fileOutputGrp.setLayoutData(fileOutputGrpGrDt);
+        fileOutputGrp.setText("ファイル出力先設定");
+
+        fileOutputModeSaveBtn = new Button(fileOutputGrp, SWT.RADIO);
+        fileOutputModeSaveBtn.setText("記憶する");
+        fileOutputTxt = new Text(fileOutputGrp, SWT.BORDER);
+        fileOutputTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        fileOutputTxt.setText(ps.getString(PreferenceConstants.FILE_OUT_DIR));
+        fileOutputTxt.setEditable(false);
+        Button addBtn = new Button(fileOutputGrp, SWT.NULL);
+        addBtn.setText("クリア");
+        addBtn.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                fileOutputTxt.setText("");
+                ps.setValue(PreferenceConstants.FILE_OUT_DIR, "");
+            }
+        });
+        fileOutputModeConfirmBtn = new Button(fileOutputGrp, SWT.RADIO);
+        fileOutputModeConfirmBtn.setText("毎回確認");
+
+        if (ps.getString(PreferenceConstants.FILE_OUT_MODE).equals("save")) { //$NON-NLS-1$
+            fileOutputModeSaveBtn.setSelection(true);
+            fileOutputModeConfirmBtn.setSelection(false);
+        } else {
+            fileOutputModeSaveBtn.setSelection(false);
+            fileOutputModeConfirmBtn.setSelection(true);
+        }
 
         Group csvFileFmtGrp = new Group(composite, SWT.NONE);
         GridLayout csvFileFmtGrpLt = new GridLayout(1, false);
@@ -200,6 +241,11 @@ public class CSVPreferencePage extends PreferencePage {
             MessageDialog.openError(getShell(), Messages.getString("csvpreferencepage.dialog.title"), String.join("\r\n", errors)); //$NON-NLS-1$ //$NON-NLS-2$
             return false;
         } else {
+            if (fileOutputModeSaveBtn.getSelection()) {
+                ps.setValue(PreferenceConstants.FILE_OUT_MODE, "save"); //$NON-NLS-1$
+            } else {
+                ps.setValue(PreferenceConstants.FILE_OUT_MODE, ""); //$NON-NLS-1$
+            }
             ps.setValue(PreferenceConstants.CSV_FILE_FORMAT_VUL, this.vulCSVFileFmtTxt.getText());
             ps.setValue(PreferenceConstants.CSV_FILE_FORMAT_LIB, this.libCSVFileFmtTxt.getText());
             ps.setValue(PreferenceConstants.CSV_FILE_FORMAT_ATTACKEVENT, this.evtCSVFileFmtTxt.getText());

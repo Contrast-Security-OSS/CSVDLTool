@@ -123,6 +123,7 @@ public class VulGetWithProgress implements IRunnableWithProgress {
 
     private Shell shell;
     private PreferenceStore ps;
+    private String outDirPath;
     private List<String> dstApps;
     private Map<String, AppInfo> fullAppMap;
     private Map<FilterEnum, Set<Filter>> filterMap;
@@ -136,10 +137,11 @@ public class VulGetWithProgress implements IRunnableWithProgress {
 
     Logger logger = LogManager.getLogger("csvdltool"); //$NON-NLS-1$
 
-    public VulGetWithProgress(Shell shell, PreferenceStore ps, List<String> dstApps, Map<String, AppInfo> fullAppMap, Map<FilterEnum, Set<Filter>> filterMap, Date frDate,
-            Date toDate, boolean isOnlyParentApp, boolean isOnlyCurVulExp, boolean isIncludeDesc, boolean isIncludeStackTrace) {
+    public VulGetWithProgress(Shell shell, PreferenceStore ps, String outDirPath, List<String> dstApps, Map<String, AppInfo> fullAppMap, Map<FilterEnum, Set<Filter>> filterMap,
+            Date frDate, Date toDate, boolean isOnlyParentApp, boolean isOnlyCurVulExp, boolean isIncludeDesc, boolean isIncludeStackTrace) {
         this.shell = shell;
         this.ps = ps;
+        this.outDirPath = outDirPath;
         this.dstApps = dstApps;
         this.fullAppMap = fullAppMap;
         this.filterMap = filterMap;
@@ -536,12 +538,11 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                         } else {
                             csvLineList.add(String.format("=HYPERLINK(\"%s.txt\",\"%s\")", trace.getUuid(), trace.getUuid())); //$NON-NLS-1$
                         }
-                        String textFileName = String.format("%s\\%s.txt", timestamp, trace.getUuid()); //$NON-NLS-1$
-                        if (OS.isFamilyMac()) {
-                            textFileName = String.format("%s/%s.txt", timestamp, trace.getUuid()); //$NON-NLS-1$
-                            if (System.getProperty("user.dir").contains(".app/Contents/Java")) { //$NON-NLS-1$ //$NON-NLS-2$
-                                textFileName = String.format("../../../%s/%s.txt", timestamp, trace.getUuid()); //$NON-NLS-1$
-                            }
+                        String textFileName = String.format("%s%s%s.txt", timestamp, System.getProperty("file.separator"), trace.getUuid()); //$NON-NLS-1$
+                        textFileName = this.outDirPath + System.getProperty("file.separator") + textFileName;
+                        File dir = new File(new File(textFileName).getParent());
+                        if (!dir.exists()) {
+                            dir.mkdirs();
                         }
                         File file = new File(textFileName);
 
@@ -672,12 +673,11 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                         FileUtils.writeLines(file, Main.FILE_ENCODING, noteLines, true);
                     }
                     if (isIncludeStackTrace) {
-                        String textFileName = String.format("%s\\%s.txt", timestamp, trace.getUuid()); //$NON-NLS-1$
-                        if (OS.isFamilyMac()) {
-                            textFileName = String.format("%s/%s.txt", timestamp, trace.getUuid()); //$NON-NLS-1$
-                            if (System.getProperty("user.dir").contains(".app/Contents/Java")) { //$NON-NLS-1$ //$NON-NLS-2$
-                                textFileName = String.format("../../../%s/%s.txt", timestamp, trace.getUuid()); //$NON-NLS-1$
-                            }
+                        String textFileName = String.format("%s%s%s.txt", timestamp, System.getProperty("file.separator"), trace.getUuid()); //$NON-NLS-1$
+                        textFileName = this.outDirPath + System.getProperty("file.separator") + textFileName;
+                        File dir = new File(new File(textFileName).getParent());
+                        if (!dir.exists()) {
+                            dir.mkdirs();
                         }
                         File file = new File(textFileName);
                         // ==================== 19-7. スタックトレース ====================
@@ -727,23 +727,17 @@ public class VulGetWithProgress implements IRunnableWithProgress {
         SubMonitor sub2Monitor = subMonitor.split(10).setWorkRemaining(csvList.size());
         Thread.sleep(500);
         String filePath = timestamp + ".csv"; //$NON-NLS-1$
-        if (OS.isFamilyMac()) {
-            if (System.getProperty("user.dir").contains(".app/Contents/Java")) { //$NON-NLS-1$ //$NON-NLS-2$
-                filePath = "../../../" + timestamp + ".csv"; //$NON-NLS-1$ //$NON-NLS-2$
-            }
-        }
         if (isIncludeDesc) {
-            filePath = timestamp + "\\" + timestamp + ".csv"; //$NON-NLS-1$ //$NON-NLS-2$
-            if (OS.isFamilyMac()) {
-                filePath = timestamp + "/" + timestamp + ".csv"; //$NON-NLS-1$ //$NON-NLS-2$
-                if (System.getProperty("user.dir").contains(".app/Contents/Java")) { //$NON-NLS-1$ //$NON-NLS-2$
-                    filePath = "../../../" + timestamp + "/" + timestamp + ".csv"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                }
-            }
+            filePath = timestamp + System.getProperty("file.separator") + timestamp + ".csv"; //$NON-NLS-1$ //$NON-NLS-2$
         }
         String csv_encoding = Main.CSV_WIN_ENCODING;
         if (OS.isFamilyMac()) {
             csv_encoding = Main.CSV_MAC_ENCODING;
+        }
+        filePath = this.outDirPath + System.getProperty("file.separator") + filePath;
+        File dir = new File(new File(filePath).getParent());
+        if (!dir.exists()) {
+            dir.mkdirs();
         }
         try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(filePath)), csv_encoding))) {
             CSVPrinter printer = CSVFormat.EXCEL.print(bw);

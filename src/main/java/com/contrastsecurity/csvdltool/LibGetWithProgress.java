@@ -72,6 +72,7 @@ public class LibGetWithProgress implements IRunnableWithProgress {
 
     private Shell shell;
     private PreferenceStore ps;
+    private String outDirPath;
     private List<String> dstApps;
     private Map<String, AppInfo> fullAppMap;
     private boolean isOnlyHasCVE;
@@ -80,9 +81,11 @@ public class LibGetWithProgress implements IRunnableWithProgress {
 
     Logger logger = LogManager.getLogger("csvdltool"); //$NON-NLS-1$
 
-    public LibGetWithProgress(Shell shell, PreferenceStore ps, List<String> dstApps, Map<String, AppInfo> fullAppMap, boolean isOnlyHasCVE, boolean isIncludeCVEDetail) {
+    public LibGetWithProgress(Shell shell, PreferenceStore ps, String outDirPath, List<String> dstApps, Map<String, AppInfo> fullAppMap, boolean isOnlyHasCVE,
+            boolean isIncludeCVEDetail) {
         this.shell = shell;
         this.ps = ps;
+        this.outDirPath = outDirPath;
         this.dstApps = dstApps;
         this.fullAppMap = fullAppMap;
         this.isOnlyHasCVE = isOnlyHasCVE;
@@ -355,12 +358,11 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                         } else {
                             csvLineList.add(String.format("=HYPERLINK(\"%s.txt\",\"%s\")", library.getHash(), library.getHash())); //$NON-NLS-1$
                         }
-                        String textFileName = String.format("%s\\%s.txt", timestamp, library.getHash()); //$NON-NLS-1$
-                        if (OS.isFamilyMac()) {
-                            textFileName = String.format("%s/%s.txt", timestamp, library.getHash()); //$NON-NLS-1$
-                            if (System.getProperty("user.dir").contains(".app/Contents/Java")) { //$NON-NLS-1$ //$NON-NLS-2$
-                                textFileName = String.format("../../../%s/%s.txt", timestamp, library.getHash()); //$NON-NLS-1$
-                            }
+                        String textFileName = String.format("%s%s%s.txt", timestamp, System.getProperty("file.separator"), library.getHash()); //$NON-NLS-1$
+                        textFileName = this.outDirPath + System.getProperty("file.separator") + textFileName;
+                        File dir = new File(new File(textFileName).getParent());
+                        if (!dir.exists()) {
+                            dir.mkdirs();
                         }
                         File file = new File(textFileName);
                         for (Vuln vuln : library.getVulns()) {
@@ -420,23 +422,17 @@ public class LibGetWithProgress implements IRunnableWithProgress {
         SubMonitor sub2Monitor = SubMonitor.convert(monitor, 20);
         sub2Monitor.beginTask("", csvList.size()); //$NON-NLS-1$
         String filePath = timestamp + ".csv"; //$NON-NLS-1$
-        if (OS.isFamilyMac()) {
-            if (System.getProperty("user.dir").contains(".app/Contents/Java")) { //$NON-NLS-1$ //$NON-NLS-2$
-                filePath = "../../../" + timestamp + ".csv"; //$NON-NLS-1$ //$NON-NLS-2$
-            }
-        }
         if (isIncludeCVEDetail) {
-            filePath = timestamp + "\\" + timestamp + ".csv"; //$NON-NLS-1$ //$NON-NLS-2$
-            if (OS.isFamilyMac()) {
-                filePath = timestamp + "/" + timestamp + ".csv"; //$NON-NLS-1$ //$NON-NLS-2$
-                if (System.getProperty("user.dir").contains(".app/Contents/Java")) { //$NON-NLS-1$ //$NON-NLS-2$
-                    filePath = "../../../" + timestamp + "/" + timestamp + ".csv"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                }
-            }
+            filePath = timestamp + System.getProperty("file.separator") + timestamp + ".csv"; //$NON-NLS-1$ //$NON-NLS-2$
         }
         String csv_encoding = Main.CSV_WIN_ENCODING;
         if (OS.isFamilyMac()) {
             csv_encoding = Main.CSV_MAC_ENCODING;
+        }
+        filePath = this.outDirPath + System.getProperty("file.separator") + filePath;
+        File dir = new File(new File(filePath).getParent());
+        if (!dir.exists()) {
+            dir.mkdirs();
         }
         try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(filePath)), csv_encoding))) {
             CSVPrinter printer = CSVFormat.EXCEL.print(bw);

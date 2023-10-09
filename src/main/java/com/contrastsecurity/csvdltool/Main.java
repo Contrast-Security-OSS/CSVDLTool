@@ -1745,7 +1745,7 @@ public class Main implements PropertyChangeListener {
 
         // #################### SERVERLESS #################### //
         CTabItem serverlessTabItem = new CTabItem(mainTabFolder, SWT.NONE);
-        serverlessTabItem.setText("SERVERLESS");
+        serverlessTabItem.setText("SERVERLESS(β版)");
         serverlessTabItem.setImage(new Image(shell.getDisplay(), getClass().getClassLoader().getResourceAsStream("contrast-serverless-02.png"))); //$NON-NLS-1$
 
         Composite serverlessShell = new Composite(mainTabFolder, SWT.NONE);

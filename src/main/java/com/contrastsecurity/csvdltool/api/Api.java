@@ -58,8 +58,8 @@ import org.jasypt.util.text.BasicTextEncryptor;
 import com.contrastsecurity.csvdltool.BasicAuthStatusEnum;
 import com.contrastsecurity.csvdltool.CSVDLToolShell;
 import com.contrastsecurity.csvdltool.Main;
-import com.contrastsecurity.csvdltool.Messages;
 import com.contrastsecurity.csvdltool.Main.AuthType;
+import com.contrastsecurity.csvdltool.Messages;
 import com.contrastsecurity.csvdltool.PasswordDialog;
 import com.contrastsecurity.csvdltool.TsvDialog;
 import com.contrastsecurity.csvdltool.TsvStatusEnum;
@@ -116,6 +116,9 @@ public abstract class Api {
     private boolean jsonResponseFlg;
     private int authRetryMax;
 
+    private int connectTimeoutOverride;
+    private int socketTimeoutOverride;
+
     public Api(Shell shell, IPreferenceStore ps, Organization org) {
         this.shell = shell;
         this.ps = ps;
@@ -129,6 +132,8 @@ public abstract class Api {
         this.ignoreStatusCodes = new ArrayList<Integer>();
         this.jsonResponseFlg = true;
         this.authRetryMax = this.ps.getInt(PreferenceConstants.AUTH_RETRY_MAX);
+        this.connectTimeoutOverride = -1;
+        this.socketTimeoutOverride = -1;
     }
 
     public Api(Shell shell, IPreferenceStore ps, Organization org, boolean jsonResponseFlg) {
@@ -271,7 +276,8 @@ public abstract class Api {
         } catch (ApiException e) {
             throw new TsvException(String.format("%s\r\n%s", Messages.getString("api.teamserver.return.error"), e.getMessage())); //$NON-NLS-1$ //$NON-NLS-2$
         } catch (NonApiException e) {
-            throw new TsvException(String.format("%s %s\r\n%s", Messages.getString("api.unexpected.status.code.error"), e.getMessage(), Messages.getString("api.make.sure.logfile"))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            throw new TsvException(
+                    String.format("%s %s\r\n%s", Messages.getString("api.unexpected.status.code.error"), e.getMessage(), Messages.getString("api.make.sure.logfile"))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         } catch (Exception e) {
             throw new TsvException(String.format("%s\r\n%s", Messages.getString("api.message.dialog.unknown.error"), e.getMessage())); //$NON-NLS-1$ //$NON-NLS-2$
         }
@@ -507,8 +513,14 @@ public abstract class Api {
         Response response = null;
         try {
             int connectTimeout = Integer.parseInt(this.ps.getString(PreferenceConstants.CONNECTION_TIMEOUT));
-            int sockettTimeout = Integer.parseInt(this.ps.getString(PreferenceConstants.SOCKET_TIMEOUT));
-            clientBuilder.readTimeout(sockettTimeout, TimeUnit.MILLISECONDS).connectTimeout(connectTimeout, TimeUnit.MILLISECONDS);
+            if (this.connectTimeoutOverride > 0) {
+                connectTimeout = this.connectTimeoutOverride;
+            }
+            int socketTimeout = Integer.parseInt(this.ps.getString(PreferenceConstants.SOCKET_TIMEOUT));
+            if (this.socketTimeoutOverride > 0) {
+                socketTimeout = this.socketTimeoutOverride;
+            }
+            clientBuilder.readTimeout(socketTimeout, TimeUnit.MILLISECONDS).connectTimeout(connectTimeout, TimeUnit.MILLISECONDS);
 
             if (this.ps.getBoolean(PreferenceConstants.IGNORE_SSLCERT_CHECK)) {
                 SSLContext sslContext = SSLContext.getInstance("SSL"); //$NON-NLS-1$
@@ -647,6 +659,14 @@ public abstract class Api {
                 throw e;
             }
         }
+    }
+
+    public void setConnectTimeoutOverride(int connectTimeoutOverride) {
+        this.connectTimeoutOverride = connectTimeoutOverride;
+    }
+
+    public void setSocketTimeoutOverride(int socketTimeoutOverride) {
+        this.socketTimeoutOverride = socketTimeoutOverride;
     }
 
     private static TrustManager[] getTrustManager() {

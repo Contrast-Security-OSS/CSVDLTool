@@ -64,10 +64,13 @@ public class PutTagsToAttackEventsApi extends Api {
         if (!this.tag.isEmpty()) {
             addTag = String.format("\"%s\"", this.tag); //$NON-NLS-1$
         }
+        String rmvTags = "";
+        if (!this.removeTags.isEmpty()) {
+            rmvTags = this.removeTags.stream().map(tag -> tag).collect(Collectors.joining("\",\"", "\"", "\""));
+        }
         MediaType mediaTypeJson = MediaType.parse("application/json; charset=UTF-8"); //$NON-NLS-1$
         String json = String.format("{\"attack_events_uuid\":[%s],\"tags\":[%s],\"tags_remove\":[%s]}", //$NON-NLS-1$
-                this.attackEvents.stream().map(ae -> ae.getEvent_uuid()).collect(Collectors.joining("\",\"", "\"", "\"")), addTag, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                this.removeTags.stream().map(tag -> tag).collect(Collectors.joining("\",\"", "\"", "\""))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                this.attackEvents.stream().map(ae -> ae.getEvent_uuid()).collect(Collectors.joining("\",\"", "\"", "\"")), addTag, rmvTags);//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         return RequestBody.create(json, mediaTypeJson);
     }
 

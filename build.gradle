@@ -10,11 +10,6 @@ targetCompatibility = JavaVersion.VERSION_17
 def defaultEncoding = 'UTF-8'
     tasks.withType(AbstractCompile) each { it.options.encoding = defaultEncoding }
 
-//compileJava {
-//    options.encoding = defaultEncoding
-//    options.compilerArgs << '-Xlint:unchecked'
-//}
-
 tasks.withType(JavaCompile) {
     options.encoding = defaultEncoding
     options.compilerArgs << '-Xlint:deprecation'

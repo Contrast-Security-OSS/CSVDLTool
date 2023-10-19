@@ -205,13 +205,8 @@ public class VulGetWithProgress implements IRunnableWithProgress {
         List<List<String>> csvList = new ArrayList<List<String>>();
         try {
             // 長文情報（何が起こったか？など）を出力する場合はフォルダに出力
-            if (this.isIncludeDesc) {
-                String dirPath = timestamp;
-                if (OS.isFamilyMac()) {
-                    if (System.getProperty("user.dir").contains(".app/Contents/Java")) { //$NON-NLS-1$ //$NON-NLS-2$
-                        dirPath = "../../../" + timestamp; //$NON-NLS-1$
-                    }
-                }
+            if (this.isIncludeDesc || this.isIncludeStackTrace) {
+                String dirPath = this.outDirPath + System.getProperty("file.separator") + timestamp;
                 Path dir = Paths.get(dirPath);
                 Files.createDirectory(dir);
             }
@@ -540,10 +535,6 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                         }
                         String textFileName = String.format("%s%s%s.txt", timestamp, System.getProperty("file.separator"), trace.getUuid()); //$NON-NLS-1$
                         textFileName = this.outDirPath + System.getProperty("file.separator") + textFileName;
-                        File dir = new File(new File(textFileName).getParent());
-                        if (!dir.exists()) {
-                            dir.mkdirs();
-                        }
                         File file = new File(textFileName);
 
                         // ==================== 19-1. ルート ====================
@@ -675,10 +666,6 @@ public class VulGetWithProgress implements IRunnableWithProgress {
                     if (isIncludeStackTrace) {
                         String textFileName = String.format("%s%s%s.txt", timestamp, System.getProperty("file.separator"), trace.getUuid()); //$NON-NLS-1$
                         textFileName = this.outDirPath + System.getProperty("file.separator") + textFileName;
-                        File dir = new File(new File(textFileName).getParent());
-                        if (!dir.exists()) {
-                            dir.mkdirs();
-                        }
                         File file = new File(textFileName);
                         // ==================== 19-7. スタックトレース ====================
                         List<String> detailLines = new ArrayList<String>();
@@ -735,10 +722,6 @@ public class VulGetWithProgress implements IRunnableWithProgress {
             csv_encoding = Main.CSV_MAC_ENCODING;
         }
         filePath = this.outDirPath + System.getProperty("file.separator") + filePath;
-        File dir = new File(new File(filePath).getParent());
-        if (!dir.exists()) {
-            dir.mkdirs();
-        }
         try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(filePath)), csv_encoding))) {
             CSVPrinter printer = CSVFormat.EXCEL.print(bw);
             if (this.ps.getBoolean(PreferenceConstants.CSV_OUT_HEADER_VUL)) {

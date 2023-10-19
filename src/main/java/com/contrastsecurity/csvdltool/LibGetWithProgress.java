@@ -145,12 +145,7 @@ public class LibGetWithProgress implements IRunnableWithProgress {
         try {
             // 長文情報（何が起こったか？など）を出力する場合はフォルダに出力
             if (this.isIncludeCVEDetail) {
-                String dirPath = timestamp;
-                if (OS.isFamilyMac()) {
-                    if (System.getProperty("user.dir").contains(".app/Contents/Java")) { //$NON-NLS-1$ //$NON-NLS-2$
-                        dirPath = "../../../" + timestamp; //$NON-NLS-1$
-                    }
-                }
+                String dirPath = this.outDirPath + System.getProperty("file.separator") + timestamp;
                 Path dir = Paths.get(dirPath);
                 Files.createDirectory(dir);
             }
@@ -359,10 +354,6 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                         }
                         String textFileName = String.format("%s%s%s.txt", timestamp, System.getProperty("file.separator"), library.getHash()); //$NON-NLS-1$
                         textFileName = this.outDirPath + System.getProperty("file.separator") + textFileName;
-                        File dir = new File(new File(textFileName).getParent());
-                        if (!dir.exists()) {
-                            dir.mkdirs();
-                        }
                         File file = new File(textFileName);
                         for (Vuln vuln : library.getVulns()) {
                             // ==================== 14-1. タイトル ====================

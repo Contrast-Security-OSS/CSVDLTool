@@ -990,6 +990,9 @@ public class Main implements PropertyChangeListener {
                 if (outDirPath.isEmpty()) {
                     outDirPath = getOutDirPath();
                 }
+                if (outDirPath == null || outDirPath.isEmpty()) {
+                    return;
+                }
                 VulGetWithProgress progress = new VulGetWithProgress(shell, ps, outDirPath, dstApps, fullAppMap, assessFilterMap, frLastDetectedDate, toLastDetectedDate,
                         vulOnlyParentAppChk.getSelection(), vulOnlyCurVulExpChk.getSelection(), includeDescChk.getSelection(), includeStackTraceChk.getSelection());
                 ProgressMonitorDialog progDialog = new VulGetProgressMonitorDialog(shell);
@@ -1113,6 +1116,9 @@ public class Main implements PropertyChangeListener {
                 String outDirPath = ps.getString(PreferenceConstants.FILE_OUT_DIR);
                 if (outDirPath.isEmpty()) {
                     outDirPath = getOutDirPath();
+                }
+                if (outDirPath == null || outDirPath.isEmpty()) {
+                    return;
                 }
                 LibGetWithProgress progress = new LibGetWithProgress(shell, ps, outDirPath, dstApps, fullAppMap, onlyHasCVEChk.getSelection(), includeCVEDetailChk.getSelection());
                 ProgressMonitorDialog progDialog = new LibGetProgressMonitorDialog(shell);

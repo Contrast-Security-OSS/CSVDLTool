@@ -42,6 +42,8 @@ import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -287,14 +289,17 @@ public class Main implements PropertyChangeListener {
     private void initialize() {
         try {
             String homeDir = System.getProperty("user.home"); //$NON-NLS-1$
-            this.ps = new PreferenceStore(homeDir + "\\csvdltool.properties"); //$NON-NLS-1$
-            if (OS.isFamilyMac()) {
-                this.ps = new PreferenceStore(homeDir + "/csvdltool.properties"); //$NON-NLS-1$
-            }
+            this.ps = new PreferenceStore(homeDir + System.getProperty("file.separator") + "csvdltool.properties"); //$NON-NLS-1$ //$NON-NLS-2$
             try {
                 this.ps.load();
             } catch (FileNotFoundException fnfe) {
                 this.ps.save();
+            }
+            String outDirPath = this.ps.getString(PreferenceConstants.FILE_OUT_DIR);
+            if (outDirPath != null && !outDirPath.isEmpty()) {
+                if (!Files.isWritable(Paths.get(outDirPath))) {
+                    this.ps.setValue(PreferenceConstants.FILE_OUT_DIR, "");
+                }
             }
         } catch (FileNotFoundException fnfe) {
         } catch (Exception e) {
@@ -2780,6 +2785,10 @@ public class Main implements PropertyChangeListener {
         }
         if (ps.getString(PreferenceConstants.FILE_OUT_MODE).equals("save")) {
             ps.setValue(PreferenceConstants.FILE_OUT_DIR, outDirPath);
+        }
+        if (!Files.isWritable(Paths.get(outDirPath))) {
+            MessageDialog.openError(shell, "出力先ディレクトリの指定", String.format("このディレクトリには書き込み権限がありません。\r\n%s", outDirPath));
+            return null;
         }
         return outDirPath;
     }

@@ -2783,12 +2783,12 @@ public class Main implements PropertyChangeListener {
         if (outDirPath == null) {
             return null;
         }
+        if (!Files.isWritable(Paths.get(outDirPath))) {
+            MessageDialog.openError(shell, "出力先ディレクトリの指定", String.format("このディレクトリには書き込み権限がありません。他のディレクトリを指定してください。\r\n%s", outDirPath));
+            return null;
+        }
         if (ps.getString(PreferenceConstants.FILE_OUT_MODE).equals("save")) {
             ps.setValue(PreferenceConstants.FILE_OUT_DIR, outDirPath);
-        }
-        if (!Files.isWritable(Paths.get(outDirPath))) {
-            MessageDialog.openError(shell, "出力先ディレクトリの指定", String.format("このディレクトリには書き込み権限がありません。\r\n%s", outDirPath));
-            return null;
         }
         return outDirPath;
     }

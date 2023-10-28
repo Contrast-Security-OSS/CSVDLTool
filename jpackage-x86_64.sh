@@ -3,6 +3,7 @@
 JAVA_HOME="/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home"
 APP_NAME="CSVDLTool"
 APP_VERSION="2.1.0"
+SM_KEY_PAIR="key_455812447"
 
 jpackage \
   --name ${APP_NAME}-${APP_VERSION}-x86_64 \
@@ -20,5 +21,10 @@ jpackage \
   --icon src/main/resources/csvdltool.icns \
   --vendor "Contrast Security Japan G.K." \
   --copyright "Copyright (c) 2020 Contrast Security Japan G.K."
+
+smctl-mac-x64 sign \
+  --keypair-alias ${SM_KEY_PAIR} \
+  --config-file /Users/turbou/digicert/pkcs11properties.cfg \
+  --input /Users/turbou/Documents/git/CSVDLTool/build/${APP_NAME}-${APP_VERSION}-aarch64.app/
 
 exit 0

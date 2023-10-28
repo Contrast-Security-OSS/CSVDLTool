@@ -25,6 +25,8 @@ jpackage \
 smctl-mac-x64 sign \
   --keypair-alias ${SM_KEY_PAIR} \
   --config-file /Users/turbou/digicert/pkcs11properties.cfg \
-  --input /Users/turbou/Documents/git/CSVDLTool/build/${APP_NAME}-${APP_VERSION}-aarch64.app/
+  --input build/${APP_NAME}-${APP_VERSION}-aarch64.app/
+
+7z a build/${APP_NAME}-${APP_VERSION}-aarch64.cli7z build/${APP_NAME}-${APP_VERSION}-aarch64.app/
 
 exit 0

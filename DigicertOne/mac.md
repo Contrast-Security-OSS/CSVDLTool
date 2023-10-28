@@ -37,6 +37,11 @@
   ```bash
   source ~/.bash_profile
   ```
+#### キーチェーンアクセスに証明書を登録
+- 証明書の保存
+  ```bash
+  smctl-mac-x64 credentials save <API Key> <Client certificate password>
+  ```
 #### 設定ファイルの作成
 - PKCS11コンフィグファイルの作成
   ```bash

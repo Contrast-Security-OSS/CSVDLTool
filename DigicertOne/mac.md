@@ -37,6 +37,17 @@
   ```bash
   source ~/.bash_profile
   ```
+#### 設定ファイルの作成
+- PKCS11コンフィグファイルの作成
+  ```bash
+  vim ~/digicert/pkcs11properties.cfg
+  ```
+  ```properties
+  name=signingmanager 
+  library=/Users/turbou/digicert/smpkcs11.dylib
+  slotListIndex=0
+  ```
+#### 確認
 - 動作確認
   ```bash
   smctl-mac-x64 healthcheck
@@ -46,4 +57,15 @@
   --------- User credentials ------
   Status: Connected
   ```
-
+### 署名
+- 署名コマンド
+  ```bash
+  smctl-mac-x64 sign \
+      --keypair-alias key_455812447 \
+      --verbose=true \
+      --config-file /Users/turbou/digicert/pkcs11properties.cfg \
+      --input /Users/turbou/Documents/git/CSVDLTool/build/CSVDLTool_aarch64.app/
+  ```
+  - キーペアはKeyLockerの証明書管理に置かれている証明書のキーペアを使います.
+  - インプットは署名するappファイルですが、最後のスラッシュがないとエラーになります。
+  

@@ -26,7 +26,7 @@
   *C:\DigiCert\pkcs11properties.cfg*
   ```properties
   name=signingmanager 
-  library="C:\DigiCert\smpkcs11.dll"
+  library="C:/DigiCert/smpkcs11.dll"
   slotListIndex=0
   ```
 #### もろもろセットアップ
@@ -40,25 +40,18 @@
     - Pkcs11 Confiuration File: 上で作成した*pkcs11properties.cfg*ファイル
     - Save APIなんちゃらのチェックボックスにチェックする
   - 成功するとキーペアの詳細が確認できます。さらにそのままNextを繰り返してFinishまで行って完了です。
-#### 確認
-- 動作確認
-  ```bash
-  smctl-mac-x64 healthcheck
-  ```
-  冒頭にこのように出ていればOK
-  ```
-  --------- User credentials ------
-  Status: Connected
-  ```
+#### Launch4jのsign4jを使うための準備
+- jsign-5.0.jarのダウンロード  
+  https://docs.digicert.com/ja/software-trust-manager/sign-with-digicert-signing-tools/third-party-signing-tool-integrations/jsign.html  
+  に沿って、jsign-5.0.jarをダウンロードする。  
+  https://github.com/ebourg/jsign/releases/download/5.0/jsign-5.0.jar  
+  ダウンロード先は任意ですが、`C:\DigiCert`の下にDLした前提で進めます。  
 ### 署名
-- 署名コマンド
-  ```bash
-  smctl-mac-x64 sign \
-      --keypair-alias key_455812447 \
-      --verbose=true \
-      --config-file /Users/turbou/digicert/pkcs11properties.cfg \
-      --input /Users/turbou/Documents/git/CSVDLTool/build/CSVDLTool_aarch64.app/
+- 署名コマンド  
+  コマンドプロンプトは管理者として実行で起動してください。
+  ```powershell
+  cd C:\Program Files (x86)\launch4j\sign4j
+  sign4j.exe java -jar C:\DigiCert\jsign-5.0.jar --keystore "C:\DigiCert\pkcs11properties.cfg" --storetype PKCS11 C:\Users\turbou\Desktop\CSVDLTool_work\common\CSVDLTool_2.1.0.exe
   ```
-  - キーペアはKeyLockerの証明書管理に置かれている証明書のキーペアを使います.
-  - インプットは署名するappファイルですが、最後のスラッシュがないとエラーになります。
+  - 電子署名についてはファイルを右クリックのプロパティで確認ができます。
   

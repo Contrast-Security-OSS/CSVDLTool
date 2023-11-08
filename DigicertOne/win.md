@@ -5,12 +5,6 @@
 - APIキー、認証証明書を作成  
   すでに作成済みなら使いまわしても良いです。  
   それぞれAPIキー、証明書パスワードのメモと認証証明書のダウンロード
-- 環境変数のセット
-  ```
-  export SM_HOST=https://clientauth.one.digicert.com
-  export SM_API_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-  export SM_CLIENT_CERT_FILE=/Users/turbou/Downloads/Certificate_pkcs12.p12
-  ```
 #### KeyLockerクライアントツール
 - KeyLocker - リソースからクライアントツールをDL  
   https://one.digicert.com/signingmanager/client-tools  

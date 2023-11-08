@@ -1,8 +1,9 @@
-## DigiCert KeyLocker手順
+## DigiCert KeyLocker手順（Windows）
 ### 環境構築
 #### 環境変数の設定
 - DigiCert Oneにログイン
 - APIキー、認証証明書を作成  
+  すでに作成済みなら使いまわしても良いです。  
   それぞれAPIキー、証明書パスワードのメモと認証証明書のダウンロード
 - 環境変数のセット
   ```
@@ -13,30 +14,13 @@
 #### KeyLockerクライアントツール
 - KeyLocker - リソースからクライアントツールをDL  
   https://one.digicert.com/signingmanager/client-tools  
-  Keylockertools-mac-x64.tar.gz
-- 解凍してセットアップ  
-  ```bash
-  # 解凍
-  tar zxvf Keylockertools-mac-x64.tar.gz
-  # 2つのdmgファイルが展開されるのでマウント
-  hdiutil mount smctl-mac-x64.dmg
-  hdiutil mount smpkcs11.dylib.dmg
-  # クライアントツールの格納先（ユーザーフォーム直下としてますが、パスを通せばどこでも良い）
-  mkdir ~/digicert
-  # クライアントツールの格納
-  cp /Volumes/smctl-mac/smctl-mac-x64 ~/digicert/
-  cp /Volumes/smpkcs11/smpkcs11.dylib ~/digicert/
-  ```
-  パスを通す
-  ```bash
-  vim ~/.bash_profile
-  ```
-  ```
-  export PATH=/Users/turbou/digicert:$PATH
-  ```
-  ```bash
-  source ~/.bash_profile
-  ```
+  Keylockertools-windows-x64.msi
+- DigiCert Keylocker Toolsのインストール  
+  デフォルトの```C:\Program Files\DigiCert\DigiCert Keylocker Tools```でも良いですが、パスが短いほうが良いので  
+  ```C:\DigiCert```下にインストールします。
+- Click-to-signのインストール  
+  インストールしたフォルダに```DigiCert_Click_to_sign.msi```があるので、これでインストールを行います。  
+  これについては場所はデフォルトの```C:\Program Files\DigiCert\Click-to-sign\```でも良いです。
 #### キーチェーンアクセスに証明書を登録
 - 証明書の保存
   ```bash

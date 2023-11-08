@@ -29,6 +29,7 @@
   library="C:/DigiCert/smpkcs11.dll"
   slotListIndex=0
   ```
+  パスに円マークを使ったりすると署名のところでエラーになります。
 #### もろもろセットアップ
 - Click to sign.exeを実行する  
   *C:\Program Files\DigiCert\Click-to-sign\Click to sign.exe*  

@@ -16,26 +16,30 @@
   https://one.digicert.com/signingmanager/client-tools  
   Keylockertools-windows-x64.msi
 - DigiCert Keylocker Toolsのインストール  
-  デフォルトの```C:\Program Files\DigiCert\DigiCert Keylocker Tools```でも良いですが、パスが短いほうが良いので  
-  ```C:\DigiCert```下にインストールします。
+  デフォルトの*C:\Program Files\DigiCert\DigiCert Keylocker Tools*でも良いですが、パスが短いほうが良いので  
+  *C:\DigiCert*下にインストールします。
 - Click-to-signのインストール  
-  インストールしたフォルダに```DigiCert_Click_to_sign.msi```があるので、これでインストールを行います。  
-  これについては場所はデフォルトの```C:\Program Files\DigiCert\Click-to-sign\```でも良いです。
-#### キーチェーンアクセスに証明書を登録
-- 証明書の保存
-  ```bash
-  smctl-mac-x64 credentials save <API Key> <Client certificate password>
-  ```
+  インストールしたフォルダに*DigiCert_Click_to_sign.msi*があるので、これでインストールを行います。  
+  これについては場所はデフォルトの*C:\Program Files\DigiCert\Click-to-sign\*でも良いです。
 #### 設定ファイルの作成
-- PKCS11コンフィグファイルの作成
-  ```bash
-  vim ~/digicert/pkcs11properties.cfg
-  ```
+- PKCS11コンフィグファイルの作成  
+  *C:\DigiCert\pkcs11properties.cfg*
   ```properties
   name=signingmanager 
-  library=/Users/turbou/digicert/smpkcs11.dylib
+  library="C:\DigiCert\smpkcs11.dll"
   slotListIndex=0
   ```
+#### もろもろセットアップ
+- Click to sign.exeを実行する  
+  *C:\Program Files\DigiCert\Click-to-sign\Click to sign.exe*  
+  - 起動後、Nextで次画面で以下を入力してNext  
+    - HOST: https://clientauth.one.digicert.com
+    - API Key: DigiCert Oneから取得したAPIキー
+    - Client Authentication Certificate: DigiCert OneからDLした*Certificate_pkcs12.p12*ファイル
+    - Client Authentication Certificate: DigiCert OneからDLした*Certificate_pkcs12.p12*ファイルのパスワード
+    - Pkcs11 Confiuration File: 上で作成した*pkcs11properties.cfg*ファイル
+    - Save APIなんちゃらのチェックボックスにチェックする
+  - 成功するとキーペアの詳細が確認できます。さらにそのままNextを繰り返してFinishまで行って完了です。
 #### 確認
 - 動作確認
   ```bash

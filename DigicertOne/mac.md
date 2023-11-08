@@ -1,4 +1,4 @@
-## DigiCert KeyLocker手順
+## DigiCert KeyLocker手順（MacOS）
 ### 環境構築
 #### 環境変数の設定
 - DigiCert Oneにログイン

@@ -35,6 +35,8 @@
     - Pkcs11 Confiuration File: 上で作成した*pkcs11properties.cfg*ファイル
     - Save APIなんちゃらのチェックボックスにチェックする
   - 成功するとキーペアの詳細が確認できます。さらにそのままNextを繰り返してFinishまで行って完了です。
+
+  これらの作業を行うことで環境変数もすべてセットしてくれます。
 #### Launch4jのsign4jを使うための準備
 - jsign-5.0.jarのダウンロード  
   https://docs.digicert.com/ja/software-trust-manager/sign-with-digicert-signing-tools/third-party-signing-tool-integrations/jsign.html  

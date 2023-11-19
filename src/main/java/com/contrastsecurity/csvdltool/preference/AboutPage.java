@@ -26,6 +26,7 @@ package com.contrastsecurity.csvdltool.preference;
 import java.awt.Desktop;
 import java.net.URI;
 
+import org.apache.commons.exec.OS;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
@@ -136,7 +137,6 @@ public class AboutPage extends PreferencePage {
         new Link(licenseGrp, SWT.NONE).setText("- ide 3.3.0-I20070620"); //$NON-NLS-1$
         new Link(licenseGrp, SWT.NONE).setText("- workbench 3.3.0-I20070608-1100"); //$NON-NLS-1$
         new Link(licenseGrp, SWT.NONE).setText("- jface 3.3.0-I20070606-0010"); //$NON-NLS-1$
-        new Link(licenseGrp, SWT.NONE).setText("- org.eclipse.swt.win32.win32.x86 4.3"); //$NON-NLS-1$
 
         Link epl2LicenseLinkLbl = new Link(licenseGrp, SWT.NONE);
         epl2LicenseLinkLbl.setText("This software includes the work that is distributed in the <a>Eclipse Public License 2.0</a>"); //$NON-NLS-1$
@@ -151,7 +151,11 @@ public class AboutPage extends PreferencePage {
                 }
             }
         });
-        new Link(licenseGrp, SWT.NONE).setText("- org.eclipse.swt.cocoa.macosx.x86_64 3.109.0"); //$NON-NLS-1$
+        if (OS.isFamilyMac()) {
+            new Link(licenseGrp, SWT.NONE).setText("- org.eclipse.swt.cocoa.macosx.x86_64|aarch64 3.124.100"); //$NON-NLS-1$
+        } else {
+            new Link(licenseGrp, SWT.NONE).setText("- org.eclipse.swt.win32.win32.x86_64 3.124.100"); //$NON-NLS-1$
+        }
 
         noDefaultAndApplyButton();
         return parent;

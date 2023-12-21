@@ -991,8 +991,9 @@ public class Main implements PropertyChangeListener {
                             Messages.getString("main.export.application.unselected.error.message")); //$NON-NLS-1$
                     return;
                 }
+                boolean isSaveOutDirPath = ps.getString(PreferenceConstants.FILE_OUT_MODE).equals("save");
                 String outDirPath = ps.getString(PreferenceConstants.FILE_OUT_DIR);
-                if (outDirPath.isEmpty()) {
+                if (!isSaveOutDirPath || outDirPath.isEmpty()) {
                     outDirPath = getOutDirPath();
                 }
                 if (outDirPath == null || outDirPath.isEmpty()) {
@@ -1118,8 +1119,9 @@ public class Main implements PropertyChangeListener {
                             Messages.getString("main.export.application.unselected.error.message")); //$NON-NLS-1$
                     return;
                 }
+                boolean isSaveOutDirPath = ps.getString(PreferenceConstants.FILE_OUT_MODE).equals("save");
                 String outDirPath = ps.getString(PreferenceConstants.FILE_OUT_DIR);
-                if (outDirPath.isEmpty()) {
+                if (!isSaveOutDirPath || outDirPath.isEmpty()) {
                     outDirPath = getOutDirPath();
                 }
                 if (outDirPath == null || outDirPath.isEmpty()) {
@@ -1422,8 +1424,9 @@ public class Main implements PropertyChangeListener {
         miExp.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
+                boolean isSaveOutDirPath = ps.getString(PreferenceConstants.FILE_OUT_MODE).equals("save");
                 String outDirPath = ps.getString(PreferenceConstants.FILE_OUT_DIR);
-                if (outDirPath.isEmpty()) {
+                if (!isSaveOutDirPath || outDirPath.isEmpty()) {
                     outDirPath = getOutDirPath();
                 }
                 int[] selectIndexes = attackTable.getSelectionIndices();
@@ -1561,8 +1564,9 @@ public class Main implements PropertyChangeListener {
         miReport.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
+                boolean isSaveOutDirPath = ps.getString(PreferenceConstants.FILE_OUT_MODE).equals("save");
                 String outDirPath = ps.getString(PreferenceConstants.FILE_OUT_DIR);
-                if (outDirPath.isEmpty()) {
+                if (!isSaveOutDirPath || outDirPath.isEmpty()) {
                     outDirPath = getOutDirPath();
                 }
                 int[] selectIndexes = attackTable.getSelectionIndices();

@@ -87,6 +87,7 @@ public class CSVPreferencePage extends PreferencePage {
         fileOutputTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         fileOutputTxt.setText(ps.getString(PreferenceConstants.FILE_OUT_DIR));
         fileOutputTxt.setEditable(false);
+        fileOutputTxt.setMessage("エクスポート時に出力先をご指定いただけます。");
         Button addBtn = new Button(fileOutputGrp, SWT.NULL);
         addBtn.setText("クリア");
         addBtn.addSelectionListener(new SelectionAdapter() {

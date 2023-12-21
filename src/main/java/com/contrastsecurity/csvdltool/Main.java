@@ -2362,7 +2362,7 @@ public class Main implements PropertyChangeListener {
         List<String> categories = new ArrayList<String>(categorySet);
         if (categories.size() > 1) {
             item.setText(3, String.valueOf(categories.size()));
-        } else {
+        } else if (!categories.isEmpty()) {
             item.setText(3, categories.get(0));
         }
         item.setText(4, function.getFunctionName());

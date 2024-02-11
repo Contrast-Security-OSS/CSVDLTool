@@ -9,8 +9,10 @@
   export SM_HOST=https://clientauth.one.digicert.com
   # 自身アカウントのAPIトークン
   export SM_API_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-  # 自身アカウントの生成した証明書DLの際に表示されたパスワード
+  # 自身アカウントの生成してDLした証明書のパス
   export SM_CLIENT_CERT_FILE=/Users/turbou/Downloads/Certificate_pkcs12.p12
+  # 自身アカウントの生成した証明書DLの際に表示されたパスワード
+  SM_CLIENT_CERT_PWD=XXXXXXX
   ```
 #### KeyLockerクライアントツール
 - KeyLocker - リソースからクライアントツールをDL  
@@ -42,7 +44,7 @@
 #### キーチェーンアクセスに証明書を登録
 - 証明書の保存
   ```bash
-  smctl-mac-x64 credentials save <API Key> <Client certificate password>
+  smctl-mac-x64 credentials save $SM_API_KEY $SM_CLIENT_CERT_PWD
   ```
 #### 設定ファイルの作成
 - PKCS11コンフィグファイルの作成

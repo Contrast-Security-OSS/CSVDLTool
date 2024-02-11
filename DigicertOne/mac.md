@@ -12,7 +12,7 @@
   # 自身アカウントの生成してDLした証明書のパス
   export SM_CLIENT_CERT_FILE=/Users/turbou/Downloads/Certificate_pkcs12.p12
   # 自身アカウントの生成した証明書DLの際に表示されたパスワード
-  SM_CLIENT_CERT_PWD=XXXXXXX
+  export SM_CLIENT_CERT_PWD=XXXXXXX
   ```
 #### KeyLockerクライアントツール
 - KeyLocker - リソースからクライアントツールをDL  

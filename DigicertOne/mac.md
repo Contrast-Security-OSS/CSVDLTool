@@ -5,9 +5,11 @@
 - APIキー、認証証明書を作成  
   それぞれAPIキー、証明書パスワードのメモと認証証明書のダウンロード
 - 環境変数のセット
-  ```
+  ```bash
   export SM_HOST=https://clientauth.one.digicert.com
+  # 自身アカウントのAPIトークン
   export SM_API_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+  # 自身アカウントの生成した証明書DLの際に表示されたパスワード
   export SM_CLIENT_CERT_FILE=/Users/turbou/Downloads/Certificate_pkcs12.p12
   ```
 #### KeyLockerクライアントツール

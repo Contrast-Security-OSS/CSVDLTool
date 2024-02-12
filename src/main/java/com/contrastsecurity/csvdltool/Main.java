@@ -2027,6 +2027,12 @@ public class Main implements PropertyChangeListener {
         miServerExp.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
+                boolean isSaveOutDirPath = ps.getString(PreferenceConstants.FILE_OUT_MODE).equals("save");
+                String outDirPath = ps.getString(PreferenceConstants.FILE_OUT_DIR);
+                if (!isSaveOutDirPath || outDirPath.isEmpty()) {
+                    outDirPath = getOutDirPath();
+                }
+
                 int[] selectIndexes = serverTable.getSelectionIndices();
                 List<List<String>> csvList = new ArrayList<List<String>>();
                 String csvFileFormat = ps.getString(PreferenceConstants.CSV_FILE_FORMAT_SERVER);
@@ -2034,16 +2040,15 @@ public class Main implements PropertyChangeListener {
                     csvFileFormat = ps.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT_SERVER);
                 }
                 String timestamp = new SimpleDateFormat(csvFileFormat).format(new Date());
-                String currentPath = System.getProperty("user.dir"); //$NON-NLS-1$
                 String filePath = timestamp + ".csv"; //$NON-NLS-1$
-                if (OS.isFamilyMac()) {
-                    if (currentPath.contains(".app/Contents/Java")) { //$NON-NLS-1$
-                        filePath = "../../../" + timestamp + ".csv"; //$NON-NLS-1$ //$NON-NLS-2$
-                    }
-                }
                 String csv_encoding = Main.CSV_WIN_ENCODING;
                 if (OS.isFamilyMac()) {
                     csv_encoding = Main.CSV_MAC_ENCODING;
+                }
+                filePath = outDirPath + System.getProperty("file.separator") + filePath;
+                File dir = new File(new File(filePath).getParent());
+                if (!dir.exists()) {
+                    dir.mkdirs();
                 }
                 String columnJsonStr = ps.getString(PreferenceConstants.CSV_COLUMN_SERVER);
                 List<ServerCSVColumn> columnList = null;

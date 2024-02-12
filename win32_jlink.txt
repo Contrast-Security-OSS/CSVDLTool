@@ -1,5 +1,5 @@
 jdeps --ignore-missing-deps build\libs\CSVDLTool-2.1.1.jar
-jlink --compress=2 --module-path "C:\Program Files\Java\jdk-17\jmods" --add-modules java.base,java.desktop,java.logging,java.sql,java.xml,jdk.crypto.ec,java.management --output jre17-min
+jlink --compress=2 --module-path "C:\Program Files\Java\jdk-17\jmods" --add-modules java.base,java.desktop,java.logging,java.sql,java.xml,java.management,jdk.crypto.ec,jdk.unsupported --output jre17-min
 
 --add-opens java.base/java.time.format=ALL-UNNAMED
 --add-opens java.base/java.util.regex=ALL-UNNAMED

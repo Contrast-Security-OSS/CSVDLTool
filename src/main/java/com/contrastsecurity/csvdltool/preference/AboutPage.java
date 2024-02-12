@@ -76,7 +76,7 @@ public class AboutPage extends PreferencePage {
         Label versionValueLbl = new Label(appGrp, SWT.NONE);
         GridData versionValueLblGrDt = new GridData();
         versionValueLbl.setLayoutData(versionValueLblGrDt);
-        versionValueLbl.setText("2.1.0"); //$NON-NLS-1$
+        versionValueLbl.setText("2.1.1"); //$NON-NLS-1$
 
         Label copyrightLbl = new Label(appGrp, SWT.NONE);
         GridData copyrightLblGrDt = new GridData();
@@ -108,15 +108,15 @@ public class AboutPage extends PreferencePage {
         new Link(licenseGrp, SWT.NONE).setText("- commons-exec 1.3"); //$NON-NLS-1$
         new Link(licenseGrp, SWT.NONE).setText("- commons-io 2.8.0"); //$NON-NLS-1$
         new Link(licenseGrp, SWT.NONE).setText("- commons-lang3 3.4"); //$NON-NLS-1$
-        new Link(licenseGrp, SWT.NONE).setText("- commons-logging 1.2"); //$NON-NLS-1$
-        new Link(licenseGrp, SWT.NONE).setText("- gson 2.8.6"); //$NON-NLS-1$
+        new Link(licenseGrp, SWT.NONE).setText("- commons-logging 1.3.0"); //$NON-NLS-1$
+        new Link(licenseGrp, SWT.NONE).setText("- gson 2.10.1"); //$NON-NLS-1$
         new Link(licenseGrp, SWT.NONE).setText("- httpclient 4.5.13"); //$NON-NLS-1$
         new Link(licenseGrp, SWT.NONE).setText("- httpcore 4.4.13"); //$NON-NLS-1$
         new Link(licenseGrp, SWT.NONE).setText("- jasypt 1.9.3"); //$NON-NLS-1$
         new Link(licenseGrp, SWT.NONE).setText("- okhttp 4.10.0"); //$NON-NLS-1$
         new Link(licenseGrp, SWT.NONE).setText("- okhttp-urlconnection 4.10.0"); //$NON-NLS-1$
-        new Link(licenseGrp, SWT.NONE).setText("- log4j-core 2.17.2"); //$NON-NLS-1$
-        new Link(licenseGrp, SWT.NONE).setText("- log4j-api 2.17.2"); //$NON-NLS-1$
+        new Link(licenseGrp, SWT.NONE).setText("- log4j-core 2.22.1"); //$NON-NLS-1$
+        new Link(licenseGrp, SWT.NONE).setText("- log4j-api 2.22.1"); //$NON-NLS-1$
         new Link(licenseGrp, SWT.NONE).setText("- snakeyaml 1.16"); //$NON-NLS-1$
 
         Link eplLicenseLinkLbl = new Link(licenseGrp, SWT.NONE);
@@ -132,11 +132,12 @@ public class AboutPage extends PreferencePage {
                 }
             }
         });
-        new Link(licenseGrp, SWT.NONE).setText("- commands 3.3.0-I20070605-0010"); //$NON-NLS-1$
-        new Link(licenseGrp, SWT.NONE).setText("- common 3.3.0-v20070426"); //$NON-NLS-1$
-        new Link(licenseGrp, SWT.NONE).setText("- ide 3.3.0-I20070620"); //$NON-NLS-1$
-        new Link(licenseGrp, SWT.NONE).setText("- workbench 3.3.0-I20070608-1100"); //$NON-NLS-1$
-        new Link(licenseGrp, SWT.NONE).setText("- jface 3.3.0-I20070606-0010"); //$NON-NLS-1$
+        new Link(licenseGrp, SWT.NONE).setText("- org.eclipse.core.commands 3.11.100"); //$NON-NLS-1$
+        new Link(licenseGrp, SWT.NONE).setText("- org.eclipse.equinox.common 3.18.100"); //$NON-NLS-1$
+        new Link(licenseGrp, SWT.NONE).setText("- org.eclipse.ui.ide 3.21.100"); //$NON-NLS-1$
+        new Link(licenseGrp, SWT.NONE).setText("- org.eclipse.ui.workbench 3.130.0"); //$NON-NLS-1$
+        new Link(licenseGrp, SWT.NONE).setText("- org.eclipse.jface 3.31.0"); //$NON-NLS-1$
+        new Link(licenseGrp, SWT.NONE).setText("- org.eclipse.osgi 3.18.500"); //$NON-NLS-1$
 
         Link epl2LicenseLinkLbl = new Link(licenseGrp, SWT.NONE);
         epl2LicenseLinkLbl.setText("This software includes the work that is distributed in the <a>Eclipse Public License 2.0</a>"); //$NON-NLS-1$
@@ -152,9 +153,9 @@ public class AboutPage extends PreferencePage {
             }
         });
         if (OS.isFamilyMac()) {
-            new Link(licenseGrp, SWT.NONE).setText("- org.eclipse.swt.cocoa.macosx.x86_64|aarch64 3.124.100"); //$NON-NLS-1$
+            new Link(licenseGrp, SWT.NONE).setText("- org.eclipse.swt.cocoa.macosx.x86_64|aarch64 3.124.200"); //$NON-NLS-1$
         } else {
-            new Link(licenseGrp, SWT.NONE).setText("- org.eclipse.swt.win32.win32.x86_64 3.124.100"); //$NON-NLS-1$
+            new Link(licenseGrp, SWT.NONE).setText("- org.eclipse.swt.win32.win32.x86_64 3.124.200"); //$NON-NLS-1$
         }
 
         noDefaultAndApplyButton();

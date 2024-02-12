@@ -27,6 +27,6 @@ smctl-mac-x64 sign \
   --config-file /Users/turbou/digicert/pkcs11properties.cfg \
   --input build/${APP_NAME}-${APP_VERSION}-x86_64.app/
 
-cd build && 7z a ${APP_NAME}-${APP_VERSION}-aarch64.cli7z ${APP_NAME}-${APP_VERSION}-x86_64.app/
+cd build && 7z a ${APP_NAME}-${APP_VERSION}-x86_64.cli7z ${APP_NAME}-${APP_VERSION}-x86_64.app/
 
 exit 0

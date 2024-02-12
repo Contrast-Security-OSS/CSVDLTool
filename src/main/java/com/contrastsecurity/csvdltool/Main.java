@@ -1694,7 +1694,7 @@ public class Main implements PropertyChangeListener {
         attackTable.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                if (e.stateMask == SWT.CTRL && e.keyCode == 'a') {
+                if ((e.stateMask == SWT.CTRL || e.stateMask == SWT.COMMAND) && e.keyCode == 'a') {
                     attackTable.selectAll();
                     e.doit = false;
                 }
@@ -2128,7 +2128,7 @@ public class Main implements PropertyChangeListener {
         serverTable.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                if (e.stateMask == SWT.CTRL && e.keyCode == 'a') {
+                if ((e.stateMask == SWT.CTRL || e.stateMask == SWT.COMMAND) && e.keyCode == 'a') {
                     serverTable.selectAll();
                     e.doit = false;
                 }

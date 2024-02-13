@@ -9,7 +9,7 @@ Users can export a lot of information from TeamServer, but with this tool even m
 - Windows8.1, 10, 11
 - macOS 11(Big Sur) or higher
 #### Runtime  
-- jre1.8
+- jdk17
 
 ## Installation
 There are several binaries on [Release](https://github.com/Contrast-Security-OSS/CSVDLTool/releases/latest) page. You can use CSVDLTool without build process.  

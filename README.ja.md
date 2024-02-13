@@ -7,7 +7,7 @@ TeamServerから直接CSVレポートを出力することも出来ますが、�
 
 ## 動作環境
 #### OS
-- Windows8.1、 10, 11
+- Windows8.1, 10, 11
 - macOS 11(Big Sur)かそれ以上
 
 #### Runtime

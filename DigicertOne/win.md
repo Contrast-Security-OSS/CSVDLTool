@@ -48,8 +48,8 @@
   コマンドプロンプトは管理者として実行で起動してください。
   ```powershell
   cd C:\Program Files (x86)\launch4j\sign4j
-  sign4j.exe java -jar C:\DigiCert\jsign-5.0.jar --keystore "C:\DigiCert\pkcs11properties.cfg" --storetype PKCS11 C:\Users\turbou\Desktop\CSVDLTool_work\common\CSVDLTool_2.1.1.exe
-  sign4j.exe java -jar C:\DigiCert\jsign-5.0.jar --keystore "C:\DigiCert\pkcs11properties.cfg" --storetype PKCS11 C:\Users\turbou\Desktop\CSVDLTool_work\common\CSVDLTool_2.1.1_auditlog.exe
+  sign4j.exe java -jar C:\DigiCert\jsign-5.0.jar --keystore "C:\DigiCert\pkcs11properties.cfg" --storetype PKCS11 C:\Users\turbou\Desktop\CSVDLTool_work\common\CSVDLTool_2.1.2.exe
+  sign4j.exe java -jar C:\DigiCert\jsign-5.0.jar --keystore "C:\DigiCert\pkcs11properties.cfg" --storetype PKCS11 C:\Users\turbou\Desktop\CSVDLTool_work\common\CSVDLTool_2.1.2_auditlog.exe
   ```
   - 電子署名についてはファイルを右クリックのプロパティで確認ができます。
   

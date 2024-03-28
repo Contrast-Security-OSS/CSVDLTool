@@ -34,6 +34,9 @@ public class Vuln {
     private String availability_impact;
     private String confidentiality_impact;
     private String integrity_impact;
+    private float epss_score;
+    private float epss_percentile;
+    private boolean cisa;
 
     public String getName() {
         return name;
@@ -113,6 +116,30 @@ public class Vuln {
 
     public void setIntegrity_impact(String integrity_impact) {
         this.integrity_impact = integrity_impact;
+    }
+
+    public float getEpss_score() {
+        return epss_score;
+    }
+
+    public void setEpss_score(float epss_score) {
+        this.epss_score = epss_score;
+    }
+
+    public float getEpss_percentile() {
+        return epss_percentile;
+    }
+
+    public void setEpss_percentile(float epss_percentile) {
+        this.epss_percentile = epss_percentile;
+    }
+
+    public boolean isCisa() {
+        return cisa;
+    }
+
+    public void setCisa(boolean cisa) {
+        this.cisa = cisa;
     }
 
 }

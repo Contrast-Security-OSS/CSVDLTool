@@ -77,12 +77,13 @@ public class LibGetWithProgress implements IRunnableWithProgress {
     private List<String> dstApps;
     private Map<String, AppInfo> fullAppMap;
     private boolean isOnlyHasCVE;
+    private boolean isWithEPSS;
     private boolean isIncludeCVEDetail;
     private Timer timer;
 
     Logger logger = LogManager.getLogger("csvdltool"); //$NON-NLS-1$
 
-    public LibGetWithProgress(Shell shell, PreferenceStore ps, String outDirPath, List<String> dstApps, Map<String, AppInfo> fullAppMap, boolean isOnlyHasCVE,
+    public LibGetWithProgress(Shell shell, PreferenceStore ps, String outDirPath, List<String> dstApps, Map<String, AppInfo> fullAppMap, boolean isOnlyHasCVE, boolean isWithEPSS,
             boolean isIncludeCVEDetail) {
         this.shell = shell;
         this.ps = ps;
@@ -90,6 +91,7 @@ public class LibGetWithProgress implements IRunnableWithProgress {
         this.dstApps = dstApps;
         this.fullAppMap = fullAppMap;
         this.isOnlyHasCVE = isOnlyHasCVE;
+        this.isWithEPSS = isWithEPSS;
         this.isIncludeCVEDetail = isIncludeCVEDetail;
     }
 
@@ -145,7 +147,7 @@ public class LibGetWithProgress implements IRunnableWithProgress {
         try {
             // 長文情報（何が起こったか？など）を出力する場合はフォルダに出力
             if (this.isIncludeCVEDetail) {
-                String dirPath = this.outDirPath + System.getProperty("file.separator") + timestamp;
+                String dirPath = this.outDirPath + System.getProperty("file.separator") + timestamp; //$NON-NLS-1$
                 Path dir = Paths.get(dirPath);
                 Files.createDirectory(dir);
             }
@@ -263,7 +265,14 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                                 // ==================== 13. CVE ====================
                                 StringJoiner sj = new StringJoiner(csvColumn.getSeparateStr().replace("\\r", "\r").replace("\\n", "\n")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
                                 for (Vuln vuln : library.getVulns()) {
-                                    sj.add(vuln.getName());
+                                    if (isWithEPSS) {
+                                        String cisaStr = vuln.isCisa() ? Messages.getString("libgetwithprogress.cisa") : ""; //$NON-NLS-1$ //$NON-NLS-2$
+                                        String cveWithEPSS = String.format("%s[%.2f (%.2f%s)%s]", vuln.getName(), vuln.getEpss_score(), vuln.getEpss_percentile(), //$NON-NLS-1$
+                                                Messages.getString("libgetwithprogress.percentile"), cisaStr); //$NON-NLS-1$
+                                        sj.add(cveWithEPSS);
+                                    } else {
+                                        sj.add(vuln.getName());
+                                    }
                                 }
                                 csvLineList.add(sj.toString());
                                 break;
@@ -352,8 +361,8 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                         } else {
                             csvLineList.add(String.format("=HYPERLINK(\"%s.txt\",\"%s\")", library.getHash(), library.getHash())); //$NON-NLS-1$
                         }
-                        String textFileName = String.format("%s%s%s.txt", timestamp, System.getProperty("file.separator"), library.getHash()); //$NON-NLS-1$
-                        textFileName = this.outDirPath + System.getProperty("file.separator") + textFileName;
+                        String textFileName = String.format("%s%s%s.txt", timestamp, System.getProperty("file.separator"), library.getHash()); //$NON-NLS-1$ //$NON-NLS-2$
+                        textFileName = this.outDirPath + System.getProperty("file.separator") + textFileName; //$NON-NLS-1$
                         File file = new File(textFileName);
                         for (Vuln vuln : library.getVulns()) {
                             // ==================== 14-1. タイトル ====================
@@ -363,25 +372,30 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                                     true);
                             // ==================== 14-2. 説明 ====================
                             FileUtils.writeLines(file, Main.FILE_ENCODING, Arrays.asList(vuln.getDescription()), true);
-                            // ==================== 14-3. 機密性への影響 ====================
+                            // ==================== 14-3. EPSS ====================
+                            String cisaStr = vuln.isCisa() ? Messages.getString("libgetwithprogress.cisa") : ""; //$NON-NLS-1$ //$NON-NLS-2$
+                            String epss = String.format("%.2f (%.2f%s)%s", vuln.getEpss_score(), vuln.getEpss_percentile(), Messages.getString("libgetwithprogress.percentile"), cisaStr); //$NON-NLS-1$ //$NON-NLS-2$
+                            FileUtils.writeLines(file, Main.FILE_ENCODING, Arrays.asList(
+                                    String.format("%s %s", Messages.getString("libgetwithprogress.detail.header.epss"), epss)), true); //$NON-NLS-1$ //$NON-NLS-2$
+                            // ==================== 14-4. 機密性への影響 ====================
                             FileUtils.writeLines(file, Main.FILE_ENCODING, Arrays.asList(
                                     String.format("%s %s", Messages.getString("libgetwithprogress.detail.header.confidentiality-impact"), vuln.getConfidentiality_impact())), true); //$NON-NLS-1$ //$NON-NLS-2$
-                            // ==================== 14-4. 完全性への影響 ====================
+                            // ==================== 14-5. 完全性への影響 ====================
                             FileUtils.writeLines(file, Main.FILE_ENCODING,
                                     Arrays.asList(String.format("%s %s", Messages.getString("libgetwithprogress.detail.header.integrity_impact"), vuln.getIntegrity_impact())), //$NON-NLS-1$ //$NON-NLS-2$
                                     true);
-                            // ==================== 14-5. 可用性への影響 ====================
+                            // ==================== 14-6. 可用性への影響 ====================
                             FileUtils.writeLines(file, Main.FILE_ENCODING,
                                     Arrays.asList(
                                             String.format("%s %s", Messages.getString("libgetwithprogress.detail.header.availability_impact"), vuln.getAvailability_impact())), //$NON-NLS-1$ //$NON-NLS-2$
                                     true);
-                            // ==================== 14-6. 攻撃前の認証要否 ====================
+                            // ==================== 14-7. 攻撃前の認証要否 ====================
                             FileUtils.writeLines(file, Main.FILE_ENCODING,
                                     Arrays.asList(String.format("%s %s", Messages.getString("libgetwithprogress.detail.header.authentication"), vuln.getAuthentication())), true); //$NON-NLS-1$ //$NON-NLS-2$
-                            // ==================== 14-7. 攻撃元区分 ====================
+                            // ==================== 14-8. 攻撃元区分 ====================
                             FileUtils.writeLines(file, Main.FILE_ENCODING,
                                     Arrays.asList(String.format("%s %s", Messages.getString("libgetwithprogress.detail.header.access_vector"), vuln.getAccess_vector())), true); //$NON-NLS-1$ //$NON-NLS-2$
-                            // ==================== 14-8. 攻撃条件複雑さ ====================
+                            // ==================== 14-9. 攻撃条件複雑さ ====================
                             FileUtils.writeLines(file, Main.FILE_ENCODING,
                                     Arrays.asList(String.format("%s %s", Messages.getString("libgetwithprogress.detail.header.access_complexity"), vuln.getAccess_complexity())), //$NON-NLS-1$ //$NON-NLS-2$
                                     true);
@@ -399,7 +413,7 @@ public class LibGetWithProgress implements IRunnableWithProgress {
             monitor.subTask(""); //$NON-NLS-1$
             sub1Monitor.done();
         } catch (OperationCanceledException oce) {
-            throw new InvocationTargetException(new OperationCanceledException(Messages.getString("libgetwithprogress.progress.canceled")));
+            throw new InvocationTargetException(new OperationCanceledException(Messages.getString("libgetwithprogress.progress.canceled"))); //$NON-NLS-1$
         } catch (Exception e) {
             throw new InvocationTargetException(e);
         } finally {
@@ -420,7 +434,7 @@ public class LibGetWithProgress implements IRunnableWithProgress {
         if (OS.isFamilyMac()) {
             csv_encoding = Main.CSV_MAC_ENCODING;
         }
-        filePath = this.outDirPath + System.getProperty("file.separator") + filePath;
+        filePath = this.outDirPath + System.getProperty("file.separator") + filePath; //$NON-NLS-1$
         File dir = new File(new File(filePath).getParent());
         if (!dir.exists()) {
             dir.mkdirs();
@@ -446,7 +460,7 @@ public class LibGetWithProgress implements IRunnableWithProgress {
             }
             sub2Monitor.done();
         } catch (OperationCanceledException oce) {
-            throw new InvocationTargetException(new OperationCanceledException(Messages.getString("libgetwithprogress.progress.canceled")));
+            throw new InvocationTargetException(new OperationCanceledException(Messages.getString("libgetwithprogress.progress.canceled"))); //$NON-NLS-1$
         } catch (IOException e) {
             e.printStackTrace();
         }

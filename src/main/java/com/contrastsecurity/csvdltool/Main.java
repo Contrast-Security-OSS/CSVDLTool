@@ -193,6 +193,7 @@ public class Main implements PropertyChangeListener {
 
     private Button libExecuteBtn;
     private Button onlyHasCVEChk;
+    private Button withEPSSInfoChk;
     private Button includeCVEDetailChk;
 
     private Button attackLoadBtn;
@@ -1127,7 +1128,8 @@ public class Main implements PropertyChangeListener {
                 if (outDirPath == null || outDirPath.isEmpty()) {
                     return;
                 }
-                LibGetWithProgress progress = new LibGetWithProgress(shell, ps, outDirPath, dstApps, fullAppMap, onlyHasCVEChk.getSelection(), includeCVEDetailChk.getSelection());
+                LibGetWithProgress progress = new LibGetWithProgress(shell, ps, outDirPath, dstApps, fullAppMap, onlyHasCVEChk.getSelection(), withEPSSInfoChk.getSelection(),
+                        includeCVEDetailChk.getSelection());
                 ProgressMonitorDialog progDialog = new LibGetProgressMonitorDialog(shell);
                 try {
                     progDialog.run(true, true, progress);
@@ -1174,6 +1176,11 @@ public class Main implements PropertyChangeListener {
         onlyHasCVEChk.setText(Messages.getString("main.lib.export.option.only.has.cve")); //$NON-NLS-1$
         if (this.ps.getBoolean(PreferenceConstants.ONLY_HAS_CVE)) {
             onlyHasCVEChk.setSelection(true);
+        }
+        withEPSSInfoChk = new Button(libButtonGrp, SWT.CHECK);
+        withEPSSInfoChk.setText(Messages.getString("main.lib.export.option.with.epss")); //$NON-NLS-1$
+        if (this.ps.getBoolean(PreferenceConstants.ONLY_HAS_CVE)) {
+            withEPSSInfoChk.setSelection(true);
         }
         includeCVEDetailChk = new Button(libButtonGrp, SWT.CHECK);
         includeCVEDetailChk.setText(Messages.getString("main.lib.export.option.include.detail")); //$NON-NLS-1$

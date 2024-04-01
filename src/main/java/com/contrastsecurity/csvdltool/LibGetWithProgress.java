@@ -350,6 +350,15 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                                 }
                                 break;
                             }
+                            case LIB_22: {
+                                // ==================== 22. 既知の悪用された脆弱性の有無 ====================
+                                if (library.hasKEV()) {
+                                    csvLineList.add(csvColumn.getTrueStr());
+                                } else {
+                                    csvLineList.add(csvColumn.getFalseStr());
+                                }
+                                break;
+                            }
                             default:
                                 continue;
                         }

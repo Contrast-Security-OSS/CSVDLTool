@@ -215,4 +215,11 @@ public class Library {
         this.licenseViolation = licenseViolation;
     }
 
+    public boolean hasKEV() {
+        boolean hasKEV = false;
+        for (Vuln vuln : this.vulns) {
+            hasKEV |= vuln.isCisa();
+        }
+        return hasKEV;
+    }
 }

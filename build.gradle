@@ -58,7 +58,7 @@ task copyToLib(type: Copy) {
 jar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     archiveBaseName = 'CSVDLTool'
-    archiveVersion = '2.1.2'
+    archiveVersion = '2.1.3'
     exclude 'META-INF/*.RSA', 'META-INF/*.SF','META-INF/*.DSA' 
     manifest {
         attributes 'Implementation-Title': 'Gradle Quickstart'

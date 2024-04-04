@@ -374,7 +374,7 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                         }
                     }
                     if (isIncludeCVEDetail && !library.getVulns().isEmpty()) {
-                        // ==================== 14. 詳細 ====================
+                        // ==================== 23. 詳細 ====================
                         if (OS.isFamilyWindows()) {
                             csvLineList.add(String.format("=HYPERLINK(\".\\%s.txt\",\"%s\")", library.getHash(), library.getHash())); //$NON-NLS-1$
                         } else {
@@ -384,38 +384,46 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                         textFileName = this.outDirPath + System.getProperty("file.separator") + textFileName; //$NON-NLS-1$
                         File file = new File(textFileName);
                         for (Vuln vuln : library.getVulns()) {
-                            // ==================== 14-1. タイトル ====================
-                            FileUtils.writeLines(file, Main.FILE_ENCODING,
-                                    Arrays.asList(
-                                            String.format("=============== %s(CVSS %s) %s ===============", vuln.getName(), vuln.getSeverity_value(), vuln.getSeverity_code())), //$NON-NLS-1$
-                                    true);
-                            // ==================== 14-2. 説明 ====================
+                            // ==================== 23-1. タイトル ====================
+                            if (vuln.isHas_cvss3_score()) {
+                                String cvss3Ver = vuln.getCvss_3_vector().split(":")[1].replace("/AV", "");
+                                FileUtils.writeLines(file, Main.FILE_ENCODING,
+                                        Arrays.asList(String.format("=============== %s(CVSS%s %s) %s ===============", vuln.getName(), cvss3Ver, vuln.getCvss_3_severity_value(), //$NON-NLS-1$
+                                                vuln.getCvss_3_severity_code())),
+                                        true);
+                            } else {
+                                FileUtils.writeLines(file, Main.FILE_ENCODING,
+                                        Arrays.asList(
+                                                String.format("=============== %s(CVSS %s) %s ===============", vuln.getName(), vuln.getSeverity_value(), vuln.getSeverity_code())), //$NON-NLS-1$
+                                        true);
+                            }
+                            // ==================== 23-2. 説明 ====================
                             FileUtils.writeLines(file, Main.FILE_ENCODING, Arrays.asList(vuln.getDescription()), true);
-                            // ==================== 14-3. EPSS ====================
+                            // ==================== 23-3. EPSS ====================
                             String cisaStr = vuln.isCisa() ? Messages.getString("libgetwithprogress.cisa") : ""; //$NON-NLS-1$ //$NON-NLS-2$
-                            String epss = String.format("%.2f (%.2f%s)%s", vuln.getEpss_score(), vuln.getEpss_percentile(), Messages.getString("libgetwithprogress.percentile"), //$NON-NLS-1$ //$NON-NLS-2$
+                            String epss = String.format("%.2f (%.2f%s) %s", vuln.getEpss_score(), vuln.getEpss_percentile(), Messages.getString("libgetwithprogress.percentile"), //$NON-NLS-1$ //$NON-NLS-2$
                                     cisaStr);
                             FileUtils.writeLines(file, Main.FILE_ENCODING, Arrays.asList(String.format("%s %s", Messages.getString("libgetwithprogress.detail.header.epss"), epss)), //$NON-NLS-1$ //$NON-NLS-2$
                                     true);
-                            // ==================== 14-4. 機密性への影響 ====================
+                            // ==================== 23-4. 機密性への影響 ====================
                             FileUtils.writeLines(file, Main.FILE_ENCODING, Arrays.asList(
                                     String.format("%s %s", Messages.getString("libgetwithprogress.detail.header.confidentiality-impact"), vuln.getConfidentiality_impact())), true); //$NON-NLS-1$ //$NON-NLS-2$
-                            // ==================== 14-5. 完全性への影響 ====================
+                            // ==================== 23-5. 完全性への影響 ====================
                             FileUtils.writeLines(file, Main.FILE_ENCODING,
                                     Arrays.asList(String.format("%s %s", Messages.getString("libgetwithprogress.detail.header.integrity_impact"), vuln.getIntegrity_impact())), //$NON-NLS-1$ //$NON-NLS-2$
                                     true);
-                            // ==================== 14-6. 可用性への影響 ====================
+                            // ==================== 23-6. 可用性への影響 ====================
                             FileUtils.writeLines(file, Main.FILE_ENCODING,
                                     Arrays.asList(
                                             String.format("%s %s", Messages.getString("libgetwithprogress.detail.header.availability_impact"), vuln.getAvailability_impact())), //$NON-NLS-1$ //$NON-NLS-2$
                                     true);
-                            // ==================== 14-7. 攻撃前の認証要否 ====================
+                            // ==================== 23-7. 攻撃前の認証要否 ====================
                             FileUtils.writeLines(file, Main.FILE_ENCODING,
                                     Arrays.asList(String.format("%s %s", Messages.getString("libgetwithprogress.detail.header.authentication"), vuln.getAuthentication())), true); //$NON-NLS-1$ //$NON-NLS-2$
-                            // ==================== 14-8. 攻撃元区分 ====================
+                            // ==================== 23-8. 攻撃元区分 ====================
                             FileUtils.writeLines(file, Main.FILE_ENCODING,
                                     Arrays.asList(String.format("%s %s", Messages.getString("libgetwithprogress.detail.header.access_vector"), vuln.getAccess_vector())), true); //$NON-NLS-1$ //$NON-NLS-2$
-                            // ==================== 14-9. 攻撃条件複雑さ ====================
+                            // ==================== 23-9. 攻撃条件複雑さ ====================
                             FileUtils.writeLines(file, Main.FILE_ENCODING,
                                     Arrays.asList(String.format("%s %s", Messages.getString("libgetwithprogress.detail.header.access_complexity"), vuln.getAccess_complexity())), //$NON-NLS-1$ //$NON-NLS-2$
                                     true);

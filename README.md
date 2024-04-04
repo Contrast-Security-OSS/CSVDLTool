@@ -120,7 +120,7 @@ First of all, get the certificate file(pfx) and the certificate password.
   Using sign4j in launch4j.  
   ```powershell
   cd C:\Program Files (x86)\launch4j\sign4j
-  sign4j.exe java -jar jsign-2.0.jar --alias 1 --keystore C:\Users\turbou\Desktop\CSVDLTool_work\XXXXX.pfx --storepass [] C:\Users\turbou\Desktop\CSVDLTool_work\common\CSVDLTool_2.1.3.exe
+  sign4j.exe java -jar jsign-2.0.jar --alias 1 --keystore C:\Users\turbou\Desktop\CSVDLTool_work\XXXXX.pfx --storepass [] C:\Users\turbou\Desktop\CSVDLTool_work\common\CSVDLTool_2.1.4.exe
   ```
 - Confirm Digital Signatures  
   You can confirm the signature in the properties of the exe file.
@@ -131,13 +131,13 @@ First of all, get the certificate file(pfx) and the certificate password.
 - Sign  
   Using codesign.  
   ```bash
-  codesign --deep -s "Contrast Security, Inc." -v CSVDLTool_2.1.3.app
-  codesign --deep -s "Contrast Security, Inc." -v CSVDLTool_2.1.3_auditlog.app
+  codesign --deep -s "Contrast Security, Inc." -v CSVDLTool_2.1.4.app
+  codesign --deep -s "Contrast Security, Inc." -v CSVDLTool_2.1.4_auditlog.app
   ```
 - Confirm Digital Signatures
   ```bash
-  codesign -d --verbose=4 CSVDLTool_2.1.3.app
-  codesign -d --verbose=4 CSVDLTool_2.1.3_auditlog.app
+  codesign -d --verbose=4 CSVDLTool_2.1.4.app
+  codesign -d --verbose=4 CSVDLTool_2.1.4_auditlog.app
   ```
     
 #### How to compress
@@ -148,7 +148,7 @@ First of all, get the certificate file(pfx) and the certificate password.
   # Installing p7zip
   brew install p7zip
   # Compress
-  7z a CSVDLTool_2.1.3.cli7z CSVDLTool_2.1.3.app/
-  7z a CSVDLTool_2.1.3_auditlog.cli7z CSVDLTool_2.1.3_auditlog.app/
+  7z a CSVDLTool_2.1.4.cli7z CSVDLTool_2.1.4.app/
+  7z a CSVDLTool_2.1.4_auditlog.cli7z CSVDLTool_2.1.4_auditlog.app/
   ```
 

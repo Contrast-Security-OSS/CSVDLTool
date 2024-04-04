@@ -34,6 +34,8 @@ public class Vuln {
     private String availability_impact;
     private String confidentiality_impact;
     private String integrity_impact;
+    private boolean has_cvss3_score;
+    private float cvss_3_severity_value;
     private float epss_score;
     private float epss_percentile;
     private boolean cisa;
@@ -116,6 +118,22 @@ public class Vuln {
 
     public void setIntegrity_impact(String integrity_impact) {
         this.integrity_impact = integrity_impact;
+    }
+
+    public boolean isHas_cvss3_score() {
+        return has_cvss3_score;
+    }
+
+    public void setHas_cvss3_score(boolean has_cvss3_score) {
+        this.has_cvss3_score = has_cvss3_score;
+    }
+
+    public float getCvss_3_severity_value() {
+        return cvss_3_severity_value;
+    }
+
+    public void setCvss_3_severity_value(float cvss_3_severity_value) {
+        this.cvss_3_severity_value = cvss_3_severity_value;
     }
 
     public float getEpss_score() {

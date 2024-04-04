@@ -82,6 +82,8 @@ public class PreferenceConstants {
     public static final String INCLUDE_STACKTRACE = new String("com.contrastsecurity.csvdltool.include_stacktrace"); //$NON-NLS-1$
 
     public static final String ONLY_HAS_CVE = new String("com.contrastsecurity.csvdltool.only_has_cve"); //$NON-NLS-1$
+    public static final String WITH_CVSS = new String("com.contrastsecurity.csvdltool.with_cvss"); //$NON-NLS-1$
+    public static final String WITH_EPSS = new String("com.contrastsecurity.csvdltool.with_epss"); //$NON-NLS-1$
     public static final String INCLUDE_CVE_DETAIL = new String("com.contrastsecurity.csvdltool.include_cve_detail"); //$NON-NLS-1$
 
     public static final String FILE_OUT_MODE = new String("com.contrastsecurity.csvdltool.file_out_mode"); //$NON-NLS-1$

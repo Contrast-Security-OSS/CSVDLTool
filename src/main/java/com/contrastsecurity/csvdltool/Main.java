@@ -193,6 +193,7 @@ public class Main implements PropertyChangeListener {
 
     private Button libExecuteBtn;
     private Button onlyHasCVEChk;
+    private Button withCVSSInfoChk;
     private Button withEPSSInfoChk;
     private Button includeCVEDetailChk;
 
@@ -402,6 +403,8 @@ public class Main implements PropertyChangeListener {
                 ps.setValue(PreferenceConstants.INCLUDE_DESCRIPTION, includeDescChk.getSelection());
                 ps.setValue(PreferenceConstants.INCLUDE_STACKTRACE, includeStackTraceChk.getSelection());
                 ps.setValue(PreferenceConstants.ONLY_HAS_CVE, onlyHasCVEChk.getSelection());
+                ps.setValue(PreferenceConstants.WITH_CVSS, withCVSSInfoChk.getSelection());
+                ps.setValue(PreferenceConstants.WITH_EPSS, withEPSSInfoChk.getSelection());
                 ps.setValue(PreferenceConstants.INCLUDE_CVE_DETAIL, includeCVEDetailChk.getSelection());
                 ps.setValue(PreferenceConstants.BASIC_AUTH_STATUS, ""); //$NON-NLS-1$
                 ps.setValue(PreferenceConstants.XSRF_TOKEN, ""); //$NON-NLS-1$
@@ -1128,8 +1131,8 @@ public class Main implements PropertyChangeListener {
                 if (outDirPath == null || outDirPath.isEmpty()) {
                     return;
                 }
-                LibGetWithProgress progress = new LibGetWithProgress(shell, ps, outDirPath, dstApps, fullAppMap, onlyHasCVEChk.getSelection(), withEPSSInfoChk.getSelection(),
-                        includeCVEDetailChk.getSelection());
+                LibGetWithProgress progress = new LibGetWithProgress(shell, ps, outDirPath, dstApps, fullAppMap, onlyHasCVEChk.getSelection(), withCVSSInfoChk.getSelection(),
+                        withEPSSInfoChk.getSelection(), includeCVEDetailChk.getSelection());
                 ProgressMonitorDialog progDialog = new LibGetProgressMonitorDialog(shell);
                 try {
                     progDialog.run(true, true, progress);
@@ -1177,9 +1180,14 @@ public class Main implements PropertyChangeListener {
         if (this.ps.getBoolean(PreferenceConstants.ONLY_HAS_CVE)) {
             onlyHasCVEChk.setSelection(true);
         }
+        withCVSSInfoChk = new Button(libButtonGrp, SWT.CHECK);
+        withCVSSInfoChk.setText(Messages.getString("main.lib.export.option.with.cvss")); //$NON-NLS-1$
+        if (this.ps.getBoolean(PreferenceConstants.WITH_CVSS)) {
+            withCVSSInfoChk.setSelection(true);
+        }
         withEPSSInfoChk = new Button(libButtonGrp, SWT.CHECK);
         withEPSSInfoChk.setText(Messages.getString("main.lib.export.option.with.epss")); //$NON-NLS-1$
-        if (this.ps.getBoolean(PreferenceConstants.ONLY_HAS_CVE)) {
+        if (this.ps.getBoolean(PreferenceConstants.WITH_EPSS)) {
             withEPSSInfoChk.setSelection(true);
         }
         includeCVEDetailChk = new Button(libButtonGrp, SWT.CHECK);

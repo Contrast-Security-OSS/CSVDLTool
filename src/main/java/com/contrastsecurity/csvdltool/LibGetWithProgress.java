@@ -77,20 +77,22 @@ public class LibGetWithProgress implements IRunnableWithProgress {
     private List<String> dstApps;
     private Map<String, AppInfo> fullAppMap;
     private boolean isOnlyHasCVE;
+    private boolean isWithCVSS;
     private boolean isWithEPSS;
     private boolean isIncludeCVEDetail;
     private Timer timer;
 
     Logger logger = LogManager.getLogger("csvdltool"); //$NON-NLS-1$
 
-    public LibGetWithProgress(Shell shell, PreferenceStore ps, String outDirPath, List<String> dstApps, Map<String, AppInfo> fullAppMap, boolean isOnlyHasCVE, boolean isWithEPSS,
-            boolean isIncludeCVEDetail) {
+    public LibGetWithProgress(Shell shell, PreferenceStore ps, String outDirPath, List<String> dstApps, Map<String, AppInfo> fullAppMap, boolean isOnlyHasCVE, boolean isWithCVSS,
+            boolean isWithEPSS, boolean isIncludeCVEDetail) {
         this.shell = shell;
         this.ps = ps;
         this.outDirPath = outDirPath;
         this.dstApps = dstApps;
         this.fullAppMap = fullAppMap;
         this.isOnlyHasCVE = isOnlyHasCVE;
+        this.isWithCVSS = isWithCVSS;
         this.isWithEPSS = isWithEPSS;
         this.isIncludeCVEDetail = isIncludeCVEDetail;
     }
@@ -265,14 +267,22 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                                 // ==================== 13. CVE ====================
                                 StringJoiner sj = new StringJoiner(csvColumn.getSeparateStr().replace("\\r", "\r").replace("\\n", "\n")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
                                 for (Vuln vuln : library.getVulns()) {
+                                    StringBuilder vulnBuffer = new StringBuilder();
+                                    vulnBuffer.append(vuln.getName());
+                                    if (isWithCVSS) {
+                                        String withCVSS = "[CVSS -]";
+                                        if (vuln.isHas_cvss3_score()) {
+                                            withCVSS = String.format("[CVSS %.1f]", vuln.getCvss_3_severity_value());
+                                        }
+                                        vulnBuffer.append(withCVSS);
+                                    }
                                     if (isWithEPSS) {
                                         String cisaStr = vuln.isCisa() ? Messages.getString("libgetwithprogress.cisa") : ""; //$NON-NLS-1$ //$NON-NLS-2$
-                                        String cveWithEPSS = String.format("%s[%.2f (%.2f%s)%s]", vuln.getName(), vuln.getEpss_score(), vuln.getEpss_percentile(), //$NON-NLS-1$
+                                        String withEPSS = String.format("[EPSS %.2f (%.2f%s) %s]", vuln.getEpss_score(), vuln.getEpss_percentile(), //$NON-NLS-1$
                                                 Messages.getString("libgetwithprogress.percentile"), cisaStr); //$NON-NLS-1$
-                                        sj.add(cveWithEPSS);
-                                    } else {
-                                        sj.add(vuln.getName());
+                                        vulnBuffer.append(withEPSS);
                                     }
+                                    sj.add(vulnBuffer.toString());
                                 }
                                 csvLineList.add(sj.toString());
                                 break;
@@ -383,9 +393,10 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                             FileUtils.writeLines(file, Main.FILE_ENCODING, Arrays.asList(vuln.getDescription()), true);
                             // ==================== 14-3. EPSS ====================
                             String cisaStr = vuln.isCisa() ? Messages.getString("libgetwithprogress.cisa") : ""; //$NON-NLS-1$ //$NON-NLS-2$
-                            String epss = String.format("%.2f (%.2f%s)%s", vuln.getEpss_score(), vuln.getEpss_percentile(), Messages.getString("libgetwithprogress.percentile"), cisaStr); //$NON-NLS-1$ //$NON-NLS-2$
-                            FileUtils.writeLines(file, Main.FILE_ENCODING, Arrays.asList(
-                                    String.format("%s %s", Messages.getString("libgetwithprogress.detail.header.epss"), epss)), true); //$NON-NLS-1$ //$NON-NLS-2$
+                            String epss = String.format("%.2f (%.2f%s)%s", vuln.getEpss_score(), vuln.getEpss_percentile(), Messages.getString("libgetwithprogress.percentile"), //$NON-NLS-1$ //$NON-NLS-2$
+                                    cisaStr);
+                            FileUtils.writeLines(file, Main.FILE_ENCODING, Arrays.asList(String.format("%s %s", Messages.getString("libgetwithprogress.detail.header.epss"), epss)), //$NON-NLS-1$ //$NON-NLS-2$
+                                    true);
                             // ==================== 14-4. 機密性への影響 ====================
                             FileUtils.writeLines(file, Main.FILE_ENCODING, Arrays.asList(
                                     String.format("%s %s", Messages.getString("libgetwithprogress.detail.header.confidentiality-impact"), vuln.getConfidentiality_impact())), true); //$NON-NLS-1$ //$NON-NLS-2$

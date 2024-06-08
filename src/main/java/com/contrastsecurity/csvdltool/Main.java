@@ -132,8 +132,6 @@ import com.contrastsecurity.csvdltool.model.AttackEventCSVColumn;
 import com.contrastsecurity.csvdltool.model.ContrastSecurityYaml;
 import com.contrastsecurity.csvdltool.model.Filter;
 import com.contrastsecurity.csvdltool.model.Organization;
-import com.contrastsecurity.csvdltool.model.Server;
-import com.contrastsecurity.csvdltool.model.ServerCSVColumn;
 import com.contrastsecurity.csvdltool.model.serverless.Function;
 import com.contrastsecurity.csvdltool.model.serverless.Result;
 import com.contrastsecurity.csvdltool.preference.AboutPage;
@@ -147,6 +145,7 @@ import com.contrastsecurity.csvdltool.preference.OtherPreferencePage;
 import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
 import com.contrastsecurity.csvdltool.preference.ServerCSVColumnPreferencePage;
 import com.contrastsecurity.csvdltool.preference.VulCSVColumnPreferencePage;
+import com.contrastsecurity.csvdltool.ui.ServerTabItem;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
@@ -199,8 +198,6 @@ public class Main implements PropertyChangeListener {
 
     private Button attackLoadBtn;
 
-    private Button serverLoadBtn;
-
     private Button settingBtn;
     private Button logOutBtn;
 
@@ -214,7 +211,6 @@ public class Main implements PropertyChangeListener {
     private Map<String, AppInfo> fullAppMap;
     private Map<FilterEnum, Set<Filter>> assessFilterMap;
     private Map<FilterEnum, Set<Filter>> protectFilterMap;
-    private Map<FilterEnum, Set<Filter>> serverFilterMap;
     private List<String> srcApps = new ArrayList<String>();
     private List<String> dstApps = new ArrayList<String>();
     private Date frLastDetectedDate;
@@ -245,9 +241,7 @@ public class Main implements PropertyChangeListener {
     private Table resultTable;
 
     // SERVER
-    private Table serverTable;
-    private List<Server> servers;
-    private List<Server> filteredServers = new ArrayList<Server>();
+    private ServerTabItem serverTabItem;
 
     private PreferenceStore ps;
 
@@ -440,10 +434,10 @@ public class Main implements PropertyChangeListener {
                 }
                 List<Organization> orgs = getValidOrganizations();
                 if (ngRequiredFields || orgs.isEmpty()) {
+                    support.firePropertyChange("buttonEnabled", null, false); //$NON-NLS-1$
                     appLoadBtn.setEnabled(false);
                     vulExecuteBtn.setEnabled(false);
                     attackLoadBtn.setEnabled(false);
-                    serverLoadBtn.setEnabled(false);
                     settingBtn.setText(Messages.getString("main.settings.initial.button.title")); //$NON-NLS-1$
                     uiReset();
                 } else {
@@ -452,10 +446,10 @@ public class Main implements PropertyChangeListener {
                         ps.setValue(PreferenceConstants.TSV_STATUS, TsvStatusEnum.NONE.name());
                         uiReset();
                     }
+                    support.firePropertyChange("buttonEnabled", null, true); //$NON-NLS-1$
                     appLoadBtn.setEnabled(true);
                     vulExecuteBtn.setEnabled(true);
                     attackLoadBtn.setEnabled(true);
-                    serverLoadBtn.setEnabled(true);
                     settingBtn.setText(Messages.getString("main.settings.button.title")); //$NON-NLS-1$
                 }
                 updateProtectOption();
@@ -1955,240 +1949,8 @@ public class Main implements PropertyChangeListener {
         serverlessTabItem.setControl(serverlessShell);
 
         // #################### SERVER #################### //
-        CTabItem serverTabItem = new CTabItem(mainTabFolder, SWT.NONE);
-        serverTabItem.setText(Messages.getString("main.tab.server.title")); //$NON-NLS-1$
-        // serverTabItem.setImage(new Image(shell.getDisplay(), getClass().getClassLoader().getResourceAsStream("server16.png"))); //$NON-NLS-1$
-
-        Composite serverShell = new Composite(mainTabFolder, SWT.NONE);
-        serverShell.setLayout(new GridLayout(1, false));
-
-        Group serverListGrp = new Group(serverShell, SWT.NONE);
-        serverListGrp.setLayout(new GridLayout(3, false));
-        GridData serverListGrpGrDt = new GridData(GridData.FILL_BOTH);
-        serverListGrpGrDt.minimumHeight = 200;
-        serverListGrp.setLayoutData(serverListGrpGrDt);
-
-        serverLoadBtn = new Button(serverListGrp, SWT.PUSH);
-        GridData serverLoadBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
-        serverLoadBtnGrDt.horizontalSpan = 3;
-        serverLoadBtnGrDt.minimumHeight = 50;
-        serverLoadBtnGrDt.heightHint = bigBtnSize.y + 20;
-        serverLoadBtn.setLayoutData(serverLoadBtnGrDt);
-        serverLoadBtn.setText(Messages.getString("main.server.load.button.title")); //$NON-NLS-1$
-        serverLoadBtn.setToolTipText(Messages.getString("main.server.load.button.tooltip")); //$NON-NLS-1$
-        serverLoadBtn.setFont(new Font(display, "Arial", 20, SWT.NORMAL)); //$NON-NLS-1$
-        serverLoadBtn.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent event) {
-                serverTable.clearAll();
-                serverTable.removeAll();
-                ServerWithProgress progress = new ServerWithProgress(shell, ps, getValidOrganizations());
-                ProgressMonitorDialog progDialog = new ServerGetProgressMonitorDialog(shell);
-                try {
-                    progDialog.run(true, true, progress);
-                    servers = progress.getAllServers();
-                    filteredServers.addAll(servers);
-                    for (Server server : servers) {
-                        addColToServerTable(server, -1);
-                    }
-                    serverFilterMap = progress.getFilterMap();
-                } catch (InvocationTargetException e) {
-                    StringWriter stringWriter = new StringWriter();
-                    PrintWriter printWriter = new PrintWriter(stringWriter);
-                    e.printStackTrace(printWriter);
-                    String trace = stringWriter.toString();
-                    if (!(e.getTargetException() instanceof TsvException)) {
-                        logger.error(trace);
-                    }
-                    String errorMsg = e.getTargetException().getMessage();
-                    if (e.getTargetException() instanceof ApiException) {
-                        MessageDialog.openError(shell, Messages.getString("main.server.load.message.dialog.title"), //$NON-NLS-1$
-                                String.format("%s\r\n%s", Messages.getString("main.teamserver.return.error"), errorMsg)); //$NON-NLS-1$ //$NON-NLS-2$
-                    } else if (e.getTargetException() instanceof NonApiException) {
-                        MessageDialog.openError(shell, Messages.getString("main.server.load.message.dialog.title"), //$NON-NLS-1$
-                                String.format("%s %s\r\n%s", Messages.getString("main.unexpected.status.code.error"), errorMsg, //$NON-NLS-1$ //$NON-NLS-2$
-                                        Messages.getString("main.message.dialog.make.sure.logfile.message"))); //$NON-NLS-1$
-                    } else if (e.getTargetException() instanceof TsvException) {
-                        MessageDialog.openError(shell, Messages.getString("main.server.load.message.dialog.title"), errorMsg); //$NON-NLS-1$
-                        return;
-                    } else if (e.getTargetException() instanceof BasicAuthException) {
-                        MessageDialog.openError(shell, Messages.getString("main.server.load.message.dialog.title"), errorMsg); //$NON-NLS-1$
-                        return;
-                    } else if (e.getTargetException() instanceof OperationCanceledException) {
-                        MessageDialog.openInformation(shell, Messages.getString("main.server.load.message.dialog.title"), errorMsg); //$NON-NLS-1$
-                        return;
-                    } else {
-                        MessageDialog.openError(shell, Messages.getString("main.server.load.message.dialog.title"), //$NON-NLS-1$
-                                String.format("%s\r\n%s", Messages.getString("main.message.dialog.unknown.error.message"), errorMsg)); //$NON-NLS-1$ //$NON-NLS-2$
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
-        serverTable = new Table(serverListGrp, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
-        GridData serverTableGrDt = new GridData(GridData.FILL_BOTH);
-        serverTableGrDt.horizontalSpan = 3;
-        serverTable.setLayoutData(serverTableGrDt);
-        serverTable.setLinesVisible(true);
-        serverTable.setHeaderVisible(true);
-
-        Menu menuServerTable = new Menu(serverTable);
-        serverTable.setMenu(menuServerTable);
-
-        MenuItem miServerExp = new MenuItem(menuServerTable, SWT.NONE);
-        miServerExp.setText(Messages.getString("main.server.menu.item.export.csv")); //$NON-NLS-1$
-        miServerExp.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                boolean isSaveOutDirPath = ps.getString(PreferenceConstants.FILE_OUT_MODE).equals("save");
-                String outDirPath = ps.getString(PreferenceConstants.FILE_OUT_DIR);
-                if (!isSaveOutDirPath || outDirPath.isEmpty()) {
-                    outDirPath = getOutDirPath();
-                }
-
-                int[] selectIndexes = serverTable.getSelectionIndices();
-                List<List<String>> csvList = new ArrayList<List<String>>();
-                String csvFileFormat = ps.getString(PreferenceConstants.CSV_FILE_FORMAT_SERVER);
-                if (csvFileFormat == null || csvFileFormat.isEmpty()) {
-                    csvFileFormat = ps.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT_SERVER);
-                }
-                String timestamp = new SimpleDateFormat(csvFileFormat).format(new Date());
-                String filePath = timestamp + ".csv"; //$NON-NLS-1$
-                String csv_encoding = Main.CSV_WIN_ENCODING;
-                if (OS.isFamilyMac()) {
-                    csv_encoding = Main.CSV_MAC_ENCODING;
-                }
-                filePath = outDirPath + System.getProperty("file.separator") + filePath;
-                File dir = new File(new File(filePath).getParent());
-                if (!dir.exists()) {
-                    dir.mkdirs();
-                }
-                String columnJsonStr = ps.getString(PreferenceConstants.CSV_COLUMN_SERVER);
-                List<ServerCSVColumn> columnList = null;
-                if (columnJsonStr.trim().length() > 0) {
-                    try {
-                        columnList = new Gson().fromJson(columnJsonStr, new TypeToken<List<ServerCSVColumn>>() {
-                        }.getType());
-                    } catch (JsonSyntaxException jse) {
-                        MessageDialog.openError(shell, Messages.getString("main.server.message.dialog.json.load.error.title"), //$NON-NLS-1$
-                                String.format("%s\r\n%s", Messages.getString("main.server.message.dialog.json.load.error.message"), columnJsonStr)); //$NON-NLS-1$ //$NON-NLS-2$
-                        columnList = new ArrayList<ServerCSVColumn>();
-                    }
-                } else {
-                    columnList = new ArrayList<ServerCSVColumn>();
-                    for (ServerCSVColmunEnum colEnum : ServerCSVColmunEnum.sortedValues()) {
-                        columnList.add(new ServerCSVColumn(colEnum));
-                    }
-                }
-                for (int idx : selectIndexes) {
-                    List<String> csvLineList = new ArrayList<String>();
-                    Server server = filteredServers.get(idx);
-                    for (ServerCSVColumn csvColumn : columnList) {
-                        if (!csvColumn.isValid()) {
-                            continue;
-                        }
-                        switch (csvColumn.getColumn()) {
-                            case SERVER_01:
-                                // ==================== 01. サーバ名 ====================
-                                csvLineList.add(server.getName());
-                                break;
-                            case SERVER_02:
-                                // ==================== 02. パス ====================
-                                csvLineList.add(server.getPath());
-                                break;
-                            case SERVER_03:
-                                // ==================== 03. 言語 ====================
-                                csvLineList.add(server.getLanguage());
-                                break;
-                            case SERVER_04:
-                                // ==================== 04. エージェントバージョン ====================
-                                csvLineList.add(server.getAgent_version());
-                                break;
-                        }
-                    }
-                    csvList.add(csvLineList);
-                }
-                try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(filePath)), csv_encoding))) {
-                    CSVPrinter printer = CSVFormat.EXCEL.print(bw);
-                    if (ps.getBoolean(PreferenceConstants.CSV_OUT_HEADER_SERVER)) {
-                        List<String> csvHeaderList = new ArrayList<String>();
-                        for (ServerCSVColumn csvColumn : columnList) {
-                            if (csvColumn.isValid()) {
-                                csvHeaderList.add(csvColumn.getColumn().getCulumn());
-                            }
-                        }
-                        printer.printRecord(csvHeaderList);
-                    }
-                    for (List<String> csvLine : csvList) {
-                        printer.printRecord(csvLine);
-                    }
-                    MessageDialog.openInformation(shell, Messages.getString("main.server.message.dialog.export.csv.title"), //$NON-NLS-1$
-                            Messages.getString("main.server.message.dialog.export.csv.message")); //$NON-NLS-1$
-                } catch (IOException ioe) {
-                    ioe.printStackTrace();
-                }
-            }
-        });
-
-        serverTable.addListener(SWT.MenuDetect, new Listener() {
-            @Override
-            public void handleEvent(Event event) {
-                if (serverTable.getSelectionCount() <= 0) {
-                    event.doit = false;
-                }
-            }
-        });
-        serverTable.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if ((e.stateMask == SWT.CTRL || e.stateMask == SWT.COMMAND) && e.keyCode == 'a') {
-                    serverTable.selectAll();
-                    e.doit = false;
-                }
-            }
-        });
-
-        TableColumn serverColumn1 = new TableColumn(serverTable, SWT.NONE);
-        serverColumn1.setWidth(0);
-        serverColumn1.setResizable(false);
-        TableColumn serverColumn2 = new TableColumn(serverTable, SWT.LEFT);
-        serverColumn2.setWidth(150);
-        serverColumn2.setText(Messages.getString("main.server.table.column0.title")); //$NON-NLS-1$
-        TableColumn serverColumn3 = new TableColumn(serverTable, SWT.LEFT);
-        serverColumn3.setWidth(360);
-        serverColumn3.setText(Messages.getString("main.server.table.column1.title")); //$NON-NLS-1$
-        TableColumn serverColumn4 = new TableColumn(serverTable, SWT.LEFT);
-        serverColumn4.setWidth(100);
-        serverColumn4.setText(Messages.getString("main.server.table.column2.title")); //$NON-NLS-1$
-        TableColumn serverColumn5 = new TableColumn(serverTable, SWT.LEFT);
-        serverColumn5.setWidth(200);
-        serverColumn5.setText(Messages.getString("main.server.table.column3.title")); //$NON-NLS-1$
-        serverTabItem.setControl(serverShell);
-
-        Button serverFilterBtn = new Button(serverListGrp, SWT.PUSH);
-        GridData serverFilterBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
-        serverFilterBtnGrDt.horizontalSpan = 3;
-        serverFilterBtn.setLayoutData(serverFilterBtnGrDt);
-        serverFilterBtn.setText(Messages.getString("main.server.filter.button.title")); //$NON-NLS-1$
-        serverFilterBtn.setToolTipText(Messages.getString("main.server.filter.button.tooltip")); //$NON-NLS-1$
-        serverFilterBtn.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                if (serverFilterMap == null) {
-                    MessageDialog.openInformation(shell, Messages.getString("main.server.filter.message.dialog.title"), //$NON-NLS-1$
-                            Messages.getString("main.server.filter.not.loaded.error.message")); //$NON-NLS-1$
-                    return;
-                }
-                ServerFilterDialog filterDialog = new ServerFilterDialog(shell, serverFilterMap);
-                filterDialog.addPropertyChangeListener(shell.getMain());
-                int result = filterDialog.open();
-                if (IDialogConstants.OK_ID != result) {
-                    return;
-                }
-            }
-        });
+        this.serverTabItem = new ServerTabItem(mainTabFolder, shell, ps, bigBtnSize);
+        this.addPropertyChangeListener(this.serverTabItem);
 
         int main_idx = this.ps.getInt(PreferenceConstants.OPENED_MAIN_TAB_IDX);
         mainTabFolder.setSelection(main_idx);
@@ -2392,22 +2154,6 @@ public class Main implements PropertyChangeListener {
         item.setText(4, function.getFunctionName());
         // item.setText(2, result.getCategoryText());
         // item.setText(3, result.getTitle());
-    }
-
-    private void addColToServerTable(Server server, int index) {
-        if (server == null) {
-            return;
-        }
-        TableItem item = null;
-        if (index > 0) {
-            item = new TableItem(serverTable, SWT.CENTER, index);
-        } else {
-            item = new TableItem(serverTable, SWT.CENTER);
-        }
-        item.setText(1, server.getName());
-        item.setText(2, server.getPath());
-        item.setText(3, server.getLanguage());
-        item.setText(4, server.getAgent_version());
     }
 
     private void uiReset() {
@@ -2765,39 +2511,13 @@ public class Main implements PropertyChangeListener {
                 }
             }
             attackEventCount.setText(String.format("%d/%d", filteredAttackEvents.size(), attackEvents.size())); //$NON-NLS-1$
-        } else if ("serverFilter".equals(event.getPropertyName())) { //$NON-NLS-1$
-            Map<FilterEnum, Set<Filter>> filterMap = (Map<FilterEnum, Set<Filter>>) event.getNewValue();
-            serverTable.clearAll();
-            serverTable.removeAll();
-            filteredServers.clear();
-            for (Server server : servers) {
-                boolean lostFlg = false;
-                for (Filter filter : filterMap.get(FilterEnum.LANGUAGE)) {
-                    if (server.getLanguage().equals(filter.getLabel())) {
-                        if (!filter.isValid()) {
-                            lostFlg |= true;
-                        }
-                    }
-                }
-                for (Filter filter : filterMap.get(FilterEnum.AGENT_VERSION)) {
-                    if (server.getAgent_version().equals(filter.getLabel())) {
-                        if (!filter.isValid()) {
-                            lostFlg |= true;
-                        }
-                    }
-                }
-                if (!lostFlg) {
-                    addColToServerTable(server, -1);
-                    filteredServers.add(server);
-                }
-            }
         } else if ("tsv".equals(event.getPropertyName())) { //$NON-NLS-1$
             System.out.println("tsv main"); //$NON-NLS-1$
         }
 
     }
 
-    private String getOutDirPath() {
+    public String getOutDirPath() {
         DirectoryDialog dirDialog = new DirectoryDialog(shell);
         dirDialog.setFilterPath(System.getProperty("user.dir"));
         if (!ps.getString(PreferenceConstants.FILE_OUT_MODE).equals("save")) {

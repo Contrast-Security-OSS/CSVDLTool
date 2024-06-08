@@ -40,7 +40,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -76,7 +75,6 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
@@ -84,28 +82,18 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.yaml.snakeyaml.Yaml;
 
-import com.contrastsecurity.csvdltool.api.AccountsApi;
 import com.contrastsecurity.csvdltool.api.Api;
 import com.contrastsecurity.csvdltool.api.LogoutApi;
-import com.contrastsecurity.csvdltool.api.ServerlessTokenApi;
 import com.contrastsecurity.csvdltool.exception.ApiException;
 import com.contrastsecurity.csvdltool.exception.BasicAuthException;
 import com.contrastsecurity.csvdltool.exception.NonApiException;
 import com.contrastsecurity.csvdltool.exception.TsvException;
-import com.contrastsecurity.csvdltool.json.ServerlessTokenJson;
-import com.contrastsecurity.csvdltool.model.Account;
 import com.contrastsecurity.csvdltool.model.ContrastSecurityYaml;
 import com.contrastsecurity.csvdltool.model.Filter;
 import com.contrastsecurity.csvdltool.model.Organization;
-import com.contrastsecurity.csvdltool.model.serverless.Function;
-import com.contrastsecurity.csvdltool.model.serverless.Result;
 import com.contrastsecurity.csvdltool.preference.AboutPage;
 import com.contrastsecurity.csvdltool.preference.AttackEventCSVColumnPreferencePage;
 import com.contrastsecurity.csvdltool.preference.BasePreferencePage;
@@ -119,6 +107,7 @@ import com.contrastsecurity.csvdltool.preference.ServerCSVColumnPreferencePage;
 import com.contrastsecurity.csvdltool.preference.VulCSVColumnPreferencePage;
 import com.contrastsecurity.csvdltool.ui.ProtectTabItem;
 import com.contrastsecurity.csvdltool.ui.ServerTabItem;
+import com.contrastsecurity.csvdltool.ui.ServerlessTabItem;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
@@ -185,13 +174,6 @@ public class Main implements PropertyChangeListener {
     private List<String> dstApps = new ArrayList<String>();
     private Date frLastDetectedDate;
     private Date toLastDetectedDate;
-
-    // SERVERLESS
-    private List<Account> serverlessAccounts = new ArrayList<Account>();
-    private int selectedAccountIndex;
-    private Combo accountCombo;
-    private Button serverlessResultLoadBtn;
-    private Table resultTable;
 
     private PreferenceStore ps;
 
@@ -1143,167 +1125,7 @@ public class Main implements PropertyChangeListener {
         addPropertyChangeListener(new ProtectTabItem(mainTabFolder, shell, ps, bigBtnSize));
 
         // #################### SERVERLESS #################### //
-        CTabItem serverlessTabItem = new CTabItem(mainTabFolder, SWT.NONE);
-        serverlessTabItem.setText("SERVERLESS(β版)");
-        serverlessTabItem.setImage(new Image(shell.getDisplay(), getClass().getClassLoader().getResourceAsStream("contrast-serverless-02.png"))); //$NON-NLS-1$
-
-        Composite serverlessShell = new Composite(mainTabFolder, SWT.NONE);
-        serverlessShell.setLayout(new GridLayout(1, false));
-
-        Group serverlessGrp = new Group(serverlessShell, SWT.NONE);
-        serverlessGrp.setLayout(new GridLayout(3, false));
-        GridData serverlessGrpGrDt = new GridData(GridData.FILL_BOTH);
-        serverlessGrpGrDt.minimumHeight = 200;
-        serverlessGrp.setLayoutData(serverlessGrpGrDt);
-
-        Group serverlessAccountGrp = new Group(serverlessGrp, SWT.NONE);
-        serverlessAccountGrp.setLayout(new GridLayout(2, false));
-        GridData serverlessAccountGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
-        serverlessAccountGrp.setLayoutData(serverlessAccountGrpGrDt);
-        serverlessAccountGrp.setText("アカウント");
-
-        accountCombo = new Combo(serverlessAccountGrp, SWT.DROP_DOWN | SWT.READ_ONLY);
-        GridData accountComboGrDt = new GridData(GridData.FILL_HORIZONTAL);
-        accountCombo.setLayoutData(accountComboGrDt);
-        this.selectedAccountIndex = -1;
-        accountCombo.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent event) {
-                Combo combo = (Combo) event.getSource();
-                selectedAccountIndex = combo.getSelectionIndex();
-            }
-        });
-
-        Button accountLoadBtn = new Button(serverlessAccountGrp, SWT.PUSH);
-        GridData accountLoadBtnGrDt = new GridData();
-        accountLoadBtn.setLayoutData(accountLoadBtnGrDt);
-        accountLoadBtn.setText("　リロード　");
-        accountLoadBtn.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent event) {
-                try {
-                    for (Organization org : getValidOrganizations()) {
-                        Api tokenApi = new ServerlessTokenApi(shell, ps, org);
-                        tokenApi.setConnectTimeoutOverride(15000);
-                        tokenApi.setSocketTimeoutOverride(15000);
-                        ServerlessTokenJson tokenJson = (ServerlessTokenJson) tokenApi.get();
-                        ps.setValue(PreferenceConstants.SERVERLESS_HOST, tokenJson.getHost());
-                        ps.setValue(PreferenceConstants.SERVERLESS_TOKEN, tokenJson.getAccessToken());
-                        Api accountsApi = new AccountsApi(shell, ps, tokenJson, org);
-                        @SuppressWarnings("unchecked")
-                        List<Account> accounts = (List<Account>) accountsApi.get();
-                        serverlessAccounts.clear();
-                        serverlessAccounts.addAll(accounts);
-                        accountCombo.removeAll();
-                        for (Account account : accounts) {
-                            accountCombo.add(String.format("%s - %s", org.getName(), account.getName()));
-                        }
-                        accountCombo.select(0);
-                        selectedAccountIndex = 0;
-                    }
-                } catch (Exception e) {
-                    MessageDialog.openError(shell, "アカウント一覧の読み込み", e.getMessage());
-                }
-            }
-        });
-
-        serverlessResultLoadBtn = new Button(serverlessGrp, SWT.PUSH);
-        GridData serverlessResultLoadBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
-        serverlessResultLoadBtnGrDt.horizontalSpan = 3;
-        serverlessResultLoadBtnGrDt.minimumHeight = 50;
-        serverlessResultLoadBtnGrDt.heightHint = bigBtnSize.y + 20;
-        serverlessResultLoadBtn.setLayoutData(serverlessResultLoadBtnGrDt);
-        serverlessResultLoadBtn.setText("取得");
-        serverlessResultLoadBtn.setToolTipText("サーバレス結果一覧を読み込みます。");
-        serverlessResultLoadBtn.setFont(new Font(display, "Arial", 20, SWT.NORMAL)); //$NON-NLS-1$
-        serverlessResultLoadBtn.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent event) {
-                if (selectedAccountIndex < 0) {
-                    MessageDialog.openInformation(shell, Messages.getString("main.attackevent.load.message.dialog.title"), "先にアカウントを読み込んでください。"); //$NON-NLS-1$
-                    return;
-                }
-                resultTable.clearAll();
-                resultTable.removeAll();
-                Account targetAccount = serverlessAccounts.get(selectedAccountIndex);
-                Organization targetOrg = null;
-                for (Organization org : getValidOrganizations()) {
-                    if (org.getOrganization_uuid().equals(targetAccount.getOrgId())) {
-                        targetOrg = org;
-                        break;
-                    }
-                }
-                if (targetOrg == null) {
-                    return;
-                }
-                ServerlessResultGetWithProgress progress = new ServerlessResultGetWithProgress(shell, ps, targetOrg, targetAccount);
-                ServerlessResultGetProgressMonitorDialog progDialog = new ServerlessResultGetProgressMonitorDialog(shell);
-                try {
-                    progDialog.run(true, true, progress);
-                    List<Function> functions = progress.getFunctions();
-                    // Collections.reverse(attackEvents);
-                    for (Function function : functions) {
-                        addColToResultTable(function, -1);
-                    }
-                    // attackEventCount.setText(String.format("%d/%d", filteredAttackEvents.size(), attackEvents.size())); //$NON-NLS-1$
-                } catch (InvocationTargetException e) {
-                    StringWriter stringWriter = new StringWriter();
-                    PrintWriter printWriter = new PrintWriter(stringWriter);
-                    e.printStackTrace(printWriter);
-                    String trace = stringWriter.toString();
-                    if (!(e.getTargetException() instanceof TsvException)) {
-                        logger.error(trace);
-                    }
-                    String errorMsg = e.getTargetException().getMessage();
-                    if (e.getTargetException() instanceof ApiException) {
-                        MessageDialog.openError(shell, Messages.getString("main.attackevent.load.message.dialog.title"), //$NON-NLS-1$
-                                String.format("%s\r\n%s", Messages.getString("main.teamserver.return.error"), errorMsg)); //$NON-NLS-1$ //$NON-NLS-2$
-                    } else if (e.getTargetException() instanceof NonApiException) {
-                        MessageDialog.openError(shell, Messages.getString("main.attackevent.load.message.dialog.title"), //$NON-NLS-1$
-                                String.format("%s %s\r\n%s", Messages.getString("main.unexpected.status.code.error"), errorMsg, //$NON-NLS-1$ //$NON-NLS-2$
-                                        Messages.getString("main.message.dialog.make.sure.logfile.message"))); //$NON-NLS-1$
-                    } else if (e.getTargetException() instanceof TsvException) {
-                        MessageDialog.openError(shell, Messages.getString("main.attackevent.load.message.dialog.title"), errorMsg); //$NON-NLS-1$
-                        return;
-                    } else if (e.getTargetException() instanceof BasicAuthException) {
-                        MessageDialog.openError(shell, Messages.getString("main.attackevent.load.message.dialog.title"), errorMsg); //$NON-NLS-1$
-                        return;
-                    } else {
-                        MessageDialog.openError(shell, Messages.getString("main.attackevent.load.message.dialog.title"), //$NON-NLS-1$
-                                String.format("%s\r\n%s", Messages.getString("main.message.dialog.unknown.error.message"), errorMsg)); //$NON-NLS-1$ //$NON-NLS-2$
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
-        resultTable = new Table(serverlessGrp, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
-        GridData resultTableGrDt = new GridData(GridData.FILL_BOTH);
-        resultTableGrDt.horizontalSpan = 3;
-        resultTable.setLayoutData(resultTableGrDt);
-        resultTable.setLinesVisible(true);
-        resultTable.setHeaderVisible(true);
-        Menu menuResultTable = new Menu(resultTable);
-        resultTable.setMenu(menuResultTable);
-
-        TableColumn resultColumn0 = new TableColumn(resultTable, SWT.NONE);
-        resultColumn0.setWidth(0);
-        resultColumn0.setResizable(false);
-        TableColumn resultColumn1 = new TableColumn(resultTable, SWT.LEFT);
-        resultColumn1.setWidth(100);
-        resultColumn1.setText("深刻度");
-        TableColumn resultColumn2 = new TableColumn(resultTable, SWT.LEFT);
-        resultColumn2.setWidth(100);
-        resultColumn2.setText("脆弱性数");
-        TableColumn resultColumn3 = new TableColumn(resultTable, SWT.LEFT);
-        resultColumn3.setWidth(100);
-        resultColumn3.setText("カテゴリ");
-        TableColumn resultColumn4 = new TableColumn(resultTable, SWT.LEFT);
-        resultColumn4.setWidth(360);
-        resultColumn4.setText("関数");
-
-        serverlessTabItem.setControl(serverlessShell);
+        addPropertyChangeListener(new ServerlessTabItem(mainTabFolder, shell, ps, bigBtnSize));
 
         // #################### SERVER #################### //
         addPropertyChangeListener(new ServerTabItem(mainTabFolder, shell, ps, bigBtnSize));
@@ -1434,32 +1256,6 @@ public class Main implements PropertyChangeListener {
         ps.setValue(PreferenceConstants.BASIC_AUTH_STATUS, BasicAuthStatusEnum.NONE.name());
         ps.setValue(PreferenceConstants.TSV_STATUS, TsvStatusEnum.NONE.name());
         logOutBtn.setEnabled(false);
-    }
-
-    private void addColToResultTable(Function function, int index) {
-        if (function == null) {
-            return;
-        }
-        TableItem item = null;
-        if (index > 0) {
-            item = new TableItem(resultTable, SWT.CENTER, index);
-        } else {
-            item = new TableItem(resultTable, SWT.CENTER);
-        }
-        item.setText(2, String.valueOf(function.getResults().size()));
-        Set<String> categorySet = new HashSet<String>();
-        for (Result result : function.getResults()) {
-            categorySet.add(result.getCategoryText());
-        }
-        List<String> categories = new ArrayList<String>(categorySet);
-        if (categories.size() > 1) {
-            item.setText(3, String.valueOf(categories.size()));
-        } else if (!categories.isEmpty()) {
-            item.setText(3, categories.get(0));
-        }
-        item.setText(4, function.getFunctionName());
-        // item.setText(2, result.getCategoryText());
-        // item.setText(3, result.getTitle());
     }
 
     private void uiReset() {

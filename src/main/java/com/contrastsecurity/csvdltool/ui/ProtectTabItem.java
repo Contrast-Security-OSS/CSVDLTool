@@ -99,24 +99,24 @@ import com.google.gson.reflect.TypeToken;
 
 public class ProtectTabItem extends CTabItem implements PropertyChangeListener {
 
-    private Button attackLoadBtn;
+    private Button loadBtn;
     private Label attackEventCount;
-    private List<Button> attackTermRadios = new ArrayList<Button>();
-    private Button attackTerm30days;
-    private Button attackTermYesterday;
-    private Button attackTermToday;
-    private Button attackTermLastWeek;
-    private Button attackTermThisWeek;
-    private Button attackTermPeriod;
+    private List<Button> termRadios = new ArrayList<Button>();
+    private Button term30days;
+    private Button termYesterday;
+    private Button termToday;
+    private Button termLastWeek;
+    private Button termThisWeek;
+    private Button termPeriod;
     private Text attackDetectedFilterTxt;
     private Date frDetectedDate;
     private Date toDetectedDate;
-    private Table attackTable;
-    private List<AttackEvent> attackEvents;
-    private List<AttackEvent> filteredAttackEvents = new ArrayList<AttackEvent>();
-    private Map<AttackEventDetectedDateFilterEnum, LocalDate> attackEventDetectedFilterMap;
+    private Table table;
+    private List<AttackEvent> events;
+    private List<AttackEvent> filteredEvents = new ArrayList<AttackEvent>();
+    private Map<AttackEventDetectedDateFilterEnum, LocalDate> eventDetectedFilterMap;
 
-    private Map<FilterEnum, Set<Filter>> protectFilterMap;
+    private Map<FilterEnum, Set<Filter>> filterMap;
 
     private CSVDLToolShell toolShell;
     private PreferenceStore ps;
@@ -132,10 +132,10 @@ public class ProtectTabItem extends CTabItem implements PropertyChangeListener {
         setText(Messages.getString("main.tab.protect.title")); //$NON-NLS-1$
         setImage(new Image(toolShell.getDisplay(), getClass().getClassLoader().getResourceAsStream("contrast-protect-rasp-02.png"))); //$NON-NLS-1$
 
-        Composite protectShell = new Composite(mainTabFolder, SWT.NONE);
-        protectShell.setLayout(new GridLayout(1, false));
+        Composite shell = new Composite(mainTabFolder, SWT.NONE);
+        shell.setLayout(new GridLayout(1, false));
 
-        Group attackListGrp = new Group(protectShell, SWT.NONE);
+        Group attackListGrp = new Group(shell, SWT.NONE);
         attackListGrp.setLayout(new GridLayout(3, false));
         GridData attackListGrpGrDt = new GridData(GridData.FILL_BOTH);
         attackListGrpGrDt.minimumHeight = 200;
@@ -145,34 +145,34 @@ public class ProtectTabItem extends CTabItem implements PropertyChangeListener {
         attackTermGrp.setLayout(new GridLayout(7, false));
         GridData attackTermGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
         attackTermGrp.setLayoutData(attackTermGrpGrDt);
-        attackTerm30days = new Button(attackTermGrp, SWT.RADIO);
-        attackTerm30days.setText(Messages.getString("main.attackevent.data.range.radio.all")); //$NON-NLS-1$
-        attackTermRadios.add(attackTerm30days);
-        attackTermYesterday = new Button(attackTermGrp, SWT.RADIO);
-        attackTermYesterday.setText(Messages.getString("main.attackevent.data.range.radio.yesterday")); //$NON-NLS-1$
-        attackTermRadios.add(attackTermYesterday);
-        attackTermToday = new Button(attackTermGrp, SWT.RADIO);
-        attackTermToday.setText(Messages.getString("main.attackevent.data.range.radio.today")); //$NON-NLS-1$
-        attackTermRadios.add(attackTermToday);
-        attackTermLastWeek = new Button(attackTermGrp, SWT.RADIO);
-        attackTermLastWeek.setText(Messages.getString("main.attackevent.data.range.radio.lastweek")); //$NON-NLS-1$
-        attackTermRadios.add(attackTermLastWeek);
-        attackTermThisWeek = new Button(attackTermGrp, SWT.RADIO);
-        attackTermThisWeek.setText(Messages.getString("main.attackevent.data.range.radio.thisweek")); //$NON-NLS-1$
-        attackTermRadios.add(attackTermThisWeek);
-        attackTermPeriod = new Button(attackTermGrp, SWT.RADIO);
-        attackTermPeriod.setText(Messages.getString("main.attackevent.data.range.radio.custom")); //$NON-NLS-1$
-        attackTermPeriod.addSelectionListener(new SelectionAdapter() {
+        term30days = new Button(attackTermGrp, SWT.RADIO);
+        term30days.setText(Messages.getString("main.attackevent.data.range.radio.all")); //$NON-NLS-1$
+        termRadios.add(term30days);
+        termYesterday = new Button(attackTermGrp, SWT.RADIO);
+        termYesterday.setText(Messages.getString("main.attackevent.data.range.radio.yesterday")); //$NON-NLS-1$
+        termRadios.add(termYesterday);
+        termToday = new Button(attackTermGrp, SWT.RADIO);
+        termToday.setText(Messages.getString("main.attackevent.data.range.radio.today")); //$NON-NLS-1$
+        termRadios.add(termToday);
+        termLastWeek = new Button(attackTermGrp, SWT.RADIO);
+        termLastWeek.setText(Messages.getString("main.attackevent.data.range.radio.lastweek")); //$NON-NLS-1$
+        termRadios.add(termLastWeek);
+        termThisWeek = new Button(attackTermGrp, SWT.RADIO);
+        termThisWeek.setText(Messages.getString("main.attackevent.data.range.radio.thisweek")); //$NON-NLS-1$
+        termRadios.add(termThisWeek);
+        termPeriod = new Button(attackTermGrp, SWT.RADIO);
+        termPeriod.setText(Messages.getString("main.attackevent.data.range.radio.custom")); //$NON-NLS-1$
+        termPeriod.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                if (attackTermPeriod.getSelection()) {
+                if (termPeriod.getSelection()) {
                     long frLong = ps.getLong(PreferenceConstants.ATTACK_DETECTED_DATE_TERM_FR);
                     long toLong = ps.getLong(PreferenceConstants.ATTACK_DETECTED_DATE_TERM_TO);
                     Date fr = frLong > 0 ? new Date(frLong) : null;
                     Date to = frLong > 0 ? new Date(toLong) : null;
                     if (fr == null && to == null) {
                         attackDetectedTermUpdate();
-                        attackLoadBtn.setFocus();
+                        loadBtn.setFocus();
                     }
                     attackDetectedFilterTxt.setForeground(toolShell.getDisplay().getSystemColor(SWT.COLOR_BLACK));
                 } else {
@@ -180,7 +180,7 @@ public class ProtectTabItem extends CTabItem implements PropertyChangeListener {
                 }
             }
         });
-        attackTermRadios.add(attackTermPeriod);
+        termRadios.add(termPeriod);
         attackDetectedFilterTxt = new Text(attackTermGrp, SWT.BORDER);
         long frLong = ps.getLong(PreferenceConstants.ATTACK_DETECTED_DATE_TERM_FR);
         long toLong = ps.getLong(PreferenceConstants.ATTACK_DETECTED_DATE_TERM_TO);
@@ -193,41 +193,41 @@ public class ProtectTabItem extends CTabItem implements PropertyChangeListener {
             public void handleEvent(Event event) {
                 attackDetectedTermUpdate();
                 if (!attackDetectedFilterTxt.getText().isEmpty()) {
-                    for (Button rdo : attackTermRadios) {
+                    for (Button rdo : termRadios) {
                         rdo.setSelection(false);
                     }
-                    attackTermPeriod.setSelection(true);
+                    termPeriod.setSelection(true);
                 }
-                attackLoadBtn.setFocus();
+                loadBtn.setFocus();
             }
         });
-        for (Button termBtn : this.attackTermRadios) {
+        for (Button termBtn : this.termRadios) {
             termBtn.setSelection(false);
-            if (this.attackTermRadios.indexOf(termBtn) == this.ps.getInt(PreferenceConstants.ATTACK_DETECTED_DATE_FILTER)) {
+            if (this.termRadios.indexOf(termBtn) == this.ps.getInt(PreferenceConstants.ATTACK_DETECTED_DATE_FILTER)) {
                 termBtn.setSelection(true);
             }
         }
-        if (attackTermPeriod.getSelection()) {
+        if (termPeriod.getSelection()) {
             attackDetectedFilterTxt.setForeground(toolShell.getDisplay().getSystemColor(SWT.COLOR_BLACK));
         } else {
             attackDetectedFilterTxt.setForeground(toolShell.getDisplay().getSystemColor(SWT.COLOR_GRAY));
         }
 
-        attackLoadBtn = new Button(attackListGrp, SWT.PUSH);
+        loadBtn = new Button(attackListGrp, SWT.PUSH);
         GridData attackLoadBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
         attackLoadBtnGrDt.horizontalSpan = 3;
         attackLoadBtnGrDt.minimumHeight = 50;
         attackLoadBtnGrDt.heightHint = bigBtnSize.y + 20;
-        attackLoadBtn.setLayoutData(attackLoadBtnGrDt);
-        attackLoadBtn.setText(Messages.getString("main.attackevent.load.button.title")); //$NON-NLS-1$
-        attackLoadBtn.setToolTipText(Messages.getString("main.attackevent.load.button.tooltip")); //$NON-NLS-1$
-        attackLoadBtn.setFont(new Font(toolShell.getDisplay(), "Arial", 20, SWT.NORMAL)); //$NON-NLS-1$
-        attackLoadBtn.addSelectionListener(new SelectionAdapter() {
+        loadBtn.setLayoutData(attackLoadBtnGrDt);
+        loadBtn.setText(Messages.getString("main.attackevent.load.button.title")); //$NON-NLS-1$
+        loadBtn.setToolTipText(Messages.getString("main.attackevent.load.button.tooltip")); //$NON-NLS-1$
+        loadBtn.setFont(new Font(toolShell.getDisplay(), "Arial", 20, SWT.NORMAL)); //$NON-NLS-1$
+        loadBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                filteredAttackEvents.clear();
-                attackTable.clearAll();
-                attackTable.removeAll();
+                filteredEvents.clear();
+                table.clearAll();
+                table.removeAll();
                 Date[] frToDate = getFrToDetectedDate();
                 if (frToDate.length != 2) {
                     MessageDialog.openError(toolShell, Messages.getString("main.attackevent.load.message.dialog.title"), //$NON-NLS-1$
@@ -238,14 +238,14 @@ public class ProtectTabItem extends CTabItem implements PropertyChangeListener {
                 ProgressMonitorDialog progDialog = new AttackGetProgressMonitorDialog(toolShell);
                 try {
                     progDialog.run(true, true, progress);
-                    attackEvents = progress.getAllAttackEvents();
-                    Collections.reverse(attackEvents);
-                    filteredAttackEvents.addAll(attackEvents);
-                    for (AttackEvent attackEvent : attackEvents) {
-                        addColToAttackTable(attackEvent, -1);
+                    events = progress.getAllAttackEvents();
+                    Collections.reverse(events);
+                    filteredEvents.addAll(events);
+                    for (AttackEvent attackEvent : events) {
+                        addColToTable(attackEvent, -1);
                     }
-                    protectFilterMap = progress.getFilterMap();
-                    attackEventCount.setText(String.format("%d/%d", filteredAttackEvents.size(), attackEvents.size())); //$NON-NLS-1$
+                    filterMap = progress.getFilterMap();
+                    attackEventCount.setText(String.format("%d/%d", filteredEvents.size(), events.size())); //$NON-NLS-1$
                 } catch (InvocationTargetException e) {
                     StringWriter stringWriter = new StringWriter();
                     PrintWriter printWriter = new PrintWriter(stringWriter);
@@ -289,26 +289,26 @@ public class ProtectTabItem extends CTabItem implements PropertyChangeListener {
         this.attackEventCount.setFont(new Font(toolShell.getDisplay(), "Arial", 10, SWT.NORMAL)); //$NON-NLS-1$
         this.attackEventCount.setText("0/0"); //$NON-NLS-1$
 
-        attackTable = new Table(attackListGrp, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
+        table = new Table(attackListGrp, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
         GridData tableGrDt = new GridData(GridData.FILL_BOTH);
         tableGrDt.horizontalSpan = 3;
-        attackTable.setLayoutData(tableGrDt);
-        attackTable.setLinesVisible(true);
-        attackTable.setHeaderVisible(true);
-        Menu menuTable = new Menu(attackTable);
-        attackTable.setMenu(menuTable);
+        table.setLayoutData(tableGrDt);
+        table.setLinesVisible(true);
+        table.setHeaderVisible(true);
+        Menu tableMenu = new Menu(table);
+        table.setMenu(tableMenu);
 
-        MenuItem miTag = new MenuItem(menuTable, SWT.NONE);
+        MenuItem miTag = new MenuItem(tableMenu, SWT.NONE);
         miTag.setText(Messages.getString("main.attackevent.menu.item.edit.tag")); //$NON-NLS-1$
         miTag.addSelectionListener(new SelectionAdapter() {
             @SuppressWarnings("unchecked")
             @Override
             public void widgetSelected(SelectionEvent e) {
-                int[] selectIndexes = attackTable.getSelectionIndices();
+                int[] selectIndexes = table.getSelectionIndices();
                 // TagInputDialog tagInputDialog = new TagInputDialog(shell);
                 Set<String> existTagSet = new TreeSet<String>();
                 for (int idx : selectIndexes) {
-                    AttackEvent attackEvent = filteredAttackEvents.get(idx);
+                    AttackEvent attackEvent = filteredEvents.get(idx);
                     for (String existTag : attackEvent.getTags()) {
                         existTagSet.add(existTag);
                     }
@@ -325,7 +325,7 @@ public class ProtectTabItem extends CTabItem implements PropertyChangeListener {
                 }
                 Map<Organization, List<AttackEvent>> orgMap = new HashMap<Organization, List<AttackEvent>>();
                 for (int idx : selectIndexes) {
-                    AttackEvent attackEvent = filteredAttackEvents.get(idx);
+                    AttackEvent attackEvent = filteredEvents.get(idx);
                     if (orgMap.containsKey(attackEvent.getOrganization())) {
                         orgMap.get(attackEvent.getOrganization()).add(attackEvent);
                     } else {
@@ -343,10 +343,10 @@ public class ProtectTabItem extends CTabItem implements PropertyChangeListener {
                                 List<String> tags = (List<String>) attackEventTagsApi.get();
                                 attackEvent.setTags(tags);
                             }
-                            attackTable.clearAll();
-                            attackTable.removeAll();
-                            for (AttackEvent attackEvent : filteredAttackEvents) {
-                                addColToAttackTable(attackEvent, -1);
+                            table.clearAll();
+                            table.removeAll();
+                            for (AttackEvent attackEvent : filteredEvents) {
+                                addColToTable(attackEvent, -1);
                             }
                             MessageDialog.openInformation(toolShell, Messages.getString("main.attackevent.message.dialog.edit.tag.title"), //$NON-NLS-1$
                                     Messages.getString("main.attackevent.message.dialog.edit.tag.message")); //$NON-NLS-1$
@@ -358,9 +358,9 @@ public class ProtectTabItem extends CTabItem implements PropertyChangeListener {
             }
         });
 
-        MenuItem miExp = new MenuItem(menuTable, SWT.NONE);
-        miExp.setText(Messages.getString("main.attackevent.menu.item.export.csv")); //$NON-NLS-1$
-        miExp.addSelectionListener(new SelectionAdapter() {
+        MenuItem miExport = new MenuItem(tableMenu, SWT.NONE);
+        miExport.setText(Messages.getString("main.attackevent.menu.item.export.csv")); //$NON-NLS-1$
+        miExport.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 boolean isSaveOutDirPath = ps.getString(PreferenceConstants.FILE_OUT_MODE).equals("save");
@@ -368,7 +368,7 @@ public class ProtectTabItem extends CTabItem implements PropertyChangeListener {
                 if (!isSaveOutDirPath || outDirPath.isEmpty()) {
                     outDirPath = toolShell.getMain().getOutDirPath();
                 }
-                int[] selectIndexes = attackTable.getSelectionIndices();
+                int[] selectIndexes = table.getSelectionIndices();
                 List<List<String>> csvList = new ArrayList<List<String>>();
                 String csvFileFormat = ps.getString(PreferenceConstants.CSV_FILE_FORMAT_ATTACKEVENT);
                 if (csvFileFormat == null || csvFileFormat.isEmpty()) {
@@ -404,7 +404,7 @@ public class ProtectTabItem extends CTabItem implements PropertyChangeListener {
                 }
                 for (int idx : selectIndexes) {
                     List<String> csvLineList = new ArrayList<String>();
-                    AttackEvent attackEvent = filteredAttackEvents.get(idx);
+                    AttackEvent attackEvent = filteredEvents.get(idx);
                     for (AttackEventCSVColumn csvColumn : columnList) {
                         if (!csvColumn.isValid()) {
                             continue;
@@ -498,7 +498,7 @@ public class ProtectTabItem extends CTabItem implements PropertyChangeListener {
             }
         });
 
-        MenuItem miReport = new MenuItem(menuTable, SWT.NONE);
+        MenuItem miReport = new MenuItem(tableMenu, SWT.NONE);
         miReport.setText(Messages.getString("main.attackevent.menu.item.output.report")); //$NON-NLS-1$
         miReport.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -508,11 +508,11 @@ public class ProtectTabItem extends CTabItem implements PropertyChangeListener {
                 if (!isSaveOutDirPath || outDirPath.isEmpty()) {
                     outDirPath = toolShell.getMain().getOutDirPath();
                 }
-                int[] selectIndexes = attackTable.getSelectionIndices();
+                int[] selectIndexes = table.getSelectionIndices();
                 Set<String> srcIpSet = new HashSet<String>();
                 Set<String> ruleSet = new HashSet<String>();
                 for (int idx : selectIndexes) {
-                    AttackEvent attackEvent = filteredAttackEvents.get(idx);
+                    AttackEvent attackEvent = filteredEvents.get(idx);
                     srcIpSet.add(attackEvent.getSource());
                     ruleSet.add(attackEvent.getRule());
                 }
@@ -525,7 +525,7 @@ public class ProtectTabItem extends CTabItem implements PropertyChangeListener {
                     srcIpMap.put(srcIp, ruleMap);
                 }
                 for (int idx : selectIndexes) {
-                    AttackEvent attackEvent = filteredAttackEvents.get(idx);
+                    AttackEvent attackEvent = filteredEvents.get(idx);
                     String srcIp = attackEvent.getSource();
                     String rule = attackEvent.getRule();
                     int cnt = srcIpMap.get(srcIp).get(rule).intValue();
@@ -562,12 +562,12 @@ public class ProtectTabItem extends CTabItem implements PropertyChangeListener {
             }
         });
 
-        MenuItem miJump = new MenuItem(menuTable, SWT.NONE);
+        MenuItem miJump = new MenuItem(tableMenu, SWT.NONE);
         miJump.setText(Messages.getString("main.attackevent.menu.item.browser.open")); //$NON-NLS-1$
         miJump.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                int[] selectIndexes = attackTable.getSelectionIndices();
+                int[] selectIndexes = table.getSelectionIndices();
                 if (selectIndexes.length > 10) {
                     MessageBox messageBox = new MessageBox(toolShell, SWT.ICON_QUESTION | SWT.YES | SWT.NO);
                     messageBox.setText(Messages.getString("main.attackevent.message.dialog.browser.open.title")); //$NON-NLS-1$
@@ -580,7 +580,7 @@ public class ProtectTabItem extends CTabItem implements PropertyChangeListener {
                 try {
                     Desktop desktop = Desktop.getDesktop();
                     for (int idx : selectIndexes) {
-                        AttackEvent attackEvent = filteredAttackEvents.get(idx);
+                        AttackEvent attackEvent = filteredEvents.get(idx);
                         String contrastUrl = ps.getString(PreferenceConstants.CONTRAST_URL);
                         String orgUuid = attackEvent.getOrganization().getOrganization_uuid();
                         String eventUuid = attackEvent.getEvent_uuid();
@@ -594,13 +594,13 @@ public class ProtectTabItem extends CTabItem implements PropertyChangeListener {
             }
         });
 
-        MenuItem miUrlCopy = new MenuItem(menuTable, SWT.NONE);
+        MenuItem miUrlCopy = new MenuItem(tableMenu, SWT.NONE);
         miUrlCopy.setText(Messages.getString("main.attackevent.menu.item.copy.teamserver.url")); //$NON-NLS-1$
         miUrlCopy.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                int selectIndex = attackTable.getSelectionIndex();
-                AttackEvent attackEvent = filteredAttackEvents.get(selectIndex);
+                int selectIndex = table.getSelectionIndex();
+                AttackEvent attackEvent = filteredEvents.get(selectIndex);
                 String contrastUrl = ps.getString(PreferenceConstants.CONTRAST_URL);
                 String orgUuid = attackEvent.getOrganization().getOrganization_uuid();
                 String eventUuid = attackEvent.getEvent_uuid();
@@ -610,70 +610,70 @@ public class ProtectTabItem extends CTabItem implements PropertyChangeListener {
             }
         });
 
-        MenuItem miSelectAll = new MenuItem(menuTable, SWT.NONE);
+        MenuItem miSelectAll = new MenuItem(tableMenu, SWT.NONE);
         miSelectAll.setText(Messages.getString("main.attackevent.menu.item.select.all")); //$NON-NLS-1$
         miSelectAll.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                attackTable.selectAll();
+                table.selectAll();
             }
         });
 
-        attackTable.addListener(SWT.MenuDetect, new Listener() {
+        table.addListener(SWT.MenuDetect, new Listener() {
             @Override
             public void handleEvent(Event event) {
                 miUrlCopy.setEnabled(true);
-                if (attackTable.getSelectionCount() <= 0) {
+                if (table.getSelectionCount() <= 0) {
                     event.doit = false;
-                } else if (attackTable.getSelectionCount() != 1) {
+                } else if (table.getSelectionCount() != 1) {
                     miUrlCopy.setEnabled(false);
                 }
             }
         });
-        attackTable.addKeyListener(new KeyAdapter() {
+        table.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
                 if ((e.stateMask == SWT.CTRL || e.stateMask == SWT.COMMAND) && e.keyCode == 'a') {
-                    attackTable.selectAll();
+                    table.selectAll();
                     e.doit = false;
                 }
             }
         });
 
-        TableColumn column0 = new TableColumn(attackTable, SWT.NONE);
+        TableColumn column0 = new TableColumn(table, SWT.NONE);
         column0.setWidth(0);
         column0.setResizable(false);
-        TableColumn column1 = new TableColumn(attackTable, SWT.LEFT);
+        TableColumn column1 = new TableColumn(table, SWT.LEFT);
         column1.setWidth(120);
         column1.setText(Messages.getString("main.attackevent.table.column0.title")); //$NON-NLS-1$
-        TableColumn column2 = new TableColumn(attackTable, SWT.LEFT);
+        TableColumn column2 = new TableColumn(table, SWT.LEFT);
         column2.setWidth(120);
         column2.setText(Messages.getString("main.attackevent.table.column1.title")); //$NON-NLS-1$
-        TableColumn column3 = new TableColumn(attackTable, SWT.CENTER);
+        TableColumn column3 = new TableColumn(table, SWT.CENTER);
         column3.setWidth(100);
         column3.setText(Messages.getString("main.attackevent.table.column2.title")); //$NON-NLS-1$
-        TableColumn column4 = new TableColumn(attackTable, SWT.LEFT);
+        TableColumn column4 = new TableColumn(table, SWT.LEFT);
         column4.setWidth(250);
         column4.setText(Messages.getString("main.attackevent.table.column3.title")); //$NON-NLS-1$
-        TableColumn column5 = new TableColumn(attackTable, SWT.LEFT);
+        TableColumn column5 = new TableColumn(table, SWT.LEFT);
         column5.setWidth(200);
         column5.setText(Messages.getString("main.attackevent.table.column4.title")); //$NON-NLS-1$
-        TableColumn column6 = new TableColumn(attackTable, SWT.LEFT);
+        TableColumn column6 = new TableColumn(table, SWT.LEFT);
         column6.setWidth(200);
         column6.setText(Messages.getString("main.attackevent.table.column5.title")); //$NON-NLS-1$
-        TableColumn column7 = new TableColumn(attackTable, SWT.LEFT);
+        TableColumn column7 = new TableColumn(table, SWT.LEFT);
         column7.setWidth(150);
         column7.setText(Messages.getString("main.attackevent.table.column6.title")); //$NON-NLS-1$
-        TableColumn column8 = new TableColumn(attackTable, SWT.LEFT);
+        TableColumn column8 = new TableColumn(table, SWT.LEFT);
         column8.setWidth(150);
         column8.setText(Messages.getString("main.attackevent.table.column7.title")); //$NON-NLS-1$
-        TableColumn column9 = new TableColumn(attackTable, SWT.LEFT);
+        TableColumn column9 = new TableColumn(table, SWT.LEFT);
         column9.setWidth(250);
         column9.setText(Messages.getString("main.attackevent.table.column8.title")); //$NON-NLS-1$
-        TableColumn column10 = new TableColumn(attackTable, SWT.LEFT);
+        TableColumn column10 = new TableColumn(table, SWT.LEFT);
         column10.setWidth(250);
         column10.setText(Messages.getString("main.attackevent.table.column9.title")); //$NON-NLS-1$
-        TableColumn column11 = new TableColumn(attackTable, SWT.LEFT);
+        TableColumn column11 = new TableColumn(table, SWT.LEFT);
         column11.setWidth(150);
         column11.setText(Messages.getString("main.attackevent.table.column10.title")); //$NON-NLS-1$
 
@@ -686,7 +686,7 @@ public class ProtectTabItem extends CTabItem implements PropertyChangeListener {
         attackEventFilterBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                if (protectFilterMap == null) {
+                if (filterMap == null) {
                     MessageDialog.openInformation(toolShell, Messages.getString("main.attackevent.filter.message.dialog.title"), //$NON-NLS-1$
                             Messages.getString("main.attackevent.filter.not.loaded.error.message")); //$NON-NLS-1$
                     return;
@@ -702,9 +702,9 @@ public class ProtectTabItem extends CTabItem implements PropertyChangeListener {
                         businessHoursFilterSet.add(new Filter(Messages.getString("main.attackevent.filter.time.slot.nighttime"))); //$NON-NLS-1$
                     }
                     businessHoursFilterSet.add(new Filter(Messages.getString("main.attackevent.filter.time.slot.othertime"))); //$NON-NLS-1$
-                    protectFilterMap.put(FilterEnum.BUSINESS_HOURS, businessHoursFilterSet);
+                    filterMap.put(FilterEnum.BUSINESS_HOURS, businessHoursFilterSet);
                 }
-                AttackEventFilterDialog filterDialog = new AttackEventFilterDialog(toolShell, protectFilterMap);
+                AttackEventFilterDialog filterDialog = new AttackEventFilterDialog(toolShell, filterMap);
                 filterDialog.addPropertyChangeListener(toolShell.getMain());
                 int result = filterDialog.open();
                 if (IDialogConstants.OK_ID != result) {
@@ -712,18 +712,18 @@ public class ProtectTabItem extends CTabItem implements PropertyChangeListener {
                 }
             }
         });
-        setControl(protectShell);
+        setControl(shell);
     }
 
-    private void addColToAttackTable(AttackEvent attackEvent, int index) {
+    private void addColToTable(AttackEvent attackEvent, int index) {
         if (attackEvent == null) {
             return;
         }
         TableItem item = null;
         if (index > 0) {
-            item = new TableItem(attackTable, SWT.CENTER, index);
+            item = new TableItem(table, SWT.CENTER, index);
         } else {
-            item = new TableItem(attackTable, SWT.CENTER);
+            item = new TableItem(table, SWT.CENTER);
         }
         item.setText(1, attackEvent.getSource_name());
         item.setText(2, attackEvent.getSource());
@@ -743,7 +743,7 @@ public class ProtectTabItem extends CTabItem implements PropertyChangeListener {
         FilterLastDetectedDialog filterDialog = new FilterLastDetectedDialog(toolShell, frDetectedDate, toDetectedDate);
         int result = filterDialog.open();
         if (IDialogConstants.OK_ID != result) {
-            attackLoadBtn.setFocus();
+            loadBtn.setFocus();
             return;
         }
         frDetectedDate = filterDialog.getFrDate();
@@ -766,25 +766,25 @@ public class ProtectTabItem extends CTabItem implements PropertyChangeListener {
     }
 
     public void updateProtectOption() {
-        this.attackEventDetectedFilterMap = getAttackEventDetectedDateMap();
-        attackTermToday.setToolTipText(this.attackEventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.TODAY).format(DateTimeFormatter.ofPattern("yyyy/MM/dd(E)"))); //$NON-NLS-1$
-        attackTermYesterday.setToolTipText(this.attackEventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.YESTERDAY).format(DateTimeFormatter.ofPattern("yyyy/MM/dd(E)"))); //$NON-NLS-1$
-        attackTerm30days.setToolTipText(String.format("%s ～ %s", //$NON-NLS-1$
-                this.attackEventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.BEFORE_30_DAYS).format(DateTimeFormatter.ofPattern("yyyy/MM/dd(E)")), //$NON-NLS-1$
-                this.attackEventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.TODAY).format(DateTimeFormatter.ofPattern("yyyy/MM/dd(E)")))); //$NON-NLS-1$
-        attackTermLastWeek.setToolTipText(String.format("%s ～ %s", //$NON-NLS-1$
-                this.attackEventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.LAST_WEEK_START).format(DateTimeFormatter.ofPattern("yyyy/MM/dd(E)")), //$NON-NLS-1$
-                this.attackEventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.LAST_WEEK_END).format(DateTimeFormatter.ofPattern("yyyy/MM/dd(E)")))); //$NON-NLS-1$
-        attackTermThisWeek.setToolTipText(String.format("%s ～ %s", //$NON-NLS-1$
-                this.attackEventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.THIS_WEEK_START).format(DateTimeFormatter.ofPattern("yyyy/MM/dd(E)")), //$NON-NLS-1$
-                this.attackEventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.THIS_WEEK_END).format(DateTimeFormatter.ofPattern("yyyy/MM/dd(E)")))); //$NON-NLS-1$
+        this.eventDetectedFilterMap = getAttackEventDetectedDateMap();
+        termToday.setToolTipText(this.eventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.TODAY).format(DateTimeFormatter.ofPattern("yyyy/MM/dd(E)"))); //$NON-NLS-1$
+        termYesterday.setToolTipText(this.eventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.YESTERDAY).format(DateTimeFormatter.ofPattern("yyyy/MM/dd(E)"))); //$NON-NLS-1$
+        term30days.setToolTipText(String.format("%s ～ %s", //$NON-NLS-1$
+                this.eventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.BEFORE_30_DAYS).format(DateTimeFormatter.ofPattern("yyyy/MM/dd(E)")), //$NON-NLS-1$
+                this.eventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.TODAY).format(DateTimeFormatter.ofPattern("yyyy/MM/dd(E)")))); //$NON-NLS-1$
+        termLastWeek.setToolTipText(String.format("%s ～ %s", //$NON-NLS-1$
+                this.eventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.LAST_WEEK_START).format(DateTimeFormatter.ofPattern("yyyy/MM/dd(E)")), //$NON-NLS-1$
+                this.eventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.LAST_WEEK_END).format(DateTimeFormatter.ofPattern("yyyy/MM/dd(E)")))); //$NON-NLS-1$
+        termThisWeek.setToolTipText(String.format("%s ～ %s", //$NON-NLS-1$
+                this.eventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.THIS_WEEK_START).format(DateTimeFormatter.ofPattern("yyyy/MM/dd(E)")), //$NON-NLS-1$
+                this.eventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.THIS_WEEK_END).format(DateTimeFormatter.ofPattern("yyyy/MM/dd(E)")))); //$NON-NLS-1$
     }
 
     private Date[] getFrToDetectedDate() {
         int idx = -1;
-        for (Button termBtn : this.attackTermRadios) {
+        for (Button termBtn : this.termRadios) {
             if (termBtn.getSelection()) {
-                idx = attackTermRadios.indexOf(termBtn);
+                idx = termRadios.indexOf(termBtn);
                 break;
             }
         }
@@ -795,24 +795,24 @@ public class ProtectTabItem extends CTabItem implements PropertyChangeListener {
         LocalDate toLocalDate = null;
         switch (idx) {
             case 0: // 30days
-                frLocalDate = this.attackEventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.BEFORE_30_DAYS);
-                toLocalDate = this.attackEventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.TODAY);
+                frLocalDate = this.eventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.BEFORE_30_DAYS);
+                toLocalDate = this.eventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.TODAY);
                 break;
             case 1: // Yesterday
-                frLocalDate = this.attackEventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.YESTERDAY);
-                toLocalDate = this.attackEventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.YESTERDAY);
+                frLocalDate = this.eventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.YESTERDAY);
+                toLocalDate = this.eventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.YESTERDAY);
                 break;
             case 2: // Today
-                frLocalDate = this.attackEventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.TODAY);
-                toLocalDate = this.attackEventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.TODAY);
+                frLocalDate = this.eventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.TODAY);
+                toLocalDate = this.eventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.TODAY);
                 break;
             case 3: // LastWeek
-                frLocalDate = this.attackEventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.LAST_WEEK_START);
-                toLocalDate = this.attackEventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.LAST_WEEK_END);
+                frLocalDate = this.eventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.LAST_WEEK_START);
+                toLocalDate = this.eventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.LAST_WEEK_END);
                 break;
             case 4: // ThisWeek
-                frLocalDate = this.attackEventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.THIS_WEEK_START);
-                toLocalDate = this.attackEventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.THIS_WEEK_END);
+                frLocalDate = this.eventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.THIS_WEEK_START);
+                toLocalDate = this.eventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.THIS_WEEK_END);
                 break;
             case 5: // Specify
                 if (frDetectedDate == null || toDetectedDate == null) {
@@ -820,8 +820,8 @@ public class ProtectTabItem extends CTabItem implements PropertyChangeListener {
                 }
                 return new Date[] { frDetectedDate, toDetectedDate };
             default:
-                frLocalDate = this.attackEventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.BEFORE_30_DAYS);
-                toLocalDate = this.attackEventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.TODAY);
+                frLocalDate = this.eventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.BEFORE_30_DAYS);
+                toLocalDate = this.eventDetectedFilterMap.get(AttackEventDetectedDateFilterEnum.TODAY);
         }
         Date frDate = Date.from(frLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
         Calendar cal = Calendar.getInstance();
@@ -854,9 +854,9 @@ public class ProtectTabItem extends CTabItem implements PropertyChangeListener {
         if ("shellActivated".equals(event.getPropertyName())) { //$NON-NLS-1$
             updateProtectOption();
         } else if ("shellClosed".equals(event.getPropertyName())) { //$NON-NLS-1$
-            for (Button termBtn : attackTermRadios) {
+            for (Button termBtn : termRadios) {
                 if (termBtn.getSelection()) {
-                    ps.setValue(PreferenceConstants.ATTACK_DETECTED_DATE_FILTER, attackTermRadios.indexOf(termBtn));
+                    ps.setValue(PreferenceConstants.ATTACK_DETECTED_DATE_FILTER, termRadios.indexOf(termBtn));
                 }
             }
         } else if ("tabSelected".equals(event.getPropertyName())) { //$NON-NLS-1$
@@ -865,13 +865,13 @@ public class ProtectTabItem extends CTabItem implements PropertyChangeListener {
                 updateProtectOption();
             }
         } else if ("buttonEnabled".equals(event.getPropertyName())) { //$NON-NLS-1$
-            attackLoadBtn.setEnabled((Boolean) event.getNewValue());
+            loadBtn.setEnabled((Boolean) event.getNewValue());
         } else if ("attackEventFilter".equals(event.getPropertyName())) { //$NON-NLS-1$
             Map<FilterEnum, Set<Filter>> filterMap = (Map<FilterEnum, Set<Filter>>) event.getNewValue();
-            attackTable.clearAll();
-            attackTable.removeAll();
-            filteredAttackEvents.clear();
-            for (AttackEvent attackEvent : attackEvents) {
+            table.clearAll();
+            table.removeAll();
+            filteredEvents.clear();
+            for (AttackEvent attackEvent : events) {
                 boolean lostFlg = false;
                 for (Filter filter : filterMap.get(FilterEnum.SOURCE_NAME)) {
                     if (attackEvent.getSource_name().equals(filter.getLabel())) {
@@ -998,11 +998,11 @@ public class ProtectTabItem extends CTabItem implements PropertyChangeListener {
                     }
                 }
                 if (!lostFlg) {
-                    addColToAttackTable(attackEvent, -1);
-                    filteredAttackEvents.add(attackEvent);
+                    addColToTable(attackEvent, -1);
+                    filteredEvents.add(attackEvent);
                 }
             }
-            attackEventCount.setText(String.format("%d/%d", filteredAttackEvents.size(), attackEvents.size())); //$NON-NLS-1$
+            attackEventCount.setText(String.format("%d/%d", filteredEvents.size(), events.size())); //$NON-NLS-1$
         }
     }
 

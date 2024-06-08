@@ -67,7 +67,7 @@ import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
 
 public class AssessTabItem extends CTabItem implements PropertyChangeListener {
 
-    private Button appLoadBtn;
+    private Button loadBtn;
     private Text srcListFilter;
     private Text srcListLanguagesFilter;
     private Text dstListFilter;
@@ -106,17 +106,17 @@ public class AssessTabItem extends CTabItem implements PropertyChangeListener {
 
     Logger logger = LogManager.getLogger("csvdltool"); //$NON-NLS-1$
 
-    public AssessTabItem(CTabFolder mainTabFolder, CSVDLToolShell shell, PreferenceStore ps) {
+    public AssessTabItem(CTabFolder mainTabFolder, CSVDLToolShell toolShell, PreferenceStore ps) {
         super(mainTabFolder, SWT.NONE);
         this.ps = ps;
-        Font bigFont = new Font(shell.getDisplay(), "Arial", 20, SWT.NORMAL);
+        Font bigFont = new Font(toolShell.getDisplay(), "Arial", 20, SWT.NORMAL);
         setText(Messages.getString("main.tab.assess.title")); //$NON-NLS-1$
-        setImage(new Image(shell.getDisplay(), getClass().getClassLoader().getResourceAsStream("contrast-assess-iast-02.png"))); //$NON-NLS-1$
+        setImage(new Image(toolShell.getDisplay(), getClass().getClassLoader().getResourceAsStream("contrast-assess-iast-02.png"))); //$NON-NLS-1$
 
-        Composite assessShell = new Composite(mainTabFolder, SWT.NONE);
-        assessShell.setLayout(new GridLayout(1, false));
+        Composite shell = new Composite(mainTabFolder, SWT.NONE);
+        shell.setLayout(new GridLayout(1, false));
 
-        Group appListGrp = new Group(assessShell, SWT.NONE);
+        Group appListGrp = new Group(shell, SWT.NONE);
         GridLayout appListGrpLt = new GridLayout(3, false);
         appListGrpLt.marginHeight = 0;
         appListGrpLt.verticalSpacing = 0;
@@ -126,18 +126,18 @@ public class AssessTabItem extends CTabItem implements PropertyChangeListener {
         appListGrp.setLayoutData(appListGrpGrDt);
         // appListGrp.setBackground(display.getSystemColor(SWT.COLOR_RED));
 
-        appLoadBtn = new Button(appListGrp, SWT.PUSH);
-        GridData appLoadBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
-        appLoadBtnGrDt.horizontalSpan = 3;
-        appLoadBtn.setLayoutData(appLoadBtnGrDt);
-        appLoadBtn.setText(Messages.getString("main.application.load.button.title")); //$NON-NLS-1$
-        appLoadBtn.setToolTipText(Messages.getString("main.application.load.button.tooltip")); //$NON-NLS-1$
-        appLoadBtn.addSelectionListener(new SelectionAdapter() {
+        loadBtn = new Button(appListGrp, SWT.PUSH);
+        GridData loadBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        loadBtnGrDt.horizontalSpan = 3;
+        loadBtn.setLayoutData(loadBtnGrDt);
+        loadBtn.setText(Messages.getString("main.application.load.button.title")); //$NON-NLS-1$
+        loadBtn.setToolTipText(Messages.getString("main.application.load.button.tooltip")); //$NON-NLS-1$
+        loadBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
                 uiReset();
-                AppsGetWithProgress progress = new AppsGetWithProgress(shell, ps, shell.getMain().getValidOrganizations());
-                ProgressMonitorDialog progDialog = new AppGetProgressMonitorDialog(shell);
+                AppsGetWithProgress progress = new AppsGetWithProgress(toolShell, ps, toolShell.getMain().getValidOrganizations());
+                ProgressMonitorDialog progDialog = new AppGetProgressMonitorDialog(toolShell);
                 try {
                     progDialog.run(true, true, progress);
                 } catch (InvocationTargetException e) {
@@ -150,25 +150,25 @@ public class AssessTabItem extends CTabItem implements PropertyChangeListener {
                     // }
                     String errorMsg = e.getTargetException().getMessage();
                     if (e.getTargetException() instanceof ApiException) {
-                        MessageDialog.openError(shell, Messages.getString("main.application.load.message.dialog.title"), //$NON-NLS-1$
+                        MessageDialog.openError(toolShell, Messages.getString("main.application.load.message.dialog.title"), //$NON-NLS-1$
                                 String.format("%s\r\n%s", Messages.getString("main.teamserver.return.error"), errorMsg)); //$NON-NLS-1$ //$NON-NLS-2$
                     } else if (e.getTargetException() instanceof NonApiException) {
                         logger.error(trace);
-                        MessageDialog.openError(shell, Messages.getString("main.application.load.message.dialog.title"), //$NON-NLS-1$
+                        MessageDialog.openError(toolShell, Messages.getString("main.application.load.message.dialog.title"), //$NON-NLS-1$
                                 String.format("%s %s\r\n%s", Messages.getString("main.unexpected.status.code.error"), errorMsg, //$NON-NLS-1$ //$NON-NLS-2$
                                         Messages.getString("main.message.dialog.make.sure.logfile.message"))); //$NON-NLS-1$
                     } else if (e.getTargetException() instanceof TsvException) {
-                        MessageDialog.openError(shell, Messages.getString("main.application.load.message.dialog.title"), errorMsg); //$NON-NLS-1$
+                        MessageDialog.openError(toolShell, Messages.getString("main.application.load.message.dialog.title"), errorMsg); //$NON-NLS-1$
                         return;
                     } else if (e.getTargetException() instanceof BasicAuthException) {
-                        MessageDialog.openError(shell, Messages.getString("main.application.load.message.dialog.title"), errorMsg); //$NON-NLS-1$
+                        MessageDialog.openError(toolShell, Messages.getString("main.application.load.message.dialog.title"), errorMsg); //$NON-NLS-1$
                         return;
                     } else if (e.getTargetException() instanceof OperationCanceledException) {
-                        MessageDialog.openInformation(shell, Messages.getString("main.application.load.message.dialog.title"), errorMsg); //$NON-NLS-1$
+                        MessageDialog.openInformation(toolShell, Messages.getString("main.application.load.message.dialog.title"), errorMsg); //$NON-NLS-1$
                         return;
                     } else {
                         logger.error(trace);
-                        MessageDialog.openError(shell, Messages.getString("main.application.load.message.dialog.title"), //$NON-NLS-1$
+                        MessageDialog.openError(toolShell, Messages.getString("main.application.load.message.dialog.title"), //$NON-NLS-1$
                                 String.format("%s\r\n%s", Messages.getString("main.message.dialog.unknown.error.message"), errorMsg)); //$NON-NLS-1$ //$NON-NLS-2$
                     }
                     return;
@@ -184,7 +184,7 @@ public class AssessTabItem extends CTabItem implements PropertyChangeListener {
                     sj.add(String.format("　%s", userName)); //$NON-NLS-1$
                     sj.add(Messages.getString("main.application.load.empty.list.warning.message.3")); //$NON-NLS-1$
                     sj.add(Messages.getString("main.application.load.empty.list.warning.message.4")); //$NON-NLS-1$
-                    MessageDialog.openInformation(shell, Messages.getString("main.application.load.message.dialog.title"), sj.toString()); //$NON-NLS-1$
+                    MessageDialog.openInformation(toolShell, Messages.getString("main.application.load.message.dialog.title"), sj.toString()); //$NON-NLS-1$
                 }
                 for (String appLabel : fullAppMap.keySet()) {
                     srcList.add(appLabel); // UI list
@@ -259,16 +259,16 @@ public class AssessTabItem extends CTabItem implements PropertyChangeListener {
         GridData srcListDescLblGrDt = new GridData(GridData.FILL_HORIZONTAL);
         srcListDescLblGrDt.minimumHeight = 12;
         srcListDescLbl.setLayoutData(srcListDescLblGrDt);
-        srcListDescLbl.setFont(new Font(shell.getDisplay(), "Arial", 8, SWT.NORMAL)); //$NON-NLS-1$
+        srcListDescLbl.setFont(new Font(toolShell.getDisplay(), "Arial", 8, SWT.NORMAL)); //$NON-NLS-1$
         srcListDescLbl.setText(Messages.getString("main.available.app.list.count.label")); //$NON-NLS-1$
-        srcListDescLbl.setForeground(shell.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
+        srcListDescLbl.setForeground(toolShell.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
         this.srcCount = new Label(srcListLblComp, SWT.RIGHT);
         GridData srcCountGrDt = new GridData(GridData.FILL_HORIZONTAL);
         srcCountGrDt.minimumHeight = 12;
         this.srcCount.setLayoutData(srcCountGrDt);
-        this.srcCount.setFont(new Font(shell.getDisplay(), "Arial", 8, SWT.NORMAL)); //$NON-NLS-1$
+        this.srcCount.setFont(new Font(toolShell.getDisplay(), "Arial", 8, SWT.NORMAL)); //$NON-NLS-1$
         this.srcCount.setText("0"); //$NON-NLS-1$
-        this.srcCount.setForeground(shell.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
+        this.srcCount.setForeground(toolShell.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
 
         Composite btnGrp = new Composite(appListGrp, SWT.NONE);
         btnGrp.setLayout(new GridLayout(1, false));
@@ -432,23 +432,23 @@ public class AssessTabItem extends CTabItem implements PropertyChangeListener {
         GridData dstListDescLblGrDt = new GridData(GridData.FILL_HORIZONTAL);
         dstListDescLblGrDt.minimumHeight = 12;
         dstListDescLbl.setLayoutData(dstListDescLblGrDt);
-        dstListDescLbl.setFont(new Font(shell.getDisplay(), "Arial", 8, SWT.NORMAL)); //$NON-NLS-1$
+        dstListDescLbl.setFont(new Font(toolShell.getDisplay(), "Arial", 8, SWT.NORMAL)); //$NON-NLS-1$
         dstListDescLbl.setText(Messages.getString("main.selected.app.list.count.label")); //$NON-NLS-1$
-        dstListDescLbl.setForeground(shell.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
+        dstListDescLbl.setForeground(toolShell.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
         this.dstCount = new Label(dstListLblComp, SWT.RIGHT);
         GridData dstCountGrDt = new GridData(GridData.FILL_HORIZONTAL);
         dstCountGrDt.minimumHeight = 12;
         this.dstCount.setLayoutData(dstCountGrDt);
-        this.dstCount.setFont(new Font(shell.getDisplay(), "Arial", 8, SWT.NORMAL)); //$NON-NLS-1$
+        this.dstCount.setFont(new Font(toolShell.getDisplay(), "Arial", 8, SWT.NORMAL)); //$NON-NLS-1$
         this.dstCount.setText("0"); //$NON-NLS-1$
-        this.dstCount.setForeground(shell.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
+        this.dstCount.setForeground(toolShell.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
 
-        subTabFolder = new CTabFolder(assessShell, SWT.NONE);
+        subTabFolder = new CTabFolder(shell, SWT.NONE);
         GridData tabFolderGrDt = new GridData(GridData.FILL_HORIZONTAL);
         subTabFolder.setLayoutData(tabFolderGrDt);
         subTabFolder.setSelectionBackground(
-                new Color[] { shell.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND), shell.getDisplay().getSystemColor(SWT.COLOR_WIDGET_LIGHT_SHADOW) }, new int[] { 100 },
-                true);
+                new Color[] { toolShell.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND), toolShell.getDisplay().getSystemColor(SWT.COLOR_WIDGET_LIGHT_SHADOW) },
+                new int[] { 100 }, true);
 
         // #################### 脆弱性 #################### //
         CTabItem vulTabItem = new CTabItem(subTabFolder, SWT.NONE);
@@ -484,7 +484,7 @@ public class AssessTabItem extends CTabItem implements PropertyChangeListener {
         vulSeverityFilterTxt.addListener(SWT.MouseUp, new Listener() {
             public void handleEvent(Event e) {
                 if (assessFilterMap != null && assessFilterMap.containsKey(FilterEnum.SEVERITY)) {
-                    FilterSeverityDialog filterDialog = new FilterSeverityDialog(shell, assessFilterMap.get(FilterEnum.SEVERITY));
+                    FilterSeverityDialog filterDialog = new FilterSeverityDialog(toolShell, assessFilterMap.get(FilterEnum.SEVERITY));
                     int result = filterDialog.open();
                     if (IDialogConstants.OK_ID != result) {
                         vulExecuteBtn.setFocus();
@@ -518,7 +518,7 @@ public class AssessTabItem extends CTabItem implements PropertyChangeListener {
         vulVulnTypeFilterTxt.addListener(SWT.MouseUp, new Listener() {
             public void handleEvent(Event e) {
                 if (assessFilterMap != null && assessFilterMap.containsKey(FilterEnum.VULNTYPE)) {
-                    FilterVulnTypeDialog filterDialog = new FilterVulnTypeDialog(shell, assessFilterMap.get(FilterEnum.VULNTYPE));
+                    FilterVulnTypeDialog filterDialog = new FilterVulnTypeDialog(toolShell, assessFilterMap.get(FilterEnum.VULNTYPE));
                     int result = filterDialog.open();
                     if (IDialogConstants.OK_ID != result) {
                         vulExecuteBtn.setFocus();
@@ -549,7 +549,7 @@ public class AssessTabItem extends CTabItem implements PropertyChangeListener {
         vulLastDetectedFilterTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         vulLastDetectedFilterTxt.addListener(SWT.MouseUp, new Listener() {
             public void handleEvent(Event e) {
-                FilterLastDetectedDialog filterDialog = new FilterLastDetectedDialog(shell, frLastDetectedDate, toLastDetectedDate);
+                FilterLastDetectedDialog filterDialog = new FilterLastDetectedDialog(toolShell, frLastDetectedDate, toLastDetectedDate);
                 int result = filterDialog.open();
                 if (IDialogConstants.OK_ID != result) {
                     vulExecuteBtn.setFocus();
@@ -582,26 +582,26 @@ public class AssessTabItem extends CTabItem implements PropertyChangeListener {
         vulExecuteBtn.setLayoutData(executeBtnGrDt);
         vulExecuteBtn.setText(Messages.getString("main.vul.export.button.title")); //$NON-NLS-1$
         vulExecuteBtn.setToolTipText(Messages.getString("main.vul.export.button.tooltip")); //$NON-NLS-1$
-        vulExecuteBtn.setFont(new Font(shell.getDisplay(), "Arial", 20, SWT.NORMAL)); //$NON-NLS-1$
+        vulExecuteBtn.setFont(new Font(toolShell.getDisplay(), "Arial", 20, SWT.NORMAL)); //$NON-NLS-1$
         vulExecuteBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
                 if (dstApps.isEmpty()) {
-                    MessageDialog.openInformation(shell, Messages.getString("main.vul.export.message.dialog.title"), //$NON-NLS-1$
+                    MessageDialog.openInformation(toolShell, Messages.getString("main.vul.export.message.dialog.title"), //$NON-NLS-1$
                             Messages.getString("main.export.application.unselected.error.message")); //$NON-NLS-1$
                     return;
                 }
                 boolean isSaveOutDirPath = ps.getString(PreferenceConstants.FILE_OUT_MODE).equals("save");
                 String outDirPath = ps.getString(PreferenceConstants.FILE_OUT_DIR);
                 if (!isSaveOutDirPath || outDirPath.isEmpty()) {
-                    outDirPath = shell.getMain().getOutDirPath();
+                    outDirPath = toolShell.getMain().getOutDirPath();
                 }
                 if (outDirPath == null || outDirPath.isEmpty()) {
                     return;
                 }
-                VulGetWithProgress progress = new VulGetWithProgress(shell, ps, outDirPath, dstApps, fullAppMap, assessFilterMap, frLastDetectedDate, toLastDetectedDate,
+                VulGetWithProgress progress = new VulGetWithProgress(toolShell, ps, outDirPath, dstApps, fullAppMap, assessFilterMap, frLastDetectedDate, toLastDetectedDate,
                         vulOnlyParentAppChk.getSelection(), vulOnlyCurVulExpChk.getSelection(), includeDescChk.getSelection(), includeStackTraceChk.getSelection());
-                ProgressMonitorDialog progDialog = new VulGetProgressMonitorDialog(shell);
+                ProgressMonitorDialog progDialog = new VulGetProgressMonitorDialog(toolShell);
                 try {
                     progDialog.run(true, true, progress);
                 } catch (InvocationTargetException e) {
@@ -614,27 +614,27 @@ public class AssessTabItem extends CTabItem implements PropertyChangeListener {
                     // }
                     String exceptionMsg = e.getTargetException().getMessage();
                     if (e.getTargetException() instanceof ApiException) {
-                        MessageDialog.openError(shell, Messages.getString("main.vul.export.message.dialog.title"), //$NON-NLS-1$
+                        MessageDialog.openError(toolShell, Messages.getString("main.vul.export.message.dialog.title"), //$NON-NLS-1$
                                 String.format("%s\r\n%s", Messages.getString("main.teamserver.return.error"), exceptionMsg)); //$NON-NLS-1$ //$NON-NLS-2$
                     } else if (e.getTargetException() instanceof NonApiException) {
                         logger.error(trace);
-                        MessageDialog.openError(shell, Messages.getString("main.vul.export.message.dialog.title"), //$NON-NLS-1$
+                        MessageDialog.openError(toolShell, Messages.getString("main.vul.export.message.dialog.title"), //$NON-NLS-1$
                                 String.format("%s %s\r\n%s", Messages.getString("main.unexpected.status.code.error"), exceptionMsg, //$NON-NLS-1$ //$NON-NLS-2$
                                         Messages.getString("main.message.dialog.make.sure.logfile.message"))); //$NON-NLS-1$
                     } else if (e.getTargetException() instanceof InterruptedException) {
-                        MessageDialog.openInformation(shell, trace, exceptionMsg);
+                        MessageDialog.openInformation(toolShell, trace, exceptionMsg);
                     } else if (e.getTargetException() instanceof TsvException) {
-                        MessageDialog.openError(shell, Messages.getString("main.vul.export.message.dialog.title"), exceptionMsg); //$NON-NLS-1$
+                        MessageDialog.openError(toolShell, Messages.getString("main.vul.export.message.dialog.title"), exceptionMsg); //$NON-NLS-1$
                         return;
                     } else if (e.getTargetException() instanceof BasicAuthException) {
-                        MessageDialog.openError(shell, Messages.getString("main.vul.export.message.dialog.title"), exceptionMsg); //$NON-NLS-1$
+                        MessageDialog.openError(toolShell, Messages.getString("main.vul.export.message.dialog.title"), exceptionMsg); //$NON-NLS-1$
                         return;
                     } else if (e.getTargetException() instanceof OperationCanceledException) {
-                        MessageDialog.openInformation(shell, Messages.getString("main.application.load.message.dialog.title"), exceptionMsg); //$NON-NLS-1$
+                        MessageDialog.openInformation(toolShell, Messages.getString("main.application.load.message.dialog.title"), exceptionMsg); //$NON-NLS-1$
                         return;
                     } else {
                         logger.error(trace);
-                        MessageDialog.openError(shell, Messages.getString("main.vul.export.message.dialog.title"), //$NON-NLS-1$
+                        MessageDialog.openError(toolShell, Messages.getString("main.vul.export.message.dialog.title"), //$NON-NLS-1$
                                 String.format("%s\r\n%s", Messages.getString("main.message.dialog.unknown.error.message"), exceptionMsg)); //$NON-NLS-1$ //$NON-NLS-2$
                     }
                 } catch (InterruptedException e) {
@@ -710,26 +710,26 @@ public class AssessTabItem extends CTabItem implements PropertyChangeListener {
         libExecuteBtn.setLayoutData(libExecuteBtnGrDt);
         libExecuteBtn.setText(Messages.getString("main.lib.export.button.title")); //$NON-NLS-1$
         libExecuteBtn.setToolTipText(Messages.getString("main.lib.export.button.tooltip")); //$NON-NLS-1$
-        libExecuteBtn.setFont(new Font(shell.getDisplay(), "Arial", 20, SWT.NORMAL)); //$NON-NLS-1$
+        libExecuteBtn.setFont(new Font(toolShell.getDisplay(), "Arial", 20, SWT.NORMAL)); //$NON-NLS-1$
         libExecuteBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
                 if (dstApps.isEmpty()) {
-                    MessageDialog.openInformation(shell, Messages.getString("main.lib.export.message.dialog.title"), //$NON-NLS-1$
+                    MessageDialog.openInformation(toolShell, Messages.getString("main.lib.export.message.dialog.title"), //$NON-NLS-1$
                             Messages.getString("main.export.application.unselected.error.message")); //$NON-NLS-1$
                     return;
                 }
                 boolean isSaveOutDirPath = ps.getString(PreferenceConstants.FILE_OUT_MODE).equals("save");
                 String outDirPath = ps.getString(PreferenceConstants.FILE_OUT_DIR);
                 if (!isSaveOutDirPath || outDirPath.isEmpty()) {
-                    outDirPath = shell.getMain().getOutDirPath();
+                    outDirPath = toolShell.getMain().getOutDirPath();
                 }
                 if (outDirPath == null || outDirPath.isEmpty()) {
                     return;
                 }
-                LibGetWithProgress progress = new LibGetWithProgress(shell, ps, outDirPath, dstApps, fullAppMap, onlyHasCVEChk.getSelection(), withCVSSInfoChk.getSelection(),
+                LibGetWithProgress progress = new LibGetWithProgress(toolShell, ps, outDirPath, dstApps, fullAppMap, onlyHasCVEChk.getSelection(), withCVSSInfoChk.getSelection(),
                         withEPSSInfoChk.getSelection(), includeCVEDetailChk.getSelection());
-                ProgressMonitorDialog progDialog = new LibGetProgressMonitorDialog(shell);
+                ProgressMonitorDialog progDialog = new LibGetProgressMonitorDialog(toolShell);
                 try {
                     progDialog.run(true, true, progress);
                 } catch (InvocationTargetException e) {
@@ -742,27 +742,27 @@ public class AssessTabItem extends CTabItem implements PropertyChangeListener {
                     // }
                     String exceptionMsg = e.getTargetException().getMessage();
                     if (e.getTargetException() instanceof ApiException) {
-                        MessageDialog.openError(shell, Messages.getString("main.lib.export.message.dialog.title"), //$NON-NLS-1$
+                        MessageDialog.openError(toolShell, Messages.getString("main.lib.export.message.dialog.title"), //$NON-NLS-1$
                                 String.format("%s\r\n%s", Messages.getString("main.teamserver.return.error"), exceptionMsg)); //$NON-NLS-1$ //$NON-NLS-2$
                     } else if (e.getTargetException() instanceof NonApiException) {
                         logger.error(trace);
-                        MessageDialog.openError(shell, Messages.getString("main.lib.export.message.dialog.title"), //$NON-NLS-1$
+                        MessageDialog.openError(toolShell, Messages.getString("main.lib.export.message.dialog.title"), //$NON-NLS-1$
                                 String.format("%s %s\r\n%s", Messages.getString("main.unexpected.status.code.error"), exceptionMsg, //$NON-NLS-1$ //$NON-NLS-2$
                                         Messages.getString("main.message.dialog.make.sure.logfile.message"))); //$NON-NLS-1$
                     } else if (e.getTargetException() instanceof InterruptedException) {
-                        MessageDialog.openInformation(shell, trace, exceptionMsg);
+                        MessageDialog.openInformation(toolShell, trace, exceptionMsg);
                     } else if (e.getTargetException() instanceof TsvException) {
-                        MessageDialog.openError(shell, Messages.getString("main.lib.export.message.dialog.title"), exceptionMsg); //$NON-NLS-1$
+                        MessageDialog.openError(toolShell, Messages.getString("main.lib.export.message.dialog.title"), exceptionMsg); //$NON-NLS-1$
                         return;
                     } else if (e.getTargetException() instanceof BasicAuthException) {
-                        MessageDialog.openError(shell, Messages.getString("main.lib.export.message.dialog.title"), exceptionMsg); //$NON-NLS-1$
+                        MessageDialog.openError(toolShell, Messages.getString("main.lib.export.message.dialog.title"), exceptionMsg); //$NON-NLS-1$
                         return;
                     } else if (e.getTargetException() instanceof OperationCanceledException) {
-                        MessageDialog.openInformation(shell, Messages.getString("main.lib.export.message.dialog.title"), exceptionMsg); //$NON-NLS-1$
+                        MessageDialog.openInformation(toolShell, Messages.getString("main.lib.export.message.dialog.title"), exceptionMsg); //$NON-NLS-1$
                         return;
                     } else {
                         logger.error(trace);
-                        MessageDialog.openError(shell, Messages.getString("main.lib.export.message.dialog.title"), //$NON-NLS-1$
+                        MessageDialog.openError(toolShell, Messages.getString("main.lib.export.message.dialog.title"), //$NON-NLS-1$
                                 String.format("%s\r\n%s", Messages.getString("main.message.dialog.unknown.error.message"), exceptionMsg)); //$NON-NLS-1$ //$NON-NLS-2$
                     }
                 } catch (InterruptedException e) {
@@ -797,7 +797,7 @@ public class AssessTabItem extends CTabItem implements PropertyChangeListener {
         int sub_idx = this.ps.getInt(PreferenceConstants.OPENED_SUB_TAB_IDX);
         subTabFolder.setSelection(sub_idx);
 
-        setControl(assessShell);
+        setControl(shell);
     }
 
     private void uiReset() {
@@ -875,7 +875,7 @@ public class AssessTabItem extends CTabItem implements PropertyChangeListener {
             this.ps.setValue(PreferenceConstants.INCLUDE_CVE_DETAIL, includeCVEDetailChk.getSelection());
         } else if ("tabSelected".equals(event.getPropertyName())) { //$NON-NLS-1$
         } else if ("buttonEnabled".equals(event.getPropertyName())) { //$NON-NLS-1$
-            appLoadBtn.setEnabled((Boolean) event.getNewValue());
+            loadBtn.setEnabled((Boolean) event.getNewValue());
             vulExecuteBtn.setEnabled((Boolean) event.getNewValue());
         } else if ("validOrgChanged".equals(event.getPropertyName())) { //$NON-NLS-1$
             uiReset();

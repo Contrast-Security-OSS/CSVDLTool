@@ -82,7 +82,7 @@ public class ServerTabItem extends CTabItem implements PropertyChangeListener {
     public ServerTabItem(CTabFolder mainTabFolder, CSVDLToolShell toolShell, PreferenceStore ps, Point bigBtnSize) {
         super(mainTabFolder, SWT.NONE);
         setText(Messages.getString("main.tab.server.title")); //$NON-NLS-1$
-        // serverTabItem.setImage(new Image(shell.getDisplay(), getClass().getClassLoader().getResourceAsStream("server16.png"))); //$NON-NLS-1$
+        // serverTabItem.setImage(new Image(toolShell.getDisplay(), getClass().getClassLoader().getResourceAsStream("server16.png"))); //$NON-NLS-1$
 
         Composite shell = new Composite(mainTabFolder, SWT.NONE);
         shell.setLayout(new GridLayout(1, false));
@@ -335,7 +335,13 @@ public class ServerTabItem extends CTabItem implements PropertyChangeListener {
     @SuppressWarnings("unchecked")
     @Override
     public void propertyChange(PropertyChangeEvent event) {
-        if ("buttonEnabled".equals(event.getPropertyName())) { //$NON-NLS-1$
+        if ("shellActivated".equals(event.getPropertyName())) { //$NON-NLS-1$
+        } else if ("shellClosed".equals(event.getPropertyName())) { //$NON-NLS-1$
+        } else if ("tabSelected".equals(event.getPropertyName())) { //$NON-NLS-1$
+            if (event.getNewValue() instanceof ServerTabItem) {
+                System.out.println("server tab selected.");
+            }
+        } else if ("buttonEnabled".equals(event.getPropertyName())) { //$NON-NLS-1$
             loadBtn.setEnabled((Boolean) event.getNewValue());
         } else if ("serverFilter".equals(event.getPropertyName())) { //$NON-NLS-1$
             Map<FilterEnum, Set<Filter>> filterMap = (Map<FilterEnum, Set<Filter>>) event.getNewValue();

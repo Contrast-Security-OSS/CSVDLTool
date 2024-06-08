@@ -35,6 +35,7 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -79,10 +80,11 @@ public class ServerTabItem extends CTabItem implements PropertyChangeListener {
 
     Logger logger = LogManager.getLogger("csvdltool"); //$NON-NLS-1$
 
-    public ServerTabItem(CTabFolder mainTabFolder, CSVDLToolShell toolShell, PreferenceStore ps, Point bigBtnSize) {
+    public ServerTabItem(CTabFolder mainTabFolder, CSVDLToolShell toolShell, PreferenceStore ps) {
         super(mainTabFolder, SWT.NONE);
         setText(Messages.getString("main.tab.server.title")); //$NON-NLS-1$
         // serverTabItem.setImage(new Image(toolShell.getDisplay(), getClass().getClassLoader().getResourceAsStream("server16.png"))); //$NON-NLS-1$
+        Font bigFont = new Font(toolShell.getDisplay(), "Arial", 20, SWT.NORMAL);
 
         Composite shell = new Composite(mainTabFolder, SWT.NONE);
         shell.setLayout(new GridLayout(1, false));
@@ -94,6 +96,10 @@ public class ServerTabItem extends CTabItem implements PropertyChangeListener {
         listGrp.setLayoutData(listGrpGrDt);
 
         loadBtn = new Button(listGrp, SWT.PUSH);
+        GC gc = new GC(loadBtn);
+        gc.setFont(bigFont);
+        Point bigBtnSize = gc.textExtent(Messages.getString("main.server.load.button.title"));
+        gc.dispose();
         GridData loadBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
         loadBtnGrDt.horizontalSpan = 3;
         loadBtnGrDt.minimumHeight = 50;

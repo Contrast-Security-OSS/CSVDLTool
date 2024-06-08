@@ -52,6 +52,7 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
@@ -125,10 +126,11 @@ public class ProtectTabItem extends CTabItem implements PropertyChangeListener {
 
     Logger logger = LogManager.getLogger("csvdltool"); //$NON-NLS-1$
 
-    public ProtectTabItem(CTabFolder mainTabFolder, CSVDLToolShell toolShell, PreferenceStore ps, Point bigBtnSize) {
+    public ProtectTabItem(CTabFolder mainTabFolder, CSVDLToolShell toolShell, PreferenceStore ps) {
         super(mainTabFolder, SWT.NONE);
         this.toolShell = toolShell;
         this.ps = ps;
+        Font bigFont = new Font(toolShell.getDisplay(), "Arial", 20, SWT.NORMAL);
         setText(Messages.getString("main.tab.protect.title")); //$NON-NLS-1$
         setImage(new Image(toolShell.getDisplay(), getClass().getClassLoader().getResourceAsStream("contrast-protect-rasp-02.png"))); //$NON-NLS-1$
 
@@ -182,8 +184,8 @@ public class ProtectTabItem extends CTabItem implements PropertyChangeListener {
         });
         termRadios.add(termPeriod);
         attackDetectedFilterTxt = new Text(attackTermGrp, SWT.BORDER);
-        long frLong = ps.getLong(PreferenceConstants.ATTACK_DETECTED_DATE_TERM_FR);
-        long toLong = ps.getLong(PreferenceConstants.ATTACK_DETECTED_DATE_TERM_TO);
+        long frLong = this.ps.getLong(PreferenceConstants.ATTACK_DETECTED_DATE_TERM_FR);
+        long toLong = this.ps.getLong(PreferenceConstants.ATTACK_DETECTED_DATE_TERM_TO);
         this.frDetectedDate = frLong > 0 ? new Date(frLong) : null;
         this.toDetectedDate = frLong > 0 ? new Date(toLong) : null;
         attackDetectedTermTextSet(this.frDetectedDate, this.toDetectedDate);
@@ -214,6 +216,10 @@ public class ProtectTabItem extends CTabItem implements PropertyChangeListener {
         }
 
         loadBtn = new Button(attackListGrp, SWT.PUSH);
+        GC gc = new GC(loadBtn);
+        gc.setFont(bigFont);
+        Point bigBtnSize = gc.textExtent(Messages.getString("main.vul.export.button.title"));
+        gc.dispose();
         GridData attackLoadBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
         attackLoadBtnGrDt.horizontalSpan = 3;
         attackLoadBtnGrDt.minimumHeight = 50;
@@ -749,8 +755,8 @@ public class ProtectTabItem extends CTabItem implements PropertyChangeListener {
         frDetectedDate = filterDialog.getFrDate();
         toDetectedDate = filterDialog.getToDate();
         attackDetectedTermTextSet(frDetectedDate, toDetectedDate);
-        ps.setValue(PreferenceConstants.ATTACK_DETECTED_DATE_TERM_FR, frDetectedDate != null ? frDetectedDate.getTime() : 0);
-        ps.setValue(PreferenceConstants.ATTACK_DETECTED_DATE_TERM_TO, toDetectedDate != null ? toDetectedDate.getTime() : 0);
+        this.ps.setValue(PreferenceConstants.ATTACK_DETECTED_DATE_TERM_FR, frDetectedDate != null ? frDetectedDate.getTime() : 0);
+        this.ps.setValue(PreferenceConstants.ATTACK_DETECTED_DATE_TERM_TO, toDetectedDate != null ? toDetectedDate.getTime() : 0);
     }
 
     private void attackDetectedTermTextSet(Date fr, Date to) {
@@ -837,7 +843,7 @@ public class ProtectTabItem extends CTabItem implements PropertyChangeListener {
         map.put(AttackEventDetectedDateFilterEnum.YESTERDAY, today.minusDays(1));
         map.put(AttackEventDetectedDateFilterEnum.BEFORE_30_DAYS, today.minusDays(30));
         LocalDate lastWeekStart = today.with(TemporalAdjusters.previous(DayOfWeek.SUNDAY));
-        lastWeekStart = lastWeekStart.minusDays(7 - ps.getInt(PreferenceConstants.ATTACK_START_WEEKDAY));
+        lastWeekStart = lastWeekStart.minusDays(7 - this.ps.getInt(PreferenceConstants.ATTACK_START_WEEKDAY));
         if (lastWeekStart.plusDays(7).isAfter(today)) {
             lastWeekStart = lastWeekStart.minusDays(7);
         }
@@ -856,7 +862,7 @@ public class ProtectTabItem extends CTabItem implements PropertyChangeListener {
         } else if ("shellClosed".equals(event.getPropertyName())) { //$NON-NLS-1$
             for (Button termBtn : termRadios) {
                 if (termBtn.getSelection()) {
-                    ps.setValue(PreferenceConstants.ATTACK_DETECTED_DATE_FILTER, termRadios.indexOf(termBtn));
+                    this.ps.setValue(PreferenceConstants.ATTACK_DETECTED_DATE_FILTER, termRadios.indexOf(termBtn));
                 }
             }
         } else if ("tabSelected".equals(event.getPropertyName())) { //$NON-NLS-1$
@@ -919,8 +925,8 @@ public class ProtectTabItem extends CTabItem implements PropertyChangeListener {
                 // 時間帯フィルタ
                 if (filterMap.containsKey(FilterEnum.BUSINESS_HOURS)) {
                     int target = Integer.parseInt(attackEvent.getTimeStrReceived());
-                    String termDayTime = ps.getString(PreferenceConstants.ATTACK_RANGE_DAYTIME);
-                    String termNightTime = ps.getString(PreferenceConstants.ATTACK_RANGE_NIGHTTIME);
+                    String termDayTime = this.ps.getString(PreferenceConstants.ATTACK_RANGE_DAYTIME);
+                    String termNightTime = this.ps.getString(PreferenceConstants.ATTACK_RANGE_NIGHTTIME);
                     for (Filter filter : filterMap.get(FilterEnum.BUSINESS_HOURS)) {
                         if (filter.isValid()) {
                             continue;

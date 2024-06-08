@@ -20,6 +20,7 @@ import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
@@ -61,8 +62,9 @@ public class ServerlessTabItem extends CTabItem implements PropertyChangeListene
 
     Logger logger = LogManager.getLogger("csvdltool"); //$NON-NLS-1$
 
-    public ServerlessTabItem(CTabFolder mainTabFolder, CSVDLToolShell toolShell, PreferenceStore ps, Point bigBtnSize) {
+    public ServerlessTabItem(CTabFolder mainTabFolder, CSVDLToolShell toolShell, PreferenceStore ps) {
         super(mainTabFolder, SWT.NONE);
+        Font bigFont = new Font(toolShell.getDisplay(), "Arial", 20, SWT.NORMAL);
         setText("SERVERLESS(β版)");
         setImage(new Image(toolShell.getDisplay(), getClass().getClassLoader().getResourceAsStream("contrast-serverless-02.png"))); //$NON-NLS-1$
 
@@ -127,6 +129,10 @@ public class ServerlessTabItem extends CTabItem implements PropertyChangeListene
         });
 
         loadBtn = new Button(serverlessGrp, SWT.PUSH);
+        GC gc = new GC(loadBtn);
+        gc.setFont(bigFont);
+        Point bigBtnSize = gc.textExtent("取得");
+        gc.dispose();
         GridData loadBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
         loadBtnGrDt.horizontalSpan = 3;
         loadBtnGrDt.minimumHeight = 50;

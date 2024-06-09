@@ -86,6 +86,7 @@ import com.contrastsecurity.csvdltool.preference.ServerCSVColumnPreferencePage;
 import com.contrastsecurity.csvdltool.preference.VulCSVColumnPreferencePage;
 import com.contrastsecurity.csvdltool.ui.AssessTabItem;
 import com.contrastsecurity.csvdltool.ui.ProtectTabItem;
+import com.contrastsecurity.csvdltool.ui.ScanTabItem;
 import com.contrastsecurity.csvdltool.ui.ServerTabItem;
 import com.contrastsecurity.csvdltool.ui.ServerlessTabItem;
 import com.google.gson.Gson;
@@ -212,6 +213,8 @@ public class Main implements PropertyChangeListener {
             this.ps.setDefault(PreferenceConstants.CSV_COLUMN_SERVER, ServerCSVColmunEnum.defaultValuesStr());
             this.ps.setDefault(PreferenceConstants.CSV_OUT_HEADER_SERVER, true);
             this.ps.setDefault(PreferenceConstants.CSV_FILE_FORMAT_SERVER, "'server'_yyyy-MM-dd_HHmmss"); //$NON-NLS-1$
+
+            this.ps.setDefault(PreferenceConstants.INCLUDE_ARCHIVED_PROJ, true);
 
             this.ps.setDefault(PreferenceConstants.OPENED_MAIN_TAB_IDX, 0);
             this.ps.setDefault(PreferenceConstants.OPENED_SUB_TAB_IDX, 0);
@@ -371,6 +374,9 @@ public class Main implements PropertyChangeListener {
 
         // #################### SERVER #################### //
         addPropertyChangeListener(new ServerTabItem(mainTabFolder, shell, ps));
+
+        // #################### SCAN #################### //
+        addPropertyChangeListener(new ScanTabItem(mainTabFolder, shell, ps));
 
         int main_idx = this.ps.getInt(PreferenceConstants.OPENED_MAIN_TAB_IDX);
         mainTabFolder.setSelection(main_idx);

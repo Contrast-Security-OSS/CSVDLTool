@@ -93,8 +93,8 @@ public class AssessTabItem extends CTabItem implements PropertyChangeListener {
     private Text vulVulnTypeFilterTxt;
     private Text vulLastDetectedFilterTxt;
 
-    private Map<String, AppInfo> fullAppMap;
-    private Map<FilterEnum, Set<Filter>> assessFilterMap;
+    private Map<String, AppInfo> fullMap;
+    private Map<FilterEnum, Set<Filter>> filteredMap;
     private List<String> srcApps = new ArrayList<String>();
     private List<String> dstApps = new ArrayList<String>();
     private Date frLastDetectedDate;
@@ -175,8 +175,8 @@ public class AssessTabItem extends CTabItem implements PropertyChangeListener {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                fullAppMap = progress.getFullAppMap();
-                if (fullAppMap.isEmpty()) {
+                fullMap = progress.getFullAppMap();
+                if (fullMap.isEmpty()) {
                     String userName = ps.getString(PreferenceConstants.USERNAME);
                     StringJoiner sj = new StringJoiner("\r\n"); //$NON-NLS-1$
                     sj.add(Messages.getString("main.application.load.empty.list.warning.message.1")); //$NON-NLS-1$
@@ -186,12 +186,12 @@ public class AssessTabItem extends CTabItem implements PropertyChangeListener {
                     sj.add(Messages.getString("main.application.load.empty.list.warning.message.4")); //$NON-NLS-1$
                     MessageDialog.openInformation(toolShell, Messages.getString("main.application.load.message.dialog.title"), sj.toString()); //$NON-NLS-1$
                 }
-                for (String appLabel : fullAppMap.keySet()) {
+                for (String appLabel : fullMap.keySet()) {
                     srcList.add(appLabel); // UI list
                     srcApps.add(appLabel); // memory src
                 }
                 srcCount.setText(String.valueOf(srcList.getItemCount()));
-                assessFilterMap = progress.getFilterMap();
+                filteredMap = progress.getFilterMap();
                 vulSeverityFilterTxt.setText(Messages.getString("main.vul.filter.condition.severity.all")); //$NON-NLS-1$
                 vulVulnTypeFilterTxt.setText(Messages.getString("main.vul.filter.condition.vulntype.all")); //$NON-NLS-1$
             }
@@ -373,13 +373,13 @@ public class AssessTabItem extends CTabItem implements PropertyChangeListener {
             public void modifyText(ModifyEvent event) {
                 dstList.removeAll(); // UI List dst
                 dstApps.clear(); // memory dst
-                if (fullAppMap == null) {
+                if (fullMap == null) {
                     dstCount.setText(String.valueOf(dstList.getItemCount()));
                     return;
                 }
                 String keyword = dstListFilter.getText();
                 if (keyword.isEmpty()) {
-                    for (String appName : fullAppMap.keySet()) {
+                    for (String appName : fullMap.keySet()) {
                         if (srcApps.contains(appName)) {
                             continue; // 選択可能にあるアプリはスキップ
                         }
@@ -387,7 +387,7 @@ public class AssessTabItem extends CTabItem implements PropertyChangeListener {
                         dstApps.add(appName); // memory dst
                     }
                 } else {
-                    for (String appName : fullAppMap.keySet()) {
+                    for (String appName : fullMap.keySet()) {
                         if (appName.toLowerCase().contains(keyword.toLowerCase())) {
                             if (srcApps.contains(appName)) {
                                 continue; // 選択可能にあるアプリはスキップ
@@ -483,15 +483,15 @@ public class AssessTabItem extends CTabItem implements PropertyChangeListener {
         vulSeverityFilterTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         vulSeverityFilterTxt.addListener(SWT.MouseUp, new Listener() {
             public void handleEvent(Event e) {
-                if (assessFilterMap != null && assessFilterMap.containsKey(FilterEnum.SEVERITY)) {
-                    FilterSeverityDialog filterDialog = new FilterSeverityDialog(toolShell, assessFilterMap.get(FilterEnum.SEVERITY));
+                if (filteredMap != null && filteredMap.containsKey(FilterEnum.SEVERITY)) {
+                    FilterSeverityDialog filterDialog = new FilterSeverityDialog(toolShell, filteredMap.get(FilterEnum.SEVERITY));
                     int result = filterDialog.open();
                     if (IDialogConstants.OK_ID != result) {
                         vulExecuteBtn.setFocus();
                         return;
                     }
                     List<String> labels = filterDialog.getLabels();
-                    for (Filter filter : assessFilterMap.get(FilterEnum.SEVERITY)) {
+                    for (Filter filter : filteredMap.get(FilterEnum.SEVERITY)) {
                         if (labels.contains(filter.getLabel())) {
                             filter.setValid(true);
                         } else {
@@ -517,15 +517,15 @@ public class AssessTabItem extends CTabItem implements PropertyChangeListener {
         vulVulnTypeFilterTxt.setLayoutData(vulVulnTypeFilterTxtGrDt);
         vulVulnTypeFilterTxt.addListener(SWT.MouseUp, new Listener() {
             public void handleEvent(Event e) {
-                if (assessFilterMap != null && assessFilterMap.containsKey(FilterEnum.VULNTYPE)) {
-                    FilterVulnTypeDialog filterDialog = new FilterVulnTypeDialog(toolShell, assessFilterMap.get(FilterEnum.VULNTYPE));
+                if (filteredMap != null && filteredMap.containsKey(FilterEnum.VULNTYPE)) {
+                    FilterVulnTypeDialog filterDialog = new FilterVulnTypeDialog(toolShell, filteredMap.get(FilterEnum.VULNTYPE));
                     int result = filterDialog.open();
                     if (IDialogConstants.OK_ID != result) {
                         vulExecuteBtn.setFocus();
                         return;
                     }
                     List<String> labels = filterDialog.getLabels();
-                    for (Filter filter : assessFilterMap.get(FilterEnum.VULNTYPE)) {
+                    for (Filter filter : filteredMap.get(FilterEnum.VULNTYPE)) {
                         if (labels.contains(filter.getLabel())) {
                             filter.setValid(true);
                         } else {
@@ -599,7 +599,7 @@ public class AssessTabItem extends CTabItem implements PropertyChangeListener {
                 if (outDirPath == null || outDirPath.isEmpty()) {
                     return;
                 }
-                VulGetWithProgress progress = new VulGetWithProgress(toolShell, ps, outDirPath, dstApps, fullAppMap, assessFilterMap, frLastDetectedDate, toLastDetectedDate,
+                VulGetWithProgress progress = new VulGetWithProgress(toolShell, ps, outDirPath, dstApps, fullMap, filteredMap, frLastDetectedDate, toLastDetectedDate,
                         vulOnlyParentAppChk.getSelection(), vulOnlyCurVulExpChk.getSelection(), includeDescChk.getSelection(), includeStackTraceChk.getSelection());
                 ProgressMonitorDialog progDialog = new VulGetProgressMonitorDialog(toolShell);
                 try {
@@ -727,7 +727,7 @@ public class AssessTabItem extends CTabItem implements PropertyChangeListener {
                 if (outDirPath == null || outDirPath.isEmpty()) {
                     return;
                 }
-                LibGetWithProgress progress = new LibGetWithProgress(toolShell, ps, outDirPath, dstApps, fullAppMap, onlyHasCVEChk.getSelection(), withCVSSInfoChk.getSelection(),
+                LibGetWithProgress progress = new LibGetWithProgress(toolShell, ps, outDirPath, dstApps, fullMap, onlyHasCVEChk.getSelection(), withCVSSInfoChk.getSelection(),
                         withEPSSInfoChk.getSelection(), includeCVEDetailChk.getSelection());
                 ProgressMonitorDialog progDialog = new LibGetProgressMonitorDialog(toolShell);
                 try {
@@ -810,22 +810,22 @@ public class AssessTabItem extends CTabItem implements PropertyChangeListener {
         dstList.removeAll();
         dstApps.clear();
         // full
-        if (fullAppMap != null) {
-            fullAppMap.clear();
+        if (fullMap != null) {
+            fullMap.clear();
         }
     }
 
     private void srcListFilterUpdate() {
         srcList.removeAll(); // UI List src
         srcApps.clear(); // memory src
-        if (fullAppMap == null) {
+        if (fullMap == null) {
             srcCount.setText(String.valueOf(srcList.getItemCount()));
             return;
         }
         String keyword = srcListFilter.getText().trim();
         String language = srcListLanguagesFilter.getText().trim();
         if (keyword.isEmpty() && language.isEmpty()) {
-            for (String appLabel : fullAppMap.keySet()) {
+            for (String appLabel : fullMap.keySet()) {
                 if (dstApps.contains(appLabel)) {
                     continue; // 既に選択済みのアプリはスキップ
                 }
@@ -833,7 +833,7 @@ public class AssessTabItem extends CTabItem implements PropertyChangeListener {
                 srcApps.add(appLabel); // memory src
             }
         } else {
-            for (String appLabel : fullAppMap.keySet()) {
+            for (String appLabel : fullMap.keySet()) {
                 boolean isKeywordValid = true;
                 if (!keyword.isEmpty()) {
                     if (!appLabel.toLowerCase().contains(keyword.toLowerCase())) {
@@ -845,7 +845,7 @@ public class AssessTabItem extends CTabItem implements PropertyChangeListener {
                 }
                 boolean isLanguageValid = true;
                 if (!language.isEmpty()) {
-                    AppInfo appInfo = fullAppMap.get(appLabel);
+                    AppInfo appInfo = fullMap.get(appLabel);
                     if (!appInfo.getLanguageLabel().toLowerCase().contains(language)) {
                         isLanguageValid = false;
                     }

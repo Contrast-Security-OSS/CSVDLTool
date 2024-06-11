@@ -191,7 +191,6 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                         throw new OperationCanceledException();
                     }
                     List<String> csvLineList = new ArrayList<String>();
-                    monitor.subTask(library.getFile_name());
                     monitor.subTask(
                             String.format("%s %s (%d/%d)", Messages.getString("libgetwithprogress.progress.loading.library"), library.getFile_name(), libIdx, allLibraries.size())); //$NON-NLS-1$ //$NON-NLS-2$
                     for (LibCSVColumn csvColumn : columnList) {

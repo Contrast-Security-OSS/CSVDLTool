@@ -215,6 +215,10 @@ public class Main implements PropertyChangeListener {
             this.ps.setDefault(PreferenceConstants.CSV_FILE_FORMAT_SERVER, "'server'_yyyy-MM-dd_HHmmss"); //$NON-NLS-1$
 
             this.ps.setDefault(PreferenceConstants.INCLUDE_ARCHIVED_PROJ, true);
+            this.ps.setDefault(PreferenceConstants.CSV_COLUMN_SCANRESULT, ScanResultCSVColmunEnum.defaultValuesStr());
+            this.ps.setDefault(PreferenceConstants.SLEEP_SCANRESULT, 300);
+            this.ps.setDefault(PreferenceConstants.CSV_OUT_HEADER_SCANRESULT, true);
+            this.ps.setDefault(PreferenceConstants.CSV_FILE_FORMAT_SCANRESULT, "'scanresult'_yyyy-MM-dd_HHmmss"); //$NON-NLS-1$
 
             this.ps.setDefault(PreferenceConstants.OPENED_MAIN_TAB_IDX, 0);
             this.ps.setDefault(PreferenceConstants.OPENED_SUB_TAB_IDX, 0);

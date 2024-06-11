@@ -87,10 +87,14 @@ public class PreferenceConstants {
     public static final String INCLUDE_CVE_DETAIL = new String("com.contrastsecurity.csvdltool.include_cve_detail"); //$NON-NLS-1$
 
     public static final String INCLUDE_ARCHIVED_PROJ = new String("com.contrastsecurity.csvdltool.include_archived_proj"); //$NON-NLS-1$
-    
+    public static final String SLEEP_SCANRESULT = new String("com.contrastsecurity.csvdltool.sleep_scanresult"); //$NON-NLS-1$
+    public static final String CSV_OUT_HEADER_SCANRESULT = new String("com.contrastsecurity.csvdltool.csv_out_header_scanresult"); //$NON-NLS-1$
+    public static final String CSV_COLUMN_SCANRESULT = new String("com.contrastsecurity.csvdltool.csv_out_column_scanresult"); //$NON-NLS-1$
+    public static final String CSV_FILE_FORMAT_SCANRESULT = new String("com.contrastsecurity.csvdltool.csv_file_format_scanresult"); //$NON-NLS-1$
+
     public static final String FILE_OUT_MODE = new String("com.contrastsecurity.csvdltool.file_out_mode"); //$NON-NLS-1$
     public static final String FILE_OUT_DIR = new String("com.contrastsecurity.csvdltool.file_out_dir"); //$NON-NLS-1$
-    
+
     public static final String OPENED_MAIN_TAB_IDX = new String("com.contrastsecurity.csvdltool.opened_main_tab_idx"); //$NON-NLS-1$
     public static final String OPENED_SUB_TAB_IDX = new String("com.contrastsecurity.csvdltool.opened_sub_tab_idx"); //$NON-NLS-1$
     public static final String MEM_WIDTH = new String("com.contrastsecurity.csvdltool.mem_width"); //$NON-NLS-1$

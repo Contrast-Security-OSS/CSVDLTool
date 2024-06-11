@@ -25,6 +25,7 @@ package com.contrastsecurity.csvdltool;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -60,7 +61,7 @@ public class ScanProjectsGetWithProgress implements IRunnableWithProgress {
         this.targetArchivedProj = targetArchivedProj;
     }
 
-    @SuppressWarnings({ "unchecked" })
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
         fullProjectMap = new TreeMap<String, ScanProjectInfo>();
@@ -74,11 +75,16 @@ public class ScanProjectsGetWithProgress implements IRunnableWithProgress {
                 // プロジェクト一覧を取得
                 monitor.subTask("プロジェクト一覧の情報を取得...");
                 Api projectsApi = new ProjectsApi(this.shell, this.ps, org, this.targetArchivedProj, 0);
+                projectsApi.setIgnoreStatusCodes(new ArrayList(Arrays.asList(403)));
                 List<ScanProject> tmpProjects = (List<ScanProject>) projectsApi.get();
-                System.out.println(tmpProjects.size());
+                if (tmpProjects == null) {
+                    monitor.subTask("プロジェクト一覧の情報を取得...スキャンが有効ではないためスキップします。");
+                    Thread.sleep(1000);
+                    subMonitor.worked(100);
+                    continue;
+                }
                 orgProjects.addAll(tmpProjects);
                 int totalCount = projectsApi.getTotalCount();
-                System.out.println(totalCount);
                 SubMonitor child1Monitor = subMonitor.split(100).setWorkRemaining(totalCount);
                 monitor.subTask(String.format("%s(%d/%d)", "プロジェクト一覧の情報を取得...", orgProjects.size(), totalCount)); //$NON-NLS-1$
                 child1Monitor.worked(tmpProjects.size());
@@ -91,7 +97,6 @@ public class ScanProjectsGetWithProgress implements IRunnableWithProgress {
                     }
                     projectsApi = new ProjectsApi(this.shell, this.ps, org, this.targetArchivedProj, orgProjects.size());
                     tmpProjects = (List<ScanProject>) projectsApi.get();
-                    System.out.println(tmpProjects.size());
                     orgProjects.addAll(tmpProjects);
                     monitor.subTask(String.format("%s(%d/%d)", "プロジェクト一覧の情報を取得...", orgProjects.size(), totalCount)); //$NON-NLS-1$
                     child1Monitor.worked(tmpProjects.size());
@@ -99,7 +104,6 @@ public class ScanProjectsGetWithProgress implements IRunnableWithProgress {
                 }
                 child1Monitor.done();
                 for (ScanProject scanProj : orgProjects) {
-                    System.out.println(scanProj.getName());
                     fullProjectMap.put(scanProj.getName(), new ScanProjectInfo(org, scanProj.getId(), scanProj.getName())); // $NON-NLS-1$
                 }
                 Thread.sleep(500);

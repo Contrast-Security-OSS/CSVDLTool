@@ -21,31 +21,22 @@
  * 
  */
 
-package com.contrastsecurity.csvdltool;
+package com.contrastsecurity.csvdltool.model.scan;
 
-import java.util.List;
+import java.util.Map;
 
-import com.contrastsecurity.csvdltool.model.Organization;
-
-public class ScanProjectInfo {
-    private Organization organization;
+public class ScanResult {
     private String id;
     private String name;
-    private boolean archived;
-    private List<String> vulnerableLanguages;
+    private String language;
+    private String severity;
+    private String status;
+    private String lastSeenTime;
+    private Map<String, String> message;
 
-    public ScanProjectInfo(Organization organization, String id, String name) {
-        this.organization = organization;
+    public ScanResult(String id, String name) {
         this.id = id;
         this.name = name;
-    }
-
-    public Organization getOrganization() {
-        return organization;
-    }
-
-    public void setOrganization(Organization organization) {
-        this.organization = organization;
     }
 
     public String getId() {
@@ -64,20 +55,44 @@ public class ScanProjectInfo {
         this.name = name;
     }
 
-    public boolean isArchived() {
-        return archived;
+    public String getLanguage() {
+        return language;
     }
 
-    public void setArchived(boolean archived) {
-        this.archived = archived;
+    public void setLanguage(String language) {
+        this.language = language;
     }
 
-    public List<String> getVulnerableLanguages() {
-        return vulnerableLanguages;
+    public String getSeverity() {
+        return severity;
     }
 
-    public void setVulnerableLanguages(List<String> vulnerableLanguages) {
-        this.vulnerableLanguages = vulnerableLanguages;
+    public void setSeverity(String severity) {
+        this.severity = severity;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getLastSeenTime() {
+        return lastSeenTime;
+    }
+
+    public void setLastSeenTime(String lastSeenTime) {
+        this.lastSeenTime = lastSeenTime;
+    }
+
+    public Map<String, String> getMessage() {
+        return message;
+    }
+
+    public void setMessage(Map<String, String> message) {
+        this.message = message;
     }
 
 }

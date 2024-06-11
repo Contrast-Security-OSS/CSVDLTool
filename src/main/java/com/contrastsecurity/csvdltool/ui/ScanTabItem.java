@@ -2,16 +2,21 @@ package com.contrastsecurity.csvdltool.ui;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.preference.PreferenceStore;
 import org.eclipse.swt.SWT;
@@ -21,8 +26,11 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -34,9 +42,16 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 
 import com.contrastsecurity.csvdltool.CSVDLToolShell;
+import com.contrastsecurity.csvdltool.Messages;
 import com.contrastsecurity.csvdltool.ScanProjectGetProgressMonitorDialog;
 import com.contrastsecurity.csvdltool.ScanProjectInfo;
 import com.contrastsecurity.csvdltool.ScanProjectsGetWithProgress;
+import com.contrastsecurity.csvdltool.ScanResultsGetProgressMonitorDialog;
+import com.contrastsecurity.csvdltool.ScanResultsGetWithProgress;
+import com.contrastsecurity.csvdltool.exception.ApiException;
+import com.contrastsecurity.csvdltool.exception.BasicAuthException;
+import com.contrastsecurity.csvdltool.exception.NonApiException;
+import com.contrastsecurity.csvdltool.exception.TsvException;
 import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
 
 public class ScanTabItem extends CTabItem implements PropertyChangeListener {
@@ -49,6 +64,11 @@ public class ScanTabItem extends CTabItem implements PropertyChangeListener {
     private org.eclipse.swt.widgets.List dstList;
     private Label srcCount;
     private Label dstCount;
+    private CTabFolder subTabFolder;
+
+    private Button vulExecuteBtn;
+    private Button includeStackTraceChk;
+
     private Map<String, ScanProjectInfo> fullMap;
     private List<String> srcProjects = new ArrayList<String>();
     private List<String> dstProjects = new ArrayList<String>();
@@ -111,6 +131,10 @@ public class ScanTabItem extends CTabItem implements PropertyChangeListener {
                 }
                 fullMap = progress.getFullProjectMap();
                 if (fullMap.isEmpty()) {
+                    StringJoiner sj = new StringJoiner("\r\n"); //$NON-NLS-1$
+                    sj.add("スキャンプロジェクトの取得件数が０件です。考えられる原因としては以下となります。"); //$NON-NLS-1$
+                    sj.add("・選択している組織でスキャンが有効になっていない。"); //$NON-NLS-1$
+                    MessageDialog.openInformation(toolShell, "プロジェクト一覧の取得", sj.toString()); //$NON-NLS-1$
                 }
                 for (String projLabel : fullMap.keySet()) {
                     srcList.add(projLabel); // UI list
@@ -351,6 +375,108 @@ public class ScanTabItem extends CTabItem implements PropertyChangeListener {
         this.dstCount.setFont(new Font(toolShell.getDisplay(), "Arial", 8, SWT.NORMAL)); //$NON-NLS-1$
         this.dstCount.setText("0"); //$NON-NLS-1$
         this.dstCount.setForeground(toolShell.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
+
+        subTabFolder = new CTabFolder(shell, SWT.NONE);
+        GridData tabFolderGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        subTabFolder.setLayoutData(tabFolderGrDt);
+        subTabFolder.setSelectionBackground(
+                new Color[] { toolShell.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND), toolShell.getDisplay().getSystemColor(SWT.COLOR_WIDGET_LIGHT_SHADOW) },
+                new int[] { 100 }, true);
+
+        // #################### 脆弱性 #################### //
+        CTabItem vulTabItem = new CTabItem(subTabFolder, SWT.NONE);
+        vulTabItem.setText("脆弱性");
+
+        // ========== グループ ==========
+        Composite vulButtonGrp = new Composite(subTabFolder, SWT.NULL);
+        GridLayout vulButtonGrpLt = new GridLayout(1, false);
+        vulButtonGrpLt.marginWidth = 10;
+        vulButtonGrpLt.marginHeight = 10;
+        vulButtonGrp.setLayout(vulButtonGrpLt);
+        GridData vulButtonGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        // vulButtonGrpGrDt.horizontalSpan = 3;
+        // vulButtonGrpGrDt.widthHint = 100;
+        vulButtonGrp.setLayoutData(vulButtonGrpGrDt);
+
+        // ========== 取得ボタン ==========
+        vulExecuteBtn = new Button(vulButtonGrp, SWT.PUSH);
+        GC gc = new GC(vulExecuteBtn);
+        gc.setFont(bigFont);
+        Point bigBtnSize = gc.textExtent(Messages.getString("main.lib.export.button.title"));
+        gc.dispose();
+        GridData vulExecuteBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        vulExecuteBtnGrDt.minimumHeight = 50;
+        vulExecuteBtnGrDt.heightHint = bigBtnSize.y + 20;
+        vulExecuteBtn.setLayoutData(vulExecuteBtnGrDt);
+        vulExecuteBtn.setText(Messages.getString("main.lib.export.button.title")); //$NON-NLS-1$
+        vulExecuteBtn.setToolTipText(Messages.getString("main.lib.export.button.tooltip")); //$NON-NLS-1$
+        vulExecuteBtn.setFont(new Font(toolShell.getDisplay(), "Arial", 20, SWT.NORMAL)); //$NON-NLS-1$
+        vulExecuteBtn.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                if (dstProjects.isEmpty()) {
+                    MessageDialog.openInformation(toolShell, Messages.getString("main.lib.export.message.dialog.title"), //$NON-NLS-1$
+                            Messages.getString("main.export.application.unselected.error.message")); //$NON-NLS-1$
+                    return;
+                }
+                boolean isSaveOutDirPath = ps.getString(PreferenceConstants.FILE_OUT_MODE).equals("save");
+                String outDirPath = ps.getString(PreferenceConstants.FILE_OUT_DIR);
+                if (!isSaveOutDirPath || outDirPath.isEmpty()) {
+                    outDirPath = toolShell.getMain().getOutDirPath();
+                }
+                if (outDirPath == null || outDirPath.isEmpty()) {
+                    return;
+                }
+                ScanResultsGetWithProgress progress = new ScanResultsGetWithProgress(toolShell, ps, outDirPath, dstProjects, fullMap, includeStackTraceChk.getSelection());
+                ProgressMonitorDialog progDialog = new ScanResultsGetProgressMonitorDialog(toolShell);
+                try {
+                    progDialog.run(true, true, progress);
+                } catch (InvocationTargetException e) {
+                    StringWriter stringWriter = new StringWriter();
+                    PrintWriter printWriter = new PrintWriter(stringWriter);
+                    e.printStackTrace(printWriter);
+                    String trace = stringWriter.toString();
+                    // if (!(e.getTargetException() instanceof TsvException)) {
+                    // logger.error(trace);
+                    // }
+                    String exceptionMsg = e.getTargetException().getMessage();
+                    if (e.getTargetException() instanceof ApiException) {
+                        MessageDialog.openError(toolShell, Messages.getString("main.lib.export.message.dialog.title"), //$NON-NLS-1$
+                                String.format("%s\r\n%s", Messages.getString("main.teamserver.return.error"), exceptionMsg)); //$NON-NLS-1$ //$NON-NLS-2$
+                    } else if (e.getTargetException() instanceof NonApiException) {
+                        logger.error(trace);
+                        MessageDialog.openError(toolShell, Messages.getString("main.lib.export.message.dialog.title"), //$NON-NLS-1$
+                                String.format("%s %s\r\n%s", Messages.getString("main.unexpected.status.code.error"), exceptionMsg, //$NON-NLS-1$ //$NON-NLS-2$
+                                        Messages.getString("main.message.dialog.make.sure.logfile.message"))); //$NON-NLS-1$
+                    } else if (e.getTargetException() instanceof InterruptedException) {
+                        MessageDialog.openInformation(toolShell, trace, exceptionMsg);
+                    } else if (e.getTargetException() instanceof TsvException) {
+                        MessageDialog.openError(toolShell, Messages.getString("main.lib.export.message.dialog.title"), exceptionMsg); //$NON-NLS-1$
+                        return;
+                    } else if (e.getTargetException() instanceof BasicAuthException) {
+                        MessageDialog.openError(toolShell, Messages.getString("main.lib.export.message.dialog.title"), exceptionMsg); //$NON-NLS-1$
+                        return;
+                    } else if (e.getTargetException() instanceof OperationCanceledException) {
+                        MessageDialog.openInformation(toolShell, Messages.getString("main.lib.export.message.dialog.title"), exceptionMsg); //$NON-NLS-1$
+                        return;
+                    } else {
+                        logger.error(trace);
+                        MessageDialog.openError(toolShell, Messages.getString("main.lib.export.message.dialog.title"), //$NON-NLS-1$
+                                String.format("%s\r\n%s", Messages.getString("main.message.dialog.unknown.error.message"), exceptionMsg)); //$NON-NLS-1$ //$NON-NLS-2$
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        includeStackTraceChk = new Button(vulButtonGrp, SWT.CHECK);
+        includeStackTraceChk.setText(Messages.getString("main.lib.export.option.include.detail")); //$NON-NLS-1$
+        includeStackTraceChk.setToolTipText(Messages.getString("main.lib.export.option.include.detail.tooltip")); //$NON-NLS-1$
+        if (this.ps.getBoolean(PreferenceConstants.INCLUDE_CVE_DETAIL)) {
+            includeStackTraceChk.setSelection(true);
+        }
+        vulTabItem.setControl(vulButtonGrp);
+        subTabFolder.setSelection(0);
 
         setControl(shell);
     }

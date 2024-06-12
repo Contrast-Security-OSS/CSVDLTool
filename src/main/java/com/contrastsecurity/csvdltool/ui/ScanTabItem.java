@@ -470,8 +470,8 @@ public class ScanTabItem extends CTabItem implements PropertyChangeListener {
             }
         });
         includeStackTraceChk = new Button(vulButtonGrp, SWT.CHECK);
-        includeStackTraceChk.setText(Messages.getString("main.lib.export.option.include.detail")); //$NON-NLS-1$
-        includeStackTraceChk.setToolTipText(Messages.getString("main.lib.export.option.include.detail.tooltip")); //$NON-NLS-1$
+        includeStackTraceChk.setText("脆弱性の詳細も添付ファイルで出力する。（フォルダ出力）"); //$NON-NLS-1$
+        includeStackTraceChk.setToolTipText(""); //$NON-NLS-1$
         if (this.ps.getBoolean(PreferenceConstants.INCLUDE_CVE_DETAIL)) {
             includeStackTraceChk.setSelection(true);
         }

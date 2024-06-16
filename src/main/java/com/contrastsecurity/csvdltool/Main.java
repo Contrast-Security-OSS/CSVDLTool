@@ -82,6 +82,7 @@ import com.contrastsecurity.csvdltool.preference.LibCSVColumnPreferencePage;
 import com.contrastsecurity.csvdltool.preference.MyPreferenceDialog;
 import com.contrastsecurity.csvdltool.preference.OtherPreferencePage;
 import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
+import com.contrastsecurity.csvdltool.preference.ScanResultCSVColumnPreferencePage;
 import com.contrastsecurity.csvdltool.preference.ServerCSVColumnPreferencePage;
 import com.contrastsecurity.csvdltool.preference.VulCSVColumnPreferencePage;
 import com.contrastsecurity.csvdltool.ui.AssessTabItem;
@@ -415,6 +416,7 @@ public class Main implements PropertyChangeListener {
                 PreferenceNode libCsvColumnNode = new PreferenceNode("libcsvcolumn", new LibCSVColumnPreferencePage()); //$NON-NLS-1$
                 PreferenceNode evtCsvColumnNode = new PreferenceNode("evtcsvcolumn", new AttackEventCSVColumnPreferencePage()); //$NON-NLS-1$
                 PreferenceNode svrCsvColumnNode = new PreferenceNode("svrcsvcolumn", new ServerCSVColumnPreferencePage()); //$NON-NLS-1$
+                PreferenceNode scanResultCsvColumnNode = new PreferenceNode("scanresultcsvcolumn", new ScanResultCSVColumnPreferencePage()); //$NON-NLS-1$
                 mgr.addToRoot(baseNode);
                 mgr.addToRoot(connectionNode);
                 mgr.addToRoot(otherNode);
@@ -423,6 +425,7 @@ public class Main implements PropertyChangeListener {
                 mgr.addTo(csvNode.getId(), libCsvColumnNode);
                 mgr.addTo(csvNode.getId(), evtCsvColumnNode);
                 mgr.addTo(csvNode.getId(), svrCsvColumnNode);
+                mgr.addTo(csvNode.getId(), scanResultCsvColumnNode);
                 PreferenceNode aboutNode = new PreferenceNode("about", new AboutPage()); //$NON-NLS-1$
                 mgr.addToRoot(aboutNode);
                 preferenceDialog = new MyPreferenceDialog(shell, mgr);

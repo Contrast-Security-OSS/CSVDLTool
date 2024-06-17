@@ -39,10 +39,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.stream.Collectors;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.exec.OS;
+import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -54,9 +56,12 @@ import org.eclipse.jface.preference.PreferenceStore;
 import org.eclipse.swt.widgets.Shell;
 
 import com.contrastsecurity.csvdltool.api.Api;
+import com.contrastsecurity.csvdltool.api.scan.ScanResultApi;
 import com.contrastsecurity.csvdltool.api.scan.ScanResultsApi;
+import com.contrastsecurity.csvdltool.json.scan.ScanResultJson;
 import com.contrastsecurity.csvdltool.model.Organization;
 import com.contrastsecurity.csvdltool.model.ScanResultCSVColumn;
+import com.contrastsecurity.csvdltool.model.scan.Audit;
 import com.contrastsecurity.csvdltool.model.scan.ScanResult;
 import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
 import com.google.gson.Gson;
@@ -205,70 +210,47 @@ public class ScanResultsGetWithProgress implements IRunnableWithProgress {
                                 continue;
                         }
                     }
-                    // if (includeStackTraceChk && !library.getVulns().isEmpty()) {
-                    // // ==================== 23. 詳細 ====================
-                    // if (OS.isFamilyWindows()) {
-                    // csvLineList.add(String.format("=HYPERLINK(\".\\%s.txt\",\"%s\")", library.getHash(), library.getHash())); //$NON-NLS-1$
-                    // } else {
-                    // csvLineList.add(String.format("=HYPERLINK(\"%s.txt\",\"%s\")", library.getHash(), library.getHash())); //$NON-NLS-1$
-                    // }
-                    // String textFileName = String.format("%s%s%s.txt", timestamp, System.getProperty("file.separator"), library.getHash()); //$NON-NLS-1$ //$NON-NLS-2$
-                    // textFileName = this.outDirPath + System.getProperty("file.separator") + textFileName; //$NON-NLS-1$
-                    // File file = new File(textFileName);
-                    // for (Vuln vuln : library.getVulns()) {
-                    // // ==================== 23-1. タイトル ====================
-                    // if (vuln.isHas_cvss3_score()) {
-                    // String cvss3Ver = vuln.getCvss_3_vector().split(":")[1].replace("/AV", "");
-                    // FileUtils.writeLines(file, Main.FILE_ENCODING,
-                    // Arrays.asList(String.format("=============== %s(CVSS%s %s) %s ===============", vuln.getName(), cvss3Ver, vuln.getCvss_3_severity_value(), //$NON-NLS-1$
-                    // vuln.getCvss_3_severity_code())),
-                    // true);
-                    // } else {
-                    // FileUtils.writeLines(file, Main.FILE_ENCODING,
-                    // Arrays.asList(
-                    // String.format("=============== %s(CVSS %s) %s ===============", vuln.getName(), vuln.getSeverity_value(), vuln.getSeverity_code())), //$NON-NLS-1$
-                    // true);
-                    // }
-                    // // ==================== 23-2. 説明 ====================
-                    // FileUtils.writeLines(file, Main.FILE_ENCODING, Arrays.asList(vuln.getDescription()), true);
-                    // // ==================== 23-3. EPSS ====================
-                    // String cisaStr = vuln.isCisa() ? Messages.getString("libgetwithprogress.cisa") : ""; //$NON-NLS-1$ //$NON-NLS-2$
-                    // String epss = String.format("%.2f (%.2f%s) %s", vuln.getEpss_score(), vuln.getEpss_percentile(), Messages.getString("libgetwithprogress.percentile"),
-                    // //$NON-NLS-1$ //$NON-NLS-2$
-                    // cisaStr);
-                    // FileUtils.writeLines(file, Main.FILE_ENCODING, Arrays.asList(String.format("%s %s", Messages.getString("libgetwithprogress.detail.header.epss"), epss)),
-                    // //$NON-NLS-1$ //$NON-NLS-2$
-                    // true);
-                    // // ==================== 23-4. 機密性への影響 ====================
-                    // FileUtils.writeLines(file, Main.FILE_ENCODING, Arrays.asList(
-                    // String.format("%s %s", Messages.getString("libgetwithprogress.detail.header.confidentiality-impact"), vuln.getConfidentiality_impact())), true);
-                    // //$NON-NLS-1$ //$NON-NLS-2$
-                    // // ==================== 23-5. 完全性への影響 ====================
-                    // FileUtils.writeLines(file, Main.FILE_ENCODING,
-                    // Arrays.asList(String.format("%s %s", Messages.getString("libgetwithprogress.detail.header.integrity_impact"), vuln.getIntegrity_impact())), //$NON-NLS-1$
-                    // //$NON-NLS-2$
-                    // true);
-                    // // ==================== 23-6. 可用性への影響 ====================
-                    // FileUtils.writeLines(file, Main.FILE_ENCODING,
-                    // Arrays.asList(
-                    // String.format("%s %s", Messages.getString("libgetwithprogress.detail.header.availability_impact"), vuln.getAvailability_impact())), //$NON-NLS-1$
-                    // //$NON-NLS-2$
-                    // true);
-                    // // ==================== 23-7. 攻撃前の認証要否 ====================
-                    // FileUtils.writeLines(file, Main.FILE_ENCODING,
-                    // Arrays.asList(String.format("%s %s", Messages.getString("libgetwithprogress.detail.header.authentication"), vuln.getAuthentication())), true); //$NON-NLS-1$
-                    // //$NON-NLS-2$
-                    // // ==================== 23-8. 攻撃元区分 ====================
-                    // FileUtils.writeLines(file, Main.FILE_ENCODING,
-                    // Arrays.asList(String.format("%s %s", Messages.getString("libgetwithprogress.detail.header.access_vector"), vuln.getAccess_vector())), true); //$NON-NLS-1$
-                    // //$NON-NLS-2$
-                    // // ==================== 23-9. 攻撃条件複雑さ ====================
-                    // FileUtils.writeLines(file, Main.FILE_ENCODING,
-                    // Arrays.asList(String.format("%s %s", Messages.getString("libgetwithprogress.detail.header.access_complexity"), vuln.getAccess_complexity())), //$NON-NLS-1$
-                    // //$NON-NLS-2$
-                    // true);
-                    // }
-                    // }
+                    if (includeStackTraceChk) {
+                        // ==================== 06. 詳細 ====================
+                        Api scanResultApi = new ScanResultApi(this.shell, this.ps, org, projId, result.getId());
+                        ScanResultJson resultDetail = (ScanResultJson) scanResultApi.get();
+                        if (OS.isFamilyWindows()) {
+                            csvLineList.add(String.format("=HYPERLINK(\".\\%s.txt\",\"%s\")", result.getId(), result.getId())); //$NON-NLS-1$
+                        } else {
+                            csvLineList.add(String.format("=HYPERLINK(\"%s.txt\",\"%s\")", result.getId(), result.getId())); //$NON-NLS-1$
+                        }
+                        String textFileName = String.format("%s%s%s.txt", timestamp, System.getProperty("file.separator"), result.getId()); //$NON-NLS-1$ //$NON-NLS-2$
+                        textFileName = this.outDirPath + System.getProperty("file.separator") + textFileName; //$NON-NLS-1$
+                        File file = new File(textFileName);
+                        List<String> lines = new ArrayList<String>();
+                        lines.add(String.format("最初の検出: %s", resultDetail.getFirstCreatedTime()));
+                        lines.add(String.format("最後の検出: %s", resultDetail.getLastSeenTime()));
+                        lines.add(String.format("モジュール: %s", "対応中"));
+                        lines.add(String.format("カテゴリ: %s", resultDetail.getCategory()));
+                        lines.add(String.format("深刻度: %s", resultDetail.getSeverity()));
+                        lines.add(String.format("信頼性: %s", resultDetail.getConfidence()));
+                        lines.add("セキュリティ基準:");
+                        resultDetail.getStandards().forEach((k, v) -> {
+                            lines.add(String.format(" - %s: %s", k, String.join(", ", v)));
+                        });
+                        lines.add("概要:");
+                        lines.add(resultDetail.getRisk());
+                        lines.add("修正方法:");
+                        lines.add(resultDetail.getRecommendation());
+                        if (resultDetail.getCwe() != null && !resultDetail.getCwe().isEmpty()) {
+                            lines.add("CWE:");
+                            lines.add(String.join(System.getProperty("file.separator"), resultDetail.getCwe()));
+                        }
+                        if (resultDetail.getOwasp() != null && !resultDetail.getOwasp().isEmpty()) {
+                            lines.add("OWASP:");
+                            lines.add(String.join(System.getProperty("file.separator"), resultDetail.getOwasp()));
+                        }
+                        if (resultDetail.getAudit() != null && !resultDetail.getAudit().isEmpty()) {
+                            lines.add("アクティビティ:");
+                            lines.add(resultDetail.sortedAudits().stream().map(Audit::toString).collect(Collectors.joining(System.getProperty("line.separator"))));
+                        }
+                        FileUtils.writeLines(file, Main.FILE_ENCODING, lines, true);
+                    }
 
                     csvList.add(csvLineList);
                     libIdx++;

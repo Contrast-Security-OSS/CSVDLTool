@@ -24,46 +24,40 @@
 package com.contrastsecurity.csvdltool.api.scan;
 
 import java.lang.reflect.Type;
-import java.util.List;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Shell;
 
 import com.contrastsecurity.csvdltool.api.Api;
-import com.contrastsecurity.csvdltool.json.scan.ScanResultsJson;
+import com.contrastsecurity.csvdltool.json.scan.ScanResultJson;
 import com.contrastsecurity.csvdltool.model.Organization;
-import com.contrastsecurity.csvdltool.model.scan.ScanResult;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-public class ScanResultsApi extends Api {
+public class ScanResultApi extends Api {
 
-    private final static int LIMIT = 10;
     private String projectId;
-    private int offset;
+    private String resultId;
 
-    public ScanResultsApi(Shell shell, IPreferenceStore ps, Organization org, String projectId, int offset) {
+    public ScanResultApi(Shell shell, IPreferenceStore ps, Organization org, String projectId, String resultId) {
         super(shell, ps, org);
-        this.offset = offset;
         this.projectId = projectId;
+        this.resultId = resultId;
     }
 
     @Override
     protected String getUrl() {
         String orgId = this.org.getOrganization_uuid();
-        int page = this.offset / LIMIT;
-        return String.format("%s/api/sast/organizations/%s/projects/%s/results/info?page=%d&size=%d&sort=severity,asc", this.contrastUrl, orgId, this.projectId, page, LIMIT); //$NON-NLS-1$
+        return String.format("%s/api/sast/organizations/%s/projects/%s/results/%s", this.contrastUrl, orgId, this.projectId, this.resultId); //$NON-NLS-1$
     }
 
     @Override
     protected Object convert(String response) {
         Gson gson = new Gson();
-        Type contType = new TypeToken<ScanResultsJson>() {
+        Type contType = new TypeToken<ScanResultJson>() {
         }.getType();
-        ScanResultsJson scanResultsJson = gson.fromJson(response, contType);
-        this.totalCount = scanResultsJson.getTotalElements();
-        List<ScanResult> scanResults = scanResultsJson.getScanResults();
-        return scanResults;
+        ScanResultJson scanResult = gson.fromJson(response, contType);
+        return scanResult;
     }
 
 }

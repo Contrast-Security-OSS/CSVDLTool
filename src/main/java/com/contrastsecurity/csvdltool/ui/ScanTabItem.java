@@ -81,7 +81,7 @@ public class ScanTabItem extends CTabItem implements PropertyChangeListener {
         super(mainTabFolder, SWT.NONE);
         this.ps = ps;
         Font bigFont = new Font(toolShell.getDisplay(), "Arial", 20, SWT.NORMAL);
-        setText("SCAN");
+        setText("SCAN(β版)");
         setImage(new Image(toolShell.getDisplay(), getClass().getClassLoader().getResourceAsStream("contrast-scan-sast-02.png"))); //$NON-NLS-1$
 
         Composite shell = new Composite(mainTabFolder, SWT.NONE);

@@ -99,13 +99,13 @@ public class ScanResultCSVColumnPreferencePage extends PreferencePage {
         GridData csvGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
         // csvGrpGrDt.horizontalSpan = 2;
         csvColumnGrp.setLayoutData(csvGrpGrDt);
-        csvColumnGrp.setText("CSV出力内容の設定");
+        csvColumnGrp.setText(Messages.getString("csvcolumnpreferencepage.output.settings.group.title")); //$NON-NLS-1$
 
         outCsvHeaderFlg = new Button(csvColumnGrp, SWT.CHECK);
         GridData outCsvHeaderFlgGrDt = new GridData(GridData.FILL_HORIZONTAL);
         outCsvHeaderFlgGrDt.horizontalSpan = 3;
         outCsvHeaderFlg.setLayoutData(outCsvHeaderFlgGrDt);
-        outCsvHeaderFlg.setText("カラムヘッダ（項目名）を出力");
+        outCsvHeaderFlg.setText(Messages.getString("csvcolumnpreferencepage.column.header.print.checkbox.label")); //$NON-NLS-1$
         if (ps.getBoolean(PreferenceConstants.CSV_OUT_HEADER_SCANRESULT)) {
             outCsvHeaderFlg.setSelection(true);
         }
@@ -166,13 +166,13 @@ public class ScanResultCSVColumnPreferencePage extends PreferencePage {
         column0.setResizable(false);
         TableColumn column1 = new TableColumn(table, SWT.CENTER);
         column1.setWidth(50);
-        column1.setText("出力");
+        column1.setText(Messages.getString("csvcolumnpreferencepage.table.column0.title")); //$NON-NLS-1$
         TableColumn column2 = new TableColumn(table, SWT.LEFT);
         column2.setWidth(200);
-        column2.setText("項目名");
+        column2.setText(Messages.getString("csvcolumnpreferencepage.table.column1.title")); //$NON-NLS-1$
         TableColumn column3 = new TableColumn(table, SWT.CENTER);
         column3.setWidth(75);
-        column3.setText("区切り文字");
+        column3.setText(Messages.getString("csvcolumnpreferencepage.table.column2.title")); //$NON-NLS-1$
         TableColumn column4 = new TableColumn(table, SWT.CENTER);
         column4.setWidth(75);
         column4.setText("true"); //$NON-NLS-1$
@@ -181,7 +181,7 @@ public class ScanResultCSVColumnPreferencePage extends PreferencePage {
         column5.setText("false"); //$NON-NLS-1$
         TableColumn column6 = new TableColumn(table, SWT.LEFT);
         column6.setWidth(350);
-        column6.setText("備考");
+        column6.setText(Messages.getString("csvcolumnpreferencepage.table.column3.title")); //$NON-NLS-1$
 
         for (ScanResultCSVColumn col : columnList) {
             this.addColToTable(col, -1);
@@ -266,7 +266,7 @@ public class ScanResultCSVColumnPreferencePage extends PreferencePage {
 
         final Button allOnBtn = new Button(chkButtonGrp, SWT.NULL);
         allOnBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        allOnBtn.setText("すべてオン");
+        allOnBtn.setText(Messages.getString("csvcolumnpreferencepage.all.on.button.title")); //$NON-NLS-1$
         allOnBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -281,7 +281,7 @@ public class ScanResultCSVColumnPreferencePage extends PreferencePage {
 
         final Button allOffBtn = new Button(chkButtonGrp, SWT.NULL);
         allOffBtn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        allOffBtn.setText("すべてオフ");
+        allOffBtn.setText(Messages.getString("csvcolumnpreferencepage.all.off.button.title")); //$NON-NLS-1$
         allOffBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -296,9 +296,9 @@ public class ScanResultCSVColumnPreferencePage extends PreferencePage {
 
         Label descLabel = new Label(csvColumnGrp, SWT.LEFT);
         List<String> descLabelList = new ArrayList<String>();
-        descLabelList.add("・ ドラッグアンドドロップで項目の並び替えが可能です。");
-        descLabelList.add("・ 複数の値が出力される項目については、区切り文字の変更が可能です。改行させる場合は\\\\r\\\\nをご指定してください。");
-        descLabelList.add("・ 真偽の値が出力される項目については、Yes/No文字の変更が可能です。例) Y/N、○/");
+        descLabelList.add(Messages.getString("csvcolumnpreferencepage.table.desc.draganddrop")); //$NON-NLS-1$
+        descLabelList.add(Messages.getString("csvcolumnpreferencepage.table.desc.delimiter")); //$NON-NLS-1$
+        descLabelList.add(Messages.getString("csvcolumnpreferencepage.table.desc.truefalsestr")); //$NON-NLS-1$
         descLabel.setText(String.join("\r\n", descLabelList)); //$NON-NLS-1$
         GridData descLabelGrDt = new GridData(GridData.FILL_HORIZONTAL);
         descLabelGrDt.horizontalSpan = 3;

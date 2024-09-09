@@ -62,6 +62,12 @@ public class PreferenceConstants {
     public static final String CSV_COLUMN_LIB = new String("com.contrastsecurity.csvdltool.csv_out_column_lib"); //$NON-NLS-1$
     public static final String CSV_FILE_FORMAT_LIB = new String("com.contrastsecurity.csvdltool.csv_file_format_lib"); //$NON-NLS-1$
 
+    public static final String SLEEP_ROUTECOVERAGE = new String("com.contrastsecurity.csvdltool.sleep_routecoverage"); //$NON-NLS-1$
+
+    public static final String CSV_OUT_HEADER_ROUTECOVERAGE = new String("com.contrastsecurity.csvdltool.csv_out_header_routecoverage"); //$NON-NLS-1$
+    public static final String CSV_COLUMN_ROUTECOVERAGE = new String("com.contrastsecurity.csvdltool.csv_out_column_routecoverage"); //$NON-NLS-1$
+    public static final String CSV_FILE_FORMAT_ROUTECOVERAGE = new String("com.contrastsecurity.csvdltool.csv_file_format_routecoverage"); //$NON-NLS-1$
+
     public static final String ATTACK_RANGE_DAYTIME = new String("com.contrastsecurity.csvdltool.attack_range_daytime"); //$NON-NLS-1$
     public static final String ATTACK_RANGE_NIGHTTIME = new String("com.contrastsecurity.csvdltool.attack_range_nighttime"); //$NON-NLS-1$
     public static final String ATTACK_START_WEEKDAY = new String("com.contrastsecurity.csvdltool.attack_start_weekday"); //$NON-NLS-1$

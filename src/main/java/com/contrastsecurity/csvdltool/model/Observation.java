@@ -28,7 +28,7 @@ public class Observation {
     private String verb;
 
     public String getUrl() {
-        return url;
+        return this.url == null ? "-" : this.url;
     }
 
     public void setUrl(String url) {
@@ -36,11 +36,16 @@ public class Observation {
     }
 
     public String getVerb() {
-        return verb;
+        return this.verb == null ? "-" : this.verb;
     }
 
     public void setVerb(String verb) {
         this.verb = verb;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s %s", this.getVerb(), this.getUrl());
     }
 
 }

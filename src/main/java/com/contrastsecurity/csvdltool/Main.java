@@ -82,6 +82,7 @@ import com.contrastsecurity.csvdltool.preference.LibCSVColumnPreferencePage;
 import com.contrastsecurity.csvdltool.preference.MyPreferenceDialog;
 import com.contrastsecurity.csvdltool.preference.OtherPreferencePage;
 import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
+import com.contrastsecurity.csvdltool.preference.RouteCoverageCSVColumnPreferencePage;
 import com.contrastsecurity.csvdltool.preference.ScanResultCSVColumnPreferencePage;
 import com.contrastsecurity.csvdltool.preference.ServerCSVColumnPreferencePage;
 import com.contrastsecurity.csvdltool.preference.VulCSVColumnPreferencePage;
@@ -202,6 +203,11 @@ public class Main implements PropertyChangeListener {
             this.ps.setDefault(PreferenceConstants.SLEEP_LIB, 300);
             this.ps.setDefault(PreferenceConstants.CSV_OUT_HEADER_LIB, true);
             this.ps.setDefault(PreferenceConstants.CSV_FILE_FORMAT_LIB, "'lib'_yyyy-MM-dd_HHmmss"); //$NON-NLS-1$
+
+            this.ps.setDefault(PreferenceConstants.CSV_COLUMN_ROUTECOVERAGE, RouteCoverageCSVColmunEnum.defaultValuesStr());
+            this.ps.setDefault(PreferenceConstants.SLEEP_ROUTECOVERAGE, 300);
+            this.ps.setDefault(PreferenceConstants.CSV_OUT_HEADER_ROUTECOVERAGE, true);
+            this.ps.setDefault(PreferenceConstants.CSV_FILE_FORMAT_ROUTECOVERAGE, "'routecoverage'_yyyy-MM-dd_HHmmss"); //$NON-NLS-1$
 
             this.ps.setDefault(PreferenceConstants.ATTACK_RANGE_DAYTIME, "0900-1800"); //$NON-NLS-1$
             this.ps.setDefault(PreferenceConstants.ATTACK_RANGE_NIGHTTIME, "1800-0000"); //$NON-NLS-1$
@@ -414,6 +420,7 @@ public class Main implements PropertyChangeListener {
                 PreferenceNode csvNode = new PreferenceNode("csv", new CSVPreferencePage()); //$NON-NLS-1$
                 PreferenceNode vulCsvColumnNode = new PreferenceNode("vulcsvcolumn", new VulCSVColumnPreferencePage()); //$NON-NLS-1$
                 PreferenceNode libCsvColumnNode = new PreferenceNode("libcsvcolumn", new LibCSVColumnPreferencePage()); //$NON-NLS-1$
+                PreferenceNode routeCsvColumnNode = new PreferenceNode("routecsvcolumn", new RouteCoverageCSVColumnPreferencePage()); //$NON-NLS-1$
                 PreferenceNode evtCsvColumnNode = new PreferenceNode("evtcsvcolumn", new AttackEventCSVColumnPreferencePage()); //$NON-NLS-1$
                 PreferenceNode svrCsvColumnNode = new PreferenceNode("svrcsvcolumn", new ServerCSVColumnPreferencePage()); //$NON-NLS-1$
                 PreferenceNode scanResultCsvColumnNode = new PreferenceNode("scanresultcsvcolumn", new ScanResultCSVColumnPreferencePage()); //$NON-NLS-1$
@@ -423,6 +430,7 @@ public class Main implements PropertyChangeListener {
                 mgr.addToRoot(csvNode);
                 mgr.addTo(csvNode.getId(), vulCsvColumnNode);
                 mgr.addTo(csvNode.getId(), libCsvColumnNode);
+                mgr.addTo(csvNode.getId(), routeCsvColumnNode);
                 mgr.addTo(csvNode.getId(), evtCsvColumnNode);
                 mgr.addTo(csvNode.getId(), svrCsvColumnNode);
                 mgr.addTo(csvNode.getId(), scanResultCsvColumnNode);

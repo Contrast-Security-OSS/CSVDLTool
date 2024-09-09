@@ -56,23 +56,25 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
-import com.contrastsecurity.csvdltool.AttackEventCSVColmunEnum;
 import com.contrastsecurity.csvdltool.Messages;
-import com.contrastsecurity.csvdltool.model.AttackEventCSVColumn;
+import com.contrastsecurity.csvdltool.RouteCoverageCSVColmunEnum;
+import com.contrastsecurity.csvdltool.model.RouteCoverageCSVColumn;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
-public class AttackEventCSVColumnPreferencePage extends PreferencePage {
+public class RouteCoverageCSVColumnPreferencePage extends PreferencePage {
 
     private Button outCsvHeaderFlg;
-    private List<AttackEventCSVColumn> columnList;
+    private List<RouteCoverageCSVColumn> columnList;
     private List<Button> checkBoxList = new ArrayList<Button>();
     private List<Text> separateTextList = new ArrayList<Text>();
+    private List<Text> trueTextList = new ArrayList<Text>();
+    private List<Text> falseTextList = new ArrayList<Text>();
     private Table table;
 
-    public AttackEventCSVColumnPreferencePage() {
-        super(Messages.getString("attackeventcsvcolumnpreferencepage.title")); //$NON-NLS-1$
+    public RouteCoverageCSVColumnPreferencePage() {
+        super(Messages.getString("routecoveragecsvcolumnpreferencepage.title")); //$NON-NLS-1$
     }
 
     @Override
@@ -104,18 +106,18 @@ public class AttackEventCSVColumnPreferencePage extends PreferencePage {
         outCsvHeaderFlgGrDt.horizontalSpan = 3;
         outCsvHeaderFlg.setLayoutData(outCsvHeaderFlgGrDt);
         outCsvHeaderFlg.setText(Messages.getString("csvcolumnpreferencepage.column.header.print.checkbox.label")); //$NON-NLS-1$
-        if (ps.getBoolean(PreferenceConstants.CSV_OUT_HEADER_ATTACKEVENT)) {
+        if (ps.getBoolean(PreferenceConstants.CSV_OUT_HEADER_ROUTECOVERAGE)) {
             outCsvHeaderFlg.setSelection(true);
         }
 
-        String columnJsonStr = ps.getString(PreferenceConstants.CSV_COLUMN_ATTACKEVENT);
+        String columnJsonStr = ps.getString(PreferenceConstants.CSV_COLUMN_ROUTECOVERAGE);
         if (columnJsonStr.trim().length() > 0) {
             try {
-                columnList = new Gson().fromJson(columnJsonStr, new TypeToken<List<AttackEventCSVColumn>>() {
+                columnList = new Gson().fromJson(columnJsonStr, new TypeToken<List<RouteCoverageCSVColumn>>() {
                 }.getType());
-                List<AttackEventCSVColumn> defaultList = new ArrayList<AttackEventCSVColumn>();
-                for (AttackEventCSVColmunEnum colEnum : AttackEventCSVColmunEnum.sortedValues()) {
-                    defaultList.add(new AttackEventCSVColumn(colEnum));
+                List<RouteCoverageCSVColumn> defaultList = new ArrayList<RouteCoverageCSVColumn>();
+                for (RouteCoverageCSVColmunEnum colEnum : RouteCoverageCSVColmunEnum.sortedValues()) {
+                    defaultList.add(new RouteCoverageCSVColumn(colEnum));
                 }
                 if (columnList.size() != defaultList.size()) {
                     defaultList.stream().filter(p -> {
@@ -125,20 +127,21 @@ public class AttackEventCSVColumnPreferencePage extends PreferencePage {
                     });
                 }
             } catch (JsonSyntaxException e) {
-                MessageDialog.openError(getShell(), Messages.getString("attackeventcsvcolumnpreferencepage.message.dialog.title"), String.format("%s\r\n%s", Messages.getString("attackeventcsvcolumnpreferencepage.message.dialog.json.load.error.message"), columnJsonStr)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                columnList = new ArrayList<AttackEventCSVColumn>();
+                MessageDialog.openError(getShell(), Messages.getString("routecoveragecsvcolumnpreferencepage.message.dialog.title"), //$NON-NLS-1$
+                        String.format("%s\r\n%s", Messages.getString("routecoveragecsvcolumnpreferencepage.message.dialog.json.load.error.message"), columnJsonStr)); //$NON-NLS-1$ //$NON-NLS-2$
+                columnList = new ArrayList<RouteCoverageCSVColumn>();
             }
         } else {
-            columnList = new ArrayList<AttackEventCSVColumn>();
-            for (AttackEventCSVColmunEnum colEnum : AttackEventCSVColmunEnum.sortedValues()) {
-                columnList.add(new AttackEventCSVColumn(colEnum));
+            columnList = new ArrayList<RouteCoverageCSVColumn>();
+            for (RouteCoverageCSVColmunEnum colEnum : RouteCoverageCSVColmunEnum.sortedValues()) {
+                columnList.add(new RouteCoverageCSVColumn(colEnum));
             }
         }
         // Clean up ここから
         List<Integer> irregularIndexes = new ArrayList<Integer>();
         for (int i = 0; i < columnList.size(); i++) {
             Object obj = columnList.get(i);
-            if (!(obj instanceof AttackEventCSVColumn)) {
+            if (!(obj instanceof RouteCoverageCSVColumn)) {
                 irregularIndexes.add(i);
             }
         }
@@ -148,8 +151,8 @@ public class AttackEventCSVColumnPreferencePage extends PreferencePage {
         }
         // Clean up ここまで
         if (columnList.isEmpty()) {
-            for (AttackEventCSVColmunEnum colEnum : AttackEventCSVColmunEnum.sortedValues()) {
-                columnList.add(new AttackEventCSVColumn(colEnum));
+            for (RouteCoverageCSVColmunEnum colEnum : RouteCoverageCSVColmunEnum.sortedValues()) {
+                columnList.add(new RouteCoverageCSVColumn(colEnum));
             }
         }
 
@@ -171,11 +174,17 @@ public class AttackEventCSVColumnPreferencePage extends PreferencePage {
         TableColumn column3 = new TableColumn(table, SWT.CENTER);
         column3.setWidth(75);
         column3.setText(Messages.getString("csvcolumnpreferencepage.table.column2.title")); //$NON-NLS-1$
-        TableColumn column4 = new TableColumn(table, SWT.LEFT);
-        column4.setWidth(350);
-        column4.setText(Messages.getString("csvcolumnpreferencepage.table.column3.title")); //$NON-NLS-1$
+        TableColumn column4 = new TableColumn(table, SWT.CENTER);
+        column4.setWidth(75);
+        column4.setText("true"); //$NON-NLS-1$
+        TableColumn column5 = new TableColumn(table, SWT.CENTER);
+        column5.setWidth(75);
+        column5.setText("false"); //$NON-NLS-1$
+        TableColumn column6 = new TableColumn(table, SWT.LEFT);
+        column6.setWidth(350);
+        column6.setText(Messages.getString("csvcolumnpreferencepage.table.column3.title")); //$NON-NLS-1$
 
-        for (AttackEventCSVColumn col : columnList) {
+        for (RouteCoverageCSVColumn col : columnList) {
             this.addColToTable(col, -1);
         }
 
@@ -220,11 +229,11 @@ public class AttackEventCSVColumnPreferencePage extends PreferencePage {
                         return;
                     }
                     if (sourceIndex < targetIndex) {
-                        AttackEventCSVColumn targetColumn = columnList.get(sourceIndex);
+                        RouteCoverageCSVColumn targetColumn = columnList.get(sourceIndex);
                         columnList.add(targetIndex, targetColumn);
                         columnList.remove(sourceIndex);
                     } else if (sourceIndex > targetIndex) {
-                        AttackEventCSVColumn targetColumn = columnList.remove(sourceIndex);
+                        RouteCoverageCSVColumn targetColumn = columnList.remove(sourceIndex);
                         columnList.add(targetIndex, targetColumn);
                     }
                     for (Button button : checkBoxList) {
@@ -235,9 +244,17 @@ public class AttackEventCSVColumnPreferencePage extends PreferencePage {
                         text.dispose();
                     }
                     separateTextList.clear();
+                    for (Text text : trueTextList) {
+                        text.dispose();
+                    }
+                    trueTextList.clear();
+                    for (Text text : falseTextList) {
+                        text.dispose();
+                    }
+                    falseTextList.clear();
                     table.clearAll();
                     table.removeAll();
-                    for (AttackEventCSVColumn col : columnList) {
+                    for (RouteCoverageCSVColumn col : columnList) {
                         addColToTable(col, -1);
                     }
                 }
@@ -254,7 +271,7 @@ public class AttackEventCSVColumnPreferencePage extends PreferencePage {
         allOnBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                for (AttackEventCSVColumn col : columnList) {
+                for (RouteCoverageCSVColumn col : columnList) {
                     col.setValid(true);
                 }
                 for (Button button : checkBoxList) {
@@ -272,7 +289,7 @@ public class AttackEventCSVColumnPreferencePage extends PreferencePage {
                 for (Button button : checkBoxList) {
                     button.setSelection(false);
                 }
-                for (AttackEventCSVColumn col : columnList) {
+                for (RouteCoverageCSVColumn col : columnList) {
                     col.setValid(false);
                 }
             }
@@ -282,6 +299,7 @@ public class AttackEventCSVColumnPreferencePage extends PreferencePage {
         List<String> descLabelList = new ArrayList<String>();
         descLabelList.add(Messages.getString("csvcolumnpreferencepage.table.desc.draganddrop")); //$NON-NLS-1$
         descLabelList.add(Messages.getString("csvcolumnpreferencepage.table.desc.delimiter")); //$NON-NLS-1$
+        descLabelList.add(Messages.getString("csvcolumnpreferencepage.table.desc.truefalsestr")); //$NON-NLS-1$
         descLabel.setText(String.join("\r\n", descLabelList)); //$NON-NLS-1$
         GridData descLabelGrDt = new GridData(GridData.FILL_HORIZONTAL);
         descLabelGrDt.horizontalSpan = 3;
@@ -306,7 +324,7 @@ public class AttackEventCSVColumnPreferencePage extends PreferencePage {
         defaultBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                outCsvHeaderFlg.setSelection(ps.getDefaultBoolean(PreferenceConstants.CSV_OUT_HEADER_ATTACKEVENT));
+                outCsvHeaderFlg.setSelection(ps.getDefaultBoolean(PreferenceConstants.CSV_OUT_HEADER_ROUTECOVERAGE));
                 columnList.clear();
                 for (Button button : checkBoxList) {
                     button.dispose();
@@ -316,12 +334,20 @@ public class AttackEventCSVColumnPreferencePage extends PreferencePage {
                     text.dispose();
                 }
                 separateTextList.clear();
+                for (Text text : trueTextList) {
+                    text.dispose();
+                }
+                trueTextList.clear();
+                for (Text text : falseTextList) {
+                    text.dispose();
+                }
+                falseTextList.clear();
                 table.clearAll();
                 table.removeAll();
-                for (AttackEventCSVColmunEnum colEnum : AttackEventCSVColmunEnum.sortedValues()) {
-                    columnList.add(new AttackEventCSVColumn(colEnum));
+                for (RouteCoverageCSVColmunEnum colEnum : RouteCoverageCSVColmunEnum.sortedValues()) {
+                    columnList.add(new RouteCoverageCSVColumn(colEnum));
                 }
-                for (AttackEventCSVColumn col : columnList) {
+                for (RouteCoverageCSVColumn col : columnList) {
                     addColToTable(col, -1);
                 }
             }
@@ -350,16 +376,16 @@ public class AttackEventCSVColumnPreferencePage extends PreferencePage {
             return true;
         }
         List<String> errors = new ArrayList<String>();
-        ps.setValue(PreferenceConstants.CSV_OUT_HEADER_ATTACKEVENT, this.outCsvHeaderFlg.getSelection());
-        ps.setValue(PreferenceConstants.CSV_COLUMN_ATTACKEVENT, new Gson().toJson(this.columnList));
+        ps.setValue(PreferenceConstants.CSV_OUT_HEADER_ROUTECOVERAGE, this.outCsvHeaderFlg.getSelection());
+        ps.setValue(PreferenceConstants.CSV_COLUMN_ROUTECOVERAGE, new Gson().toJson(this.columnList));
         if (!errors.isEmpty()) {
-            MessageDialog.openError(getShell(), Messages.getString("attackeventcsvcolumnpreferencepage.dialog.title"), String.join("\r\n", errors)); //$NON-NLS-1$ //$NON-NLS-2$
+            MessageDialog.openError(getShell(), Messages.getString("routecoveragecsvcolumnpreferencepage.dialog.title"), String.join("\r\n", errors)); //$NON-NLS-1$ //$NON-NLS-2$
             return false;
         }
         return true;
     }
 
-    private void addColToTable(AttackEventCSVColumn col, int index) {
+    private void addColToTable(RouteCoverageCSVColumn col, int index) {
         if (col == null) {
             return;
         }
@@ -374,7 +400,7 @@ public class AttackEventCSVColumnPreferencePage extends PreferencePage {
                 Button triggerBtn = (Button) e.getSource();
                 int clickIndex = checkBoxList.indexOf(triggerBtn);
                 boolean selected = triggerBtn.getSelection();
-                AttackEventCSVColumn targetColumn = columnList.get(clickIndex);
+                RouteCoverageCSVColumn targetColumn = columnList.get(clickIndex);
                 targetColumn.setValid(selected);
             }
         });
@@ -402,7 +428,7 @@ public class AttackEventCSVColumnPreferencePage extends PreferencePage {
                     Text modifyText = (Text) e.getSource();
                     int modifyIndex = separateTextList.indexOf(modifyText);
                     String text = modifyText.getText();
-                    AttackEventCSVColumn targetColumn = columnList.get(modifyIndex);
+                    RouteCoverageCSVColumn targetColumn = columnList.get(modifyIndex);
                     targetColumn.setSeparateStr(text);
                 }
             });
@@ -415,6 +441,55 @@ public class AttackEventCSVColumnPreferencePage extends PreferencePage {
             item.setText(3, ""); //$NON-NLS-1$
             separateTextList.add(new Text(table, SWT.NONE));
         }
-        item.setText(4, col.getColumn().getRemarks());
+        if (col.isBoolean()) {
+            // TrueStr
+            TableEditor editor3 = new TableEditor(table);
+            Text trueText = new Text(table, SWT.NONE);
+            trueText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+            trueText.setTextLimit(10);
+            trueText.setText(col.getTrueStr());
+            trueText.addModifyListener(new ModifyListener() {
+                @Override
+                public void modifyText(ModifyEvent e) {
+                    Text modifyText = (Text) e.getSource();
+                    int modifyIndex = trueTextList.indexOf(modifyText);
+                    String text = modifyText.getText();
+                    RouteCoverageCSVColumn targetColumn = columnList.get(modifyIndex);
+                    targetColumn.setTrueStr(text);
+                }
+            });
+            trueText.pack();
+            editor3.grabHorizontal = true;
+            editor3.horizontalAlignment = SWT.CENTER;
+            editor3.setEditor(trueText, item, 4);
+            trueTextList.add(trueText);
+            // FalseStr
+            TableEditor editor4 = new TableEditor(table);
+            Text falseText = new Text(table, SWT.NONE);
+            falseText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+            falseText.setTextLimit(10);
+            falseText.setText(col.getFalseStr());
+            falseText.addModifyListener(new ModifyListener() {
+                @Override
+                public void modifyText(ModifyEvent e) {
+                    Text modifyText = (Text) e.getSource();
+                    int modifyIndex = falseTextList.indexOf(modifyText);
+                    String text = modifyText.getText();
+                    RouteCoverageCSVColumn targetColumn = columnList.get(modifyIndex);
+                    targetColumn.setFalseStr(text);
+                }
+            });
+            falseText.pack();
+            editor4.grabHorizontal = true;
+            editor4.horizontalAlignment = SWT.CENTER;
+            editor4.setEditor(falseText, item, 5);
+            falseTextList.add(falseText);
+        } else {
+            item.setText(4, ""); //$NON-NLS-1$
+            item.setText(5, ""); //$NON-NLS-1$
+            trueTextList.add(new Text(table, SWT.NONE));
+            falseTextList.add(new Text(table, SWT.NONE));
+        }
+        item.setText(6, col.getColumn().getRemarks());
     }
 }

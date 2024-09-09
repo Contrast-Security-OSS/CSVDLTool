@@ -428,7 +428,6 @@ public class LibGetWithProgress implements IRunnableWithProgress {
                                     true);
                         }
                     }
-
                     csvList.add(csvLineList);
                     libIdx++;
                     sub1_1Monitor.worked(1);

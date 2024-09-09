@@ -23,11 +23,21 @@
 
 package com.contrastsecurity.csvdltool.model;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 public class Route {
     private String signature;
     private List<Observation> observations;
+    private String route_hash;
+    private String status;
+    private int vulnerabilities;
+    private List<String> environments;
+    private String exercised;
+    private Application app;
+    private List<Server> servers;
 
     public String getSignature() {
         return signature;
@@ -43,6 +53,70 @@ public class Route {
 
     public void setObservations(List<Observation> observations) {
         this.observations = observations;
+    }
+
+    public String getRoute_hash() {
+        return route_hash;
+    }
+
+    public void setRoute_hash(String route_hash) {
+        this.route_hash = route_hash;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public int getVulnerabilities() {
+        return vulnerabilities;
+    }
+
+    public void setVulnerabilities(int vulnerabilities) {
+        this.vulnerabilities = vulnerabilities;
+    }
+
+    public List<String> getEnvironments() {
+        return environments;
+    }
+
+    public void setEnvironments(List<String> environments) {
+        this.environments = environments;
+    }
+
+    public String getExercised() {
+        return exercised;
+    }
+
+    public String getFormatExercised() {
+        if (this.exercised == null) {
+            return "";
+        }
+        LocalDateTime ldt = LocalDateTime.ofInstant(Instant.ofEpochMilli(Long.parseLong(this.exercised)), ZoneId.systemDefault());
+        return ldt.toString();
+    }
+
+    public void setExercised(String exercised) {
+        this.exercised = exercised;
+    }
+
+    public Application getApp() {
+        return app;
+    }
+
+    public void setApp(Application app) {
+        this.app = app;
+    }
+
+    public List<Server> getServers() {
+        return servers;
+    }
+
+    public void setServers(List<Server> servers) {
+        this.servers = servers;
     }
 
 }

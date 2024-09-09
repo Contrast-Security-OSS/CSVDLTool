@@ -64,6 +64,8 @@ import com.contrastsecurity.csvdltool.exception.NonApiException;
 import com.contrastsecurity.csvdltool.exception.TsvException;
 import com.contrastsecurity.csvdltool.model.Filter;
 import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
+import com.contrastsecurity.csvdltool.ui.monitordialog.routecoverage.RouteCoverageGetProgressMonitorDialog;
+import com.contrastsecurity.csvdltool.ui.monitordialog.routecoverage.RouteCoverageGetWithProgress;
 
 public class AssessTabItem extends CTabItem implements PropertyChangeListener {
 
@@ -88,6 +90,8 @@ public class AssessTabItem extends CTabItem implements PropertyChangeListener {
     private Button withCVSSInfoChk;
     private Button withEPSSInfoChk;
     private Button includeCVEDetailChk;
+
+    private Button routeExecuteBtn;
 
     private Text vulSeverityFilterTxt;
     private Text vulVulnTypeFilterTxt;
@@ -793,6 +797,90 @@ public class AssessTabItem extends CTabItem implements PropertyChangeListener {
             includeCVEDetailChk.setSelection(true);
         }
         libTabItem.setControl(libButtonGrp);
+
+        // #################### ルートカバレッジ #################### //
+        CTabItem routeTabItem = new CTabItem(subTabFolder, SWT.NONE);
+        routeTabItem.setText(Messages.getString("main.route.tab.title")); //$NON-NLS-1$
+
+        // ========== グループ ==========
+        Composite routeButtonGrp = new Composite(subTabFolder, SWT.NULL);
+        GridLayout routeButtonGrpLt = new GridLayout(1, false);
+        routeButtonGrpLt.marginWidth = 10;
+        routeButtonGrpLt.marginHeight = 10;
+        routeButtonGrp.setLayout(routeButtonGrpLt);
+        GridData routeButtonGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        // routeButtonGrpGrDt.horizontalSpan = 3;
+        // routeButtonGrpGrDt.widthHint = 100;
+        routeButtonGrp.setLayoutData(routeButtonGrpGrDt);
+
+        // ========== 取得ボタン ==========
+        routeExecuteBtn = new Button(routeButtonGrp, SWT.PUSH);
+        GridData routeExecuteBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        routeExecuteBtnGrDt.minimumHeight = 50;
+        routeExecuteBtnGrDt.heightHint = bigBtnSize.y + 20;
+        routeExecuteBtn.setLayoutData(routeExecuteBtnGrDt);
+        routeExecuteBtn.setText(Messages.getString("main.route.export.button.title")); //$NON-NLS-1$
+        routeExecuteBtn.setToolTipText(Messages.getString("main.route.export.button.tooltip")); //$NON-NLS-1$
+        routeExecuteBtn.setFont(new Font(toolShell.getDisplay(), "Arial", 20, SWT.NORMAL)); //$NON-NLS-1$
+        routeExecuteBtn.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                if (dstApps.isEmpty()) {
+                    MessageDialog.openInformation(toolShell, Messages.getString("main.lib.export.message.dialog.title"), //$NON-NLS-1$
+                            Messages.getString("main.export.application.unselected.error.message")); //$NON-NLS-1$
+                    return;
+                }
+                boolean isSaveOutDirPath = ps.getString(PreferenceConstants.FILE_OUT_MODE).equals("save");
+                String outDirPath = ps.getString(PreferenceConstants.FILE_OUT_DIR);
+                if (!isSaveOutDirPath || outDirPath.isEmpty()) {
+                    outDirPath = toolShell.getMain().getOutDirPath();
+                }
+                if (outDirPath == null || outDirPath.isEmpty()) {
+                    return;
+                }
+                RouteCoverageGetWithProgress progress = new RouteCoverageGetWithProgress(toolShell, ps, outDirPath, dstApps, fullMap);
+                ProgressMonitorDialog progDialog = new RouteCoverageGetProgressMonitorDialog(toolShell);
+                try {
+                    progDialog.run(true, true, progress);
+                } catch (InvocationTargetException e) {
+                    StringWriter stringWriter = new StringWriter();
+                    PrintWriter printWriter = new PrintWriter(stringWriter);
+                    e.printStackTrace(printWriter);
+                    String trace = stringWriter.toString();
+                    // if (!(e.getTargetException() instanceof TsvException)) {
+                    // logger.error(trace);
+                    // }
+                    String exceptionMsg = e.getTargetException().getMessage();
+                    if (e.getTargetException() instanceof ApiException) {
+                        MessageDialog.openError(toolShell, Messages.getString("main.route.export.message.dialog.title"), //$NON-NLS-1$
+                                String.format("%s\r\n%s", Messages.getString("main.teamserver.return.error"), exceptionMsg)); //$NON-NLS-1$ //$NON-NLS-2$
+                    } else if (e.getTargetException() instanceof NonApiException) {
+                        logger.error(trace);
+                        MessageDialog.openError(toolShell, Messages.getString("main.route.export.message.dialog.title"), //$NON-NLS-1$
+                                String.format("%s %s\r\n%s", Messages.getString("main.unexpected.status.code.error"), exceptionMsg, //$NON-NLS-1$ //$NON-NLS-2$
+                                        Messages.getString("main.message.dialog.make.sure.logfile.message"))); //$NON-NLS-1$
+                    } else if (e.getTargetException() instanceof InterruptedException) {
+                        MessageDialog.openInformation(toolShell, trace, exceptionMsg);
+                    } else if (e.getTargetException() instanceof TsvException) {
+                        MessageDialog.openError(toolShell, Messages.getString("main.route.export.message.dialog.title"), exceptionMsg); //$NON-NLS-1$
+                        return;
+                    } else if (e.getTargetException() instanceof BasicAuthException) {
+                        MessageDialog.openError(toolShell, Messages.getString("main.route.export.message.dialog.title"), exceptionMsg); //$NON-NLS-1$
+                        return;
+                    } else if (e.getTargetException() instanceof OperationCanceledException) {
+                        MessageDialog.openInformation(toolShell, Messages.getString("main.route.export.message.dialog.title"), exceptionMsg); //$NON-NLS-1$
+                        return;
+                    } else {
+                        logger.error(trace);
+                        MessageDialog.openError(toolShell, Messages.getString("main.route.export.message.dialog.title"), //$NON-NLS-1$
+                                String.format("%s\r\n%s", Messages.getString("main.message.dialog.unknown.error.message"), exceptionMsg)); //$NON-NLS-1$ //$NON-NLS-2$
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        routeTabItem.setControl(routeButtonGrp);
 
         int sub_idx = this.ps.getInt(PreferenceConstants.OPENED_SUB_TAB_IDX);
         subTabFolder.setSelection(sub_idx);

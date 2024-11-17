@@ -29,6 +29,11 @@
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry sourcepath="/Users/turbou/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-text/1.12.0/9ff4f979b84635ca1b57a3298dd905b61e7fd0ca/commons-text-1.12.0-sources.jar" kind="lib" path="/Users/turbou/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-text/1.12.0/66aa90dc099701c4d3b14bd256c328f592ccf0d6/commons-text-1.12.0.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry sourcepath="/Users/turbou/.gradle/caches/modules-2/files-2.1/com.google.code.gson/gson/2.10.1/982a90132e942f302e6fe79d6e78c4bc2e998569/gson-2.10.1-sources.jar" kind="lib" path="/Users/turbou/.gradle/caches/modules-2/files-2.1/com.google.code.gson/gson/2.10.1/b3add478d4382b78ea20b1671390a858002feb6c/gson-2.10.1.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
@@ -39,7 +44,7 @@
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="/Users/turbou/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-lang3/3.4/b49dafc9cfef24c356827f322e773e7c26725dd2/commons-lang3-3.4-sources.jar" kind="lib" path="/Users/turbou/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-lang3/3.4/5fe28b9518e58819180a43a850fbc0dd24b7c050/commons-lang3-3.4.jar">
+	<classpathentry sourcepath="/Users/turbou/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-lang3/3.14.0/9ef3e18356f4ac30b15bfa48c02a7f54b51af382/commons-lang3-3.14.0-sources.jar" kind="lib" path="/Users/turbou/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-lang3/3.14.0/1ed471194b02f2c6cb734a0cd6f6f107c673afae/commons-lang3-3.14.0.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>

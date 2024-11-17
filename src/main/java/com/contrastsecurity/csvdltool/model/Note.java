@@ -25,7 +25,7 @@ package com.contrastsecurity.csvdltool.model;
 
 import java.util.List;
 
-import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 
 public class Note {
     private String note;

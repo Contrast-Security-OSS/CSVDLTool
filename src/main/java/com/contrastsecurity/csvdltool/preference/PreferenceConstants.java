@@ -64,6 +64,10 @@ public class PreferenceConstants {
 
     public static final String SLEEP_ROUTECOVERAGE = new String("com.contrastsecurity.csvdltool.sleep_routecoverage"); //$NON-NLS-1$
 
+    public static final String SBOM_TYPE = new String("com.contrastsecurity.csvdltool.sbom_type"); //$NON-NLS-1$
+    public static final String SLEEP_SBOM = new String("com.contrastsecurity.csvdltool.sleep_sbom"); //$NON-NLS-1$
+    public static final String JSON_FILE_FORMAT_SBOM = new String("com.contrastsecurity.csvdltool.json_file_format_sbom"); //$NON-NLS-1$
+
     public static final String CSV_OUT_HEADER_ROUTECOVERAGE = new String("com.contrastsecurity.csvdltool.csv_out_header_routecoverage"); //$NON-NLS-1$
     public static final String CSV_COLUMN_ROUTECOVERAGE = new String("com.contrastsecurity.csvdltool.csv_out_column_routecoverage"); //$NON-NLS-1$
     public static final String CSV_FILE_FORMAT_ROUTECOVERAGE = new String("com.contrastsecurity.csvdltool.csv_file_format_routecoverage"); //$NON-NLS-1$

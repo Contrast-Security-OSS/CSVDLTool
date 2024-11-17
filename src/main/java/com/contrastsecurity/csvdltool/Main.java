@@ -209,6 +209,10 @@ public class Main implements PropertyChangeListener {
             this.ps.setDefault(PreferenceConstants.CSV_OUT_HEADER_ROUTECOVERAGE, true);
             this.ps.setDefault(PreferenceConstants.CSV_FILE_FORMAT_ROUTECOVERAGE, "'routecoverage'_yyyy-MM-dd_HHmmss"); //$NON-NLS-1$
 
+            this.ps.setDefault(PreferenceConstants.SBOM_TYPE, "cyclonedx");
+            this.ps.setDefault(PreferenceConstants.SLEEP_SBOM, 300);
+            this.ps.setDefault(PreferenceConstants.JSON_FILE_FORMAT_SBOM, "'sbom_${format}'_yyyy-MM-dd_HHmmss"); //$NON-NLS-1$
+
             this.ps.setDefault(PreferenceConstants.ATTACK_RANGE_DAYTIME, "0900-1800"); //$NON-NLS-1$
             this.ps.setDefault(PreferenceConstants.ATTACK_RANGE_NIGHTTIME, "1800-0000"); //$NON-NLS-1$
             this.ps.setDefault(PreferenceConstants.ATTACK_START_WEEKDAY, 1); // 月曜日

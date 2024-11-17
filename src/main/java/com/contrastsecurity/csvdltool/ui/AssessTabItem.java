@@ -66,6 +66,9 @@ import com.contrastsecurity.csvdltool.model.Filter;
 import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
 import com.contrastsecurity.csvdltool.ui.monitordialog.routecoverage.RouteCoverageGetProgressMonitorDialog;
 import com.contrastsecurity.csvdltool.ui.monitordialog.routecoverage.RouteCoverageGetWithProgress;
+import com.contrastsecurity.csvdltool.ui.monitordialog.sbom.SBOMGetProgressMonitorDialog;
+import com.contrastsecurity.csvdltool.ui.monitordialog.sbom.SBOMGetWithProgress;
+import com.contrastsecurity.csvdltool.ui.monitordialog.sbom.SBOMGetWithProgress.SBOMTypeEnum;
 
 public class AssessTabItem extends CTabItem implements PropertyChangeListener {
 
@@ -92,6 +95,10 @@ public class AssessTabItem extends CTabItem implements PropertyChangeListener {
     private Button includeCVEDetailChk;
 
     private Button routeExecuteBtn;
+
+    private Button sbomExecuteBtn;
+    private Button sbomCyclonedx;
+    private Button sbomSpdx;
 
     private Text vulSeverityFilterTxt;
     private Text vulVulnTypeFilterTxt;
@@ -826,7 +833,7 @@ public class AssessTabItem extends CTabItem implements PropertyChangeListener {
             @Override
             public void widgetSelected(SelectionEvent event) {
                 if (dstApps.isEmpty()) {
-                    MessageDialog.openInformation(toolShell, Messages.getString("main.lib.export.message.dialog.title"), //$NON-NLS-1$
+                    MessageDialog.openInformation(toolShell, Messages.getString("main.route.export.message.dialog.title"), //$NON-NLS-1$
                             Messages.getString("main.export.application.unselected.error.message")); //$NON-NLS-1$
                     return;
                 }
@@ -881,6 +888,111 @@ public class AssessTabItem extends CTabItem implements PropertyChangeListener {
             }
         });
         routeTabItem.setControl(routeButtonGrp);
+
+        // #################### SBOM #################### //
+        CTabItem sbomTabItem = new CTabItem(subTabFolder, SWT.NONE);
+        sbomTabItem.setText("SBOM");
+
+        // ========== グループ ==========
+        Composite sbomButtonGrp = new Composite(subTabFolder, SWT.NULL);
+        GridLayout sbomButtonGrpLt = new GridLayout(1, false);
+        sbomButtonGrpLt.marginWidth = 10;
+        sbomButtonGrpLt.marginHeight = 10;
+        sbomButtonGrp.setLayout(sbomButtonGrpLt);
+        GridData sbomButtonGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        // sbomButtonGrpGrDt.horizontalSpan = 3;
+        // sbomButtonGrpGrDt.widthHint = 100;
+        sbomButtonGrp.setLayoutData(sbomButtonGrpGrDt);
+
+        Composite authInputTypeGrp = new Composite(sbomButtonGrp, SWT.NONE);
+        GridLayout authInputTypeGrpLt = new GridLayout(2, false);
+        authInputTypeGrpLt.marginWidth = 0;
+        authInputTypeGrpLt.marginBottom = -5;
+        authInputTypeGrpLt.verticalSpacing = 10;
+        authInputTypeGrp.setLayout(authInputTypeGrpLt);
+        GridData authInputTypeGrpGrDt = new GridData();
+        authInputTypeGrpGrDt.horizontalSpan = 2;
+        authInputTypeGrp.setLayoutData(authInputTypeGrpGrDt);
+
+        sbomCyclonedx = new Button(authInputTypeGrp, SWT.RADIO);
+        sbomCyclonedx.setText("CycloneDX");
+        sbomCyclonedx.setToolTipText("CycloneDX Software Bill of Materials (SBOM) Standard");
+
+        sbomSpdx = new Button(authInputTypeGrp, SWT.RADIO);
+        sbomSpdx.setText("SPDX");
+        sbomSpdx.setToolTipText("Software Package Data Exchange");
+
+        if (ps.getString(PreferenceConstants.SBOM_TYPE).equals("cyclonedx")) { //$NON-NLS-1$
+            sbomCyclonedx.setSelection(true);
+        } else {
+            sbomSpdx.setSelection(true);
+        }
+
+        // ========== 取得ボタン ==========
+        sbomExecuteBtn = new Button(sbomButtonGrp, SWT.PUSH);
+        GridData sbomExecuteBtnGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        sbomExecuteBtnGrDt.minimumHeight = 50;
+        sbomExecuteBtnGrDt.heightHint = bigBtnSize.y + 20;
+        sbomExecuteBtn.setLayoutData(sbomExecuteBtnGrDt);
+        sbomExecuteBtn.setText("取得");
+        sbomExecuteBtn.setToolTipText("SBOM（ソフトウェア部品表）をJSON形式で取得します。");
+        sbomExecuteBtn.setFont(new Font(toolShell.getDisplay(), "Arial", 20, SWT.NORMAL)); //$NON-NLS-1$
+        sbomExecuteBtn.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                if (dstApps.isEmpty()) {
+                    MessageDialog.openInformation(toolShell, "SBOMの出力", Messages.getString("main.export.application.unselected.error.message")); //$NON-NLS-2$
+                    return;
+                }
+                boolean isSaveOutDirPath = ps.getString(PreferenceConstants.FILE_OUT_MODE).equals("save");
+                String outDirPath = ps.getString(PreferenceConstants.FILE_OUT_DIR);
+                if (!isSaveOutDirPath || outDirPath.isEmpty()) {
+                    outDirPath = toolShell.getMain().getOutDirPath();
+                }
+                if (outDirPath == null || outDirPath.isEmpty()) {
+                    return;
+                }
+                SBOMGetWithProgress progress = new SBOMGetWithProgress(toolShell, ps, outDirPath, dstApps, fullMap,
+                        sbomCyclonedx.getSelection() ? SBOMTypeEnum.CYCLONEDX : SBOMTypeEnum.SPDX);
+                ProgressMonitorDialog progDialog = new SBOMGetProgressMonitorDialog(toolShell);
+                try {
+                    progDialog.run(true, true, progress);
+                } catch (InvocationTargetException e) {
+                    StringWriter stringWriter = new StringWriter();
+                    PrintWriter printWriter = new PrintWriter(stringWriter);
+                    e.printStackTrace(printWriter);
+                    String trace = stringWriter.toString();
+                    // if (!(e.getTargetException() instanceof TsvException)) {
+                    // logger.error(trace);
+                    // }
+                    String exceptionMsg = e.getTargetException().getMessage();
+                    if (e.getTargetException() instanceof ApiException) {
+                        MessageDialog.openError(toolShell, "SBOMの出力", String.format("%s\r\n%s", Messages.getString("main.teamserver.return.error"), exceptionMsg)); //$NON-NLS-2$ //$NON-NLS-3$
+                    } else if (e.getTargetException() instanceof NonApiException) {
+                        logger.error(trace);
+                        MessageDialog.openError(toolShell, "SBOMの取得", String.format("%s %s\r\n%s", Messages.getString("main.unexpected.status.code.error"), exceptionMsg, //$NON-NLS-2$ //$NON-NLS-3$
+                                Messages.getString("main.message.dialog.make.sure.logfile.message"))); //$NON-NLS-1$
+                    } else if (e.getTargetException() instanceof InterruptedException) {
+                        MessageDialog.openInformation(toolShell, trace, exceptionMsg);
+                    } else if (e.getTargetException() instanceof TsvException) {
+                        MessageDialog.openError(toolShell, "SBOMの取得", exceptionMsg);
+                        return;
+                    } else if (e.getTargetException() instanceof BasicAuthException) {
+                        MessageDialog.openError(toolShell, "SBOMの取得", exceptionMsg);
+                        return;
+                    } else if (e.getTargetException() instanceof OperationCanceledException) {
+                        MessageDialog.openInformation(toolShell, "SBOMの取得", exceptionMsg);
+                        return;
+                    } else {
+                        logger.error(trace);
+                        MessageDialog.openError(toolShell, "SBOMの取得", String.format("%s\r\n%s", Messages.getString("main.message.dialog.unknown.error.message"), exceptionMsg)); //$NON-NLS-2$ //$NON-NLS-3$
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        sbomTabItem.setControl(sbomButtonGrp);
 
         int sub_idx = this.ps.getInt(PreferenceConstants.OPENED_SUB_TAB_IDX);
         subTabFolder.setSelection(sub_idx);
@@ -961,6 +1073,7 @@ public class AssessTabItem extends CTabItem implements PropertyChangeListener {
             this.ps.setValue(PreferenceConstants.WITH_CVSS, withCVSSInfoChk.getSelection());
             this.ps.setValue(PreferenceConstants.WITH_EPSS, withEPSSInfoChk.getSelection());
             this.ps.setValue(PreferenceConstants.INCLUDE_CVE_DETAIL, includeCVEDetailChk.getSelection());
+            this.ps.setValue(PreferenceConstants.SBOM_TYPE, sbomCyclonedx.getSelection() ? "cyclonedx" : "spdx");
         } else if ("tabSelected".equals(event.getPropertyName())) { //$NON-NLS-1$
         } else if ("buttonEnabled".equals(event.getPropertyName())) { //$NON-NLS-1$
             loadBtn.setEnabled((Boolean) event.getNewValue());

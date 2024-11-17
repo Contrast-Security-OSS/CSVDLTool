@@ -52,6 +52,7 @@ public class CSVPreferencePage extends PreferencePage {
     private Text libCSVFileFmtTxt;
     private Text evtCSVFileFmtTxt;
     private Text svrCSVFileFmtTxt;
+    private Text sbomJSONFolderFmtTxt;
 
     public CSVPreferencePage() {
         super(Messages.getString("csvpreferencepage.title")); //$NON-NLS-1$
@@ -79,26 +80,26 @@ public class CSVPreferencePage extends PreferencePage {
         GridData fileOutputGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
         // fileOutputGrpGrDt.horizontalSpan = 2;
         fileOutputGrp.setLayoutData(fileOutputGrpGrDt);
-        fileOutputGrp.setText("ファイル出力先設定");
+        fileOutputGrp.setText(Messages.getString("csvpreferencepage.outputdir.group.title")); //$NON-NLS-1$
 
         fileOutputModeSaveBtn = new Button(fileOutputGrp, SWT.RADIO);
-        fileOutputModeSaveBtn.setText("記憶する");
+        fileOutputModeSaveBtn.setText(Messages.getString("csvpreferencepage.outputdir.memory.button.title")); //$NON-NLS-1$
         fileOutputTxt = new Text(fileOutputGrp, SWT.BORDER);
         fileOutputTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         fileOutputTxt.setText(ps.getString(PreferenceConstants.FILE_OUT_DIR));
         fileOutputTxt.setEditable(false);
-        fileOutputTxt.setMessage("エクスポート時に出力先をご指定いただけます。");
+        fileOutputTxt.setMessage(Messages.getString("csvpreferencepage.outputdir.text.message")); //$NON-NLS-1$
         Button addBtn = new Button(fileOutputGrp, SWT.NULL);
-        addBtn.setText("クリア");
+        addBtn.setText(Messages.getString("csvpreferencepage.outputdir.clear.button.title")); //$NON-NLS-1$
         addBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                fileOutputTxt.setText("");
-                ps.setValue(PreferenceConstants.FILE_OUT_DIR, "");
+                fileOutputTxt.setText(""); //$NON-NLS-1$
+                ps.setValue(PreferenceConstants.FILE_OUT_DIR, ""); //$NON-NLS-1$
             }
         });
         fileOutputModeConfirmBtn = new Button(fileOutputGrp, SWT.RADIO);
-        fileOutputModeConfirmBtn.setText("毎回確認");
+        fileOutputModeConfirmBtn.setText(Messages.getString("csvpreferencepage.everytimecheck.button.title")); //$NON-NLS-1$
 
         if (ps.getString(PreferenceConstants.FILE_OUT_MODE).equals("save")) { //$NON-NLS-1$
             fileOutputModeSaveBtn.setSelection(true);
@@ -189,6 +190,39 @@ public class CSVPreferencePage extends PreferencePage {
         csvFileFormatHint.setLayoutData(csvFileFormatHintGrDt);
         csvFileFormatHint.setText(Messages.getString("csvpreferencepage.csv.file.format.desc")); //$NON-NLS-1$
 
+        Group jsonFileFmtGrp = new Group(composite, SWT.NONE);
+        GridLayout jsonFileFmtGrpLt = new GridLayout(1, false);
+        jsonFileFmtGrpLt.marginWidth = 10;
+        jsonFileFmtGrpLt.marginHeight = 10;
+        jsonFileFmtGrpLt.horizontalSpacing = 5;
+        jsonFileFmtGrpLt.verticalSpacing = 10;
+        jsonFileFmtGrp.setLayout(jsonFileFmtGrpLt);
+        GridData jsonFileFmtGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        // jsonFileFmtGrpGrDt.horizontalSpan = 2;
+        jsonFileFmtGrp.setLayoutData(jsonFileFmtGrpGrDt);
+        jsonFileFmtGrp.setText(Messages.getString("csvpreferencepage.jsonfolderformat.group.title")); //$NON-NLS-1$
+
+        Group sbomJSONFileFmtGrp = new Group(jsonFileFmtGrp, SWT.NONE);
+        GridLayout sbomJSONFileFmtGrpLt = new GridLayout(1, false);
+        sbomJSONFileFmtGrpLt.marginWidth = 10;
+        sbomJSONFileFmtGrpLt.marginHeight = 10;
+        sbomJSONFileFmtGrpLt.horizontalSpacing = 10;
+        sbomJSONFileFmtGrp.setLayout(sbomJSONFileFmtGrpLt);
+        GridData sbomJSONFileFmtGrpGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        // sbomJSONFileFmtGrpGrDt.horizontalSpan = 2;
+        sbomJSONFileFmtGrp.setLayoutData(sbomJSONFileFmtGrpGrDt);
+        sbomJSONFileFmtGrp.setText(Messages.getString("csvpreferencepage.sbom.group.title")); //$NON-NLS-1$
+
+        sbomJSONFolderFmtTxt = new Text(sbomJSONFileFmtGrp, SWT.BORDER);
+        sbomJSONFolderFmtTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        sbomJSONFolderFmtTxt.setText(ps.getString(PreferenceConstants.JSON_FILE_FORMAT_SBOM));
+        sbomJSONFolderFmtTxt.setMessage(ps.getDefaultString(PreferenceConstants.JSON_FILE_FORMAT_SBOM));
+
+        Label sbomJSONFolderFmtHint = new Label(sbomJSONFileFmtGrp, SWT.LEFT);
+        GridData sbomJSONFolderFmtHintGrDt = new GridData(GridData.FILL_HORIZONTAL);
+        sbomJSONFolderFmtHint.setLayoutData(sbomJSONFolderFmtHintGrDt);
+        sbomJSONFolderFmtHint.setText(Messages.getString("csvpreferencepage.sbom.group.variable.format.hint")); //$NON-NLS-1$
+
         Composite buttonGrp = new Composite(parent, SWT.NONE);
         GridLayout buttonGrpLt = new GridLayout(2, false);
         buttonGrpLt.marginHeight = 15;
@@ -212,6 +246,7 @@ public class CSVPreferencePage extends PreferencePage {
                 libCSVFileFmtTxt.setText(ps.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT_LIB));
                 evtCSVFileFmtTxt.setText(ps.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT_ATTACKEVENT));
                 svrCSVFileFmtTxt.setText(ps.getDefaultString(PreferenceConstants.CSV_FILE_FORMAT_SERVER));
+                sbomJSONFolderFmtTxt.setText(ps.getDefaultString(PreferenceConstants.JSON_FILE_FORMAT_SBOM));
             }
         });
 
@@ -251,6 +286,7 @@ public class CSVPreferencePage extends PreferencePage {
             ps.setValue(PreferenceConstants.CSV_FILE_FORMAT_LIB, this.libCSVFileFmtTxt.getText());
             ps.setValue(PreferenceConstants.CSV_FILE_FORMAT_ATTACKEVENT, this.evtCSVFileFmtTxt.getText());
             ps.setValue(PreferenceConstants.CSV_FILE_FORMAT_SERVER, this.svrCSVFileFmtTxt.getText());
+            ps.setValue(PreferenceConstants.JSON_FILE_FORMAT_SBOM, this.sbomJSONFolderFmtTxt.getText());
         }
         return true;
     }

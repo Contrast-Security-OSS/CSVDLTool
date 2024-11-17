@@ -60,6 +60,9 @@ public class OtherPreferencePage extends PreferencePage {
     private List<Button> weekDayBtns = new ArrayList<Button>();
     private Text vulSleepTxt;
     private Text libSleepTxt;
+    private Text routeCoverageSleepTxt;
+    private Text sbomSleepTxt;
+    private Text scanResultSleepTxt;
 
     public OtherPreferencePage() {
         super(Messages.getString("otherpreferencepage.title")); //$NON-NLS-1$
@@ -171,6 +174,39 @@ public class OtherPreferencePage extends PreferencePage {
             }
         });
 
+        // ========== ルートカバレッジごとスリープ ========== //
+        new Label(ctrlGrp, SWT.LEFT).setText(Messages.getString("otherpreferencepage.interval.routecoverage.label")); //$NON-NLS-1$
+        routeCoverageSleepTxt = new Text(ctrlGrp, SWT.BORDER);
+        routeCoverageSleepTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        routeCoverageSleepTxt.setText(ps.getString(PreferenceConstants.SLEEP_ROUTECOVERAGE));
+        routeCoverageSleepTxt.addListener(SWT.FocusIn, new Listener() {
+            public void handleEvent(Event e) {
+                routeCoverageSleepTxt.selectAll();
+            }
+        });
+
+        // ========== SBOMごとスリープ ========== //
+        new Label(ctrlGrp, SWT.LEFT).setText(Messages.getString("otherpreferencepage.interval.sbom.label")); //$NON-NLS-1$
+        sbomSleepTxt = new Text(ctrlGrp, SWT.BORDER);
+        sbomSleepTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        sbomSleepTxt.setText(ps.getString(PreferenceConstants.SLEEP_SBOM));
+        sbomSleepTxt.addListener(SWT.FocusIn, new Listener() {
+            public void handleEvent(Event e) {
+                sbomSleepTxt.selectAll();
+            }
+        });
+
+        // ========== Scanごとスリープ ========== //
+        new Label(ctrlGrp, SWT.LEFT).setText(Messages.getString("otherpreferencepage.interval.scanresult.label")); //$NON-NLS-1$
+        scanResultSleepTxt = new Text(ctrlGrp, SWT.BORDER);
+        scanResultSleepTxt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        scanResultSleepTxt.setText(ps.getString(PreferenceConstants.SLEEP_SCANRESULT));
+        scanResultSleepTxt.addListener(SWT.FocusIn, new Listener() {
+            public void handleEvent(Event e) {
+                scanResultSleepTxt.selectAll();
+            }
+        });
+
         Composite buttonGrp = new Composite(parent, SWT.NONE);
         GridLayout buttonGrpLt = new GridLayout(2, false);
         buttonGrpLt.marginHeight = 15;
@@ -196,6 +232,9 @@ public class OtherPreferencePage extends PreferencePage {
                 btn.setSelection(true);
                 vulSleepTxt.setText(ps.getDefaultString(PreferenceConstants.SLEEP_VUL));
                 libSleepTxt.setText(ps.getDefaultString(PreferenceConstants.SLEEP_LIB));
+                routeCoverageSleepTxt.setText(ps.getDefaultString(PreferenceConstants.SLEEP_ROUTECOVERAGE));
+                sbomSleepTxt.setText(ps.getDefaultString(PreferenceConstants.SLEEP_SBOM));
+                scanResultSleepTxt.setText(ps.getDefaultString(PreferenceConstants.SLEEP_SCANRESULT));
             }
         });
 
@@ -250,6 +289,27 @@ public class OtherPreferencePage extends PreferencePage {
                 errors.add(Messages.getString("otherpreferencepage.interval.library.nondigit.error.message")); //$NON-NLS-1$
             }
         }
+        if (this.routeCoverageSleepTxt.getText().isEmpty()) {
+            errors.add(Messages.getString("otherpreferencepage.interval.routecoverage.empty.error.message")); //$NON-NLS-1$
+        } else {
+            if (!StringUtils.isNumeric(this.routeCoverageSleepTxt.getText())) {
+                errors.add(Messages.getString("otherpreferencepage.interval.routecoverage.nondigit.error.message")); //$NON-NLS-1$
+            }
+        }
+        if (this.sbomSleepTxt.getText().isEmpty()) {
+            errors.add(Messages.getString("otherpreferencepage.interval.sbom.empty.error.message")); //$NON-NLS-1$
+        } else {
+            if (!StringUtils.isNumeric(this.sbomSleepTxt.getText())) {
+                errors.add(Messages.getString("otherpreferencepage.interval.sbom.nondigit.error.message")); //$NON-NLS-1$
+            }
+        }
+        if (this.scanResultSleepTxt.getText().isEmpty()) {
+            errors.add(Messages.getString("otherpreferencepage.interval.scanresult.empty.error.message")); //$NON-NLS-1$
+        } else {
+            if (!StringUtils.isNumeric(this.scanResultSleepTxt.getText())) {
+                errors.add(Messages.getString("otherpreferencepage.interval.scanresult.nondigit.error.message")); //$NON-NLS-1$
+            }
+        }
 
         if (!errors.isEmpty()) {
             MessageDialog.openError(getShell(), Messages.getString("otherpreferencepage.title"), String.join("\r\n", errors)); //$NON-NLS-1$ //$NON-NLS-2$
@@ -267,6 +327,9 @@ public class OtherPreferencePage extends PreferencePage {
             ps.setValue(PreferenceConstants.ATTACK_START_WEEKDAY, weekDaySelection);
             ps.setValue(PreferenceConstants.SLEEP_VUL, this.vulSleepTxt.getText());
             ps.setValue(PreferenceConstants.SLEEP_LIB, this.libSleepTxt.getText());
+            ps.setValue(PreferenceConstants.SLEEP_ROUTECOVERAGE, this.routeCoverageSleepTxt.getText());
+            ps.setValue(PreferenceConstants.SLEEP_SBOM, this.sbomSleepTxt.getText());
+            ps.setValue(PreferenceConstants.SLEEP_SCANRESULT, this.scanResultSleepTxt.getText());
         }
         return true;
     }

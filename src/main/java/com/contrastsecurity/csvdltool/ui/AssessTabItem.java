@@ -1035,6 +1035,9 @@ public class AssessTabItem extends CTabItem implements PropertyChangeListener {
         } else {
             for (String appLabel : fullMap.keySet()) {
                 boolean isKeywordValid = true;
+                if (dstApps.contains(appLabel)) {
+                    continue; // 既に選択済みのアプリはスキップ
+                }
                 if (!keyword.isEmpty()) {
                     if (!appLabel.toLowerCase().contains(keyword.toLowerCase())) {
                         if (dstApps.contains(appLabel)) {

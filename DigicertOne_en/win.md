@@ -59,8 +59,8 @@
   Launch Command Prompt as an administrator.
   ```powershell
   cd C:\Program Files (x86)\launch4j\sign4j
-  sign4j.exe java -jar C:\DigiCert\jsign-5.0.jar --keystore "C:\DigiCert\pkcs11properties.cfg" --storetype PKCS11 C:\Users\turbou\Desktop\CSVDLTool_work\common\CSVDLTool_2.1.4.exe
-  sign4j.exe java -jar C:\DigiCert\jsign-5.0.jar --keystore "C:\DigiCert\pkcs11properties.cfg" --storetype PKCS11 C:\Users\turbou\Desktop\CSVDLTool_work\common\CSVDLTool_2.1.4_auditlog.exe
+  sign4j.exe java -jar C:\DigiCert\jsign-5.0.jar --keystore "C:\DigiCert\pkcs11properties.cfg" --storetype PKCS11 C:\Users\turbou\Desktop\CSVDLTool_work\common\CSVDLTool_2.1.5.exe
+  sign4j.exe java -jar C:\DigiCert\jsign-5.0.jar --keystore "C:\DigiCert\pkcs11properties.cfg" --storetype PKCS11 C:\Users\turbou\Desktop\CSVDLTool_work\common\CSVDLTool_2.1.5_auditlog.exe
   ```
   - You can check the digital signature by right-clicking on the file and selecting Properties. 
 

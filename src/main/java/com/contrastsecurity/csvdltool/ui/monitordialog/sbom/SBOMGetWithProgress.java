@@ -54,6 +54,7 @@ import com.contrastsecurity.csvdltool.Messages;
 import com.contrastsecurity.csvdltool.api.Api;
 import com.contrastsecurity.csvdltool.api.sbom.SBOMCyclonedxApi;
 import com.contrastsecurity.csvdltool.api.sbom.SBOMSpdxApi;
+import com.contrastsecurity.csvdltool.api.sbom.SBOMSpdxV3Api;
 import com.contrastsecurity.csvdltool.model.Organization;
 import com.contrastsecurity.csvdltool.preference.PreferenceConstants;
 
@@ -62,6 +63,7 @@ public class SBOMGetWithProgress implements IRunnableWithProgress {
     public enum SBOMTypeEnum {
         CYCLONEDX,
         SPDX,
+        SPDXV3,
     }
 
     private Shell shell;
@@ -134,8 +136,10 @@ public class SBOMGetWithProgress implements IRunnableWithProgress {
                 Api sbomApi = null;
                 if (this.sbomTypeEnum == SBOMTypeEnum.CYCLONEDX) {
                     sbomApi = new SBOMCyclonedxApi(this.shell, this.ps, org, appId);
-                } else {
+                } else if (this.sbomTypeEnum == SBOMTypeEnum.SPDX) {
                     sbomApi = new SBOMSpdxApi(this.shell, this.ps, org, appId);
+                } else {
+                    sbomApi = new SBOMSpdxV3Api(this.shell, this.ps, org, appId);
                 }
                 String json = (String) sbomApi.get();
                 String filePath = appName + ".json"; //$NON-NLS-1$

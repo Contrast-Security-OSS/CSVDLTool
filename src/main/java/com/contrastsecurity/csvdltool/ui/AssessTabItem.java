@@ -99,6 +99,7 @@ public class AssessTabItem extends CTabItem implements PropertyChangeListener {
     private Button sbomExecuteBtn;
     private Button sbomCyclonedx;
     private Button sbomSpdx;
+    private Button sbomSpdxV3;
 
     private Text vulSeverityFilterTxt;
     private Text vulVulnTypeFilterTxt;
@@ -905,7 +906,7 @@ public class AssessTabItem extends CTabItem implements PropertyChangeListener {
         sbomButtonGrp.setLayoutData(sbomButtonGrpGrDt);
 
         Composite authInputTypeGrp = new Composite(sbomButtonGrp, SWT.NONE);
-        GridLayout authInputTypeGrpLt = new GridLayout(2, false);
+        GridLayout authInputTypeGrpLt = new GridLayout(3, false);
         authInputTypeGrpLt.marginWidth = 0;
         authInputTypeGrpLt.marginBottom = -5;
         authInputTypeGrpLt.verticalSpacing = 10;
@@ -922,10 +923,16 @@ public class AssessTabItem extends CTabItem implements PropertyChangeListener {
         sbomSpdx.setText("SPDX");
         sbomSpdx.setToolTipText("Software Package Data Exchange");
 
+        sbomSpdxV3 = new Button(authInputTypeGrp, SWT.RADIO);
+        sbomSpdxV3.setText("SPDX 3.0");
+        sbomSpdxV3.setToolTipText("Software Package Data Exchange v3.0");
+
         if (ps.getString(PreferenceConstants.SBOM_TYPE).equals("cyclonedx")) { //$NON-NLS-1$
             sbomCyclonedx.setSelection(true);
-        } else {
+        } else if (ps.getString(PreferenceConstants.SBOM_TYPE).equals("spdx")) { //$NON-NLS-1$
             sbomSpdx.setSelection(true);
+        } else {
+            sbomSpdxV3.setSelection(true);
         }
 
         // ========== 取得ボタン ==========
@@ -952,8 +959,15 @@ public class AssessTabItem extends CTabItem implements PropertyChangeListener {
                 if (outDirPath == null || outDirPath.isEmpty()) {
                     return;
                 }
-                SBOMGetWithProgress progress = new SBOMGetWithProgress(toolShell, ps, outDirPath, dstApps, fullMap,
-                        sbomCyclonedx.getSelection() ? SBOMTypeEnum.CYCLONEDX : SBOMTypeEnum.SPDX);
+                SBOMTypeEnum selectedSbomTypeEnum = null;
+                if (sbomCyclonedx.getSelection()) {
+                    selectedSbomTypeEnum = SBOMTypeEnum.CYCLONEDX;
+                } else if (sbomSpdx.getSelection()) {
+                    selectedSbomTypeEnum = SBOMTypeEnum.SPDX;
+                } else {
+                    selectedSbomTypeEnum = SBOMTypeEnum.SPDXV3;
+                }
+                SBOMGetWithProgress progress = new SBOMGetWithProgress(toolShell, ps, outDirPath, dstApps, fullMap, selectedSbomTypeEnum);
                 ProgressMonitorDialog progDialog = new SBOMGetProgressMonitorDialog(toolShell);
                 try {
                     progDialog.run(true, true, progress);
@@ -1076,7 +1090,13 @@ public class AssessTabItem extends CTabItem implements PropertyChangeListener {
             this.ps.setValue(PreferenceConstants.WITH_CVSS, withCVSSInfoChk.getSelection());
             this.ps.setValue(PreferenceConstants.WITH_EPSS, withEPSSInfoChk.getSelection());
             this.ps.setValue(PreferenceConstants.INCLUDE_CVE_DETAIL, includeCVEDetailChk.getSelection());
-            this.ps.setValue(PreferenceConstants.SBOM_TYPE, sbomCyclonedx.getSelection() ? "cyclonedx" : "spdx");
+            if (sbomCyclonedx.getSelection()) {
+                this.ps.setValue(PreferenceConstants.SBOM_TYPE, "cyclonedx");
+            } else if (sbomSpdx.getSelection()) {
+                this.ps.setValue(PreferenceConstants.SBOM_TYPE, "spdx");
+            } else {
+                this.ps.setValue(PreferenceConstants.SBOM_TYPE, "spdxv3");
+            }
         } else if ("tabSelected".equals(event.getPropertyName())) { //$NON-NLS-1$
         } else if ("buttonEnabled".equals(event.getPropertyName())) { //$NON-NLS-1$
             loadBtn.setEnabled((Boolean) event.getNewValue());

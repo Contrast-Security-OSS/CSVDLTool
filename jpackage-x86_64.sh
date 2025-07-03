@@ -2,7 +2,7 @@
 
 JAVA_HOME="/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home"
 APP_NAME="CSVDLTool"
-APP_VERSION="2.1.5"
+APP_VERSION="2.1.6"
 SM_KEY_PAIR="key_798313656"
 
 jpackage \

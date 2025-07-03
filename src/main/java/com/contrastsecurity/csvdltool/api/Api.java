@@ -490,6 +490,11 @@ public abstract class Api {
         if (((CSVDLToolShell) this.shell).getMain().getAuthType() == AuthType.PASSWORD) {
             clientBuilder.cookieJar(((CSVDLToolShell) this.shell).getMain().getCookieJar());
         }
+        clientBuilder.addInterceptor(new RetryInterceptor(3, 1000));
+        clientBuilder.addNetworkInterceptor(chain -> {
+            Request request = chain.request().newBuilder().addHeader("Connection", "close").build();
+            return chain.proceed(request);
+        });
         Request.Builder requestBuilder = null;
         switch (httpMethod) {
             case POST:

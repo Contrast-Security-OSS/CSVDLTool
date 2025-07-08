@@ -2,11 +2,16 @@ package com.contrastsecurity.csvdltool.api;
 
 import java.io.IOException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
 
 public class RetryInterceptor implements Interceptor {
+
+    Logger logger = LogManager.getLogger("csvdltool"); //$NON-NLS-1$
 
     private final int maxRetries;
     private final long retryDelayMillis;
@@ -22,7 +27,7 @@ public class RetryInterceptor implements Interceptor {
         Response response = null;
         IOException lastException = null;
 
-        for (int i = 0; i < maxRetries; i++) {
+        for (int retryCount = 0; retryCount < maxRetries; retryCount++) {
             try {
                 response = chain.proceed(request);
                 if (response.isSuccessful()) {
@@ -30,7 +35,9 @@ public class RetryInterceptor implements Interceptor {
                 }
             } catch (IOException e) {
                 lastException = e;
-                System.err.println("Request failed, retrying... (" + (i + 1) + "/" + maxRetries + ")");
+                logger.warn(request.url());
+                logger.warn("Request failed, retrying by interceptor... (" + (retryCount + 1) + "/" + maxRetries + ")");
+                // System.err.println("Request failed, retrying... (" + (i + 1) + "/" + maxRetries + ")");
                 try {
                     Thread.sleep(retryDelayMillis);
                 } catch (InterruptedException ie) {

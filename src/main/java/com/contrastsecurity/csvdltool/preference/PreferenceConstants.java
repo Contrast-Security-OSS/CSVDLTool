@@ -50,6 +50,10 @@ public class PreferenceConstants {
     public static final String SOCKET_TIMEOUT = new String("com.contrastsecurity.csvdltool.socket_timeout"); //$NON-NLS-1$
     public static final String AUTO_RELOGIN_INTERVAL = new String("com.contrastsecurity.csvdltool.auto_relogin_interval"); //$NON-NLS-1$
 
+    public static final String RETRY_METHOD = new String("com.contrastsecurity.csvdltool.retry_method"); //$NON-NLS-1$
+    public static final String MAX_RETRIES = new String("com.contrastsecurity.csvdltool.max_retries"); //$NON-NLS-1$
+    public static final String RETRY_INTERVAL = new String("com.contrastsecurity.csvdltool.retry_interval"); //$NON-NLS-1$
+
     public static final String SLEEP_VUL = new String("com.contrastsecurity.csvdltool.sleep_vul"); //$NON-NLS-1$
 
     public static final String CSV_OUT_HEADER_VUL = new String("com.contrastsecurity.csvdltool.csv_out_header_vul"); //$NON-NLS-1$

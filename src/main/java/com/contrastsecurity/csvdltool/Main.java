@@ -194,6 +194,10 @@ public class Main implements PropertyChangeListener {
 
             this.ps.setDefault(PreferenceConstants.VUL_ONLY_CURVUL_EXP, true);
 
+            this.ps.setDefault(PreferenceConstants.RETRY_METHOD, "interceptor"); // interceptor or trycatch
+            this.ps.setDefault(PreferenceConstants.MAX_RETRIES, 3);
+            this.ps.setDefault(PreferenceConstants.RETRY_INTERVAL, 1000);
+
             this.ps.setDefault(PreferenceConstants.CSV_COLUMN_VUL, VulCSVColmunEnum.defaultValuesStr());
             this.ps.setDefault(PreferenceConstants.SLEEP_VUL, 300);
             this.ps.setDefault(PreferenceConstants.CSV_OUT_HEADER_VUL, true);

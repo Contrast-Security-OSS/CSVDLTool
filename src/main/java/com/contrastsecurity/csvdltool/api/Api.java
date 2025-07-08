@@ -390,8 +390,34 @@ public abstract class Api {
                 }
             }
         }
-        String response = this.getResponse(HttpMethod.GET);
-        return this.convert(response);
+        if (ps.getString(PreferenceConstants.RETRY_METHOD).equals("trycatch")) {
+            int maxRetries = Integer.parseInt(this.ps.getString(PreferenceConstants.MAX_RETRIES));
+            int retryCount = 0;
+            Exception lastException = null;
+            while (retryCount < maxRetries) {
+                String response = null;
+                try {
+                    response = this.getResponse(HttpMethod.GET);
+                    return this.convert(response);
+                } catch (Exception e) {
+                    lastException = e;
+                    logger.warn(getUrl());
+                    logger.warn("Request failed, retrying by trycatch... (" + (retryCount + 1) + "/" + maxRetries + ")");
+                    // System.err.println("リトライします... (" + (retryCount + 1) + "/" + maxRetry + ")");
+                }
+                Thread.sleep(Integer.parseInt(this.ps.getString(PreferenceConstants.RETRY_INTERVAL)));
+                retryCount++;
+            }
+            StringWriter stringWriter = new StringWriter();
+            PrintWriter printWriter = new PrintWriter(stringWriter);
+            lastException.printStackTrace(printWriter);
+            String trace = stringWriter.toString();
+            logger.error(trace);
+            return null;
+        } else {
+            String response = this.getResponse(HttpMethod.GET);
+            return this.convert(response);
+        }
     }
 
     public Object postWithoutCheckTsv() throws Exception {
@@ -490,7 +516,10 @@ public abstract class Api {
         if (((CSVDLToolShell) this.shell).getMain().getAuthType() == AuthType.PASSWORD) {
             clientBuilder.cookieJar(((CSVDLToolShell) this.shell).getMain().getCookieJar());
         }
-        clientBuilder.addInterceptor(new RetryInterceptor(3, 1000));
+        if (ps.getString(PreferenceConstants.RETRY_METHOD).equals("interceptor")) {
+            clientBuilder.addInterceptor(new RetryInterceptor(Integer.parseInt(this.ps.getString(PreferenceConstants.MAX_RETRIES)),
+                    Integer.parseInt(this.ps.getString(PreferenceConstants.RETRY_INTERVAL))));
+        }
         clientBuilder.addNetworkInterceptor(chain -> {
             Request request = chain.request().newBuilder().addHeader("Connection", "close").build();
             return chain.proceed(request);
